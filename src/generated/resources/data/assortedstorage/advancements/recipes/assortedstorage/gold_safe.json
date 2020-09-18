@@ -1,0 +1,43 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "assortedstorage:gold_safe"
+    ]
+  },
+  "criteria": {
+    "has_obsidian_chest": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "assortedstorage:obsidian_safe"
+          }
+        ]
+      }
+    },
+    "has_gold": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:ingots/gold"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "assortedstorage:gold_safe"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_obsidian_chest",
+      "has_gold",
+      "has_the_recipe"
+    ]
+  ]
+}

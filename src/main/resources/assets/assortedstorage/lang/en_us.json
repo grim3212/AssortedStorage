@@ -1,0 +1,34 @@
+{
+	"itemGroup.assortedstorage": "Assorted Storage",
+	
+	"assortedstorage.info.combo": "Combo: ",
+	
+	"assortedstorage.container.wood_cabinet": "Wood Cabinet",
+	"assortedstorage.container.glass_cabinet": "Glass Cabinet",
+	"assortedstorage.container.warehouse_crate": "Warehouse Crate",
+	"assortedstorage.container.gold_safe": "Gold Safe",
+	"assortedstorage.container.obsidian_safe": "Obsidian Safe",
+	"assortedstorage.container.locker": "Locker",
+	"assortedstorage.container.item_tower": "Item Tower",
+	"assortedstorage.container.item_tower.row": " - Row %s of",
+	"assortedstorage.container.locksmith_workbench": "Locksmith Workbench",
+	
+	"block.assortedstorage.wood_cabinet": "Wood Cabinet",
+	"block.assortedstorage.glass_cabinet": "Glass Cabinet",
+	"block.assortedstorage.oak_warehouse_crate": "Oak Warehouse Crate",
+	"block.assortedstorage.birch_warehouse_crate": "Birch Warehouse Crate",
+	"block.assortedstorage.spruce_warehouse_crate": "Spruce Warehouse Crate",
+	"block.assortedstorage.acacia_warehouse_crate": "Acacia Warehouse Crate",
+	"block.assortedstorage.dark_oak_warehouse_crate": "Dark Oak Warehouse Crate",
+	"block.assortedstorage.jungle_warehouse_crate": "Jungle Warehouse Crate",
+	"block.assortedstorage.warped_warehouse_crate": "Warped Warehouse Crate",
+	"block.assortedstorage.crimson_warehouse_crate": "Crimson Warehouse Crate",
+	"block.assortedstorage.gold_safe": "§6Gold Safe",
+	"block.assortedstorage.obsidian_safe": "§5Obsidian Safe",
+	"block.assortedstorage.locker": "Locker",
+	"block.assortedstorage.item_tower": "Item Tower",
+	"block.assortedstorage.locksmith_workbench": "Locksmith Workbench",
+	
+	"item.assortedstorage.locksmith_key": "Locksmith Key",
+	"item.assortedstorage.locksmith_lock": "Locksmith Lock"
+}

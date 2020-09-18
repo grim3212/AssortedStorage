@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " X ",
+    "XCX",
+    " X "
+  ],
+  "key": {
+    "X": {
+      "tag": "minecraft:planks"
+    },
+    "C": {
+      "tag": "forge:chests/wooden"
+    }
+  },
+  "result": {
+    "item": "assortedstorage:wood_cabinet"
+  }
+}

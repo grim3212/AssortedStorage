@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " G ",
+    "GCG",
+    " G "
+  ],
+  "key": {
+    "G": {
+      "tag": "forge:ingots/gold"
+    },
+    "C": {
+      "item": "assortedstorage:obsidian_safe"
+    }
+  },
+  "result": {
+    "item": "assortedstorage:gold_safe"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "assortedstorage:jungle_warehouse_crate"
+    ]
+  },
+  "criteria": {
+    "has_jungle_planks": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:jungle_planks"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "assortedstorage:jungle_warehouse_crate"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_jungle_planks",
+      "has_the_recipe"
+    ]
+  ]
+}

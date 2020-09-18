@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LLL",
+    "P P",
+    "PPP"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:birch_planks"
+    },
+    "L": {
+      "tag": "minecraft:birch_logs"
+    }
+  },
+  "result": {
+    "item": "assortedstorage:birch_warehouse_crate"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "assortedstorage:spruce_warehouse_crate"
+    ]
+  },
+  "criteria": {
+    "has_spruce_planks": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:spruce_planks"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "assortedstorage:spruce_warehouse_crate"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_spruce_planks",
+      "has_the_recipe"
+    ]
+  ]
+}

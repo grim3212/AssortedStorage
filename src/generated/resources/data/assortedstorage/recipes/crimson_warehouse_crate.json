@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LLL",
+    "P P",
+    "PPP"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:crimson_planks"
+    },
+    "L": {
+      "item": "minecraft:crimson_stem"
+    }
+  },
+  "result": {
+    "item": "assortedstorage:crimson_warehouse_crate"
+  }
+}

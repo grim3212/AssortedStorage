@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "assortedstorage:dark_oak_warehouse_crate"
+    ]
+  },
+  "criteria": {
+    "has_dark_oak_planks": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:dark_oak_planks"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "assortedstorage:dark_oak_warehouse_crate"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_dark_oak_planks",
+      "has_the_recipe"
+    ]
+  ]
+}

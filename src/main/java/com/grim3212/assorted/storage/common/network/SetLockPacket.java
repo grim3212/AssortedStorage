@@ -1,0 +1,33 @@
+package com.grim3212.assorted.storage.common.network;
+
+import java.util.function.Supplier;
+
+import com.grim3212.assorted.storage.common.inventory.LocksmithWorkbenchContainer;
+
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.network.NetworkEvent;
+
+public class SetLockPacket {
+
+	private final String lock;
+
+	public SetLockPacket(String lock) {
+		this.lock = lock;
+	}
+
+	public static SetLockPacket decode(PacketBuffer buf) {
+		return new SetLockPacket(buf.readString(10));
+	}
+
+	public void encode(PacketBuffer buf) {
+		buf.writeString(this.lock, 10);
+	}
+
+	public void handle(Supplier<NetworkEvent.Context> ctx) {
+		if (ctx.get().getDirection().getReceptionSide() == LogicalSide.SERVER) {
+			ctx.get().enqueueWork(() -> ((LocksmithWorkbenchContainer) ctx.get().getSender().openContainer).updateLock(this.lock));
+			ctx.get().setPacketHandled(true);
+		}
+	}
+}
