@@ -6,11 +6,11 @@ import org.apache.logging.log4j.Logger;
 import com.grim3212.assorted.storage.client.data.StorageBlockstateProvider;
 import com.grim3212.assorted.storage.client.data.StorageItemModelProvider;
 import com.grim3212.assorted.storage.client.screen.DualLockerScreen;
+import com.grim3212.assorted.storage.client.screen.GenericStorageScreen;
 import com.grim3212.assorted.storage.client.screen.GoldSafeScreen;
 import com.grim3212.assorted.storage.client.screen.ItemTowerScreen;
 import com.grim3212.assorted.storage.client.screen.LockerScreen;
 import com.grim3212.assorted.storage.client.screen.LocksmithWorkbenchScreen;
-import com.grim3212.assorted.storage.client.screen.StorageScreen;
 import com.grim3212.assorted.storage.client.tileentity.GlassCabinetTileEntityRenderer;
 import com.grim3212.assorted.storage.client.tileentity.GoldSafeTileEntityRenderer;
 import com.grim3212.assorted.storage.client.tileentity.ItemTowerTileEntityRenderer;
@@ -71,11 +71,11 @@ public class AssortedStorage {
 	}
 
 	private void setupClient(final FMLClientSetupEvent event) {
-		ScreenManager.registerFactory(StorageContainerTypes.WOOD_CABINET.get(), StorageScreen::new);
-		ScreenManager.registerFactory(StorageContainerTypes.GLASS_CABINET.get(), StorageScreen::new);
-		ScreenManager.registerFactory(StorageContainerTypes.WAREHOUSE_CRATE.get(), StorageScreen::new);
+		ScreenManager.registerFactory(StorageContainerTypes.WOOD_CABINET.get(), GenericStorageScreen::new);
+		ScreenManager.registerFactory(StorageContainerTypes.GLASS_CABINET.get(), GenericStorageScreen::new);
+		ScreenManager.registerFactory(StorageContainerTypes.WAREHOUSE_CRATE.get(), GenericStorageScreen::new);
 		ScreenManager.registerFactory(StorageContainerTypes.GOLD_SAFE.get(), GoldSafeScreen::new);
-		ScreenManager.registerFactory(StorageContainerTypes.OBSIDIAN_SAFE.get(), StorageScreen::new);
+		ScreenManager.registerFactory(StorageContainerTypes.OBSIDIAN_SAFE.get(), GenericStorageScreen::new);
 		ScreenManager.registerFactory(StorageContainerTypes.LOCKER.get(), LockerScreen::new);
 		ScreenManager.registerFactory(StorageContainerTypes.DUAL_LOCKER.get(), DualLockerScreen::new);
 		ScreenManager.registerFactory(StorageContainerTypes.ITEM_TOWER.get(), ItemTowerScreen::new);

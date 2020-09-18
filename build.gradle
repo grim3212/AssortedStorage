@@ -88,16 +88,6 @@ dependencies {
 processResources {
     // Exclude datagenerator .cache directory
     exclude '.cache'
-
-    from(sourceSets.main.resources.srcDirs) {
-        include 'META-INF/mods.toml'
-
-        expand 'version': project.version, 'mcversion': minecraft_version, 'forge_version': forge_version
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'META-INF/mods.toml'
-    }
 }
 
 

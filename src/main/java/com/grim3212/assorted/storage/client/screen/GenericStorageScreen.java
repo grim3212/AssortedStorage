@@ -8,9 +8,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class GoldSafeScreen extends BaseStorageScreen<StorageContainer> {
+public class GenericStorageScreen extends BaseStorageScreen<StorageContainer> {
 
-	public GoldSafeScreen(StorageContainer container, PlayerInventory playerInventory, ITextComponent title) {
-		super(container, playerInventory, title, 1);
+	public GenericStorageScreen(StorageContainer container, PlayerInventory playerInventory, ITextComponent title) {
+		super(container, playerInventory, title);
 	}
 }

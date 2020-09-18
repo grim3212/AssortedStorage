@@ -8,7 +8,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class LockerScreen extends StorageScreen<LockerContainer> {
+public class LockerScreen extends BaseStorageScreen<LockerContainer> {
 
 	public LockerScreen(LockerContainer container, PlayerInventory playerInventory, ITextComponent title) {
 		super(container, playerInventory, title, 5);

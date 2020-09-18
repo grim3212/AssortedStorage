@@ -13,16 +13,16 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class StorageScreen<T extends Container> extends ContainerScreen<T> implements IHasContainer<T> {
+public abstract class BaseStorageScreen<T extends Container> extends ContainerScreen<T> implements IHasContainer<T> {
 
 	private static final ResourceLocation CHEST_GUI_TEXTURE = new ResourceLocation("textures/gui/container/generic_54.png");
 	protected final int inventoryRows;
 
-	public StorageScreen(T container, PlayerInventory playerInventory, ITextComponent title) {
+	public BaseStorageScreen(T container, PlayerInventory playerInventory, ITextComponent title) {
 		this(container, playerInventory, title, 3);
 	}
 
-	public StorageScreen(T container, PlayerInventory playerInventory, ITextComponent title, int rows) {
+	public BaseStorageScreen(T container, PlayerInventory playerInventory, ITextComponent title, int rows) {
 		super(container, playerInventory, title);
 
 		this.inventoryRows = rows;
