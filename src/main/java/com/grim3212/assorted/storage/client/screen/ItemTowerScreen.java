@@ -41,7 +41,7 @@ public class ItemTowerScreen extends ContainerScreen<ItemTowerContainer> impleme
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		this.renderBackground(matrixStack);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		this.func_230459_a_(matrixStack, mouseX, mouseY);
+		this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
 	}
 
 	@Override

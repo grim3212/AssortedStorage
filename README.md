@@ -1,6 +1,6 @@
 # Assorted Storage
 
-As the name suggests this contains a random assortment of storage to your Minecraft world.
+As the name suggests this contains a random assortment of storage to add to your Minecraft world.
 
 ## Issue Reporting
 Please include the following

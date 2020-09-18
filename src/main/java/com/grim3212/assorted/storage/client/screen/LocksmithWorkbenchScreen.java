@@ -109,7 +109,7 @@ public class LocksmithWorkbenchScreen extends ContainerScreen<LocksmithWorkbench
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		RenderSystem.disableBlend();
 		this.lockField.render(matrixStack, mouseX, mouseY, partialTicks);
-		this.func_230459_a_(matrixStack, mouseX, mouseY);
+		this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
 	}
 
 	@Override
