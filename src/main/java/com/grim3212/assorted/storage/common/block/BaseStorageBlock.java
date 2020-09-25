@@ -56,7 +56,6 @@ public abstract class BaseStorageBlock extends Block {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		if (context == ISelectionContext.dummy())
 			return FAKE_SIDES_AND_BOTTOM;
@@ -90,7 +89,6 @@ public abstract class BaseStorageBlock extends Block {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
 		TileEntity te = worldIn.getTileEntity(pos);
 
@@ -116,7 +114,6 @@ public abstract class BaseStorageBlock extends Block {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			TileEntity tileentity = worldIn.getTileEntity(pos);
@@ -206,7 +203,6 @@ public abstract class BaseStorageBlock extends Block {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
 		super.eventReceived(state, worldIn, pos, id, param);
 		TileEntity tileentity = worldIn.getTileEntity(pos);
@@ -229,7 +225,6 @@ public abstract class BaseStorageBlock extends Block {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public BlockState mirror(BlockState state, Mirror mirrorIn) {
 		return state.rotate(mirrorIn.toRotation(state.get(FACING)));
 	}

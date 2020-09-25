@@ -64,7 +64,6 @@ public class StorageItemModelProvider extends ItemModelProvider {
 		return generatedItem(name(i));
 	}
 	
-	@SuppressWarnings("deprecation")
 	private static String name(Item i) {
 		return Registry.ITEM.getKey(i).getPath();
 	}

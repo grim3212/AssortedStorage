@@ -73,7 +73,6 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 		simpleBlock(b, f);
 	}
 	
-	@SuppressWarnings("deprecation")
 	private static String name(Block i) {
 		return Registry.BLOCK.getKey(i).getPath();
 	}

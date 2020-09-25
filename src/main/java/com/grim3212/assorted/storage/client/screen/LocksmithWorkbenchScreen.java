@@ -113,7 +113,6 @@ public class LocksmithWorkbenchScreen extends ContainerScreen<LocksmithWorkbench
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int x, int y) {
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		this.minecraft.getTextureManager().bindTexture(GUI_TEXTURE);
