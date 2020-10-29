@@ -7,5 +7,5 @@ Please include the following
 
 * Minecraft Version
 * Forge version
-* GrimPack version
+* Assorted Storage version
 * Crash reports

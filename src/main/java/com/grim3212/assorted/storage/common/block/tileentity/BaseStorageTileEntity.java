@@ -101,7 +101,7 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 		ItemStackHelper.loadAllItems(nbt, this.chestContents);
 
 		if (nbt.contains("CustomName", 8)) {
-			this.customName = ITextComponent.Serializer.func_240643_a_(nbt.getString("CustomName"));
+			this.customName = ITextComponent.Serializer.getComponentFromJson(nbt.getString("CustomName"));
 		}
 
 		this.readPacketNBT(nbt);
