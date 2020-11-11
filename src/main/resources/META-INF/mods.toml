@@ -1,42 +1,31 @@
 # Find more information on toml format here:  https://github.com/toml-lang/toml
-# The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
-modLoader="javafml" #mandatory
-# A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[34,)" #mandatory
-# The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
+
+modLoader="javafml"
+loaderVersion="[35,)"
 license="GPL-3.0 License"
-# A URL to refer people to when problems occur with this mod
-issueTrackerURL="https://github.com/grim3212/AssortedStorage" #optional
-# A list of mods - how many allowed here is determined by the individual mod loader
-[[mods]] #mandatory
-# The modid of the mod
-modId="assortedstorage" #mandatory
-# The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
-version="${file.jarVersion}" #mandatory
- # A display name for the mod
-displayName="Assorted Storage" #mandatory
-# A URL to query for updates for this mod. See the JSON update specification <here>
-#updateJSONURL="" #optional
-# A URL for the "homepage" for this mod, displayed in the mod UI
-displayURL="https://grim3212.com/" #optional
-# A file name (in the root of the mod JAR) containing a logo for display
-logoFile="logo.png" #optional
-# A text field displayed in the mod UI
-authors="Grim3212" #optional
-# The description text for the mod (multi line!) (#mandatory)
+issueTrackerURL="https://github.com/grim3212/AssortedStorage"
+
+[[mods]]
+modId="assortedstorage"
+version="${file.jarVersion}"
+displayName="Assorted Storage"
+#updateJSONURL=""
+displayURL="https://grim3212.com/"
+logoFile="logo.png"
+authors="Grim3212"
 description='''
 Assorted blocks and items useful for storage
 '''
-# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
+
 [[dependencies.assortedstorage]]
     modId="forge"
     mandatory=true
-    versionRange="[34,)"
+    versionRange="[35,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.assortedstorage]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.3]"
+    versionRange="[1.16.4]"
     ordering="NONE"
     side="BOTH"
