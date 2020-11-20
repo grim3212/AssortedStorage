@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "assortedstorage:locksmith_workbench_alt"
+    ]
+  },
+  "criteria": {
+    "has_lock": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "assortedstorage:locksmith_lock"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "assortedstorage:locksmith_workbench_alt"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_lock",
+      "has_the_recipe"
+    ]
+  ]
+}

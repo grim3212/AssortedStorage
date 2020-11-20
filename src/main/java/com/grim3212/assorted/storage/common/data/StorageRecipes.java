@@ -2,15 +2,18 @@ package com.grim3212.assorted.storage.common.data;
 
 import java.util.function.Consumer;
 
+import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.data.RecipeProvider;
 import net.minecraft.data.ShapedRecipeBuilder;
 import net.minecraft.item.Items;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.Tags;
 
 public class StorageRecipes extends RecipeProvider {
@@ -38,6 +41,8 @@ public class StorageRecipes extends RecipeProvider {
 
 		ShapedRecipeBuilder.shapedRecipe(StorageItems.LOCKSMITH_LOCK.get(), 3).key('X', Tags.Items.INGOTS_IRON).patternLine(" X ").patternLine("X X").patternLine("XXX").addCriterion("has_iron", hasItem(Tags.Items.INGOTS_IRON)).build(consumer);
 		ShapedRecipeBuilder.shapedRecipe(StorageItems.LOCKSMITH_KEY.get(), 3).key('X', Tags.Items.INGOTS_IRON).patternLine("XX").patternLine("XX").patternLine("X ").addCriterion("has_iron", hasItem(Tags.Items.INGOTS_IRON)).build(consumer);
+		ShapedRecipeBuilder.shapedRecipe(StorageBlocks.LOCKSMITH_WORKBENCH.get(), 1).key('L', StorageItems.LOCKSMITH_LOCK.get()).key('K', StorageItems.LOCKSMITH_KEY.get()).key('W', Blocks.CRAFTING_TABLE).patternLine("L").patternLine("K").patternLine("W").addCriterion("has_lock", hasItem(StorageItems.LOCKSMITH_LOCK.get())).build(consumer);
+		ShapedRecipeBuilder.shapedRecipe(StorageBlocks.LOCKSMITH_WORKBENCH.get(), 1).key('L', StorageItems.LOCKSMITH_LOCK.get()).key('K', StorageItems.LOCKSMITH_KEY.get()).key('W', Blocks.CRAFTING_TABLE).patternLine("K").patternLine("L").patternLine("W").addCriterion("has_lock", hasItem(StorageItems.LOCKSMITH_LOCK.get())).build(consumer, new ResourceLocation(AssortedStorage.MODID, "locksmith_workbench_alt"));
 	}
 
 	@Override

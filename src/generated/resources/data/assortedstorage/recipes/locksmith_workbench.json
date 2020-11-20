@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "L",
+    "K",
+    "W"
+  ],
+  "key": {
+    "L": {
+      "item": "assortedstorage:locksmith_lock"
+    },
+    "K": {
+      "item": "assortedstorage:locksmith_key"
+    },
+    "W": {
+      "item": "minecraft:crafting_table"
+    }
+  },
+  "result": {
+    "item": "assortedstorage:locksmith_workbench"
+  }
+}
