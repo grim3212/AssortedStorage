@@ -85,12 +85,6 @@ dependencies {
     minecraft 'net.minecraftforge:forge:' + minecraft_version + '-' + forge_version
 }
 
-processResources {
-    // Exclude datagenerator .cache directory
-    exclude '.cache'
-}
-
-
 jar {
     manifest {
         attributes([
@@ -102,5 +96,27 @@ jar {
             "Implementation-Vendor" :"Grim3212",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
+    }
+}
+
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+processResources {
+    // Exclude datagenerator .cache directory
+    exclude '.cache'
+    
+    // Minify JSON
+    doLast {
+        def jsonMinifyStart = System.currentTimeMillis()
+        def jsonMinified = 0
+        def jsonBytesSaved = 0
+        fileTree(dir: outputs.files.asPath, include: '**/*.json').each {
+            File file = it
+            jsonMinified++
+            def oldLength = file.length()
+            file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
+            jsonBytesSaved += oldLength - file.length()
+        }
+        println('Minified ' + jsonMinified + ' json files. Saved ' + jsonBytesSaved + ' bytes. Took ' + (System.currentTimeMillis() - jsonMinifyStart) + 'ms.')
     }
 }
