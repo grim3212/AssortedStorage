@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.grim3212.assorted.storage.common.block.GoldSafeBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 
 import net.minecraft.block.Block;
@@ -16,6 +17,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DirectoryCache;
 import net.minecraft.data.IDataProvider;
 import net.minecraft.loot.ConstantRange;
+import net.minecraft.loot.DynamicLootEntry;
 import net.minecraft.loot.ItemLootEntry;
 import net.minecraft.loot.LootEntry;
 import net.minecraft.loot.LootParameterSets;
@@ -23,6 +25,9 @@ import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.LootTableManager;
 import net.minecraft.loot.conditions.SurvivesExplosion;
+import net.minecraft.loot.functions.CopyName;
+import net.minecraft.loot.functions.CopyName.Source;
+import net.minecraft.loot.functions.SetContents;
 import net.minecraft.util.ResourceLocation;
 
 public class StorageLootProvider implements IDataProvider {
@@ -36,7 +41,6 @@ public class StorageLootProvider implements IDataProvider {
 
 		blocks.add(StorageBlocks.WOOD_CABINET.get());
 		blocks.add(StorageBlocks.GLASS_CABINET.get());
-		blocks.add(StorageBlocks.GOLD_SAFE.get());
 		blocks.add(StorageBlocks.OBSIDIAN_SAFE.get());
 		blocks.add(StorageBlocks.LOCKER.get());
 		blocks.add(StorageBlocks.ITEM_TOWER.get());
@@ -59,6 +63,8 @@ public class StorageLootProvider implements IDataProvider {
 			tables.put(b.getRegistryName(), genRegular(b));
 		}
 
+		tables.put(StorageBlocks.GOLD_SAFE.getId(), genInventoryStorage(StorageBlocks.GOLD_SAFE.get()));
+
 		for (Map.Entry<ResourceLocation, LootTable.Builder> e : tables.entrySet()) {
 			Path path = getPath(generator.getOutputFolder(), e.getKey());
 			IDataProvider.save(GSON, cache, LootTableManager.toJson(e.getValue().setParameterSet(LootParameterSets.BLOCK).build()), path);
@@ -71,6 +77,12 @@ public class StorageLootProvider implements IDataProvider {
 
 	private static LootTable.Builder genRegular(Block b) {
 		LootEntry.Builder<?> entry = ItemLootEntry.builder(b);
+		LootPool.Builder pool = LootPool.builder().name("main").rolls(ConstantRange.of(1)).addEntry(entry).acceptCondition(SurvivesExplosion.builder());
+		return LootTable.builder().addLootPool(pool);
+	}
+
+	private static LootTable.Builder genInventoryStorage(Block b) {
+		LootEntry.Builder<?> entry = ItemLootEntry.builder(b).acceptFunction(CopyName.builder(Source.BLOCK_ENTITY)).acceptFunction(SetContents.builderIn().addLootEntry(DynamicLootEntry.func_216162_a(GoldSafeBlock.CONTENTS)));
 		LootPool.Builder pool = LootPool.builder().name("main").rolls(ConstantRange.of(1)).addEntry(entry).acceptCondition(SurvivesExplosion.builder());
 		return LootTable.builder().addLootPool(pool);
 	}

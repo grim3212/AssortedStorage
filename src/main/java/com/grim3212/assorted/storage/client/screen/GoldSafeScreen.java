@@ -11,6 +11,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class GoldSafeScreen extends BaseStorageScreen<StorageContainer> {
 
 	public GoldSafeScreen(StorageContainer container, PlayerInventory playerInventory, ITextComponent title) {
-		super(container, playerInventory, title, 1);
+		super(container, playerInventory, title, 4);
 	}
 }

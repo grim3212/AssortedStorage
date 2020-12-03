@@ -38,7 +38,7 @@ public class StorageContainer extends Container {
 	}
 
 	public static StorageContainer createGoldSafeContainer(int windowId, PlayerInventory playerInventory) {
-		return new StorageContainer(StorageContainerTypes.GOLD_SAFE.get(), windowId, playerInventory, new Inventory(9));
+		return new StorageContainer(StorageContainerTypes.GOLD_SAFE.get(), windowId, playerInventory, new Inventory(36));
 	}
 
 	public static StorageContainer createGoldSafeContainer(int windowId, PlayerInventory playerInventory, IInventory inventory) {

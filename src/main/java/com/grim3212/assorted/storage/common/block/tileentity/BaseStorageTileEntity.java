@@ -94,35 +94,6 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	protected abstract ITextComponent getDefaultName();
 
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
-		this.chestContents = NonNullList.withSize(this.getSizeInventory(), ItemStack.EMPTY);
-
-		ItemStackHelper.loadAllItems(nbt, this.chestContents);
-
-		if (nbt.contains("CustomName", 8)) {
-			this.customName = ITextComponent.Serializer.getComponentFromJson(nbt.getString("CustomName"));
-		}
-
-		this.readPacketNBT(nbt);
-	}
-
-	@Override
-	public CompoundNBT write(CompoundNBT compound) {
-		super.write(compound);
-
-		ItemStackHelper.saveAllItems(compound, this.chestContents);
-
-		if (this.customName != null) {
-			compound.putString("CustomName", ITextComponent.Serializer.toJson(this.customName));
-		}
-
-		this.writePacketNBT(compound);
-
-		return compound;
-	}
-
-	@Override
 	public void tick() {
 		int i = this.pos.getX();
 		int j = this.pos.getY();
@@ -234,6 +205,40 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	}
 
 	public abstract Block getBlockToUse();
+
+	@Override
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
+		this.chestContents = NonNullList.withSize(this.getSizeInventory(), ItemStack.EMPTY);
+
+		ItemStackHelper.loadAllItems(nbt, this.chestContents);
+
+		if (nbt.contains("CustomName", 8)) {
+			this.customName = ITextComponent.Serializer.getComponentFromJson(nbt.getString("CustomName"));
+		}
+
+		this.readPacketNBT(nbt);
+	}
+
+	@Override
+	public CompoundNBT write(CompoundNBT compound) {
+		super.write(compound);
+
+		ItemStackHelper.saveAllItems(compound, this.chestContents);
+
+		if (this.customName != null) {
+			compound.putString("CustomName", ITextComponent.Serializer.toJson(this.customName));
+		}
+
+		this.writePacketNBT(compound);
+
+		return compound;
+	}
+
+	public CompoundNBT saveToNbt(CompoundNBT compound) {
+		ItemStackHelper.saveAllItems(compound, this.chestContents, false);
+		return compound;
+	}
 
 	public void writePacketNBT(CompoundNBT cmp) {
 		this.lockCode.write(cmp);

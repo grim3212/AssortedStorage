@@ -33,4 +33,5 @@ public class ObsidianSafeBlock extends BaseStorageBlock {
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		return SAFE_SHAPE;
 	}
+
 }
