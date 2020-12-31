@@ -21,6 +21,7 @@ import com.grim3212.assorted.storage.client.tileentity.WoodCabinetTileEntityRend
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.tileentity.StorageTileEntityTypes;
 import com.grim3212.assorted.storage.common.data.StorageBlockTagProvider;
+import com.grim3212.assorted.storage.common.data.StorageItemTagProvider;
 import com.grim3212.assorted.storage.common.data.StorageLootProvider;
 import com.grim3212.assorted.storage.common.data.StorageRecipes;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
@@ -100,6 +101,7 @@ public class AssortedStorage {
 			datagenerator.addProvider(new StorageRecipes(datagenerator));
 			StorageBlockTagProvider blockTagProvider = new StorageBlockTagProvider(datagenerator, fileHelper);
 			datagenerator.addProvider(blockTagProvider);
+			datagenerator.addProvider(new StorageItemTagProvider(datagenerator, blockTagProvider, fileHelper));
 			datagenerator.addProvider(new StorageLootProvider(datagenerator));
 		}
 
