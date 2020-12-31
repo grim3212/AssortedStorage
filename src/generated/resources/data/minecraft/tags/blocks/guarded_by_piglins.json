@@ -1,0 +1,19 @@
+{
+  "replace": false,
+  "values": [
+    "assortedstorage:acacia_warehouse_crate",
+    "assortedstorage:birch_warehouse_crate",
+    "assortedstorage:dark_oak_warehouse_crate",
+    "assortedstorage:jungle_warehouse_crate",
+    "assortedstorage:oak_warehouse_crate",
+    "assortedstorage:spruce_warehouse_crate",
+    "assortedstorage:crimson_warehouse_crate",
+    "assortedstorage:warped_warehouse_crate",
+    "assortedstorage:glass_cabinet",
+    "assortedstorage:wood_cabinet",
+    "assortedstorage:gold_safe",
+    "assortedstorage:obsidian_safe",
+    "assortedstorage:locker",
+    "assortedstorage:item_tower"
+  ]
+}

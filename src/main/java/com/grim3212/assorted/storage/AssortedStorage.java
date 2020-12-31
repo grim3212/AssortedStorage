@@ -20,6 +20,7 @@ import com.grim3212.assorted.storage.client.tileentity.WarehouseCrateTileEntityR
 import com.grim3212.assorted.storage.client.tileentity.WoodCabinetTileEntityRenderer;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.tileentity.StorageTileEntityTypes;
+import com.grim3212.assorted.storage.common.data.StorageBlockTagProvider;
 import com.grim3212.assorted.storage.common.data.StorageLootProvider;
 import com.grim3212.assorted.storage.common.data.StorageRecipes;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
@@ -31,6 +32,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -92,15 +94,18 @@ public class AssortedStorage {
 
 	private void gatherData(GatherDataEvent event) {
 		DataGenerator datagenerator = event.getGenerator();
+		ExistingFileHelper fileHelper = event.getExistingFileHelper();
 
 		if (event.includeServer()) {
 			datagenerator.addProvider(new StorageRecipes(datagenerator));
+			StorageBlockTagProvider blockTagProvider = new StorageBlockTagProvider(datagenerator, fileHelper);
+			datagenerator.addProvider(blockTagProvider);
 			datagenerator.addProvider(new StorageLootProvider(datagenerator));
 		}
 
 		if (event.includeClient()) {
-			datagenerator.addProvider(new StorageBlockstateProvider(datagenerator, event.getExistingFileHelper()));
-			datagenerator.addProvider(new StorageItemModelProvider(datagenerator, event.getExistingFileHelper()));
+			datagenerator.addProvider(new StorageBlockstateProvider(datagenerator, fileHelper));
+			datagenerator.addProvider(new StorageItemModelProvider(datagenerator, fileHelper));
 		}
 	}
 }
