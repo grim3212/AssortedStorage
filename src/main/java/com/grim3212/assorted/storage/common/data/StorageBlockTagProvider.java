@@ -33,6 +33,8 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 		builder.addItemEntry(StorageBlocks.OBSIDIAN_SAFE.get());
 		builder.addItemEntry(StorageBlocks.LOCKER.get());
 		builder.addItemEntry(StorageBlocks.ITEM_TOWER.get());
+
+		this.getOrCreateBuilder(BlockTags.DOORS).addItemEntry(StorageBlocks.QUARTZ_LOCKED_DOOR.get());
 	}
 
 	@Override

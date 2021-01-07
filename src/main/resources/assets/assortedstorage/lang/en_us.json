@@ -28,6 +28,7 @@
 	"block.assortedstorage.locker": "Locker",
 	"block.assortedstorage.item_tower": "Item Tower",
 	"block.assortedstorage.locksmith_workbench": "Locksmith Workbench",
+	"block.assortedstorage.quartz_locked_door": "Quartz Locked Door",
 	
 	"item.assortedstorage.locksmith_key": "Locksmith Key",
 	"item.assortedstorage.locksmith_lock": "Locksmith Lock"

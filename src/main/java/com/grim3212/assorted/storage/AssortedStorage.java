@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.grim3212.assorted.storage.client.data.StorageBlockstateProvider;
 import com.grim3212.assorted.storage.client.data.StorageItemModelProvider;
+import com.grim3212.assorted.storage.client.proxy.ClientProxy;
 import com.grim3212.assorted.storage.client.screen.DualLockerScreen;
 import com.grim3212.assorted.storage.client.screen.GenericStorageScreen;
 import com.grim3212.assorted.storage.client.screen.GoldSafeScreen;
@@ -26,6 +27,7 @@ import com.grim3212.assorted.storage.common.data.StorageLootProvider;
 import com.grim3212.assorted.storage.common.data.StorageRecipes;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.network.PacketHandler;
+import com.grim3212.assorted.storage.common.proxy.IProxy;
 
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.data.DataGenerator;
@@ -35,6 +37,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -48,6 +51,9 @@ public class AssortedStorage {
 
 	public static final Logger LOGGER = LogManager.getLogger(MODID);
 
+	public static IProxy proxy = new IProxy() {
+	};
+
 	public static final ItemGroup ASSORTED_STORAGE_ITEM_GROUP = (new ItemGroup("assortedstorage") {
 		@Override
 		@OnlyIn(Dist.CLIENT)
@@ -57,6 +63,9 @@ public class AssortedStorage {
 	});
 
 	public AssortedStorage() {
+		DistExecutor.callWhenOn(Dist.CLIENT, () -> () -> proxy = new ClientProxy());
+		proxy.starting();
+
 		final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
 		modBus.addListener(this::setup);

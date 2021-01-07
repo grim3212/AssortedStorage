@@ -50,6 +50,8 @@ public class StorageBlocks {
 	public static final RegistryObject<WarehouseCrateBlock> WARPED_WAREHOUSE_CRATE = register("warped_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.WARPED), () -> warpedWarehouseCrateRenderer());
 	public static final RegistryObject<WarehouseCrateBlock> CRIMSON_WAREHOUSE_CRATE = register("crimson_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.CRIMSON), () -> crimsonWarehouseCrateRenderer());
 
+	public static final RegistryObject<LockedDoorBlock> QUARTZ_LOCKED_DOOR = register("quartz_locked_door", () -> new LockedDoorBlock(Block.Properties.create(Material.IRON).sound(SoundType.METAL).hardnessAndResistance(3.0f, 5.0f)));
+
 	private static <T extends Block> RegistryObject<T> register(String name, Supplier<? extends T> sup) {
 		return register(name, sup, block -> item(block));
 	}

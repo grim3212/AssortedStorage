@@ -18,6 +18,7 @@ public class StorageItemTagProvider extends ItemTagsProvider {
 	@Override
 	protected void registerTags() {
 		this.getOrCreateBuilder(ItemTags.PIGLIN_LOVED).addItemEntry(StorageBlocks.GOLD_SAFE.get().asItem());
+		this.getOrCreateBuilder(ItemTags.DOORS).addItemEntry(StorageBlocks.QUARTZ_LOCKED_DOOR.get().asItem());
 	}
 
 	@Override
