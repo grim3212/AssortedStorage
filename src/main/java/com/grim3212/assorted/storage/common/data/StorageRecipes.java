@@ -44,7 +44,7 @@ public class StorageRecipes extends RecipeProvider {
 		ShapedRecipeBuilder.shapedRecipe(StorageBlocks.LOCKSMITH_WORKBENCH.get(), 1).key('L', StorageItems.LOCKSMITH_LOCK.get()).key('K', StorageItems.LOCKSMITH_KEY.get()).key('W', Blocks.CRAFTING_TABLE).patternLine("L").patternLine("K").patternLine("W").addCriterion("has_lock", hasItem(StorageItems.LOCKSMITH_LOCK.get())).build(consumer);
 		ShapedRecipeBuilder.shapedRecipe(StorageBlocks.LOCKSMITH_WORKBENCH.get(), 1).key('L', StorageItems.LOCKSMITH_LOCK.get()).key('K', StorageItems.LOCKSMITH_KEY.get()).key('W', Blocks.CRAFTING_TABLE).patternLine("K").patternLine("L").patternLine("W").addCriterion("has_lock", hasItem(StorageItems.LOCKSMITH_LOCK.get())).build(consumer, new ResourceLocation(AssortedStorage.MODID, "locksmith_workbench_alt"));
 
-		ShapedRecipeBuilder.shapedRecipe(StorageBlocks.QUARTZ_LOCKED_DOOR.get(), 3).key('X', Items.QUARTZ_BLOCK).patternLine("XX").patternLine("XX").patternLine("XX").addCriterion("has_quartz", hasItem(Items.QUARTZ_BLOCK)).build(consumer);
+		ShapedRecipeBuilder.shapedRecipe(StorageBlocks.QUARTZ_DOOR.get(), 3).key('X', Items.QUARTZ).patternLine("XX").patternLine("XX").patternLine("XX").addCriterion("has_quartz", hasItem(Items.QUARTZ)).build(consumer);
 	}
 
 	@Override

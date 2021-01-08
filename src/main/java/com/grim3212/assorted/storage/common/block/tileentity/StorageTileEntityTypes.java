@@ -24,7 +24,7 @@ public class StorageTileEntityTypes {
 
 	public static final RegistryObject<TileEntityType<WarehouseCrateTileEntity>> WAREHOUSE_CRATE = TILE_ENTITIES.register("warehouse_crate", () -> new TileEntityType<>(WarehouseCrateTileEntity::new, getWarehouseCrates(), null));
 
-	public static final RegistryObject<TileEntityType<BasicLockedTileEntity>> BASIC_LOCKED = TILE_ENTITIES.register("basic_locked", () -> new TileEntityType<>(BasicLockedTileEntity::new, Sets.newHashSet(StorageBlocks.QUARTZ_LOCKED_DOOR.get()), null));
+	public static final RegistryObject<TileEntityType<BaseLockedTileEntity>> BASE_LOCKED = TILE_ENTITIES.register("base_locked", () -> new TileEntityType<>(BaseLockedTileEntity::new, StorageBlocks.lockedDoors(), null));
 
 	private static Set<Block> getWarehouseCrates() {
 		return Sets.newHashSet(StorageBlocks.OAK_WAREHOUSE_CRATE.get(), StorageBlocks.BIRCH_WAREHOUSE_CRATE.get(), StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get(), StorageBlocks.ACACIA_WAREHOUSE_CRATE.get(), StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get(), StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get(), StorageBlocks.WARPED_WAREHOUSE_CRATE.get(), StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get());

@@ -17,24 +17,28 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 
 	@Override
 	protected void registerTags() {
-		Builder<Block> builder = this.getOrCreateBuilder(BlockTags.GUARDED_BY_PIGLINS);
+		Builder<Block> piglinBuilder = this.getOrCreateBuilder(BlockTags.GUARDED_BY_PIGLINS);
+		piglinBuilder.addItemEntry(StorageBlocks.ACACIA_WAREHOUSE_CRATE.get());
+		piglinBuilder.addItemEntry(StorageBlocks.BIRCH_WAREHOUSE_CRATE.get());
+		piglinBuilder.addItemEntry(StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get());
+		piglinBuilder.addItemEntry(StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get());
+		piglinBuilder.addItemEntry(StorageBlocks.OAK_WAREHOUSE_CRATE.get());
+		piglinBuilder.addItemEntry(StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get());
+		piglinBuilder.addItemEntry(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get());
+		piglinBuilder.addItemEntry(StorageBlocks.WARPED_WAREHOUSE_CRATE.get());
+		piglinBuilder.addItemEntry(StorageBlocks.GLASS_CABINET.get());
+		piglinBuilder.addItemEntry(StorageBlocks.WOOD_CABINET.get());
+		piglinBuilder.addItemEntry(StorageBlocks.GOLD_SAFE.get());
+		piglinBuilder.addItemEntry(StorageBlocks.OBSIDIAN_SAFE.get());
+		piglinBuilder.addItemEntry(StorageBlocks.LOCKER.get());
+		piglinBuilder.addItemEntry(StorageBlocks.ITEM_TOWER.get());
 
-		builder.addItemEntry(StorageBlocks.ACACIA_WAREHOUSE_CRATE.get());
-		builder.addItemEntry(StorageBlocks.BIRCH_WAREHOUSE_CRATE.get());
-		builder.addItemEntry(StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get());
-		builder.addItemEntry(StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get());
-		builder.addItemEntry(StorageBlocks.OAK_WAREHOUSE_CRATE.get());
-		builder.addItemEntry(StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get());
-		builder.addItemEntry(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get());
-		builder.addItemEntry(StorageBlocks.WARPED_WAREHOUSE_CRATE.get());
-		builder.addItemEntry(StorageBlocks.GLASS_CABINET.get());
-		builder.addItemEntry(StorageBlocks.WOOD_CABINET.get());
-		builder.addItemEntry(StorageBlocks.GOLD_SAFE.get());
-		builder.addItemEntry(StorageBlocks.OBSIDIAN_SAFE.get());
-		builder.addItemEntry(StorageBlocks.LOCKER.get());
-		builder.addItemEntry(StorageBlocks.ITEM_TOWER.get());
+		Builder<Block> doorBuilder = this.getOrCreateBuilder(BlockTags.DOORS);
+		doorBuilder.addItemEntry(StorageBlocks.QUARTZ_DOOR.get());
+		for (Block b : StorageBlocks.lockedDoors()) {
+			doorBuilder.addItemEntry(b);
+		}
 
-		this.getOrCreateBuilder(BlockTags.DOORS).addItemEntry(StorageBlocks.QUARTZ_LOCKED_DOOR.get());
 	}
 
 	@Override

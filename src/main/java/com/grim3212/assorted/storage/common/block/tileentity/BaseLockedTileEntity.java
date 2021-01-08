@@ -3,17 +3,18 @@ package com.grim3212.assorted.storage.common.block.tileentity;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 
-public class BasicLockedTileEntity extends TileEntity {
+public class BaseLockedTileEntity extends TileEntity {
 
 	private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
 
-	public BasicLockedTileEntity() {
-		super(StorageTileEntityTypes.BASIC_LOCKED.get());
+	public BaseLockedTileEntity() {
+		super(StorageTileEntityTypes.BASE_LOCKED.get());
 	}
 
 	public boolean isLocked() {
@@ -29,6 +30,13 @@ public class BasicLockedTileEntity extends TileEntity {
 			this.lockCode = StorageLockCode.EMPTY_CODE;
 		else
 			this.lockCode = new StorageLockCode(s);
+
+		if (world != null) {
+			world.notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), 3);
+			if (!world.isRemote) {
+				world.func_230547_a_(pos, getBlockState().getBlock());
+			}
+		}
 	}
 
 	@Override
@@ -70,5 +78,9 @@ public class BasicLockedTileEntity extends TileEntity {
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		this.readPacketNBT(pkt.getNbtCompound());
+		requestModelDataUpdate();
+		if (world instanceof ClientWorld) {
+			world.notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), 0);
+		}
 	}
 }

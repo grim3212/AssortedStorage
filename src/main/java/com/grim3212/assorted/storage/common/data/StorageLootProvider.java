@@ -74,8 +74,8 @@ public class StorageLootProvider implements IDataProvider {
 			IDataProvider.save(GSON, cache, LootTableManager.toJson(e.getValue().setParameterSet(LootParameterSets.BLOCK).build()), path);
 		}
 
-		Path doorPath = getPath(generator.getOutputFolder(), StorageBlocks.QUARTZ_LOCKED_DOOR.get().getRegistryName());
-		IDataProvider.save(GSON, cache, LootTableManager.toJson(genDoor(StorageBlocks.QUARTZ_LOCKED_DOOR.get()).setParameterSet(LootParameterSets.BLOCK).build()), doorPath);
+		Path doorPath = getPath(generator.getOutputFolder(), StorageBlocks.QUARTZ_DOOR.get().getRegistryName());
+		IDataProvider.save(GSON, cache, LootTableManager.toJson(genDoor(StorageBlocks.QUARTZ_DOOR.get()).setParameterSet(LootParameterSets.BLOCK).build()), doorPath);
 	}
 
 	private static Path getPath(Path root, ResourceLocation id) {

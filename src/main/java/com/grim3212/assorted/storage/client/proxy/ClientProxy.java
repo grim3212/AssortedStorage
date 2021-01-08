@@ -3,6 +3,7 @@ package com.grim3212.assorted.storage.client.proxy;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.proxy.IProxy;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
@@ -20,7 +21,11 @@ public class ClientProxy implements IProxy {
 	}
 
 	private void setupClient(final FMLClientSetupEvent event) {
-		RenderTypeLookup.setRenderLayer(StorageBlocks.QUARTZ_LOCKED_DOOR.get(), RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(StorageBlocks.QUARTZ_DOOR.get(), RenderType.getCutout());
+
+		for (Block b : StorageBlocks.lockedDoors()) {
+			RenderTypeLookup.setRenderLayer(b, RenderType.getCutout());
+		}
 	}
 
 	@Override
