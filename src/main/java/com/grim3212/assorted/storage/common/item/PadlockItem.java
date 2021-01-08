@@ -42,11 +42,9 @@ public class PadlockItem extends CombinationItem {
 		doorMapping.put(Blocks.WARPED_DOOR, StorageBlocks.LOCKED_WARPED_DOOR.get());
 		doorMapping.put(Blocks.IRON_DOOR, StorageBlocks.LOCKED_IRON_DOOR.get());
 
-		ResourceLocation quartzDoor = new ResourceLocation("assorteddecor:quartz_door");
-		if (Registry.BLOCK.containsKey(quartzDoor)) {
-			Block b = Registry.BLOCK.getOrDefault(quartzDoor);
-			if (b != Blocks.AIR)
-				doorMapping.put(b, StorageBlocks.LOCKED_QUARTZ_DOOR.get());
+		Block quartzDoor = Registry.BLOCK.getOrDefault(new ResourceLocation("assorteddecor:quartz_door"));
+		if (quartzDoor != Blocks.AIR) {
+			doorMapping.put(quartzDoor, StorageBlocks.LOCKED_QUARTZ_DOOR.get());
 		}
 	}
 
