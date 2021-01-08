@@ -21,7 +21,7 @@ public class ClientProxy implements IProxy {
 	}
 
 	private void setupClient(final FMLClientSetupEvent event) {
-		RenderTypeLookup.setRenderLayer(StorageBlocks.QUARTZ_DOOR.get(), RenderType.getCutout());
+		
 
 		for (Block b : StorageBlocks.lockedDoors()) {
 			RenderTypeLookup.setRenderLayer(b, RenderType.getCutout());

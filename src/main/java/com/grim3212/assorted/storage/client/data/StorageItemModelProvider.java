@@ -53,8 +53,6 @@ public class StorageItemModelProvider extends ItemModelProvider {
 
 		generatedItem(StorageItems.LOCKSMITH_KEY.get());
 		generatedItem(StorageItems.LOCKSMITH_LOCK.get());
-
-		generatedItem(StorageBlocks.QUARTZ_DOOR.get().asItem());
 	}
 
 	private ItemModelBuilder generatedItem(String name) {

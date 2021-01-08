@@ -14,6 +14,7 @@ import com.grim3212.assorted.storage.common.block.StorageBlocks;
 
 import net.minecraft.advancements.criterion.StatePropertiesPredicate;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.DoorBlock;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DirectoryCache;
@@ -74,17 +75,29 @@ public class StorageLootProvider implements IDataProvider {
 			IDataProvider.save(GSON, cache, LootTableManager.toJson(e.getValue().setParameterSet(LootParameterSets.BLOCK).build()), path);
 		}
 
-		Path doorPath = getPath(generator.getOutputFolder(), StorageBlocks.QUARTZ_DOOR.get().getRegistryName());
-		IDataProvider.save(GSON, cache, LootTableManager.toJson(genDoor(StorageBlocks.QUARTZ_DOOR.get()).setParameterSet(LootParameterSets.BLOCK).build()), doorPath);
+		door(StorageBlocks.LOCKED_IRON_DOOR.get(), Blocks.IRON_DOOR, cache);
+		door(StorageBlocks.LOCKED_OAK_DOOR.get(), Blocks.OAK_DOOR, cache);
+		door(StorageBlocks.LOCKED_SPRUCE_DOOR.get(), Blocks.SPRUCE_DOOR, cache);
+		door(StorageBlocks.LOCKED_BIRCH_DOOR.get(), Blocks.BIRCH_DOOR, cache);
+		door(StorageBlocks.LOCKED_ACACIA_DOOR.get(), Blocks.ACACIA_DOOR, cache);
+		door(StorageBlocks.LOCKED_JUNGLE_DOOR.get(), Blocks.JUNGLE_DOOR, cache);
+		door(StorageBlocks.LOCKED_DARK_OAK_DOOR.get(), Blocks.DARK_OAK_DOOR, cache);
+		door(StorageBlocks.LOCKED_CRIMSON_DOOR.get(), Blocks.CRIMSON_DOOR, cache);
+		door(StorageBlocks.LOCKED_WARPED_DOOR.get(), Blocks.WARPED_DOOR, cache);
+	}
+
+	private void door(Block b, Block out, DirectoryCache cache) throws IOException {
+		Path doorPath = getPath(generator.getOutputFolder(), b.getRegistryName());
+		IDataProvider.save(GSON, cache, LootTableManager.toJson(genDoor(b, out).setParameterSet(LootParameterSets.BLOCK).build()), doorPath);
 	}
 
 	private static Path getPath(Path root, ResourceLocation id) {
 		return root.resolve("data/" + id.getNamespace() + "/loot_tables/blocks/" + id.getPath() + ".json");
 	}
 
-	private static LootTable.Builder genDoor(Block b) {
+	private static LootTable.Builder genDoor(Block b, Block out) {
 		BlockStateProperty.Builder halfCondition = BlockStateProperty.builder(b).fromProperties(StatePropertiesPredicate.Builder.newBuilder().withProp(DoorBlock.HALF, DoubleBlockHalf.LOWER));
-		LootEntry.Builder<?> entry = ItemLootEntry.builder(b).acceptCondition(halfCondition);
+		LootEntry.Builder<?> entry = ItemLootEntry.builder(out).acceptCondition(halfCondition);
 		LootPool.Builder pool = LootPool.builder().name("main").rolls(ConstantRange.of(1)).addEntry(entry).acceptCondition(SurvivesExplosion.builder());
 		return LootTable.builder().addLootPool(pool);
 	}

@@ -54,7 +54,6 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 
 		genericBlock(StorageBlocks.LOCKSMITH_WORKBENCH.get());
 
-		doorBlock(StorageBlocks.QUARTZ_DOOR.get(), resource("block/quartz_door_bottom"), resource("block/quartz_door_top"));
 		doorBlock(StorageBlocks.LOCKED_QUARTZ_DOOR.get(), resource("block/locked_quartz_door_bottom"), resource("block/locked_quartz_door_top"));
 		doorBlock(StorageBlocks.LOCKED_OAK_DOOR.get(), resource("block/locked_oak_door_bottom"), resource("block/locked_oak_door_top"));
 		doorBlock(StorageBlocks.LOCKED_SPRUCE_DOOR.get(), resource("block/locked_spruce_door_bottom"), resource("block/locked_spruce_door_top"));

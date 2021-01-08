@@ -16,9 +16,11 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class PadlockItem extends CombinationItem {
@@ -39,7 +41,13 @@ public class PadlockItem extends CombinationItem {
 		doorMapping.put(Blocks.CRIMSON_DOOR, StorageBlocks.LOCKED_CRIMSON_DOOR.get());
 		doorMapping.put(Blocks.WARPED_DOOR, StorageBlocks.LOCKED_WARPED_DOOR.get());
 		doorMapping.put(Blocks.IRON_DOOR, StorageBlocks.LOCKED_IRON_DOOR.get());
-		doorMapping.put(StorageBlocks.QUARTZ_DOOR.get(), StorageBlocks.LOCKED_QUARTZ_DOOR.get());
+
+		ResourceLocation quartzDoor = new ResourceLocation("assorteddecor:quartz_door");
+		if (Registry.BLOCK.containsKey(quartzDoor)) {
+			Block b = Registry.BLOCK.getOrDefault(quartzDoor);
+			if (b != Blocks.AIR)
+				doorMapping.put(b, StorageBlocks.LOCKED_QUARTZ_DOOR.get());
+		}
 	}
 
 	private Block getMatchingDoor(Block doorIn) {

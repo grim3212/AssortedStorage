@@ -34,7 +34,6 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 		piglinBuilder.addItemEntry(StorageBlocks.ITEM_TOWER.get());
 
 		Builder<Block> doorBuilder = this.getOrCreateBuilder(BlockTags.DOORS);
-		doorBuilder.addItemEntry(StorageBlocks.QUARTZ_DOOR.get());
 		for (Block b : StorageBlocks.lockedDoors()) {
 			doorBuilder.addItemEntry(b);
 		}
