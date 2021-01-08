@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/door_top",
-  "textures": {
-    "bottom": "assortedstorage:block/quartz_door_bottom_locked",
-    "top": "assortedstorage:block/quartz_door_top_locked"
-  }
-}

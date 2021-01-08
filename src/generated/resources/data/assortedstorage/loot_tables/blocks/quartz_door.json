@@ -10,13 +10,13 @@
           "conditions": [
             {
               "condition": "minecraft:block_state_property",
-              "block": "assortedstorage:quartz_locked_door",
+              "block": "assortedstorage:quartz_door",
               "properties": {
                 "half": "lower"
               }
             }
           ],
-          "name": "assortedstorage:quartz_locked_door"
+          "name": "assortedstorage:quartz_door"
         }
       ],
       "conditions": [

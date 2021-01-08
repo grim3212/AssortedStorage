@@ -2,7 +2,7 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "assortedstorage:quartz_locked_door"
+      "assortedstorage:quartz_door"
     ]
   },
   "criteria": {
@@ -11,7 +11,7 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:quartz_block"
+            "item": "minecraft:quartz"
           }
         ]
       }
@@ -19,7 +19,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "assortedstorage:quartz_locked_door"
+        "recipe": "assortedstorage:quartz_door"
       }
     }
   },

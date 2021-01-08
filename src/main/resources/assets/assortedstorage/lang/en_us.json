@@ -28,7 +28,16 @@
 	"block.assortedstorage.locker": "Locker",
 	"block.assortedstorage.item_tower": "Item Tower",
 	"block.assortedstorage.locksmith_workbench": "Locksmith Workbench",
-	"block.assortedstorage.quartz_locked_door": "Quartz Locked Door",
+	"block.assortedstorage.quartz_door": "Quartz Door",
+	"block.assortedstorage.locked_quartz_door": "Locked Quartz Door",
+	"block.assortedstorage.locked_oak_door": "Locked Oak Door",
+	"block.assortedstorage.locked_spruce_door": "Locked Spruce Door",
+	"block.assortedstorage.locked_birch_door": "Locked Birch Door",
+	"block.assortedstorage.locked_acacia_door": "Locked Acacia Door",
+	"block.assortedstorage.locked_jungle_door": "Locked Jungle Door",
+	"block.assortedstorage.locked_dark_oak_door": "Locked Dark Oak Door",
+	"block.assortedstorage.locked_crimson_door": "Locked Crimson Door",
+	"block.assortedstorage.locked_warped_door": "Locked Warped Door",
 	
 	"item.assortedstorage.locksmith_key": "Locksmith Key",
 	"item.assortedstorage.locksmith_lock": "Locksmith Lock"

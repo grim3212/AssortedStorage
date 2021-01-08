@@ -19,6 +19,7 @@ import com.grim3212.assorted.storage.common.item.LockerItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.DoorBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.WoodType;
@@ -56,16 +57,16 @@ public class StorageBlocks {
 
 	public static final RegistryObject<DoorBlock> QUARTZ_DOOR = register("quartz_door", () -> new DoorBlock(Block.Properties.create(Material.IRON, MaterialColor.QUARTZ).setRequiresTool().hardnessAndResistance(5.0F).sound(SoundType.METAL).notSolid()));
 
-	public static final RegistryObject<LockedDoorBlock> LOCKED_OAK_DOOR = register("locked_oak_door", () -> new LockedDoorBlock(Block.Properties.create(Material.WOOD, MaterialColor.WOOD).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
-	public static final RegistryObject<LockedDoorBlock> LOCKED_SPRUCE_DOOR = register("locked_spruce_door", () -> new LockedDoorBlock(Block.Properties.create(Material.WOOD, MaterialColor.OBSIDIAN).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
-	public static final RegistryObject<LockedDoorBlock> LOCKED_BIRCH_DOOR = register("locked_birch_door", () -> new LockedDoorBlock(Block.Properties.create(Material.WOOD, MaterialColor.SAND).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
-	public static final RegistryObject<LockedDoorBlock> LOCKED_JUNGLE_DOOR = register("locked_jungle_door", () -> new LockedDoorBlock(Block.Properties.create(Material.WOOD, MaterialColor.DIRT).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
-	public static final RegistryObject<LockedDoorBlock> LOCKED_ACACIA_DOOR = register("locked_acacia_door", () -> new LockedDoorBlock(Block.Properties.create(Material.WOOD, MaterialColor.ADOBE).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
-	public static final RegistryObject<LockedDoorBlock> LOCKED_DARK_OAK_DOOR = register("locked_dark_oak_door", () -> new LockedDoorBlock(Block.Properties.create(Material.WOOD, MaterialColor.BROWN).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
-	public static final RegistryObject<LockedDoorBlock> LOCKED_CRIMSON_DOOR = register("locked_crimson_door", () -> new LockedDoorBlock(Block.Properties.create(Material.NETHER_WOOD, MaterialColor.CRIMSON_STEM).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
-	public static final RegistryObject<LockedDoorBlock> LOCKED_WARPED_DOOR = register("locked_warped_door", () -> new LockedDoorBlock(Block.Properties.create(Material.NETHER_WOOD, MaterialColor.WARPED_STEM).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
-	public static final RegistryObject<LockedDoorBlock> LOCKED_IRON_DOOR = register("locked_iron_door", () -> new LockedDoorBlock(Block.Properties.create(Material.IRON, MaterialColor.IRON).setRequiresTool().hardnessAndResistance(5.0F).sound(SoundType.METAL).notSolid()));
-	public static final RegistryObject<LockedDoorBlock> LOCKED_QUARTZ_DOOR = register("locked_quartz_door", () -> new LockedDoorBlock(Block.Properties.create(Material.IRON, MaterialColor.QUARTZ).setRequiresTool().hardnessAndResistance(5.0F).sound(SoundType.METAL).notSolid()));
+	public static final RegistryObject<LockedDoorBlock> LOCKED_OAK_DOOR = registerNoItem("locked_oak_door", () -> new LockedDoorBlock(Blocks.OAK_DOOR, Block.Properties.create(Material.WOOD, MaterialColor.WOOD).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
+	public static final RegistryObject<LockedDoorBlock> LOCKED_SPRUCE_DOOR = registerNoItem("locked_spruce_door", () -> new LockedDoorBlock(Blocks.SPRUCE_DOOR, Block.Properties.create(Material.WOOD, MaterialColor.OBSIDIAN).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
+	public static final RegistryObject<LockedDoorBlock> LOCKED_BIRCH_DOOR = registerNoItem("locked_birch_door", () -> new LockedDoorBlock(Blocks.BIRCH_DOOR, Block.Properties.create(Material.WOOD, MaterialColor.SAND).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
+	public static final RegistryObject<LockedDoorBlock> LOCKED_JUNGLE_DOOR = registerNoItem("locked_jungle_door", () -> new LockedDoorBlock(Blocks.JUNGLE_DOOR, Block.Properties.create(Material.WOOD, MaterialColor.DIRT).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
+	public static final RegistryObject<LockedDoorBlock> LOCKED_ACACIA_DOOR = registerNoItem("locked_acacia_door", () -> new LockedDoorBlock(Blocks.ACACIA_DOOR, Block.Properties.create(Material.WOOD, MaterialColor.ADOBE).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
+	public static final RegistryObject<LockedDoorBlock> LOCKED_DARK_OAK_DOOR = registerNoItem("locked_dark_oak_door", () -> new LockedDoorBlock(Blocks.DARK_OAK_DOOR, Block.Properties.create(Material.WOOD, MaterialColor.BROWN).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
+	public static final RegistryObject<LockedDoorBlock> LOCKED_CRIMSON_DOOR = registerNoItem("locked_crimson_door", () -> new LockedDoorBlock(Blocks.CRIMSON_DOOR, Block.Properties.create(Material.NETHER_WOOD, MaterialColor.CRIMSON_STEM).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
+	public static final RegistryObject<LockedDoorBlock> LOCKED_WARPED_DOOR = registerNoItem("locked_warped_door", () -> new LockedDoorBlock(Blocks.WARPED_DOOR, Block.Properties.create(Material.NETHER_WOOD, MaterialColor.WARPED_STEM).hardnessAndResistance(3.0F).sound(SoundType.WOOD).notSolid()));
+	public static final RegistryObject<LockedDoorBlock> LOCKED_IRON_DOOR = registerNoItem("locked_iron_door", () -> new LockedDoorBlock(Blocks.IRON_DOOR, Block.Properties.create(Material.IRON, MaterialColor.IRON).setRequiresTool().hardnessAndResistance(5.0F).sound(SoundType.METAL).notSolid()));
+	public static final RegistryObject<LockedDoorBlock> LOCKED_QUARTZ_DOOR = registerNoItem("locked_quartz_door", () -> new LockedDoorBlock(QUARTZ_DOOR.get(), Block.Properties.create(Material.IRON, MaterialColor.QUARTZ).setRequiresTool().hardnessAndResistance(5.0F).sound(SoundType.METAL).notSolid()));
 
 	public static Set<Block> lockedDoors() {
 		return Sets.newHashSet(StorageBlocks.LOCKED_OAK_DOOR.get(), StorageBlocks.LOCKED_SPRUCE_DOOR.get(), StorageBlocks.LOCKED_BIRCH_DOOR.get(), StorageBlocks.LOCKED_JUNGLE_DOOR.get(), StorageBlocks.LOCKED_ACACIA_DOOR.get(), StorageBlocks.LOCKED_DARK_OAK_DOOR.get(), StorageBlocks.LOCKED_CRIMSON_DOOR.get(), StorageBlocks.LOCKED_WARPED_DOOR.get(), StorageBlocks.LOCKED_IRON_DOOR.get(), StorageBlocks.LOCKED_QUARTZ_DOOR.get());

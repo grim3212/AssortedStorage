@@ -7,7 +7,6 @@ import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 
-import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -56,10 +55,6 @@ public class StorageItemModelProvider extends ItemModelProvider {
 		generatedItem(StorageItems.LOCKSMITH_LOCK.get());
 
 		generatedItem(StorageBlocks.QUARTZ_DOOR.get().asItem());
-
-		for (Block b : StorageBlocks.lockedDoors()) {
-			generatedItem(b.asItem());
-		}
 	}
 
 	private ItemModelBuilder generatedItem(String name) {

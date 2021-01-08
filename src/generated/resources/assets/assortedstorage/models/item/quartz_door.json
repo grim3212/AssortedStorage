@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "assortedstorage:item/quartz_locked_door"
+    "layer0": "assortedstorage:item/quartz_door"
   }
 }

@@ -6,9 +6,9 @@ import com.grim3212.assorted.storage.common.util.StorageLockCode;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.DoorBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
@@ -23,20 +23,47 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.FakePlayer;
 
 public class LockedDoorBlock extends DoorBlock {
 
-	public LockedDoorBlock(Properties builder) {
+	private final Block parent;
+
+	public LockedDoorBlock(Block parent, Properties builder) {
 		super(builder);
 		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.NORTH).with(OPEN, false).with(HINGE, DoorHingeSide.LEFT).with(POWERED, false).with(HALF, DoubleBlockHalf.LOWER));
+		this.parent = parent;
+	}
+
+	@Override
+	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
+		return this.parent.getPickBlock(state, target, world, pos, player);
 	}
 
 	@Override
 	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
 		// redstone doesn't work with locked doors
+	}
+
+	@Override
+	public void openDoor(World worldIn, BlockState state, BlockPos pos, boolean open) {
+		// AI can't open locked doors
+	}
+
+	@Override
+	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		DoubleBlockHalf doubleblockhalf = stateIn.get(HALF);
+		if (facing.getAxis() == Direction.Axis.Y && doubleblockhalf == DoubleBlockHalf.LOWER == (facing == Direction.UP)) {
+
+			boolean isValidBlock = doubleblockhalf == DoubleBlockHalf.UPPER ? worldIn.getBlockState(currentPos.down()).getBlock() instanceof DoorBlock : worldIn.getBlockState(currentPos.up()).getBlock() instanceof DoorBlock;
+
+			return facingState.isIn(this) && facingState.get(HALF) != doubleblockhalf ? stateIn.with(FACING, facingState.get(FACING)).with(OPEN, facingState.get(OPEN)).with(HINGE, facingState.get(HINGE)).with(POWERED, facingState.get(POWERED)) : isValidBlock ? stateIn : Blocks.AIR.getDefaultState();
+		} else {
+			return doubleblockhalf == DoubleBlockHalf.LOWER && facing == Direction.DOWN && !stateIn.isValidPosition(worldIn, currentPos) ? Blocks.AIR.getDefaultState() : stateIn;
+		}
 	}
 
 	@Override
@@ -47,19 +74,7 @@ public class LockedDoorBlock extends DoorBlock {
 				BaseLockedTileEntity teStorage = (BaseLockedTileEntity) worldIn.getTileEntity(pos);
 
 				if (teStorage.isLocked()) {
-					ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
-					CompoundNBT tag = new CompoundNBT();
-					new StorageLockCode(teStorage.getLockCode()).write(tag);
-					lockStack.setTag(tag);
-
 					if (removeLock(worldIn, pos, player)) {
-						ItemEntity blockDropped = new ItemEntity(worldIn, (double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), lockStack);
-						if (!worldIn.isRemote) {
-							worldIn.addEntity(blockDropped);
-							if (!(player instanceof FakePlayer)) {
-								blockDropped.onCollideWithPlayer(player);
-							}
-						}
 						return ActionResultType.SUCCESS;
 					}
 				}
@@ -74,11 +89,6 @@ public class LockedDoorBlock extends DoorBlock {
 		} else {
 			return ActionResultType.PASS;
 		}
-	}
-
-	@Override
-	public void openDoor(World worldIn, BlockState state, BlockPos pos, boolean open) {
-		// AI can't open locked doors
 	}
 
 	@Override
@@ -135,86 +145,29 @@ public class LockedDoorBlock extends DoorBlock {
 	}
 
 	private boolean removeLock(World worldIn, BlockPos pos, PlayerEntity entityplayer) {
-		BaseLockedTileEntity tileentity = (BaseLockedTileEntity) worldIn.getTileEntity(pos);
-		tileentity.setLockCode("");
-		tileentity.getWorld().playSound(entityplayer, tileentity.getPos(), SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 0.5F, tileentity.getWorld().rand.nextFloat() * 0.1F + 0.9F);
-
 		BlockState state = worldIn.getBlockState(pos);
-		BlockState blockstate = Block.getValidBlockForPosition(state, worldIn, pos);
-		Block.replaceBlock(state, blockstate, worldIn, pos, 3);
+		Direction dir = state.get(FACING);
+		boolean open = state.get(OPEN);
+		DoorHingeSide hinge = state.get(HINGE);
+		DoubleBlockHalf half = state.get(HALF);
+		BlockState toPlace = this.parent.getDefaultState().with(FACING, dir).with(OPEN, open).with(HINGE, hinge);
 
-		if (worldIn.getBlockState(pos).get(HALF) == DoubleBlockHalf.UPPER) {
-			BaseLockedTileEntity tileentityLower = (BaseLockedTileEntity) worldIn.getTileEntity(pos.down());
-			if (tileentityLower != null) {
-				tileentityLower.setLockCode("");
-			}
+		worldIn.setBlockState(pos, toPlace.with(HALF, half), 3);
+		worldIn.playSound(entityplayer, pos, SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 0.5F, worldIn.rand.nextFloat() * 0.1F + 0.9F);
 
-			BlockState stateLower = worldIn.getBlockState(pos.down());
-			BlockState blockstateLower = Block.getValidBlockForPosition(stateLower, worldIn, pos.down());
-			Block.replaceBlock(stateLower, blockstateLower, worldIn, pos.down(), 3);
+		if (half == DoubleBlockHalf.UPPER) {
+			worldIn.setBlockState(pos.down(), toPlace.with(HALF, DoubleBlockHalf.LOWER), 3);
 		} else {
-			BaseLockedTileEntity tileentityUpper = (BaseLockedTileEntity) worldIn.getTileEntity(pos.up());
-			if (tileentityUpper != null) {
-				tileentityUpper.setLockCode("");
-			}
-
-			BlockState stateUpper = worldIn.getBlockState(pos.up());
-			BlockState blockstateUpper = Block.getValidBlockForPosition(stateUpper, worldIn, pos.up());
-			Block.replaceBlock(stateUpper, blockstateUpper, worldIn, pos.up(), 3);
+			worldIn.setBlockState(pos.up(), toPlace.with(HALF, DoubleBlockHalf.UPPER), 3);
 		}
 
 		return true;
 	}
 
-	private boolean tryPlaceLock(World worldIn, BlockPos pos, PlayerEntity entityplayer, Hand hand) {
-		ItemStack itemstack = entityplayer.getHeldItem(hand);
-
-		if (itemstack.hasTag()) {
-			String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
-			if (!code.isEmpty()) {
-				BaseLockedTileEntity tileentity = (BaseLockedTileEntity) worldIn.getTileEntity(pos);
-
-				if (!entityplayer.isCreative())
-					itemstack.shrink(1);
-				tileentity.setLockCode(code);
-				tileentity.getWorld().playSound(entityplayer, tileentity.getPos(), SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 0.5F, tileentity.getWorld().rand.nextFloat() * 0.1F + 0.9F);
-
-				BlockState state = worldIn.getBlockState(pos);
-				BlockState blockstate = Block.getValidBlockForPosition(state, worldIn, pos);
-				Block.replaceBlock(state, blockstate, worldIn, pos, 3);
-				if (state.get(HALF) == DoubleBlockHalf.UPPER) {
-					BaseLockedTileEntity tileentityLower = (BaseLockedTileEntity) worldIn.getTileEntity(pos.down());
-					if (tileentityLower != null) {
-						tileentityLower.setLockCode(code);
-					}
-
-					BlockState stateLower = worldIn.getBlockState(pos.down());
-					BlockState blockstateLower = Block.getValidBlockForPosition(stateLower, worldIn, pos.down());
-					Block.replaceBlock(stateLower, blockstateLower, worldIn, pos.down(), 3);
-
-				} else {
-					BaseLockedTileEntity tileentityUpper = (BaseLockedTileEntity) worldIn.getTileEntity(pos.up());
-					if (tileentityUpper != null) {
-						tileentityUpper.setLockCode(code);
-					}
-
-					BlockState stateUpper = worldIn.getBlockState(pos.up());
-					BlockState blockstateUpper = Block.getValidBlockForPosition(stateUpper, worldIn, pos.up());
-					Block.replaceBlock(stateUpper, blockstateUpper, worldIn, pos.up(), 3);
-				}
-
-				return true;
-			}
-
-		}
-
-		return false;
-	}
-
 	private boolean canAccess(IBlockReader worldIn, BlockPos pos, PlayerEntity entityplayer) {
 		BaseLockedTileEntity tileentity = (BaseLockedTileEntity) worldIn.getTileEntity(pos);
 
-		if (tileentity.isLocked()) {
+		if (tileentity != null && tileentity.isLocked()) {
 			for (int slot = 0; slot < entityplayer.inventory.getSizeInventory(); slot++) {
 				ItemStack itemstack = entityplayer.inventory.getStackInSlot(slot);
 
