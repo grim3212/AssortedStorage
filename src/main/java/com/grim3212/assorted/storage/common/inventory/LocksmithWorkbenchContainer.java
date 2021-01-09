@@ -36,7 +36,15 @@ public class LocksmithWorkbenchContainer extends Container {
 	public LocksmithWorkbenchContainer(int id, PlayerInventory playerInventory, IWorldPosCallable p_i50090_3_) {
 		super(StorageContainerTypes.LOCKSMITH_WORKBENCH.get(), id);
 		this.worldPosCallable = p_i50090_3_;
-		this.addSlot(new Slot(this.craftResult, 0, 120, 35) {
+
+		this.addSlot(new Slot(this.craftMatrix, 0, 41, 17 + 18) {
+			@Override
+			public boolean isItemValid(ItemStack stack) {
+				return stack.getItem() instanceof CombinationItem;
+			}
+		});
+
+		this.addSlot(new Slot(this.craftResult, 1, 120, 35) {
 			@Override
 			public boolean isItemValid(ItemStack stack) {
 				return false;
@@ -46,13 +54,6 @@ public class LocksmithWorkbenchContainer extends Container {
 			public ItemStack onTake(PlayerEntity thePlayer, ItemStack stack) {
 				LocksmithWorkbenchContainer.this.onTake();
 				return super.onTake(thePlayer, stack);
-			}
-		});
-
-		this.addSlot(new Slot(this.craftMatrix, 0, 41, 17 + 18) {
-			@Override
-			public boolean isItemValid(ItemStack stack) {
-				return stack.getItem() instanceof CombinationItem;
 			}
 		});
 
@@ -113,26 +114,28 @@ public class LocksmithWorkbenchContainer extends Container {
 		if (slot != null && slot.getHasStack()) {
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
-			if (index == 0) {
+			if (index == 1) {
 				this.worldPosCallable.consume((p_217067_2_, p_217067_3_) -> {
 					itemstack1.getItem().onCreated(itemstack1, p_217067_2_, playerIn);
 				});
-				if (!this.mergeItemStack(itemstack1, 10, 46, true)) {
+				if (!this.mergeItemStack(itemstack1, 2, 38, true)) {
 					return ItemStack.EMPTY;
 				}
 
 				slot.onSlotChange(itemstack1, itemstack);
-			} else if (index >= 10 && index < 46) {
-				if (!this.mergeItemStack(itemstack1, 1, 10, false)) {
-					if (index < 37) {
-						if (!this.mergeItemStack(itemstack1, 37, 46, false)) {
-							return ItemStack.EMPTY;
-						}
-					} else if (!this.mergeItemStack(itemstack1, 10, 37, false)) {
-						return ItemStack.EMPTY;
-					}
+			} else if (index == 0) {
+				if (!this.mergeItemStack(itemstack1, 2, 38, false)) {
+					return ItemStack.EMPTY;
 				}
-			} else if (!this.mergeItemStack(itemstack1, 10, 46, false)) {
+			} else if (itemstack1.getItem() instanceof CombinationItem) {
+				if (!this.mergeItemStack(itemstack1, 0, 1, false)) {
+					return ItemStack.EMPTY;
+				}
+			} else if (index >= 2 && index < 29) {
+				if (!this.mergeItemStack(itemstack1, 29, 38, false)) {
+					return ItemStack.EMPTY;
+				}
+			} else if (index >= 29 && index < 38 && !this.mergeItemStack(itemstack1, 2, 29, false)) {
 				return ItemStack.EMPTY;
 			}
 
