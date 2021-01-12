@@ -1,7 +1,7 @@
 {
 	"itemGroup.assortedstorage": "Assorted Storage",
 	
-	"assortedstorage.info.combo": "Combo: ",
+	"assortedstorage.info.combo": "Combo: %s",
 	
 	"assortedstorage.container.wood_cabinet": "Wood Cabinet",
 	"assortedstorage.container.glass_cabinet": "Glass Cabinet",
