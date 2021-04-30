@@ -51,7 +51,7 @@ public class GoldSafeBlock extends BaseStorageBlock {
 
 	@Override
 	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-		if (!state.isIn(newState.getBlock())) {
+		if (!state.matchesBlock(newState.getBlock())) {
 			TileEntity tileentity = worldIn.getTileEntity(pos);
 			if (tileentity instanceof GoldSafeTileEntity) {
 				GoldSafeTileEntity goldsafetileentity = (GoldSafeTileEntity) tileentity;
@@ -67,7 +67,7 @@ public class GoldSafeBlock extends BaseStorageBlock {
 				worldIn.updateComparatorOutputLevel(pos, state.getBlock());
 			}
 
-			if (state.hasTileEntity() && (!state.isIn(newState.getBlock()) || !newState.hasTileEntity())) {
+			if (state.hasTileEntity() && (!state.matchesBlock(newState.getBlock()) || !newState.hasTileEntity())) {
 				worldIn.removeTileEntity(pos);
 			}
 		}

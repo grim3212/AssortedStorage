@@ -48,13 +48,13 @@ public class ItemTowerScreen extends ContainerScreen<ItemTowerContainer> impleme
 	protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
 		StringTextComponent title = new StringTextComponent(this.title.getString());
 		if (this.inventory.getSizeInventory() > 18) {
-			title.append(new TranslationTextComponent(AssortedStorage.MODID + ".container.item_tower.row", this.rowId + 1));
+			title.appendSibling(new TranslationTextComponent(AssortedStorage.MODID + ".container.item_tower.row", this.rowId + 1));
 			title.appendString(" " + this.inventory.getSizeInventory() / 9);
 		}
 
-		this.font.func_243248_b(matrixStack, title, 8.0F, 6.0F, 4210752);
+		this.font.drawText(matrixStack, title, 8.0F, 6.0F, 4210752);
 
-		this.font.func_243248_b(matrixStack, this.playerInventory.getDisplayName(), 8.0F, (float) (this.ySize - 96 + 2), 4210752);
+		this.font.drawText(matrixStack, this.playerInventory.getDisplayName(), 8.0F, (float) (this.ySize - 96 + 2), 4210752);
 
 	}
 

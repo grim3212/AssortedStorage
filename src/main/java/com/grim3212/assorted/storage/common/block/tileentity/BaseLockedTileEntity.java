@@ -34,7 +34,7 @@ public class BaseLockedTileEntity extends TileEntity {
 		if (world != null) {
 			world.notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), 3);
 			if (!world.isRemote) {
-				world.func_230547_a_(pos, getBlockState().getBlock());
+				world.updateBlock(pos, getBlockState().getBlock());
 			}
 		}
 	}

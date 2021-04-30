@@ -45,7 +45,7 @@ public class QuartzDoorBlock extends DoorBlock {
 		boolean isLocked = !this.canBeLocked(worldIn, currentPos);
 		DoubleBlockHalf doubleblockhalf = stateIn.get(HALF);
 		if (facing.getAxis() == Direction.Axis.Y && doubleblockhalf == DoubleBlockHalf.LOWER == (facing == Direction.UP)) {
-			return facingState.isIn(this) && facingState.get(HALF) != doubleblockhalf ? stateIn.with(FACING, facingState.get(FACING)).with(OPEN, facingState.get(OPEN)).with(HINGE, facingState.get(HINGE)).with(POWERED, facingState.get(POWERED)).with(LOCKED, isLocked) : Blocks.AIR.getDefaultState();
+			return facingState.matchesBlock(this) && facingState.get(HALF) != doubleblockhalf ? stateIn.with(FACING, facingState.get(FACING)).with(OPEN, facingState.get(OPEN)).with(HINGE, facingState.get(HINGE)).with(POWERED, facingState.get(POWERED)).with(LOCKED, isLocked) : Blocks.AIR.getDefaultState();
 		} else {
 			return doubleblockhalf == DoubleBlockHalf.LOWER && facing == Direction.DOWN && !stateIn.isValidPosition(worldIn, currentPos) ? Blocks.AIR.getDefaultState() : stateIn.with(LOCKED, isLocked);
 		}
@@ -102,7 +102,7 @@ public class QuartzDoorBlock extends DoorBlock {
 		}
 
 		if (this.canAccess(worldIn, pos, player)) {
-			state = state.func_235896_a_(OPEN);
+			state = state.cycleValue(OPEN);
 			worldIn.setBlockState(pos, state, 10);
 			worldIn.playEvent(player, state.get(OPEN) ? this.getOpenSound() : this.getCloseSound(), pos, 0);
 			return ActionResultType.SUCCESS;
@@ -113,7 +113,7 @@ public class QuartzDoorBlock extends DoorBlock {
 
 	@Override
 	public void openDoor(World worldIn, BlockState state, BlockPos pos, boolean open) {
-		if (state.isIn(this) && state.get(OPEN) != open && !state.get(LOCKED)) {
+		if (state.matchesBlock(this) && state.get(OPEN) != open && !state.get(LOCKED)) {
 			worldIn.setBlockState(pos, state.with(OPEN, open), 10);
 			this.playSound(worldIn, pos, open);
 		}

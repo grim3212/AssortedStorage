@@ -68,7 +68,7 @@ public class LockedDoorBlock extends DoorBlock {
 
 			boolean isValidBlock = doubleblockhalf == DoubleBlockHalf.UPPER ? worldIn.getBlockState(currentPos.down()).getBlock() instanceof DoorBlock : worldIn.getBlockState(currentPos.up()).getBlock() instanceof DoorBlock;
 
-			return facingState.isIn(this) && facingState.get(HALF) != doubleblockhalf ? stateIn.with(FACING, facingState.get(FACING)).with(OPEN, facingState.get(OPEN)).with(HINGE, facingState.get(HINGE)).with(POWERED, facingState.get(POWERED)) : isValidBlock ? stateIn : Blocks.AIR.getDefaultState();
+			return facingState.matchesBlock(this) && facingState.get(HALF) != doubleblockhalf ? stateIn.with(FACING, facingState.get(FACING)).with(OPEN, facingState.get(OPEN)).with(HINGE, facingState.get(HINGE)).with(POWERED, facingState.get(POWERED)) : isValidBlock ? stateIn : Blocks.AIR.getDefaultState();
 		} else {
 			return doubleblockhalf == DoubleBlockHalf.LOWER && facing == Direction.DOWN && !stateIn.isValidPosition(worldIn, currentPos) ? Blocks.AIR.getDefaultState() : stateIn;
 		}
@@ -90,7 +90,7 @@ public class LockedDoorBlock extends DoorBlock {
 		}
 
 		if (this.canAccess(worldIn, pos, player)) {
-			state = state.func_235896_a_(OPEN);
+			state = state.cycleValue(OPEN);
 			worldIn.setBlockState(pos, state, 10);
 			worldIn.playEvent(player, state.get(OPEN) ? this.getOpenSound() : this.getCloseSound(), pos, 0);
 			return ActionResultType.SUCCESS;
