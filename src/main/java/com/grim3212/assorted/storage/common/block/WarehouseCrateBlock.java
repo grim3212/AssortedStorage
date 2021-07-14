@@ -17,7 +17,7 @@ public class WarehouseCrateBlock extends BaseStorageBlock {
 	private final WoodType type;
 
 	public WarehouseCrateBlock(WoodType type) {
-		super(Block.Properties.create(Material.WOOD).sound(SoundType.WOOD));
+		super(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD));
 		this.type = type;
 	}
 
@@ -27,7 +27,7 @@ public class WarehouseCrateBlock extends BaseStorageBlock {
 	}
 
 	protected boolean isDoorBlocked(IWorld world, BlockPos pos) {
-		return isInvalidBlock(world, pos.up());
+		return isInvalidBlock(world, pos.above());
 	}
 
 	public WoodType getWoodType() {

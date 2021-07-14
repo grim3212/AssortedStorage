@@ -13,15 +13,15 @@ import net.minecraft.world.IBlockReader;
 
 public class ObsidianSafeBlock extends BaseStorageBlock {
 
-	private static final VoxelShape START_SHAPE = Block.makeCuboidShape(0.0D, 3.0D, 0.0D, 16.0D, 16.0D, 16.0D);
-	private static final VoxelShape LEG_1 = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 3.0D, 3.0D, 3.0D);
-	private static final VoxelShape LEG_2 = Block.makeCuboidShape(13.0D, 0.0D, 0.0D, 16.0D, 3.0D, 3.0D);
-	private static final VoxelShape LEG_3 = Block.makeCuboidShape(13.0D, 0.0D, 13.0D, 16.0D, 3.0D, 16.0D);
-	private static final VoxelShape LEG_4 = Block.makeCuboidShape(0.0D, 0.0D, 13.0D, 3.0D, 3.0D, 16.0D);
+	private static final VoxelShape START_SHAPE = Block.box(0.0D, 3.0D, 0.0D, 16.0D, 16.0D, 16.0D);
+	private static final VoxelShape LEG_1 = Block.box(0.0D, 0.0D, 0.0D, 3.0D, 3.0D, 3.0D);
+	private static final VoxelShape LEG_2 = Block.box(13.0D, 0.0D, 0.0D, 16.0D, 3.0D, 3.0D);
+	private static final VoxelShape LEG_3 = Block.box(13.0D, 0.0D, 13.0D, 16.0D, 3.0D, 16.0D);
+	private static final VoxelShape LEG_4 = Block.box(0.0D, 0.0D, 13.0D, 3.0D, 3.0D, 16.0D);
 	public static final VoxelShape SAFE_SHAPE = VoxelShapes.or(START_SHAPE, LEG_1, LEG_2, LEG_3, LEG_4);
 
 	public ObsidianSafeBlock(Properties properties) {
-		super(properties.setRequiresTool().hardnessAndResistance(50.0F, 1200.0F));
+		super(properties.requiresCorrectToolForDrops().strength(50.0F, 1200.0F));
 	}
 
 	@Override

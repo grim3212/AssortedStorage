@@ -16,26 +16,26 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 	}
 
 	@Override
-	protected void registerTags() {
-		Builder<Block> piglinBuilder = this.getOrCreateBuilder(BlockTags.GUARDED_BY_PIGLINS);
-		piglinBuilder.addItemEntry(StorageBlocks.ACACIA_WAREHOUSE_CRATE.get());
-		piglinBuilder.addItemEntry(StorageBlocks.BIRCH_WAREHOUSE_CRATE.get());
-		piglinBuilder.addItemEntry(StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get());
-		piglinBuilder.addItemEntry(StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get());
-		piglinBuilder.addItemEntry(StorageBlocks.OAK_WAREHOUSE_CRATE.get());
-		piglinBuilder.addItemEntry(StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get());
-		piglinBuilder.addItemEntry(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get());
-		piglinBuilder.addItemEntry(StorageBlocks.WARPED_WAREHOUSE_CRATE.get());
-		piglinBuilder.addItemEntry(StorageBlocks.GLASS_CABINET.get());
-		piglinBuilder.addItemEntry(StorageBlocks.WOOD_CABINET.get());
-		piglinBuilder.addItemEntry(StorageBlocks.GOLD_SAFE.get());
-		piglinBuilder.addItemEntry(StorageBlocks.OBSIDIAN_SAFE.get());
-		piglinBuilder.addItemEntry(StorageBlocks.LOCKER.get());
-		piglinBuilder.addItemEntry(StorageBlocks.ITEM_TOWER.get());
+	protected void addTags() {
+		Builder<Block> piglinBuilder = this.tag(BlockTags.GUARDED_BY_PIGLINS);
+		piglinBuilder.add(StorageBlocks.ACACIA_WAREHOUSE_CRATE.get());
+		piglinBuilder.add(StorageBlocks.BIRCH_WAREHOUSE_CRATE.get());
+		piglinBuilder.add(StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get());
+		piglinBuilder.add(StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get());
+		piglinBuilder.add(StorageBlocks.OAK_WAREHOUSE_CRATE.get());
+		piglinBuilder.add(StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get());
+		piglinBuilder.add(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get());
+		piglinBuilder.add(StorageBlocks.WARPED_WAREHOUSE_CRATE.get());
+		piglinBuilder.add(StorageBlocks.GLASS_CABINET.get());
+		piglinBuilder.add(StorageBlocks.WOOD_CABINET.get());
+		piglinBuilder.add(StorageBlocks.GOLD_SAFE.get());
+		piglinBuilder.add(StorageBlocks.OBSIDIAN_SAFE.get());
+		piglinBuilder.add(StorageBlocks.LOCKER.get());
+		piglinBuilder.add(StorageBlocks.ITEM_TOWER.get());
 
-		Builder<Block> doorBuilder = this.getOrCreateBuilder(BlockTags.DOORS);
+		Builder<Block> doorBuilder = this.tag(BlockTags.DOORS);
 		for (Block b : StorageBlocks.lockedDoors()) {
-			doorBuilder.addItemEntry(b);
+			doorBuilder.add(b);
 		}
 
 	}

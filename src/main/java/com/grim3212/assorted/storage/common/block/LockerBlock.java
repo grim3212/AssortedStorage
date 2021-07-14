@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 public class LockerBlock extends BaseStorageBlock {
 
 	public LockerBlock(Properties properties) {
-		super(properties.setRequiresTool().hardnessAndResistance(3.0F, 6.0F));
+		super(properties.requiresCorrectToolForDrops().strength(3.0F, 6.0F));
 	}
 
 	@Override
@@ -37,24 +37,24 @@ public class LockerBlock extends BaseStorageBlock {
 	}
 
 	@Override
-	public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
+	public float getDestroyProgress(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
 		if (isDualLocker(worldIn, pos) && isTopLocker(worldIn, pos))
-			return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos.down());
+			return super.getDestroyProgress(state, player, worldIn, pos.below());
 
-		return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
+		return super.getDestroyProgress(state, player, worldIn, pos);
 	}
 
 	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-		if ((worldIn.getBlockState(pos.down()).getBlock() == this && worldIn.getBlockState(pos.down(2)).getBlock() == this) || (worldIn.getBlockState(pos.up()).getBlock() == this && worldIn.getBlockState(pos.up(2)).getBlock() == this)) {
+	public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+		if ((worldIn.getBlockState(pos.below()).getBlock() == this && worldIn.getBlockState(pos.below(2)).getBlock() == this) || (worldIn.getBlockState(pos.above()).getBlock() == this && worldIn.getBlockState(pos.above(2)).getBlock() == this)) {
 			return;
 		}
 
-		super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+		super.setPlacedBy(worldIn, pos, state, placer, stack);
 
-		TileEntity tileentitytop = worldIn.getTileEntity(pos.up());
+		TileEntity tileentitytop = worldIn.getBlockEntity(pos.above());
 		if (isBottomLocker(worldIn, pos) && tileentitytop != null && (tileentitytop instanceof BaseStorageTileEntity)) {
-			BaseStorageTileEntity tileentitythis = (BaseStorageTileEntity) worldIn.getTileEntity(pos);
+			BaseStorageTileEntity tileentitythis = (BaseStorageTileEntity) worldIn.getBlockEntity(pos);
 			BaseStorageTileEntity tileentitystoragetop = (BaseStorageTileEntity) tileentitytop;
 
 			if (tileentitystoragetop.isLocked()) {
@@ -65,16 +65,16 @@ public class LockerBlock extends BaseStorageBlock {
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		if (isDualLocker(worldIn, pos)) {
 			if (isTopLocker(worldIn, pos)) {
-				return onBlockActivated(worldIn.getBlockState(pos.down()), worldIn, pos.down(), player, handIn, hit);
+				return use(worldIn.getBlockState(pos.below()), worldIn, pos.below(), player, handIn, hit);
 			}
 
-			return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+			return super.use(state, worldIn, pos, player, handIn, hit);
 		}
 
-		return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+		return super.use(state, worldIn, pos, player, handIn, hit);
 	}
 
 	public static boolean isDualLocker(IBlockReader world, BlockPos pos) {
@@ -82,10 +82,10 @@ public class LockerBlock extends BaseStorageBlock {
 	}
 
 	public static boolean isTopLocker(IBlockReader world, BlockPos pos) {
-		return world.getBlockState(pos.down()) == world.getBlockState(pos);
+		return world.getBlockState(pos.below()) == world.getBlockState(pos);
 	}
 
 	public static boolean isBottomLocker(IBlockReader world, BlockPos pos) {
-		return world.getBlockState(pos.up()) == world.getBlockState(pos);
+		return world.getBlockState(pos.above()) == world.getBlockState(pos);
 	}
 }

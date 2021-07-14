@@ -47,7 +47,7 @@ public class GoldSafeTileEntity extends BaseStorageTileEntity {
 	}
 
 	@Override
-	public boolean canInsertItem(int index, ItemStack itemStackIn, @Nullable Direction direction) {
-		return !(Block.getBlockFromItem(itemStackIn.getItem()) instanceof GoldSafeBlock) && super.canInsertItem(index, itemStackIn, direction);
+	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, @Nullable Direction direction) {
+		return !(Block.byItem(itemStackIn.getItem()) instanceof GoldSafeBlock) && super.canPlaceItemThroughFace(index, itemStackIn, direction);
 	}
 }

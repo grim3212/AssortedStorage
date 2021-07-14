@@ -36,17 +36,17 @@ public class ItemTowerInventory implements ISidedInventory {
 	}
 
 	private int getLocalSlot(int slot) {
-		return slot % this.getMainInventory().getSizeInventory();
+		return slot % this.getMainInventory().getContainerSize();
 	}
 
 	private ISidedInventory getInvFromSlot(int slot) {
-		int inventoryIndex = (int) Math.floor(slot / this.getMainInventory().getSizeInventory());
+		int inventoryIndex = (int) Math.floor(slot / this.getMainInventory().getContainerSize());
 		return (ISidedInventory) this.itemTowers.get(inventoryIndex);
 	}
 
 	@Override
-	public int getSizeInventory() {
-		return this.getMainInventory().getSizeInventory() * this.itemTowers.size();
+	public int getContainerSize() {
+		return this.getMainInventory().getContainerSize() * this.itemTowers.size();
 	}
 
 	@Override
@@ -61,72 +61,72 @@ public class ItemTowerInventory implements ISidedInventory {
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int index, ItemStack stack) {
-		return getInvFromSlot(index).isItemValidForSlot(getLocalSlot(index), stack);
+	public boolean canPlaceItem(int index, ItemStack stack) {
+		return getInvFromSlot(index).canPlaceItem(getLocalSlot(index), stack);
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int index) {
-		return getInvFromSlot(index).getStackInSlot(getLocalSlot(index));
+	public ItemStack getItem(int index) {
+		return getInvFromSlot(index).getItem(getLocalSlot(index));
 	}
 
 	@Override
-	public ItemStack decrStackSize(int index, int count) {
-		return getInvFromSlot(index).decrStackSize(getLocalSlot(index), count);
+	public ItemStack removeItem(int index, int count) {
+		return getInvFromSlot(index).removeItem(getLocalSlot(index), count);
 	}
 
 	@Override
-	public ItemStack removeStackFromSlot(int index) {
-		return this.getInvFromSlot(index).removeStackFromSlot(getLocalSlot(index));
+	public ItemStack removeItemNoUpdate(int index) {
+		return this.getInvFromSlot(index).removeItemNoUpdate(getLocalSlot(index));
 	}
 
 	@Override
-	public void setInventorySlotContents(int index, ItemStack stack) {
-		getInvFromSlot(index).setInventorySlotContents(getLocalSlot(index), stack);
+	public void setItem(int index, ItemStack stack) {
+		getInvFromSlot(index).setItem(getLocalSlot(index), stack);
 	}
 
 	@Override
-	public void markDirty() {
+	public void setChanged() {
 		for (ISidedInventory inventory : this.itemTowers)
-			inventory.markDirty();
+			inventory.setChanged();
 	}
 
 	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
-		return !(player.getDistanceSq((double) this.openedFrom.getX() + 0.5D, (double) this.openedFrom.getY() + 0.5D, (double) this.openedFrom.getZ() + 0.5D) > 64.0D);
+	public boolean stillValid(PlayerEntity player) {
+		return !(player.distanceToSqr((double) this.openedFrom.getX() + 0.5D, (double) this.openedFrom.getY() + 0.5D, (double) this.openedFrom.getZ() + 0.5D) > 64.0D);
 	}
 
 	@Override
-	public void openInventory(PlayerEntity player) {
+	public void startOpen(PlayerEntity player) {
 		for (ISidedInventory inventory : this.itemTowers)
-			inventory.openInventory(player);
+			inventory.startOpen(player);
 	}
 
 	@Override
-	public void closeInventory(PlayerEntity player) {
+	public void stopOpen(PlayerEntity player) {
 		for (ISidedInventory inventory : this.itemTowers)
-			inventory.closeInventory(player);
+			inventory.stopOpen(player);
 	}
 
 	@Override
-	public void clear() {
+	public void clearContent() {
 		for (ISidedInventory inv : itemTowers) {
-			inv.clear();
+			inv.clearContent();
 		}
 	}
 
 	@Override
 	public int[] getSlotsForFace(Direction side) {
-		return IntStream.range(0, this.getSizeInventory()).toArray();
+		return IntStream.range(0, this.getContainerSize()).toArray();
 	}
 
 	@Override
-	public boolean canInsertItem(int index, ItemStack itemStackIn, Direction direction) {
-		return this.getMainInventory().canInsertItem(index, itemStackIn, direction);
+	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction) {
+		return this.getMainInventory().canPlaceItemThroughFace(index, itemStackIn, direction);
 	}
 
 	@Override
-	public boolean canExtractItem(int index, ItemStack stack, Direction direction) {
-		return this.getMainInventory().canInsertItem(index, stack, direction);
+	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
+		return this.getMainInventory().canPlaceItemThroughFace(index, stack, direction);
 	}
 }

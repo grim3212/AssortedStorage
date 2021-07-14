@@ -31,24 +31,24 @@ public class BaseLockedTileEntity extends TileEntity {
 		else
 			this.lockCode = new StorageLockCode(s);
 
-		if (world != null) {
-			world.notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), 3);
-			if (!world.isRemote) {
-				world.updateBlock(pos, getBlockState().getBlock());
+		if (level != null) {
+			level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+			if (!level.isClientSide) {
+				level.blockUpdated(worldPosition, getBlockState().getBlock());
 			}
 		}
 	}
 
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 
 		this.readPacketNBT(nbt);
 	}
 
 	@Override
-	public CompoundNBT write(CompoundNBT compound) {
-		super.write(compound);
+	public CompoundNBT save(CompoundNBT compound) {
+		super.save(compound);
 
 		this.writePacketNBT(compound);
 
@@ -65,22 +65,22 @@ public class BaseLockedTileEntity extends TileEntity {
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return write(new CompoundNBT());
+		return save(new CompoundNBT());
 	}
 
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
 		CompoundNBT nbtTagCompound = new CompoundNBT();
 		writePacketNBT(nbtTagCompound);
-		return new SUpdateTileEntityPacket(this.pos, 1, nbtTagCompound);
+		return new SUpdateTileEntityPacket(this.worldPosition, 1, nbtTagCompound);
 	}
 
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-		this.readPacketNBT(pkt.getNbtCompound());
+		this.readPacketNBT(pkt.getTag());
 		requestModelDataUpdate();
-		if (world instanceof ClientWorld) {
-			world.notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), 0);
+		if (level instanceof ClientWorld) {
+			level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
 		}
 	}
 }

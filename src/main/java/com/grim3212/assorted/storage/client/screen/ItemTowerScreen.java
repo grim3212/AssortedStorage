@@ -23,16 +23,16 @@ public class ItemTowerScreen extends ContainerScreen<ItemTowerContainer> impleme
 
 	private static final ResourceLocation ITEM_TOWER_TEXTURE = new ResourceLocation(AssortedStorage.MODID, "textures/gui/container/item_tower.png");
 	private int rowId = 0;
-	private IInventory inventory;
+	private IInventory towerInventory;
 
 	public ItemTowerScreen(ItemTowerContainer container, PlayerInventory playerInventory, ITextComponent title) {
 		super(container, playerInventory, title);
 
-		this.inventory = this.container.getItemTowerInventory();
+		this.towerInventory = this.menu.getItemTowerInventory();
 
-		this.xSize = 176;
-		this.ySize = 150;
-		this.playerInventoryTitleY = this.ySize - 94;
+		this.imageWidth = 176;
+		this.imageHeight = 150;
+		this.inventoryLabelY = this.imageHeight - 94;
 
 		this.passEvents = false;
 	}
@@ -41,69 +41,69 @@ public class ItemTowerScreen extends ContainerScreen<ItemTowerContainer> impleme
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		this.renderBackground(matrixStack);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+		this.renderTooltip(matrixStack, mouseX, mouseY);
 	}
 
 	@Override
-	protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
+	protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
 		StringTextComponent title = new StringTextComponent(this.title.getString());
-		if (this.inventory.getSizeInventory() > 18) {
-			title.appendSibling(new TranslationTextComponent(AssortedStorage.MODID + ".container.item_tower.row", this.rowId + 1));
-			title.appendString(" " + this.inventory.getSizeInventory() / 9);
+		if (this.inventory.getContainerSize() > 18) {
+			title.append(new TranslationTextComponent(AssortedStorage.MODID + ".container.item_tower.row", this.rowId + 1));
+			title.append(" " + this.inventory.getContainerSize() / 9);
 		}
 
-		this.font.drawText(matrixStack, title, 8.0F, 6.0F, 4210752);
+		this.font.draw(matrixStack, title, 8.0F, 6.0F, 4210752);
 
-		this.font.drawText(matrixStack, this.playerInventory.getDisplayName(), 8.0F, (float) (this.ySize - 96 + 2), 4210752);
+		this.font.draw(matrixStack, this.inventory.getDisplayName(), 8.0F, (float) (this.imageHeight - 96 + 2), 4210752);
 
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int x, int y) {
+	protected void renderBg(MatrixStack matrixStack, float partialTicks, int x, int y) {
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		this.minecraft.getTextureManager().bindTexture(ITEM_TOWER_TEXTURE);
+		this.minecraft.getTextureManager().bind(ITEM_TOWER_TEXTURE);
 
-		int i = (this.width - this.xSize) / 2;
-		int j = (this.height - this.ySize) / 2;
+		int i = (this.width - this.imageWidth) / 2;
+		int j = (this.height - this.imageHeight) / 2;
 
-		this.blit(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
+		this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
 
-		if (this.inventory != null && this.inventory.getSizeInventory() > 18) {
+		if (this.inventory != null && this.inventory.getContainerSize() > 18) {
 			RenderSystem.enableBlend();
-			this.blit(matrixStack, i + this.xSize - 3, j, this.xSize, 0, 20, 57);
+			this.blit(matrixStack, i + this.imageWidth - 3, j, this.imageWidth, 0, 20, 57);
 			RenderSystem.disableBlend();
 		}
 
 	}
 
 	public void scrollInventory(boolean directionDown, boolean playSound) {
-		if (this.inventory != null && this.inventory.getSizeInventory() > 18) {
+		if (this.inventory != null && this.inventory.getContainerSize() > 18) {
 			int prevRowID = this.rowId;
 			if (directionDown) {
-				if (this.rowId < this.inventory.getSizeInventory() / 9 - 1)
+				if (this.rowId < this.inventory.getContainerSize() / 9 - 1)
 					this.rowId += 1;
 				else {
 					this.rowId = 0;
 				}
 
-				if (this.inventory instanceof ItemTowerInventory) {
-					((ItemTowerInventory) this.inventory).setAnimation(1);
+				if (this.towerInventory instanceof ItemTowerInventory) {
+					((ItemTowerInventory) this.towerInventory).setAnimation(1);
 				}
 
 			} else {
 				if (this.rowId > 0)
 					this.rowId -= 1;
 				else {
-					this.rowId = (this.inventory.getSizeInventory() / 9 - 1);
+					this.rowId = (this.inventory.getContainerSize() / 9 - 1);
 				}
 
-				if (this.inventory instanceof ItemTowerInventory) {
-					((ItemTowerInventory) this.inventory).setAnimation(-1);
+				if (this.towerInventory instanceof ItemTowerInventory) {
+					((ItemTowerInventory) this.towerInventory).setAnimation(-1);
 				}
 			}
 
 			if (prevRowID != this.rowId) {
-				this.container.setDisplayRow(this.rowId);
+				this.menu.setDisplayRow(this.rowId);
 				if (playSound)
 					this.minecraft.player.playSound(SoundEvents.UI_BUTTON_CLICK, 1.0F, 1.0F);
 			}
@@ -112,8 +112,8 @@ public class ItemTowerScreen extends ContainerScreen<ItemTowerContainer> impleme
 
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int p_231044_5_) {
-		double modx = mouseX - (this.width - this.xSize) / 2;
-		double mody = mouseY - (this.height - this.ySize) / 2;
+		double modx = mouseX - (this.width - this.imageWidth) / 2;
+		double mody = mouseY - (this.height - this.imageHeight) / 2;
 
 		if (modx >= 173 && modx < 186 && mody >= 22 && mody < 35)
 			scrollInventory(false, true);

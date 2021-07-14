@@ -46,7 +46,7 @@ public class ItemTowerTileEntity extends BaseStorageTileEntity {
 
 	@Override
 	public Container createMenu(int windowId, PlayerInventory player, PlayerEntity playerEntity) {
-		return ItemTowerContainer.createItemTowerContainer(windowId, player, new ItemTowerInventory(getItemTowers(), this.pos));
+		return ItemTowerContainer.createItemTowerContainer(windowId, player, new ItemTowerInventory(getItemTowers(), this.worldPosition));
 	}
 
 	@Override
@@ -62,18 +62,18 @@ public class ItemTowerTileEntity extends BaseStorageTileEntity {
 	}
 
 	public NonNullList<ItemTowerTileEntity> getItemTowers() {
-		BlockState state = world.getBlockState(pos);
+		BlockState state = level.getBlockState(worldPosition);
 		NonNullList<ItemTowerTileEntity> itemTowers = NonNullList.create();
 
 		int downBlocks = 1;
-		while (world.getBlockState(pos.down(downBlocks)) == state) {
+		while (level.getBlockState(worldPosition.below(downBlocks)) == state) {
 			downBlocks++;
 		}
 
 		int upBlocks = 1;
-		BlockPos bottomPos = pos.down(downBlocks);
-		while (world.getBlockState(bottomPos.up(upBlocks)) == state) {
-			itemTowers.add((ItemTowerTileEntity) world.getTileEntity(bottomPos.up(upBlocks)));
+		BlockPos bottomPos = worldPosition.below(downBlocks);
+		while (level.getBlockState(bottomPos.above(upBlocks)) == state) {
+			itemTowers.add((ItemTowerTileEntity) level.getBlockEntity(bottomPos.above(upBlocks)));
 			upBlocks++;
 		}
 
@@ -82,7 +82,7 @@ public class ItemTowerTileEntity extends BaseStorageTileEntity {
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		if (!this.removed && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+		if (!this.remove && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			return itemTowerItemHandler.cast();
 		}
 		return super.getCapability(cap, side);
@@ -91,12 +91,12 @@ public class ItemTowerTileEntity extends BaseStorageTileEntity {
 	private LazyOptional<?> itemTowerItemHandler = LazyOptional.of(() -> createSidedHandler());
 
 	protected IItemHandler createSidedHandler() {
-		return new SidedInvWrapper(new ItemTowerInventory(getItemTowers(), this.pos), null);
+		return new SidedInvWrapper(new ItemTowerInventory(getItemTowers(), this.worldPosition), null);
 	}
 
 	@Override
-	public void remove() {
-		super.remove();
+	public void setRemoved() {
+		super.setRemoved();
 		this.itemTowerItemHandler.invalidate();
 	}
 

@@ -20,9 +20,9 @@ import net.minecraft.util.IWorldPosCallable;
 public class LocksmithWorkbenchContainer extends Container {
 
 	private final IInventory craftMatrix = new Inventory(1) {
-		public void markDirty() {
-			super.markDirty();
-			LocksmithWorkbenchContainer.this.onCraftMatrixChanged(this);
+		public void setChanged() {
+			super.setChanged();
+			LocksmithWorkbenchContainer.this.slotsChanged(this);
 		};
 	};
 	private final CraftResultInventory craftResult = new CraftResultInventory();
@@ -30,7 +30,7 @@ public class LocksmithWorkbenchContainer extends Container {
 	private String lock = "";
 
 	public LocksmithWorkbenchContainer(int id, PlayerInventory playerInventory) {
-		this(id, playerInventory, IWorldPosCallable.DUMMY);
+		this(id, playerInventory, IWorldPosCallable.NULL);
 	}
 
 	public LocksmithWorkbenchContainer(int id, PlayerInventory playerInventory, IWorldPosCallable p_i50090_3_) {
@@ -39,7 +39,7 @@ public class LocksmithWorkbenchContainer extends Container {
 		
 		this.addSlot(new Slot(this.craftResult, 0, 120, 35) {
 			@Override
-			public boolean isItemValid(ItemStack stack) {
+			public boolean mayPlace(ItemStack stack) {
 				return false;
 			}
 
@@ -52,7 +52,7 @@ public class LocksmithWorkbenchContainer extends Container {
 
 		this.addSlot(new Slot(this.craftMatrix, 0, 41, 17 + 18) {
 			@Override
-			public boolean isItemValid(ItemStack stack) {
+			public boolean mayPlace(ItemStack stack) {
 				return stack.getItem() instanceof CombinationItem;
 			}
 		});
@@ -78,12 +78,12 @@ public class LocksmithWorkbenchContainer extends Container {
 	}
 
 	private void onTake() {
-		this.craftMatrix.setInventorySlotContents(0, ItemStack.EMPTY);
+		this.craftMatrix.setItem(0, ItemStack.EMPTY);
 	}
 
 	@Override
-	public void onCraftMatrixChanged(IInventory inventoryIn) {
-		super.onCraftMatrixChanged(inventoryIn);
+	public void slotsChanged(IInventory inventoryIn) {
+		super.slotsChanged(inventoryIn);
 
 		if (inventoryIn == this.craftMatrix) {
 			this.updateLock(this.lock);
@@ -91,16 +91,16 @@ public class LocksmithWorkbenchContainer extends Container {
 	}
 
 	@Override
-	public void onContainerClosed(PlayerEntity playerIn) {
-		super.onContainerClosed(playerIn);
-		this.worldPosCallable.consume((p_217068_2_, p_217068_3_) -> {
+	public void removed(PlayerEntity playerIn) {
+		super.removed(playerIn);
+		this.worldPosCallable.execute((p_217068_2_, p_217068_3_) -> {
 			this.clearContainer(playerIn, p_217068_2_, this.craftMatrix);
 		});
 	}
 
 	@Override
-	public boolean canInteractWith(PlayerEntity playerIn) {
-		return isWithinUsableDistance(this.worldPosCallable, playerIn, StorageBlocks.LOCKSMITH_WORKBENCH.get());
+	public boolean stillValid(PlayerEntity playerIn) {
+		return stillValid(this.worldPosCallable, playerIn, StorageBlocks.LOCKSMITH_WORKBENCH.get());
 	}
 
 	/**
@@ -108,39 +108,39 @@ public class LocksmithWorkbenchContainer extends Container {
 	 * moves the stack between the player inventory and the other inventory(s).
 	 */
 	@Override
-	public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+	public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
 		ItemStack itemstack = ItemStack.EMPTY;
-		Slot slot = this.inventorySlots.get(index);
-		if (slot != null && slot.getHasStack()) {
-			ItemStack itemstack1 = slot.getStack();
+		Slot slot = this.slots.get(index);
+		if (slot != null && slot.hasItem()) {
+			ItemStack itemstack1 = slot.getItem();
 			itemstack = itemstack1.copy();
 			if (index == 0) {
-				this.worldPosCallable.consume((p_217067_2_, p_217067_3_) -> {
-					itemstack1.getItem().onCreated(itemstack1, p_217067_2_, playerIn);
+				this.worldPosCallable.execute((p_217067_2_, p_217067_3_) -> {
+					itemstack1.getItem().onCraftedBy(itemstack1, p_217067_2_, playerIn);
 				});
-				if (!this.mergeItemStack(itemstack1, 2, 38, true)) {
+				if (!this.moveItemStackTo(itemstack1, 2, 38, true)) {
 					return ItemStack.EMPTY;
 				}
 
-				slot.onSlotChange(itemstack1, itemstack);
+				slot.onQuickCraft(itemstack1, itemstack);
 			} else if (index >= 2 && index < 38) {
-				if (!this.mergeItemStack(itemstack1, 1, 2, false)) {
+				if (!this.moveItemStackTo(itemstack1, 1, 2, false)) {
 					if (index < 37) {
-						if (!this.mergeItemStack(itemstack1, 29, 38, false)) {
+						if (!this.moveItemStackTo(itemstack1, 29, 38, false)) {
 							return ItemStack.EMPTY;
 						}
-					} else if (!this.mergeItemStack(itemstack1, 2, 29, false)) {
+					} else if (!this.moveItemStackTo(itemstack1, 2, 29, false)) {
 						return ItemStack.EMPTY;
 					}
 				}
-			} else if (!this.mergeItemStack(itemstack1, 2, 38, false)) {
+			} else if (!this.moveItemStackTo(itemstack1, 2, 38, false)) {
 				return ItemStack.EMPTY;
 			}
 
 			if (itemstack1.isEmpty()) {
-				slot.putStack(ItemStack.EMPTY);
+				slot.set(ItemStack.EMPTY);
 			} else {
-				slot.onSlotChanged();
+				slot.setChanged();
 			}
 
 			if (itemstack1.getCount() == itemstack.getCount()) {
@@ -149,7 +149,7 @@ public class LocksmithWorkbenchContainer extends Container {
 
 			ItemStack itemstack2 = slot.onTake(playerIn, itemstack1);
 			if (index == 0) {
-				playerIn.dropItem(itemstack2, false);
+				playerIn.drop(itemstack2, false);
 			}
 		}
 
@@ -162,13 +162,13 @@ public class LocksmithWorkbenchContainer extends Container {
 	 * was double-clicked.
 	 */
 	@Override
-	public boolean canMergeSlot(ItemStack stack, Slot slotIn) {
-		return slotIn.inventory != this.craftResult && super.canMergeSlot(stack, slotIn);
+	public boolean canTakeItemForPickAll(ItemStack stack, Slot slotIn) {
+		return slotIn.container != this.craftResult && super.canTakeItemForPickAll(stack, slotIn);
 	}
 
 	public void updateLock(String lock) {
 		this.lock = lock;
-		ItemStack itemstack = this.craftMatrix.getStackInSlot(0);
+		ItemStack itemstack = this.craftMatrix.getItem(0);
 
 		if (!itemstack.isEmpty() && itemstack.getItem() instanceof CombinationItem) {
 			if (!StringUtils.isBlank(lock)) {
@@ -184,15 +184,15 @@ public class LocksmithWorkbenchContainer extends Container {
 					output.setTag(tag);
 				}
 
-				this.craftResult.setInventorySlotContents(0, output);
+				this.craftResult.setItem(0, output);
 			} else {
-				this.craftResult.setInventorySlotContents(0, ItemStack.EMPTY);
+				this.craftResult.setItem(0, ItemStack.EMPTY);
 			}
 		} else {
-			this.craftResult.setInventorySlotContents(0, ItemStack.EMPTY);
+			this.craftResult.setItem(0, ItemStack.EMPTY);
 		}
 
-		this.detectAndSendChanges();
+		this.broadcastChanges();
 	}
 
 }

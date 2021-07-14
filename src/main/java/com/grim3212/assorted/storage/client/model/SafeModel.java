@@ -19,32 +19,32 @@ public class SafeModel extends BaseStorageModel {
 	private ModelRenderer[] safeInt = new ModelRenderer[5];
 
 	public SafeModel() {
-		super(RenderType::getEntityCutout);
+		super(RenderType::entityCutout);
 
-		this.safeMain = new ModelRenderer(this, 0, 0).setTextureSize(64, 48);
-		this.safeDoor = new ModelRenderer(this, 0, 32).setTextureSize(64, 48);
-		this.safeHandle = new ModelRenderer(this, 48, 0).setTextureSize(64, 48);
-		this.safeLock = new ModelRenderer(this, 48, 29).setTextureSize(64, 48);
-		this.safeLeg1 = new ModelRenderer(this, 0, 0).setTextureSize(64, 48);
-		this.safeLeg2 = new ModelRenderer(this, 0, 0).setTextureSize(64, 48);
-		this.safeLeg3 = new ModelRenderer(this, 0, 0).setTextureSize(64, 48);
-		this.safeLeg4 = new ModelRenderer(this, 0, 0).setTextureSize(64, 48);
-		this.safeInt[0] = new ModelRenderer(this, 14, 15).setTextureSize(64, 48);
-		this.safeInt[1] = new ModelRenderer(this, 14, 0).setTextureSize(64, 48);
-		this.safeInt[2] = new ModelRenderer(this, 33, 0).setTextureSize(64, 48);
-		this.safeInt[3] = new ModelRenderer(this, 0, 0).setTextureSize(64, 48);
-		this.safeInt[4] = new ModelRenderer(this, 16, 0).setTextureSize(64, 48);
+		this.safeMain = new ModelRenderer(this, 0, 0).setTexSize(64, 48);
+		this.safeDoor = new ModelRenderer(this, 0, 32).setTexSize(64, 48);
+		this.safeHandle = new ModelRenderer(this, 48, 0).setTexSize(64, 48);
+		this.safeLock = new ModelRenderer(this, 48, 29).setTexSize(64, 48);
+		this.safeLeg1 = new ModelRenderer(this, 0, 0).setTexSize(64, 48);
+		this.safeLeg2 = new ModelRenderer(this, 0, 0).setTexSize(64, 48);
+		this.safeLeg3 = new ModelRenderer(this, 0, 0).setTexSize(64, 48);
+		this.safeLeg4 = new ModelRenderer(this, 0, 0).setTexSize(64, 48);
+		this.safeInt[0] = new ModelRenderer(this, 14, 15).setTexSize(64, 48);
+		this.safeInt[1] = new ModelRenderer(this, 14, 0).setTexSize(64, 48);
+		this.safeInt[2] = new ModelRenderer(this, 33, 0).setTexSize(64, 48);
+		this.safeInt[3] = new ModelRenderer(this, 0, 0).setTexSize(64, 48);
+		this.safeInt[4] = new ModelRenderer(this, 16, 0).setTexSize(64, 48);
 
 		this.safeMain.addBox(0.0F, 3.0F, 0.0F, 16, 13, 16);
 
 		this.safeDoor.addBox(0.0F, 6.0F, 0.0F, 10, 7, 2, 0.0F);
-		this.safeDoor.setRotationPoint(3.0F, 0.0F, 15.0F);
+		this.safeDoor.setPos(3.0F, 0.0F, 15.0F);
 
 		this.safeHandle.addBox(7.0F, 8.0F, 2.0F, 1, 3, 1, 0.0F);
-		this.safeHandle.setRotationPoint(3.0F, 0.0F, 15.0F);
+		this.safeHandle.setPos(3.0F, 0.0F, 15.0F);
 
 		this.safeLock.addBox(6.0F, 6.0F, 1.0F, 3, 6, 1, 0.0F);
-		this.safeLock.setRotationPoint(3.0F, 0.0F, 15.1F);
+		this.safeLock.setPos(3.0F, 0.0F, 15.1F);
 
 		this.safeLeg1.addBox(0.0F, 0.0F, 0.0F, 3, 3, 3);
 		this.safeLeg2.addBox(13.0F, 0.0F, 0.0F, 3, 3, 3);
@@ -59,10 +59,10 @@ public class SafeModel extends BaseStorageModel {
 	}
 
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		this.safeDoor.rotateAngleY = (-(this.doorAngle / 90.0F));
-		this.safeHandle.rotateAngleY = (-(this.doorAngle / 90.0F));
-		this.safeLock.rotateAngleY = (-(this.doorAngle / 90.0F));
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+		this.safeDoor.yRot = (-(this.doorAngle / 90.0F));
+		this.safeHandle.yRot = (-(this.doorAngle / 90.0F));
+		this.safeLock.yRot = (-(this.doorAngle / 90.0F));
 		this.safeMain.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		this.safeDoor.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		if (this.renderHandle)

@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 public class ItemTowerBlock extends BaseStorageBlock {
 
 	public ItemTowerBlock(Properties properties) {
-		super(properties.setRequiresTool().hardnessAndResistance(3.0F, 6.0F));
+		super(properties.requiresCorrectToolForDrops().strength(3.0F, 6.0F));
 	}
 
 	@Override
@@ -21,7 +21,7 @@ public class ItemTowerBlock extends BaseStorageBlock {
 	}
 
 	protected boolean isDoorBlocked(IWorld world, BlockPos pos) {
-		return isInvalidBlock(world, pos.up());
+		return isInvalidBlock(world, pos.above());
 	}
 
 	@Override

@@ -47,50 +47,50 @@ import net.minecraftforge.fml.network.NetworkHooks;
 
 public abstract class BaseStorageBlock extends Block {
 
-	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
-	public static final VoxelShape FAKE_SIDES_AND_BOTTOM = Block.makeCuboidShape(0.01D, 0.01D, 0.01D, 16.0D, 16.0D, 16.0D);
+	public static final DirectionProperty FACING = HorizontalBlock.FACING;
+	public static final VoxelShape FAKE_SIDES_AND_BOTTOM = Block.box(0.01D, 0.01D, 0.01D, 16.0D, 16.0D, 16.0D);
 
 	public BaseStorageBlock(Properties properties) {
-		super(properties.hardnessAndResistance(3.0f, 5.0f));
-		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.NORTH));
+		super(properties.strength(3.0f, 5.0f));
+		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
 	}
 
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		if (context == ISelectionContext.dummy())
+		if (context == ISelectionContext.empty())
 			return FAKE_SIDES_AND_BOTTOM;
 
 		return super.getShape(state, worldIn, pos, context);
 	}
 
 	protected boolean isInvalidBlock(IWorld world, BlockPos pos) {
-		return !world.isAirBlock(pos) && world.getBlockState(pos).isOpaqueCube(world, pos);
+		return !world.isEmptyBlock(pos) && world.getBlockState(pos).isSolidRender(world, pos);
 	}
 
 	protected boolean isDoorBlocked(IWorld world, BlockPos pos) {
-		return isInvalidBlock(world, pos.offset(world.getBlockState(pos).get(FACING)));
+		return isInvalidBlock(world, pos.relative(world.getBlockState(pos).getValue(FACING)));
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.ENTITYBLOCK_ANIMATED;
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		Direction direction = context.getPlacementHorizontalFacing().getOpposite();
+		Direction direction = context.getHorizontalDirection().getOpposite();
 
-		return this.getDefaultState().with(FACING, direction);
+		return this.defaultBlockState().setValue(FACING, direction);
 	}
 
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(FACING);
 	}
 
 	@Override
-	public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
-		TileEntity te = worldIn.getTileEntity(pos);
+	public float getDestroyProgress(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
+		TileEntity te = worldIn.getBlockEntity(pos);
 
 		if (te instanceof BaseStorageTileEntity) {
 			BaseStorageTileEntity tileentity = (BaseStorageTileEntity) te;
@@ -99,24 +99,24 @@ public abstract class BaseStorageBlock extends Block {
 				return -1.0F;
 		}
 
-		return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
+		return super.getDestroyProgress(state, player, worldIn, pos);
 	}
 
 	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-		TileEntity tileentity = worldIn.getTileEntity(pos);
+	public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+		TileEntity tileentity = worldIn.getBlockEntity(pos);
 
 		if (tileentity instanceof BaseStorageTileEntity) {
-			if (stack.hasDisplayName()) {
-				((BaseStorageTileEntity) tileentity).setCustomName(stack.getDisplayName());
+			if (stack.hasCustomHoverName()) {
+				((BaseStorageTileEntity) tileentity).setCustomName(stack.getHoverName());
 			}
 		}
 	}
 
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
-			TileEntity tileentity = worldIn.getTileEntity(pos);
+			TileEntity tileentity = worldIn.getBlockEntity(pos);
 
 			if (tileentity instanceof BaseStorageTileEntity) {
 				BaseStorageTileEntity teStorage = (BaseStorageTileEntity) tileentity;
@@ -126,32 +126,32 @@ public abstract class BaseStorageBlock extends Block {
 					CompoundNBT tag = new CompoundNBT();
 					new StorageLockCode(teStorage.getLockCode()).write(tag);
 					lockStack.setTag(tag);
-					InventoryHelper.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
+					InventoryHelper.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
 				}
 
-				InventoryHelper.dropInventoryItems(worldIn, pos, (BaseStorageTileEntity) tileentity);
-				worldIn.updateComparatorOutputLevel(pos, this);
+				InventoryHelper.dropContents(worldIn, pos, (BaseStorageTileEntity) tileentity);
+				worldIn.updateNeighbourForOutputSignal(pos, this);
 			}
 
-			super.onReplaced(state, worldIn, pos, newState, isMoving);
+			super.onRemove(state, worldIn, pos, newState, isMoving);
 		}
 	}
 
 	protected boolean canBeLocked(World worldIn, BlockPos pos) {
-		return !((BaseStorageTileEntity) worldIn.getTileEntity(pos)).isLocked();
+		return !((BaseStorageTileEntity) worldIn.getBlockEntity(pos)).isLocked();
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (this.canBeLocked(worldIn, pos) && player.getHeldItem(handIn).getItem() == StorageItems.LOCKSMITH_LOCK.get()) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		if (this.canBeLocked(worldIn, pos) && player.getItemInHand(handIn).getItem() == StorageItems.LOCKSMITH_LOCK.get()) {
 			if (tryPlaceLock(worldIn, pos, player, handIn))
 				return ActionResultType.SUCCESS;
 		}
 
-		if (player.isSneaking() && this.canAccess(worldIn, pos, player)) {
-			TileEntity tileentity = worldIn.getTileEntity(pos);
+		if (player.isShiftKeyDown() && this.canAccess(worldIn, pos, player)) {
+			TileEntity tileentity = worldIn.getBlockEntity(pos);
 			if (tileentity instanceof BaseStorageTileEntity) {
-				BaseStorageTileEntity teStorage = (BaseStorageTileEntity) worldIn.getTileEntity(pos);
+				BaseStorageTileEntity teStorage = (BaseStorageTileEntity) worldIn.getBlockEntity(pos);
 
 				if (teStorage.isLocked()) {
 					ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
@@ -161,10 +161,10 @@ public abstract class BaseStorageBlock extends Block {
 
 					if (removeLock(worldIn, pos, player)) {
 						ItemEntity blockDropped = new ItemEntity(worldIn, (double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), lockStack);
-						if (!worldIn.isRemote) {
-							worldIn.addEntity(blockDropped);
+						if (!worldIn.isClientSide) {
+							worldIn.addFreshEntity(blockDropped);
 							if (!(player instanceof FakePlayer)) {
-								blockDropped.onCollideWithPlayer(player);
+								blockDropped.playerTouch(player);
 							}
 						}
 						return ActionResultType.SUCCESS;
@@ -174,11 +174,11 @@ public abstract class BaseStorageBlock extends Block {
 		}
 
 		if (!isDoorBlocked(worldIn, pos) && this.canAccess(worldIn, pos, player)) {
-			if (!worldIn.isRemote) {
-				INamedContainerProvider inamedcontainerprovider = this.getContainer(state, worldIn, pos);
+			if (!worldIn.isClientSide) {
+				INamedContainerProvider inamedcontainerprovider = this.getMenuProvider(state, worldIn, pos);
 				if (inamedcontainerprovider != null) {
 					NetworkHooks.openGui((ServerPlayerEntity) player, inamedcontainerprovider, pos);
-					player.addStat(this.getOpenStat());
+					player.awardStat(this.getOpenStat());
 				}
 			}
 		}
@@ -192,8 +192,8 @@ public abstract class BaseStorageBlock extends Block {
 
 	@Override
 	@Nullable
-	public INamedContainerProvider getContainer(BlockState state, World world, BlockPos pos) {
-		TileEntity tileentity = world.getTileEntity(pos);
+	public INamedContainerProvider getMenuProvider(BlockState state, World world, BlockPos pos) {
+		TileEntity tileentity = world.getBlockEntity(pos);
 		return tileentity instanceof INamedContainerProvider ? (INamedContainerProvider) tileentity : null;
 	}
 
@@ -203,47 +203,47 @@ public abstract class BaseStorageBlock extends Block {
 	}
 
 	@Override
-	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
-		super.eventReceived(state, worldIn, pos, id, param);
-		TileEntity tileentity = worldIn.getTileEntity(pos);
-		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
+	public boolean triggerEvent(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+		super.triggerEvent(state, worldIn, pos, id, param);
+		TileEntity tileentity = worldIn.getBlockEntity(pos);
+		return tileentity == null ? false : tileentity.triggerEvent(id, param);
 	}
 
 	@Override
-	public boolean hasComparatorInputOverride(BlockState state) {
+	public boolean hasAnalogOutputSignal(BlockState state) {
 		return true;
 	}
 
 	@Override
-	public int getComparatorInputOverride(BlockState blockState, World worldIn, BlockPos pos) {
-		return Container.calcRedstoneFromInventory((IInventory) worldIn.getTileEntity(pos));
+	public int getAnalogOutputSignal(BlockState blockState, World worldIn, BlockPos pos) {
+		return Container.getRedstoneSignalFromContainer((IInventory) worldIn.getBlockEntity(pos));
 	}
 
 	@Override
 	public BlockState rotate(BlockState state, Rotation rot) {
-		return state.with(FACING, rot.rotate(state.get(FACING)));
+		return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
 	}
 
 	@Override
 	public BlockState mirror(BlockState state, Mirror mirrorIn) {
-		return state.rotate(mirrorIn.toRotation(state.get(FACING)));
+		return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
 	}
 
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 		return false;
 	}
 
 	private boolean removeLock(World worldIn, BlockPos pos, PlayerEntity entityplayer) {
-		BaseStorageTileEntity tileentity = (BaseStorageTileEntity) worldIn.getTileEntity(pos);
+		BaseStorageTileEntity tileentity = (BaseStorageTileEntity) worldIn.getBlockEntity(pos);
 		tileentity.setLockCode("");
-		tileentity.getWorld().playSound(entityplayer, tileentity.getPos(), SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 0.5F, tileentity.getWorld().rand.nextFloat() * 0.1F + 0.9F);
+		tileentity.getLevel().playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundCategory.BLOCKS, 0.5F, tileentity.getLevel().random.nextFloat() * 0.1F + 0.9F);
 		return true;
 	}
 
 	private boolean tryPlaceLock(World worldIn, BlockPos pos, PlayerEntity entityplayer, Hand hand) {
-		BaseStorageTileEntity tileentity = (BaseStorageTileEntity) worldIn.getTileEntity(pos);
-		ItemStack itemstack = entityplayer.getHeldItem(hand);
+		BaseStorageTileEntity tileentity = (BaseStorageTileEntity) worldIn.getBlockEntity(pos);
+		ItemStack itemstack = entityplayer.getItemInHand(hand);
 
 		if (itemstack.hasTag()) {
 			String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
@@ -251,7 +251,7 @@ public abstract class BaseStorageBlock extends Block {
 				if (!entityplayer.isCreative())
 					itemstack.shrink(1);
 				tileentity.setLockCode(code);
-				tileentity.getWorld().playSound(entityplayer, tileentity.getPos(), SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 0.5F, tileentity.getWorld().rand.nextFloat() * 0.1F + 0.9F);
+				tileentity.getLevel().playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundCategory.BLOCKS, 0.5F, tileentity.getLevel().random.nextFloat() * 0.1F + 0.9F);
 				return true;
 			}
 
@@ -261,11 +261,11 @@ public abstract class BaseStorageBlock extends Block {
 	}
 
 	private boolean canAccess(IBlockReader worldIn, BlockPos pos, PlayerEntity entityplayer) {
-		BaseStorageTileEntity tileentity = (BaseStorageTileEntity) worldIn.getTileEntity(pos);
+		BaseStorageTileEntity tileentity = (BaseStorageTileEntity) worldIn.getBlockEntity(pos);
 
 		if (tileentity.isLocked()) {
-			for (int slot = 0; slot < entityplayer.inventory.getSizeInventory(); slot++) {
-				ItemStack itemstack = entityplayer.inventory.getStackInSlot(slot);
+			for (int slot = 0; slot < entityplayer.inventory.getContainerSize(); slot++) {
+				ItemStack itemstack = entityplayer.inventory.getItem(slot);
 
 				if ((!itemstack.isEmpty()) && (itemstack.getItem() == StorageItems.LOCKSMITH_KEY.get())) {
 					if (itemstack.hasTag()) {

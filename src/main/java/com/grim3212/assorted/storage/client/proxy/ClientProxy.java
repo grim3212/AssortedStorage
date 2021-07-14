@@ -24,7 +24,7 @@ public class ClientProxy implements IProxy {
 		
 
 		for (Block b : StorageBlocks.lockedDoors()) {
-			RenderTypeLookup.setRenderLayer(b, RenderType.getCutout());
+			RenderTypeLookup.setRenderLayer(b, RenderType.cutout());
 		}
 	}
 

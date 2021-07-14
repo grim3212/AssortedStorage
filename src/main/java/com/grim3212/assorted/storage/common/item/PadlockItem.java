@@ -42,7 +42,7 @@ public class PadlockItem extends CombinationItem {
 		doorMapping.put(Blocks.WARPED_DOOR, StorageBlocks.LOCKED_WARPED_DOOR.get());
 		doorMapping.put(Blocks.IRON_DOOR, StorageBlocks.LOCKED_IRON_DOOR.get());
 
-		Block quartzDoor = Registry.BLOCK.getOrDefault(new ResourceLocation("assorteddecor:quartz_door"));
+		Block quartzDoor = Registry.BLOCK.get(new ResourceLocation("assorteddecor:quartz_door"));
 		if (quartzDoor != Blocks.AIR) {
 			doorMapping.put(quartzDoor, StorageBlocks.LOCKED_QUARTZ_DOOR.get());
 		}
@@ -56,9 +56,9 @@ public class PadlockItem extends CombinationItem {
 	}
 
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		World world = context.getWorld();
-		BlockPos pos = context.getPos();
+	public ActionResultType useOn(ItemUseContext context) {
+		World world = context.getLevel();
+		BlockPos pos = context.getClickedPos();
 
 		PlayerEntity player = context.getPlayer();
 		Hand hand = context.getHand();
@@ -69,11 +69,11 @@ public class PadlockItem extends CombinationItem {
 			}
 		}
 
-		return super.onItemUse(context);
+		return super.useOn(context);
 	}
 
 	private boolean tryPlaceLock(World worldIn, BlockPos pos, PlayerEntity entityplayer, Hand hand) {
-		ItemStack itemstack = entityplayer.getHeldItem(hand);
+		ItemStack itemstack = entityplayer.getItemInHand(hand);
 
 		if (itemstack.hasTag()) {
 			String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
@@ -88,20 +88,20 @@ public class PadlockItem extends CombinationItem {
 				if (!entityplayer.isCreative())
 					itemstack.shrink(1);
 
-				worldIn.setBlockState(pos, newDoor.getDefaultState().with(DoorBlock.FACING, currentDoor.get(DoorBlock.FACING)).with(DoorBlock.OPEN, currentDoor.get(DoorBlock.OPEN)).with(DoorBlock.HINGE, currentDoor.get(DoorBlock.HINGE)).with(DoorBlock.HALF, currentDoor.get(DoorBlock.HALF)), 3);
-				worldIn.playSound(entityplayer, pos, SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 0.5F, worldIn.rand.nextFloat() * 0.1F + 0.9F);
-				BaseLockedTileEntity currentTE = (BaseLockedTileEntity) worldIn.getTileEntity(pos);
+				worldIn.setBlock(pos, newDoor.defaultBlockState().setValue(DoorBlock.FACING, currentDoor.getValue(DoorBlock.FACING)).setValue(DoorBlock.OPEN, currentDoor.getValue(DoorBlock.OPEN)).setValue(DoorBlock.HINGE, currentDoor.getValue(DoorBlock.HINGE)).setValue(DoorBlock.HALF, currentDoor.getValue(DoorBlock.HALF)), 3);
+				worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundCategory.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+				BaseLockedTileEntity currentTE = (BaseLockedTileEntity) worldIn.getBlockEntity(pos);
 				currentTE.setLockCode(code);
 
-				if (currentDoor.get(DoorBlock.HALF) == DoubleBlockHalf.UPPER) {
-					BlockState downState = worldIn.getBlockState(pos.down());
-					worldIn.setBlockState(pos.down(), newDoor.getDefaultState().with(DoorBlock.FACING, downState.get(DoorBlock.FACING)).with(DoorBlock.OPEN, downState.get(DoorBlock.OPEN)).with(DoorBlock.HINGE, downState.get(DoorBlock.HINGE)).with(DoorBlock.HALF, downState.get(DoorBlock.HALF)), 3);
-					BaseLockedTileEntity downTE = (BaseLockedTileEntity) worldIn.getTileEntity(pos.down());
+				if (currentDoor.getValue(DoorBlock.HALF) == DoubleBlockHalf.UPPER) {
+					BlockState downState = worldIn.getBlockState(pos.below());
+					worldIn.setBlock(pos.below(), newDoor.defaultBlockState().setValue(DoorBlock.FACING, downState.getValue(DoorBlock.FACING)).setValue(DoorBlock.OPEN, downState.getValue(DoorBlock.OPEN)).setValue(DoorBlock.HINGE, downState.getValue(DoorBlock.HINGE)).setValue(DoorBlock.HALF, downState.getValue(DoorBlock.HALF)), 3);
+					BaseLockedTileEntity downTE = (BaseLockedTileEntity) worldIn.getBlockEntity(pos.below());
 					downTE.setLockCode(code);
 				} else {
-					BlockState upState = worldIn.getBlockState(pos.up());
-					worldIn.setBlockState(pos.up(), newDoor.getDefaultState().with(DoorBlock.FACING, upState.get(DoorBlock.FACING)).with(DoorBlock.OPEN, upState.get(DoorBlock.OPEN)).with(DoorBlock.HINGE, upState.get(DoorBlock.HINGE)).with(DoorBlock.HALF, upState.get(DoorBlock.HALF)), 3);
-					BaseLockedTileEntity upTE = (BaseLockedTileEntity) worldIn.getTileEntity(pos.up());
+					BlockState upState = worldIn.getBlockState(pos.above());
+					worldIn.setBlock(pos.above(), newDoor.defaultBlockState().setValue(DoorBlock.FACING, upState.getValue(DoorBlock.FACING)).setValue(DoorBlock.OPEN, upState.getValue(DoorBlock.OPEN)).setValue(DoorBlock.HINGE, upState.getValue(DoorBlock.HINGE)).setValue(DoorBlock.HALF, upState.getValue(DoorBlock.HALF)), 3);
+					BaseLockedTileEntity upTE = (BaseLockedTileEntity) worldIn.getBlockEntity(pos.above());
 					upTE.setLockCode(code);
 				}
 

@@ -61,7 +61,7 @@ public class StorageLootProvider implements IDataProvider {
 	}
 
 	@Override
-	public void act(DirectoryCache cache) throws IOException {
+	public void run(DirectoryCache cache) throws IOException {
 		Map<ResourceLocation, LootTable.Builder> tables = new HashMap<>();
 
 		for (Block b : blocks) {
@@ -72,7 +72,7 @@ public class StorageLootProvider implements IDataProvider {
 
 		for (Map.Entry<ResourceLocation, LootTable.Builder> e : tables.entrySet()) {
 			Path path = getPath(generator.getOutputFolder(), e.getKey());
-			IDataProvider.save(GSON, cache, LootTableManager.toJson(e.getValue().setParameterSet(LootParameterSets.BLOCK).build()), path);
+			IDataProvider.save(GSON, cache, LootTableManager.serialize(e.getValue().setParamSet(LootParameterSets.BLOCK).build()), path);
 		}
 
 		door(StorageBlocks.LOCKED_IRON_DOOR.get(), Blocks.IRON_DOOR, cache);
@@ -88,7 +88,7 @@ public class StorageLootProvider implements IDataProvider {
 
 	private void door(Block b, Block out, DirectoryCache cache) throws IOException {
 		Path doorPath = getPath(generator.getOutputFolder(), b.getRegistryName());
-		IDataProvider.save(GSON, cache, LootTableManager.toJson(genDoor(b, out).setParameterSet(LootParameterSets.BLOCK).build()), doorPath);
+		IDataProvider.save(GSON, cache, LootTableManager.serialize(genDoor(b, out).setParamSet(LootParameterSets.BLOCK).build()), doorPath);
 	}
 
 	private static Path getPath(Path root, ResourceLocation id) {
@@ -96,22 +96,22 @@ public class StorageLootProvider implements IDataProvider {
 	}
 
 	private static LootTable.Builder genDoor(Block b, Block out) {
-		BlockStateProperty.Builder halfCondition = BlockStateProperty.builder(b).fromProperties(StatePropertiesPredicate.Builder.newBuilder().withProp(DoorBlock.HALF, DoubleBlockHalf.LOWER));
-		LootEntry.Builder<?> entry = ItemLootEntry.builder(out).acceptCondition(halfCondition);
-		LootPool.Builder pool = LootPool.builder().name("main").rolls(ConstantRange.of(1)).addEntry(entry).acceptCondition(SurvivesExplosion.builder());
-		return LootTable.builder().addLootPool(pool);
+		BlockStateProperty.Builder halfCondition = BlockStateProperty.hasBlockStateProperties(b).setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(DoorBlock.HALF, DoubleBlockHalf.LOWER));
+		LootEntry.Builder<?> entry = ItemLootEntry.lootTableItem(out).when(halfCondition);
+		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantRange.exactly(1)).add(entry).when(SurvivesExplosion.survivesExplosion());
+		return LootTable.lootTable().withPool(pool);
 	}
 
 	private static LootTable.Builder genRegular(Block b) {
-		LootEntry.Builder<?> entry = ItemLootEntry.builder(b);
-		LootPool.Builder pool = LootPool.builder().name("main").rolls(ConstantRange.of(1)).addEntry(entry).acceptCondition(SurvivesExplosion.builder());
-		return LootTable.builder().addLootPool(pool);
+		LootEntry.Builder<?> entry = ItemLootEntry.lootTableItem(b);
+		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantRange.exactly(1)).add(entry).when(SurvivesExplosion.survivesExplosion());
+		return LootTable.lootTable().withPool(pool);
 	}
 
 	private static LootTable.Builder genInventoryStorage(Block b) {
-		LootEntry.Builder<?> entry = ItemLootEntry.builder(b).acceptFunction(CopyName.builder(Source.BLOCK_ENTITY)).acceptFunction(SetContents.builderIn().addLootEntry(DynamicLootEntry.func_216162_a(GoldSafeBlock.CONTENTS)));
-		LootPool.Builder pool = LootPool.builder().name("main").rolls(ConstantRange.of(1)).addEntry(entry).acceptCondition(SurvivesExplosion.builder());
-		return LootTable.builder().addLootPool(pool);
+		LootEntry.Builder<?> entry = ItemLootEntry.lootTableItem(b).apply(CopyName.copyName(Source.BLOCK_ENTITY)).apply(SetContents.setContents().withEntry(DynamicLootEntry.dynamicEntry(GoldSafeBlock.CONTENTS)));
+		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantRange.exactly(1)).add(entry).when(SurvivesExplosion.survivesExplosion());
+		return LootTable.lootTable().withPool(pool);
 	}
 
 	@Override

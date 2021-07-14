@@ -33,30 +33,30 @@ public class StorageTileEntityRenderer<T extends TileEntity & IStorage> extends 
 	public void render(T tileEntityIn, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		BaseStorageTileEntity tileEntity = (BaseStorageTileEntity) tileEntityIn;
 
-		World world = tileEntity.getWorld();
+		World world = tileEntity.getLevel();
 		boolean flag = world != null;
 
-		BlockState blockstate = flag ? tileEntity.getBlockState() : (BlockState) tileEntity.getBlockToUse().getDefaultState().with(BaseStorageBlock.FACING, Direction.SOUTH);
+		BlockState blockstate = flag ? tileEntity.getBlockState() : (BlockState) tileEntity.getBlockToUse().defaultBlockState().setValue(BaseStorageBlock.FACING, Direction.SOUTH);
 		Block block = blockstate.getBlock();
 
 		if (block instanceof BaseStorageBlock) {
-			matrixStackIn.push();
-			float f = blockstate.get(BaseStorageBlock.FACING).getHorizontalAngle();
+			matrixStackIn.pushPose();
+			float f = blockstate.getValue(BaseStorageBlock.FACING).toYRot();
 			matrixStackIn.translate(0.5D, 0.5D, 0.5D);
-			matrixStackIn.rotate(Vector3f.YP.rotationDegrees(-f));
+			matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(-f));
 			matrixStackIn.translate(-0.5D, -0.5D, -0.5D);
 
 			float angle = tileEntity.getRotation(partialTicks);
 			angle *= 90f;
 
-			IVertexBuilder ivertexbuilder = bufferIn.getBuffer(this.model.getRenderType(this.textureLocation));
+			IVertexBuilder ivertexbuilder = bufferIn.getBuffer(this.model.renderType(this.textureLocation));
 
 			this.model.doorAngle = angle;
 			this.model.renderHandle = !tileEntity.isLocked();
 
-			this.model.render(matrixStackIn, ivertexbuilder, combinedLightIn, combinedOverlayIn, 1, 1, 1, 1);
+			this.model.renderToBuffer(matrixStackIn, ivertexbuilder, combinedLightIn, combinedOverlayIn, 1, 1, 1, 1);
 
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 	}
 }

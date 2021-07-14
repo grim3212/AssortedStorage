@@ -23,9 +23,9 @@ public class DualLockerScreen extends ContainerScreen<LockerContainer> implement
 	public DualLockerScreen(LockerContainer container, PlayerInventory playerInventory, ITextComponent title) {
 		super(container, playerInventory, title);
 
-		this.xSize += 17;
-		this.ySize = 204;
-		this.playerInventoryTitleY = this.ySize - 94;
+		this.imageWidth += 17;
+		this.imageHeight = 204;
+		this.inventoryLabelY = this.imageHeight - 94;
 
 		this.passEvents = false;
 	}
@@ -34,28 +34,28 @@ public class DualLockerScreen extends ContainerScreen<LockerContainer> implement
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		this.renderBackground(matrixStack);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+		this.renderTooltip(matrixStack, mouseX, mouseY);
 	}
 
 	@Override
-	protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
-		this.font.drawText(matrixStack, this.title, 8.0F, 6.0F, 4210752);
+	protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
+		this.font.draw(matrixStack, this.title, 8.0F, 6.0F, 4210752);
 
-		this.font.drawText(matrixStack, this.playerInventory.getDisplayName(), 8.0F, (float) (this.ySize - 96 + 2), 4210752);
+		this.font.draw(matrixStack, this.inventory.getDisplayName(), 8.0F, (float) (this.imageHeight - 96 + 2), 4210752);
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int x, int y) {
+	protected void renderBg(MatrixStack matrixStack, float partialTicks, int x, int y) {
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		this.minecraft.getTextureManager().bindTexture(LOCKER_TEXTURE);
+		this.minecraft.getTextureManager().bind(LOCKER_TEXTURE);
 
-		int i = (this.width - this.xSize) / 2;
-		int j = (this.height - this.ySize) / 2;
+		int i = (this.width - this.imageWidth) / 2;
+		int j = (this.height - this.imageHeight) / 2;
 
-		this.blit(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
+		this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
 
 		RenderSystem.enableBlend();
-		this.blit(matrixStack, i + (this.xSize - 18), j + 20 + this.rowId, this.xSize, 0, 10, 5);
+		this.blit(matrixStack, i + (this.imageWidth - 18), j + 20 + this.rowId, this.imageWidth, 0, 10, 5);
 		RenderSystem.disableBlend();
 
 	}
@@ -70,7 +70,7 @@ public class DualLockerScreen extends ContainerScreen<LockerContainer> implement
 			this.rowId -= 1;
 
 		if (prevRowID != this.rowId) {
-			this.container.setDisplayRow(this.rowId);
+			this.menu.setDisplayRow(this.rowId);
 			if (playSound)
 				this.minecraft.player.playSound(SoundEvents.UI_BUTTON_CLICK, 1.0F, 1.0F);
 		}
@@ -78,8 +78,8 @@ public class DualLockerScreen extends ContainerScreen<LockerContainer> implement
 
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int p_231044_5_) {
-		double modx = mouseX - (this.width - this.xSize) / 2;
-		double mody = mouseY - (this.height - this.ySize) / 2;
+		double modx = mouseX - (this.width - this.imageWidth) / 2;
+		double mody = mouseY - (this.height - this.imageHeight) / 2;
 
 		if (modx >= 173 && modx < 186 && mody >= 7 && mody < 20)
 			scrollInventory(false, true);

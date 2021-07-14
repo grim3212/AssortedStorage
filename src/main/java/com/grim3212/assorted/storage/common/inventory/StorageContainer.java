@@ -59,9 +59,9 @@ public class StorageContainer extends Container {
 		super(containerType, windowId);
 		this.inventory = inventory;
 
-		int numRows = inventory.getSizeInventory() / 9;
+		int numRows = inventory.getContainerSize() / 9;
 
-		inventory.openInventory(playerInventory.player);
+		inventory.startOpen(playerInventory.player);
 
 		for (int chestRow = 0; chestRow < numRows; chestRow++) {
 			for (int chestCol = 0; chestCol < 9; chestCol++) {
@@ -85,32 +85,32 @@ public class StorageContainer extends Container {
 	}
 
 	@Override
-	public boolean canInteractWith(PlayerEntity playerIn) {
-		return this.inventory.isUsableByPlayer(playerIn);
+	public boolean stillValid(PlayerEntity playerIn) {
+		return this.inventory.stillValid(playerIn);
 	}
 
 	@Override
-	public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+	public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
 		ItemStack itemstack = ItemStack.EMPTY;
-		Slot slot = this.inventorySlots.get(index);
+		Slot slot = this.slots.get(index);
 
-		if (slot != null && slot.getHasStack()) {
-			ItemStack itemstack1 = slot.getStack();
+		if (slot != null && slot.hasItem()) {
+			ItemStack itemstack1 = slot.getItem();
 			itemstack = itemstack1.copy();
-			int maxSlot = this.inventory.getSizeInventory();
+			int maxSlot = this.inventory.getContainerSize();
 
 			if (index < maxSlot) {
-				if (!this.mergeItemStack(itemstack1, maxSlot, this.inventorySlots.size(), true)) {
+				if (!this.moveItemStackTo(itemstack1, maxSlot, this.slots.size(), true)) {
 					return ItemStack.EMPTY;
 				}
-			} else if (!this.mergeItemStack(itemstack1, 0, maxSlot, false)) {
+			} else if (!this.moveItemStackTo(itemstack1, 0, maxSlot, false)) {
 				return ItemStack.EMPTY;
 			}
 
 			if (itemstack1.isEmpty()) {
-				slot.putStack(ItemStack.EMPTY);
+				slot.set(ItemStack.EMPTY);
 			} else {
-				slot.onSlotChanged();
+				slot.setChanged();
 			}
 		}
 
@@ -118,9 +118,9 @@ public class StorageContainer extends Container {
 	}
 
 	@Override
-	public void onContainerClosed(PlayerEntity playerIn) {
-		super.onContainerClosed(playerIn);
-		this.inventory.closeInventory(playerIn);
+	public void removed(PlayerEntity playerIn) {
+		super.removed(playerIn);
+		this.inventory.stopOpen(playerIn);
 	}
 
 }

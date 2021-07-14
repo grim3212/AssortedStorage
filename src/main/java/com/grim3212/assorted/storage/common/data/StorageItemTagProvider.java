@@ -16,8 +16,8 @@ public class StorageItemTagProvider extends ItemTagsProvider {
 	}
 
 	@Override
-	protected void registerTags() {
-		this.getOrCreateBuilder(ItemTags.PIGLIN_LOVED).addItemEntry(StorageBlocks.GOLD_SAFE.get().asItem());
+	protected void addTags() {
+		this.tag(ItemTags.PIGLIN_LOVED).add(StorageBlocks.GOLD_SAFE.get().asItem());
 	}
 
 	@Override

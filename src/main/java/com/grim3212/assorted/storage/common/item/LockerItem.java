@@ -17,16 +17,16 @@ public class LockerItem extends BlockItem {
 
 	@Override
 	protected boolean canPlace(BlockItemUseContext context, BlockState state) {
-		World world = context.getWorld();
-		BlockPos pos = context.getPos();
+		World world = context.getLevel();
+		BlockPos pos = context.getClickedPos();
 
 		if (!super.canPlace(context, state))
 			return false;
 
-		if (world.getBlockState(pos.down()).getBlock() == this.getBlock()) {
-			return !LockerBlock.isTopLocker(world, pos.down());
-		} else if (world.getBlockState(pos.up()).getBlock() == this.getBlock()) {
-			return !LockerBlock.isBottomLocker(world, pos.up());
+		if (world.getBlockState(pos.below()).getBlock() == this.getBlock()) {
+			return !LockerBlock.isTopLocker(world, pos.below());
+		} else if (world.getBlockState(pos.above()).getBlock() == this.getBlock()) {
+			return !LockerBlock.isBottomLocker(world, pos.above());
 		}
 
 		return true;

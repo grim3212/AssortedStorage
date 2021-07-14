@@ -24,16 +24,16 @@ public class DualLockerInventory implements ISidedInventory {
 	private int getLocalSlot(int slot) {
 		if (!hasTopLocker() || getInvFromSlot(slot) == this.topLocker)
 			return slot;
-		return slot - this.topLocker.getSizeInventory();
+		return slot - this.topLocker.getContainerSize();
 	}
 
 	private ISidedInventory getInvFromSlot(int slot) {
-		return !hasTopLocker() ? this.bottomLocker : slot < this.topLocker.getSizeInventory() ? this.topLocker : this.bottomLocker;
+		return !hasTopLocker() ? this.bottomLocker : slot < this.topLocker.getContainerSize() ? this.topLocker : this.bottomLocker;
 	}
 
 	@Override
-	public int getSizeInventory() {
-		return hasTopLocker() ? this.topLocker.getSizeInventory() : 0 + this.bottomLocker.getSizeInventory();
+	public int getContainerSize() {
+		return hasTopLocker() ? this.topLocker.getContainerSize() : 0 + this.bottomLocker.getContainerSize();
 	}
 
 	@Override
@@ -42,61 +42,61 @@ public class DualLockerInventory implements ISidedInventory {
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int index) {
-		return getInvFromSlot(index).getStackInSlot(getLocalSlot(index));
+	public ItemStack getItem(int index) {
+		return getInvFromSlot(index).getItem(getLocalSlot(index));
 	}
 
 	@Override
-	public ItemStack decrStackSize(int index, int count) {
-		return getInvFromSlot(index).decrStackSize(getLocalSlot(index), count);
+	public ItemStack removeItem(int index, int count) {
+		return getInvFromSlot(index).removeItem(getLocalSlot(index), count);
 	}
 
 	@Override
-	public ItemStack removeStackFromSlot(int index) {
-		return this.getInvFromSlot(index).removeStackFromSlot(getLocalSlot(index));
+	public ItemStack removeItemNoUpdate(int index) {
+		return this.getInvFromSlot(index).removeItemNoUpdate(getLocalSlot(index));
 	}
 
 	@Override
-	public void setInventorySlotContents(int index, ItemStack stack) {
-		getInvFromSlot(index).setInventorySlotContents(getLocalSlot(index), stack);
+	public void setItem(int index, ItemStack stack) {
+		getInvFromSlot(index).setItem(getLocalSlot(index), stack);
 	}
 
 	@Override
-	public void markDirty() {
-		this.bottomLocker.markDirty();
+	public void setChanged() {
+		this.bottomLocker.setChanged();
 		if (hasTopLocker())
-			this.topLocker.markDirty();
+			this.topLocker.setChanged();
 	}
 
 	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
-		return hasTopLocker() ? this.topLocker.isUsableByPlayer(player) : true && this.bottomLocker.isUsableByPlayer(player);
+	public boolean stillValid(PlayerEntity player) {
+		return hasTopLocker() ? this.topLocker.stillValid(player) : true && this.bottomLocker.stillValid(player);
 	}
 
 	@Override
-	public void openInventory(PlayerEntity player) {
-		this.bottomLocker.openInventory(player);
+	public void startOpen(PlayerEntity player) {
+		this.bottomLocker.startOpen(player);
 		if (hasTopLocker())
-			this.topLocker.openInventory(player);
+			this.topLocker.startOpen(player);
 	}
 
 	@Override
-	public void closeInventory(PlayerEntity player) {
-		this.bottomLocker.closeInventory(player);
+	public void stopOpen(PlayerEntity player) {
+		this.bottomLocker.stopOpen(player);
 		if (hasTopLocker())
-			this.topLocker.closeInventory(player);
+			this.topLocker.stopOpen(player);
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int index, ItemStack stack) {
-		return getInvFromSlot(index).isItemValidForSlot(getLocalSlot(index), stack);
+	public boolean canPlaceItem(int index, ItemStack stack) {
+		return getInvFromSlot(index).canPlaceItem(getLocalSlot(index), stack);
 	}
 
 	@Override
-	public void clear() {
-		this.bottomLocker.clear();
+	public void clearContent() {
+		this.bottomLocker.clearContent();
 		if (hasTopLocker())
-			this.topLocker.clear();
+			this.topLocker.clearContent();
 	}
 
 	private static final int[] ONE_LOCKER = IntStream.range(0, 45).toArray();
@@ -110,13 +110,13 @@ public class DualLockerInventory implements ISidedInventory {
 	}
 
 	@Override
-	public boolean canInsertItem(int index, ItemStack itemStackIn, Direction direction) {
-		return this.bottomLocker.canInsertItem(index, itemStackIn, direction);
+	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction) {
+		return this.bottomLocker.canPlaceItemThroughFace(index, itemStackIn, direction);
 	}
 
 	@Override
-	public boolean canExtractItem(int index, ItemStack stack, Direction direction) {
-		return this.bottomLocker.canExtractItem(index, stack, direction);
+	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
+		return this.bottomLocker.canTakeItemThroughFace(index, stack, direction);
 	}
 
 }

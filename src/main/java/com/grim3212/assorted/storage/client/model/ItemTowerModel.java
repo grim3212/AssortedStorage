@@ -43,33 +43,33 @@ public class ItemTowerModel extends Model {
 	public float[] BottomSectionFramesZ = new float[100];
 
 	public ItemTowerModel() {
-		super(RenderType::getEntityCutout);
+		super(RenderType::entityCutout);
 
-		this.towerMain = new ModelRenderer(this, 0, 0).setTextureSize(128, 128);
-		this.towerMainInt = new ModelRenderer(this, 0, 0).setTextureSize(128, 128);
+		this.towerMain = new ModelRenderer(this, 0, 0).setTexSize(128, 128);
+		this.towerMainInt = new ModelRenderer(this, 0, 0).setTexSize(128, 128);
 
-		this.towerPost[0] = new ModelRenderer(this, 0, 80).setTextureSize(128, 128);
-		this.towerPost[1] = new ModelRenderer(this, 12, 80).setTextureSize(128, 128);
-		this.towerPost[2] = new ModelRenderer(this, 0, 99).setTextureSize(128, 128);
-		this.towerPost[3] = new ModelRenderer(this, 12, 99).setTextureSize(128, 128);
+		this.towerPost[0] = new ModelRenderer(this, 0, 80).setTexSize(128, 128);
+		this.towerPost[1] = new ModelRenderer(this, 12, 80).setTexSize(128, 128);
+		this.towerPost[2] = new ModelRenderer(this, 0, 99).setTexSize(128, 128);
+		this.towerPost[3] = new ModelRenderer(this, 12, 99).setTexSize(128, 128);
 
-		this.towerCap[0] = new ModelRenderer(this, 64, 0).setTextureSize(128, 128);
-		this.towerCap[1] = new ModelRenderer(this, 64, 0).setTextureSize(128, 128);
+		this.towerCap[0] = new ModelRenderer(this, 64, 0).setTexSize(128, 128);
+		this.towerCap[1] = new ModelRenderer(this, 64, 0).setTexSize(128, 128);
 
-		this.towerSideBar[0] = new ModelRenderer(this, 0, 32).setTextureSize(128, 128);
-		this.towerSideBar[1] = new ModelRenderer(this, 0, 34).setTextureSize(128, 128);
-		this.towerSideBar[2] = new ModelRenderer(this, 0, 32).setTextureSize(128, 128);
-		this.towerSideBar[3] = new ModelRenderer(this, 0, 34).setTextureSize(128, 128);
-		this.towerSideBar[4] = new ModelRenderer(this, 0, 32).setTextureSize(128, 128);
-		this.towerSideBar[5] = new ModelRenderer(this, 0, 34).setTextureSize(128, 128);
-		this.towerSideBar[6] = new ModelRenderer(this, 0, 32).setTextureSize(128, 128);
-		this.towerSideBar[7] = new ModelRenderer(this, 0, 34).setTextureSize(128, 128);
+		this.towerSideBar[0] = new ModelRenderer(this, 0, 32).setTexSize(128, 128);
+		this.towerSideBar[1] = new ModelRenderer(this, 0, 34).setTexSize(128, 128);
+		this.towerSideBar[2] = new ModelRenderer(this, 0, 32).setTexSize(128, 128);
+		this.towerSideBar[3] = new ModelRenderer(this, 0, 34).setTexSize(128, 128);
+		this.towerSideBar[4] = new ModelRenderer(this, 0, 32).setTexSize(128, 128);
+		this.towerSideBar[5] = new ModelRenderer(this, 0, 34).setTexSize(128, 128);
+		this.towerSideBar[6] = new ModelRenderer(this, 0, 32).setTexSize(128, 128);
+		this.towerSideBar[7] = new ModelRenderer(this, 0, 34).setTexSize(128, 128);
 
-		this.towerMidBar[0] = new ModelRenderer(this, 0, 45).setTextureSize(128, 128);
-		this.towerMidBar[1] = new ModelRenderer(this, 48, 32).setTextureSize(128, 128);
-		this.towerMidBar[2] = new ModelRenderer(this, 48, 32).setTextureSize(128, 128);
-		this.towerMidBar[3] = new ModelRenderer(this, 48, 32).setTextureSize(128, 128);
-		this.towerMidBar[4] = new ModelRenderer(this, 48, 32).setTextureSize(128, 128);
+		this.towerMidBar[0] = new ModelRenderer(this, 0, 45).setTexSize(128, 128);
+		this.towerMidBar[1] = new ModelRenderer(this, 48, 32).setTexSize(128, 128);
+		this.towerMidBar[2] = new ModelRenderer(this, 48, 32).setTexSize(128, 128);
+		this.towerMidBar[3] = new ModelRenderer(this, 48, 32).setTexSize(128, 128);
+		this.towerMidBar[4] = new ModelRenderer(this, 48, 32).setTexSize(128, 128);
 
 		this.towerMain.addBox(0.0F, 0.0F, 0.0F, 16, 16, 16);
 		this.towerMainInt.addBox(16.01F, 16.01F, 16.01F, -16, -16, -16);
@@ -185,11 +185,11 @@ public class ItemTowerModel extends Model {
 	}
 
 	public void makeShelf(ModelRenderer[] model) {
-		model[0] = new ModelRenderer(this, 0, 64).setTextureSize(128, 128);
-		model[1] = new ModelRenderer(this, 0, 68).setTextureSize(128, 128);
-		model[2] = new ModelRenderer(this, 0, 68).setTextureSize(128, 128);
-		model[3] = new ModelRenderer(this, 0, 72).setTextureSize(128, 128);
-		model[4] = new ModelRenderer(this, 0, 72).setTextureSize(128, 128);
+		model[0] = new ModelRenderer(this, 0, 64).setTexSize(128, 128);
+		model[1] = new ModelRenderer(this, 0, 68).setTexSize(128, 128);
+		model[2] = new ModelRenderer(this, 0, 68).setTexSize(128, 128);
+		model[3] = new ModelRenderer(this, 0, 72).setTexSize(128, 128);
+		model[4] = new ModelRenderer(this, 0, 72).setTexSize(128, 128);
 
 		model[0].addBox(1.0F, 0.0F, 0.0F, 14, 1, 3);
 		model[1].addBox(1.0F, 1.0F, 0.0F, 1, 1, 3);
@@ -214,7 +214,7 @@ public class ItemTowerModel extends Model {
 	}
 
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		if (this.bottomBlock && this.topBlock) {
 			this.towerMain.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			this.towerMainInt.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);

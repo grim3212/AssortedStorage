@@ -14,8 +14,8 @@ public class MoveableSlot extends Slot {
 	}
 
 	public void setSlotPosition(int slotX, int slotY) {
-		this.xPos = slotX;
-		this.yPos = slotY;
+		this.x = slotX;
+		this.y = slotY;
 		this.shouldRender = true;
 	}
 
@@ -25,7 +25,7 @@ public class MoveableSlot extends Slot {
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean isEnabled() {
+	public boolean isActive() {
 		return this.shouldRender;
 	}
 }

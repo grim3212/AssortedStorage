@@ -36,14 +36,14 @@ public class LockedDoorBlock extends DoorBlock {
 
 	public LockedDoorBlock(Block parent, Properties builder) {
 		super(builder);
-		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.NORTH).with(OPEN, false).with(HINGE, DoorHingeSide.LEFT).with(POWERED, false).with(HALF, DoubleBlockHalf.LOWER));
+		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(OPEN, false).setValue(HINGE, DoorHingeSide.LEFT).setValue(POWERED, false).setValue(HALF, DoubleBlockHalf.LOWER));
 		this.parent = parent;
 	}
 
 	public LockedDoorBlock(ResourceLocation parent, Properties builder) {
 		super(builder);
-		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.NORTH).with(OPEN, false).with(HINGE, DoorHingeSide.LEFT).with(POWERED, false).with(HALF, DoubleBlockHalf.LOWER));
-		this.parent = Registry.BLOCK.getOrDefault(parent);
+		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(OPEN, false).setValue(HINGE, DoorHingeSide.LEFT).setValue(POWERED, false).setValue(HALF, DoubleBlockHalf.LOWER));
+		this.parent = Registry.BLOCK.get(parent);
 	}
 
 	@Override
@@ -57,29 +57,29 @@ public class LockedDoorBlock extends DoorBlock {
 	}
 
 	@Override
-	public void openDoor(World worldIn, BlockState state, BlockPos pos, boolean open) {
+	public void setOpen(World worldIn, BlockState state, BlockPos pos, boolean open) {
 		// AI can't open locked doors
 	}
 
 	@Override
-	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-		DoubleBlockHalf doubleblockhalf = stateIn.get(HALF);
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		DoubleBlockHalf doubleblockhalf = stateIn.getValue(HALF);
 		if (facing.getAxis() == Direction.Axis.Y && doubleblockhalf == DoubleBlockHalf.LOWER == (facing == Direction.UP)) {
 
-			boolean isValidBlock = doubleblockhalf == DoubleBlockHalf.UPPER ? worldIn.getBlockState(currentPos.down()).getBlock() instanceof DoorBlock : worldIn.getBlockState(currentPos.up()).getBlock() instanceof DoorBlock;
+			boolean isValidBlock = doubleblockhalf == DoubleBlockHalf.UPPER ? worldIn.getBlockState(currentPos.below()).getBlock() instanceof DoorBlock : worldIn.getBlockState(currentPos.above()).getBlock() instanceof DoorBlock;
 
-			return facingState.matchesBlock(this) && facingState.get(HALF) != doubleblockhalf ? stateIn.with(FACING, facingState.get(FACING)).with(OPEN, facingState.get(OPEN)).with(HINGE, facingState.get(HINGE)).with(POWERED, facingState.get(POWERED)) : isValidBlock ? stateIn : Blocks.AIR.getDefaultState();
+			return facingState.is(this) && facingState.getValue(HALF) != doubleblockhalf ? stateIn.setValue(FACING, facingState.getValue(FACING)).setValue(OPEN, facingState.getValue(OPEN)).setValue(HINGE, facingState.getValue(HINGE)).setValue(POWERED, facingState.getValue(POWERED)) : isValidBlock ? stateIn : Blocks.AIR.defaultBlockState();
 		} else {
-			return doubleblockhalf == DoubleBlockHalf.LOWER && facing == Direction.DOWN && !stateIn.isValidPosition(worldIn, currentPos) ? Blocks.AIR.getDefaultState() : stateIn;
+			return doubleblockhalf == DoubleBlockHalf.LOWER && facing == Direction.DOWN && !stateIn.canSurvive(worldIn, currentPos) ? Blocks.AIR.defaultBlockState() : stateIn;
 		}
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (player.isSneaking() && this.canAccess(worldIn, pos, player)) {
-			TileEntity tileentity = worldIn.getTileEntity(pos);
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		if (player.isShiftKeyDown() && this.canAccess(worldIn, pos, player)) {
+			TileEntity tileentity = worldIn.getBlockEntity(pos);
 			if (tileentity instanceof BaseLockedTileEntity) {
-				BaseLockedTileEntity teStorage = (BaseLockedTileEntity) worldIn.getTileEntity(pos);
+				BaseLockedTileEntity teStorage = (BaseLockedTileEntity) worldIn.getBlockEntity(pos);
 
 				if (teStorage.isLocked()) {
 					if (removeLock(worldIn, pos, player)) {
@@ -90,9 +90,9 @@ public class LockedDoorBlock extends DoorBlock {
 		}
 
 		if (this.canAccess(worldIn, pos, player)) {
-			state = state.cycleValue(OPEN);
-			worldIn.setBlockState(pos, state, 10);
-			worldIn.playEvent(player, state.get(OPEN) ? this.getOpenSound() : this.getCloseSound(), pos, 0);
+			state = state.cycle(OPEN);
+			worldIn.setBlock(pos, state, 10);
+			worldIn.levelEvent(player, state.getValue(OPEN) ? this.getOpenSound() : this.getCloseSound(), pos, 0);
 			return ActionResultType.SUCCESS;
 		} else {
 			return ActionResultType.PASS;
@@ -100,8 +100,8 @@ public class LockedDoorBlock extends DoorBlock {
 	}
 
 	@Override
-	public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
-		TileEntity te = worldIn.getTileEntity(pos);
+	public float getDestroyProgress(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
+		TileEntity te = worldIn.getBlockEntity(pos);
 
 		if (te instanceof BaseLockedTileEntity) {
 			BaseLockedTileEntity tileentity = (BaseLockedTileEntity) te;
@@ -110,36 +110,36 @@ public class LockedDoorBlock extends DoorBlock {
 				return -1.0F;
 		}
 
-		return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
+		return super.getDestroyProgress(state, player, worldIn, pos);
 	}
 
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
-			TileEntity tileentity = worldIn.getTileEntity(pos);
+			TileEntity tileentity = worldIn.getBlockEntity(pos);
 
 			if (tileentity instanceof BaseLockedTileEntity) {
 				BaseLockedTileEntity teStorage = (BaseLockedTileEntity) tileentity;
 
-				if (teStorage.isLocked() && state.get(HALF) == DoubleBlockHalf.UPPER) {
+				if (teStorage.isLocked() && state.getValue(HALF) == DoubleBlockHalf.UPPER) {
 					ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
 					CompoundNBT tag = new CompoundNBT();
 					new StorageLockCode(teStorage.getLockCode()).write(tag);
 					lockStack.setTag(tag);
-					InventoryHelper.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
+					InventoryHelper.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
 				}
 			}
 
-			super.onReplaced(state, worldIn, pos, newState, isMoving);
+			super.onRemove(state, worldIn, pos, newState, isMoving);
 		}
 	}
 
 	private int getCloseSound() {
-		return this.material == Material.IRON ? 1011 : 1012;
+		return this.material == Material.METAL ? 1011 : 1012;
 	}
 
 	private int getOpenSound() {
-		return this.material == Material.IRON ? 1005 : 1006;
+		return this.material == Material.METAL ? 1005 : 1006;
 	}
 
 	@Override
@@ -154,30 +154,30 @@ public class LockedDoorBlock extends DoorBlock {
 
 	private boolean removeLock(World worldIn, BlockPos pos, PlayerEntity entityplayer) {
 		BlockState state = worldIn.getBlockState(pos);
-		Direction dir = state.get(FACING);
-		boolean open = state.get(OPEN);
-		DoorHingeSide hinge = state.get(HINGE);
-		DoubleBlockHalf half = state.get(HALF);
-		BlockState toPlace = this.parent.getDefaultState().with(FACING, dir).with(OPEN, open).with(HINGE, hinge);
+		Direction dir = state.getValue(FACING);
+		boolean open = state.getValue(OPEN);
+		DoorHingeSide hinge = state.getValue(HINGE);
+		DoubleBlockHalf half = state.getValue(HALF);
+		BlockState toPlace = this.parent.defaultBlockState().setValue(FACING, dir).setValue(OPEN, open).setValue(HINGE, hinge);
 
-		worldIn.setBlockState(pos, toPlace.with(HALF, half), 3);
-		worldIn.playSound(entityplayer, pos, SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 0.5F, worldIn.rand.nextFloat() * 0.1F + 0.9F);
+		worldIn.setBlock(pos, toPlace.setValue(HALF, half), 3);
+		worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundCategory.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
 
 		if (half == DoubleBlockHalf.UPPER) {
-			worldIn.setBlockState(pos.down(), toPlace.with(HALF, DoubleBlockHalf.LOWER), 3);
+			worldIn.setBlock(pos.below(), toPlace.setValue(HALF, DoubleBlockHalf.LOWER), 3);
 		} else {
-			worldIn.setBlockState(pos.up(), toPlace.with(HALF, DoubleBlockHalf.UPPER), 3);
+			worldIn.setBlock(pos.above(), toPlace.setValue(HALF, DoubleBlockHalf.UPPER), 3);
 		}
 
 		return true;
 	}
 
 	private boolean canAccess(IBlockReader worldIn, BlockPos pos, PlayerEntity entityplayer) {
-		BaseLockedTileEntity tileentity = (BaseLockedTileEntity) worldIn.getTileEntity(pos);
+		BaseLockedTileEntity tileentity = (BaseLockedTileEntity) worldIn.getBlockEntity(pos);
 
 		if (tileentity != null && tileentity.isLocked()) {
-			for (int slot = 0; slot < entityplayer.inventory.getSizeInventory(); slot++) {
-				ItemStack itemstack = entityplayer.inventory.getStackInSlot(slot);
+			for (int slot = 0; slot < entityplayer.inventory.getContainerSize(); slot++) {
+				ItemStack itemstack = entityplayer.inventory.getItem(slot);
 
 				if ((!itemstack.isEmpty()) && (itemstack.getItem() == StorageItems.LOCKSMITH_KEY.get())) {
 					if (itemstack.hasTag()) {

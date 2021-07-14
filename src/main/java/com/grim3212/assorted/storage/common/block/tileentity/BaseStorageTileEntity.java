@@ -76,7 +76,7 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	}
 
 	@Override
-	public int getSizeInventory() {
+	public int getContainerSize() {
 		return this.getItems().size();
 	}
 
@@ -95,14 +95,14 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 
 	@Override
 	public void tick() {
-		int i = this.pos.getX();
-		int j = this.pos.getY();
-		int k = this.pos.getZ();
+		int i = this.worldPosition.getX();
+		int j = this.worldPosition.getY();
+		int k = this.worldPosition.getZ();
 		++this.ticksSinceSync;
-		this.numPlayersUsing = getNumberOfPlayersUsing(this.world, this, this.ticksSinceSync, i, j, k, this.numPlayersUsing);
+		this.numPlayersUsing = getNumberOfPlayersUsing(this.level, this, this.ticksSinceSync, i, j, k, this.numPlayersUsing);
 		this.prevRotation = this.rotation;
 		if (this.numPlayersUsing > 0 && this.rotation == 0.0F) {
-			this.playSound(SoundEvents.BLOCK_CHEST_OPEN);
+			this.playSound(SoundEvents.CHEST_OPEN);
 		}
 
 		if (this.numPlayersUsing == 0 && this.rotation > 0.0F || this.numPlayersUsing > 0 && this.rotation < 1.0F) {
@@ -118,7 +118,7 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 			}
 
 			if (this.rotation < 0.5F && f1 >= 0.5F) {
-				this.playSound(SoundEvents.BLOCK_CHEST_CLOSE);
+				this.playSound(SoundEvents.CHEST_CLOSE);
 			}
 
 			if (this.rotation < 0.0F) {
@@ -134,7 +134,7 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	}
 
 	public static int getNumberOfPlayersUsing(World worldIn, BaseStorageTileEntity lockableTileEntity, int ticksSinceSync, int x, int y, int z, int numPlayersUsing) {
-		if (!worldIn.isRemote && numPlayersUsing != 0 && (ticksSinceSync + x + y + z) % 200 == 0) {
+		if (!worldIn.isClientSide && numPlayersUsing != 0 && (ticksSinceSync + x + y + z) % 200 == 0) {
 			numPlayersUsing = getNumberOfPlayersUsing(worldIn, lockableTileEntity, x, y, z);
 		}
 
@@ -144,8 +144,8 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	public static int getNumberOfPlayersUsing(World world, BaseStorageTileEntity lockableTileEntity, int x, int y, int z) {
 		int i = 0;
 
-		for (PlayerEntity playerentity : world.getEntitiesWithinAABB(PlayerEntity.class, new AxisAlignedBB((double) ((float) x - 5.0F), (double) ((float) y - 5.0F), (double) ((float) z - 5.0F), (double) ((float) (x + 1) + 5.0F), (double) ((float) (y + 1) + 5.0F), (double) ((float) (z + 1) + 5.0F)))) {
-			if (playerentity.openContainer instanceof StorageContainer) {
+		for (PlayerEntity playerentity : world.getEntitiesOfClass(PlayerEntity.class, new AxisAlignedBB((double) ((float) x - 5.0F), (double) ((float) y - 5.0F), (double) ((float) z - 5.0F), (double) ((float) (x + 1) + 5.0F), (double) ((float) (y + 1) + 5.0F), (double) ((float) (z + 1) + 5.0F)))) {
+			if (playerentity.containerMenu instanceof StorageContainer) {
 				++i;
 			}
 		}
@@ -154,25 +154,25 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	}
 
 	private void playSound(SoundEvent soundIn) {
-		double d0 = (double) this.pos.getX() + 0.5D;
-		double d1 = (double) this.pos.getY() + 0.5D;
-		double d2 = (double) this.pos.getZ() + 0.5D;
+		double d0 = (double) this.worldPosition.getX() + 0.5D;
+		double d1 = (double) this.worldPosition.getY() + 0.5D;
+		double d2 = (double) this.worldPosition.getZ() + 0.5D;
 
-		this.world.playSound((PlayerEntity) null, d0, d1, d2, soundIn, SoundCategory.BLOCKS, 0.5F, this.world.rand.nextFloat() * 0.1F + 0.9F);
+		this.level.playSound((PlayerEntity) null, d0, d1, d2, soundIn, SoundCategory.BLOCKS, 0.5F, this.level.random.nextFloat() * 0.1F + 0.9F);
 	}
 
 	@Override
-	public boolean receiveClientEvent(int id, int type) {
+	public boolean triggerEvent(int id, int type) {
 		if (id == 1) {
 			this.numPlayersUsing = type;
 			return true;
 		} else {
-			return super.receiveClientEvent(id, type);
+			return super.triggerEvent(id, type);
 		}
 	}
 
 	@Override
-	public void openInventory(PlayerEntity player) {
+	public void startOpen(PlayerEntity player) {
 		if (!player.isSpectator()) {
 			if (this.numPlayersUsing < 0) {
 				this.numPlayersUsing = 0;
@@ -184,7 +184,7 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	}
 
 	@Override
-	public void closeInventory(PlayerEntity player) {
+	public void stopOpen(PlayerEntity player) {
 		if (!player.isSpectator()) {
 			--this.numPlayersUsing;
 			this.onOpenOrClose();
@@ -195,8 +195,8 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 		Block block = this.getBlockState().getBlock();
 
 		if (block instanceof BaseStorageBlock) {
-			this.world.addBlockEvent(this.pos, block, 1, this.numPlayersUsing);
-			this.world.notifyNeighborsOfStateChange(this.pos, block);
+			this.level.blockEvent(this.worldPosition, block, 1, this.numPlayersUsing);
+			this.level.updateNeighborsAt(this.worldPosition, block);
 		}
 	}
 
@@ -207,22 +207,22 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	public abstract Block getBlockToUse();
 
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
-		this.chestContents = NonNullList.withSize(this.getSizeInventory(), ItemStack.EMPTY);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
+		this.chestContents = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
 
 		ItemStackHelper.loadAllItems(nbt, this.chestContents);
 
 		if (nbt.contains("CustomName", 8)) {
-			this.customName = ITextComponent.Serializer.getComponentFromJson(nbt.getString("CustomName"));
+			this.customName = ITextComponent.Serializer.fromJson(nbt.getString("CustomName"));
 		}
 
 		this.readPacketNBT(nbt);
 	}
 
 	@Override
-	public CompoundNBT write(CompoundNBT compound) {
-		super.write(compound);
+	public CompoundNBT save(CompoundNBT compound) {
+		super.save(compound);
 
 		ItemStackHelper.saveAllItems(compound, this.chestContents);
 
@@ -250,24 +250,24 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return write(new CompoundNBT());
+		return save(new CompoundNBT());
 	}
 
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
 		CompoundNBT nbtTagCompound = new CompoundNBT();
 		writePacketNBT(nbtTagCompound);
-		return new SUpdateTileEntityPacket(this.pos, 1, nbtTagCompound);
+		return new SUpdateTileEntityPacket(this.worldPosition, 1, nbtTagCompound);
 	}
 
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-		this.readPacketNBT(pkt.getNbtCompound());
+		this.readPacketNBT(pkt.getTag());
 	}
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		if (!this.removed && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+		if (!this.remove && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			return storageItemHandler.cast();
 		}
 		return super.getCapability(cap, side);
@@ -283,13 +283,13 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	 * invalidates a tile entity
 	 */
 	@Override
-	public void remove() {
-		super.remove();
+	public void setRemoved() {
+		super.setRemoved();
 		this.storageItemHandler.invalidate();
 	}
 
 	@Override
-	public void clear() {
+	public void clearContent() {
 		this.getItems().clear();
 	}
 
@@ -311,41 +311,41 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int index) {
+	public ItemStack getItem(int index) {
 		return this.getItems().get(index);
 	}
 
 	@Override
-	public ItemStack decrStackSize(int index, int count) {
-		ItemStack itemstack = ItemStackHelper.getAndSplit(this.getItems(), index, count);
+	public ItemStack removeItem(int index, int count) {
+		ItemStack itemstack = ItemStackHelper.removeItem(this.getItems(), index, count);
 		if (!itemstack.isEmpty()) {
-			this.markDirty();
+			this.setChanged();
 		}
 
 		return itemstack;
 	}
 
 	@Override
-	public ItemStack removeStackFromSlot(int index) {
-		return ItemStackHelper.getAndRemove(this.getItems(), index);
+	public ItemStack removeItemNoUpdate(int index) {
+		return ItemStackHelper.takeItem(this.getItems(), index);
 	}
 
 	@Override
-	public void setInventorySlotContents(int index, ItemStack stack) {
+	public void setItem(int index, ItemStack stack) {
 		this.getItems().set(index, stack);
-		if (stack.getCount() > this.getInventoryStackLimit()) {
-			stack.setCount(this.getInventoryStackLimit());
+		if (stack.getCount() > this.getMaxStackSize()) {
+			stack.setCount(this.getMaxStackSize());
 		}
 
-		this.markDirty();
+		this.setChanged();
 	}
 
 	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
-		if (this.world.getTileEntity(this.pos) != this) {
+	public boolean stillValid(PlayerEntity player) {
+		if (this.level.getBlockEntity(this.worldPosition) != this) {
 			return false;
 		} else {
-			return !(player.getDistanceSq((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D, (double) this.pos.getZ() + 0.5D) > 64.0D);
+			return !(player.distanceToSqr((double) this.worldPosition.getX() + 0.5D, (double) this.worldPosition.getY() + 0.5D, (double) this.worldPosition.getZ() + 0.5D) > 64.0D);
 		}
 	}
 
@@ -357,12 +357,12 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	}
 
 	@Override
-	public boolean canInsertItem(int index, ItemStack itemStackIn, Direction direction) {
+	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction) {
 		return !this.isLocked();
 	}
 
 	@Override
-	public boolean canExtractItem(int index, ItemStack stack, Direction direction) {
+	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
 		return !this.isLocked();
 	}
 }

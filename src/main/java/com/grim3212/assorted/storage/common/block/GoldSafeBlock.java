@@ -36,7 +36,7 @@ public class GoldSafeBlock extends BaseStorageBlock {
 	public static final ResourceLocation CONTENTS = new ResourceLocation(AssortedStorage.MODID, "contents");
 
 	public GoldSafeBlock(Properties properties) {
-		super(properties.setRequiresTool().hardnessAndResistance(50.0F, 1200.0F));
+		super(properties.requiresCorrectToolForDrops().strength(50.0F, 1200.0F));
 	}
 
 	@Override
@@ -50,9 +50,9 @@ public class GoldSafeBlock extends BaseStorageBlock {
 	}
 
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-		if (!state.matchesBlock(newState.getBlock())) {
-			TileEntity tileentity = worldIn.getTileEntity(pos);
+	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (!state.is(newState.getBlock())) {
+			TileEntity tileentity = worldIn.getBlockEntity(pos);
 			if (tileentity instanceof GoldSafeTileEntity) {
 				GoldSafeTileEntity goldsafetileentity = (GoldSafeTileEntity) tileentity;
 
@@ -61,63 +61,63 @@ public class GoldSafeBlock extends BaseStorageBlock {
 					CompoundNBT tag = new CompoundNBT();
 					new StorageLockCode(goldsafetileentity.getLockCode()).write(tag);
 					lockStack.setTag(tag);
-					InventoryHelper.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
+					InventoryHelper.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
 				}
 
-				worldIn.updateComparatorOutputLevel(pos, state.getBlock());
+				worldIn.updateNeighbourForOutputSignal(pos, state.getBlock());
 			}
 
-			if (state.hasTileEntity() && (!state.matchesBlock(newState.getBlock()) || !newState.hasTileEntity())) {
-				worldIn.removeTileEntity(pos);
+			if (state.hasTileEntity() && (!state.is(newState.getBlock()) || !newState.hasTileEntity())) {
+				worldIn.removeBlockEntity(pos);
 			}
 		}
 	}
 
 	@Override
-	public ItemStack getItem(IBlockReader worldIn, BlockPos pos, BlockState state) {
-		ItemStack itemstack = super.getItem(worldIn, pos, state);
-		GoldSafeTileEntity goldsafetileentity = (GoldSafeTileEntity) worldIn.getTileEntity(pos);
+	public ItemStack getCloneItemStack(IBlockReader worldIn, BlockPos pos, BlockState state) {
+		ItemStack itemstack = super.getCloneItemStack(worldIn, pos, state);
+		GoldSafeTileEntity goldsafetileentity = (GoldSafeTileEntity) worldIn.getBlockEntity(pos);
 		CompoundNBT compoundnbt = goldsafetileentity.saveToNbt(new CompoundNBT());
 		if (!compoundnbt.isEmpty()) {
-			itemstack.setTagInfo("BlockEntityTag", compoundnbt);
+			itemstack.addTagElement("BlockEntityTag", compoundnbt);
 		}
 
 		return itemstack;
 	}
 
 	@Override
-	public void onBlockHarvested(World worldIn, BlockPos pos, BlockState state, PlayerEntity player) {
-		TileEntity tileentity = worldIn.getTileEntity(pos);
+	public void playerWillDestroy(World worldIn, BlockPos pos, BlockState state, PlayerEntity player) {
+		TileEntity tileentity = worldIn.getBlockEntity(pos);
 		if (tileentity instanceof GoldSafeTileEntity) {
 			GoldSafeTileEntity goldsafetileentity = (GoldSafeTileEntity) tileentity;
-			if (!worldIn.isRemote && player.isCreative() && !goldsafetileentity.isEmpty()) {
+			if (!worldIn.isClientSide && player.isCreative() && !goldsafetileentity.isEmpty()) {
 				ItemStack itemstack = new ItemStack(StorageBlocks.GOLD_SAFE.get());
 				CompoundNBT compoundnbt = goldsafetileentity.saveToNbt(new CompoundNBT());
 				if (!compoundnbt.isEmpty()) {
-					itemstack.setTagInfo("BlockEntityTag", compoundnbt);
+					itemstack.addTagElement("BlockEntityTag", compoundnbt);
 				}
 
 				if (goldsafetileentity.hasCustomName()) {
-					itemstack.setDisplayName(goldsafetileentity.getCustomName());
+					itemstack.setHoverName(goldsafetileentity.getCustomName());
 				}
 
 				ItemEntity itementity = new ItemEntity(worldIn, (double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D, itemstack);
-				itementity.setDefaultPickupDelay();
-				worldIn.addEntity(itementity);
+				itementity.setDefaultPickUpDelay();
+				worldIn.addFreshEntity(itementity);
 			}
 		}
 
-		super.onBlockHarvested(worldIn, pos, state, player);
+		super.playerWillDestroy(worldIn, pos, state, player);
 	}
 
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		TileEntity tileentity = builder.get(LootParameters.BLOCK_ENTITY);
+		TileEntity tileentity = builder.getOptionalParameter(LootParameters.BLOCK_ENTITY);
 		if (tileentity instanceof GoldSafeTileEntity) {
 			GoldSafeTileEntity goldsafetileentity = (GoldSafeTileEntity) tileentity;
 			builder = builder.withDynamicDrop(CONTENTS, (context, stackConsumer) -> {
-				for (int i = 0; i < goldsafetileentity.getSizeInventory(); ++i) {
-					stackConsumer.accept(goldsafetileentity.getStackInSlot(i));
+				for (int i = 0; i < goldsafetileentity.getContainerSize(); ++i) {
+					stackConsumer.accept(goldsafetileentity.getItem(i));
 				}
 
 			});
@@ -127,9 +127,9 @@ public class GoldSafeBlock extends BaseStorageBlock {
 	}
 
 	@Override
-	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
-		CompoundNBT compoundnbt = stack.getChildTag("BlockEntityTag");
+	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
+		CompoundNBT compoundnbt = stack.getTagElement("BlockEntityTag");
 		if (compoundnbt != null) {
 			if (compoundnbt.contains("LootTable", 8)) {
 				tooltip.add(new StringTextComponent("???????"));
@@ -146,15 +146,15 @@ public class GoldSafeBlock extends BaseStorageBlock {
 						++j;
 						if (i <= 4) {
 							++i;
-							IFormattableTextComponent iformattabletextcomponent = itemstack.getDisplayName().deepCopy();
-							iformattabletextcomponent.appendString(" x").appendString(String.valueOf(itemstack.getCount()));
+							IFormattableTextComponent iformattabletextcomponent = itemstack.getHoverName().copy();
+							iformattabletextcomponent.append(" x").append(String.valueOf(itemstack.getCount()));
 							tooltip.add(iformattabletextcomponent);
 						}
 					}
 				}
 
 				if (j - i > 0) {
-					tooltip.add((new TranslationTextComponent("container.shulkerBox.more", j - i)).mergeStyle(TextFormatting.ITALIC));
+					tooltip.add((new TranslationTextComponent("container.shulkerBox.more", j - i)).withStyle(TextFormatting.ITALIC));
 				}
 			}
 		}

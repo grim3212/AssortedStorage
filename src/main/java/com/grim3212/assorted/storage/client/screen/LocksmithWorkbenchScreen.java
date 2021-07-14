@@ -39,26 +39,26 @@ public class LocksmithWorkbenchScreen extends ContainerScreen<LocksmithWorkbench
 	protected void init() {
 		super.init();
 
-		this.minecraft.keyboardListener.enableRepeatEvents(true);
-		this.lockField = new TextFieldWidget(this.font, this.guiLeft + 67, this.guiTop + 39, 42, 12, new TranslationTextComponent(AssortedStorage.MODID + ".container.keycode"));
+		this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
+		this.lockField = new TextFieldWidget(this.font, this.leftPos + 67, this.topPos + 39, 42, 12, new TranslationTextComponent(AssortedStorage.MODID + ".container.keycode"));
 		this.lockField.setCanLoseFocus(false);
 		this.lockField.setTextColor(-1);
-		this.lockField.setDisabledTextColour(-1);
-		this.lockField.setEnableBackgroundDrawing(false);
-		this.lockField.setMaxStringLength(10);
-		this.lockField.setResponder(this::func_214075_a);
+		this.lockField.setTextColorUneditable(-1);
+		this.lockField.setBordered(false);
+		this.lockField.setMaxLength(10);
+		this.lockField.setResponder(this::onNameChanged);
 		this.children.add(this.lockField);
-		this.setFocusedDefault(this.lockField);
+		this.setInitialFocus(this.lockField);
 	}
 
-	private void func_214075_a(String lock) {
+	private void onNameChanged(String lock) {
 		String s = lock;
-		Slot slot = this.container.getSlot(0);
-		if (slot != null && slot.getHasStack() && !slot.getStack().hasTag()) {
+		Slot slot = this.menu.getSlot(0);
+		if (slot != null && slot.hasItem() && !slot.getItem().hasTag()) {
 			s = "";
 		}
 
-		this.container.updateLock(s);
+		this.menu.updateLock(s);
 		PacketHandler.sendToServer(new SetLockPacket(s));
 	}
 
@@ -66,41 +66,41 @@ public class LocksmithWorkbenchScreen extends ContainerScreen<LocksmithWorkbench
 	 * Sends the contents of an inventory slot to the client-side Container. This
 	 * doesn't have to match the actual contents of that slot.
 	 */
-	public void sendSlotContents(Container containerToSend, int slotInd, ItemStack stack) {
+	public void slotChanged(Container containerToSend, int slotInd, ItemStack stack) {
 		if (slotInd == 0) {
 			String code = stack.getTag().contains("Storage_Lock", 8) ? stack.getTag().getString("Storage_Lock") : "";
 
-			this.lockField.setText(stack.isEmpty() ? "" : code);
-			this.lockField.setEnabled(!stack.isEmpty());
-			this.setListener(this.lockField);
+			this.lockField.setValue(stack.isEmpty() ? "" : code);
+			this.lockField.setEditable(!stack.isEmpty());
+			this.setFocused(this.lockField);
 		}
 
 	}
 
-	public void sendAllContents(Container containerToSend, NonNullList<ItemStack> itemsList) {
-		this.sendSlotContents(containerToSend, 0, containerToSend.getSlot(0).getStack());
+	public void refreshContainer(Container containerToSend, NonNullList<ItemStack> itemsList) {
+		this.slotChanged(containerToSend, 0, containerToSend.getSlot(0).getItem());
 	}
 
 	@Override
 	public void resize(Minecraft minecraft, int width, int height) {
-		String s = this.lockField.getText();
+		String s = this.lockField.getValue();
 		this.init(minecraft, width, height);
-		this.lockField.setText(s);
+		this.lockField.setValue(s);
 	}
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (keyCode == 256) {
-			this.minecraft.player.closeScreen();
+			this.minecraft.player.closeContainer();
 		}
 
-		return !this.lockField.keyPressed(keyCode, scanCode, modifiers) && !this.lockField.canWrite() ? super.keyPressed(keyCode, scanCode, modifiers) : true;
+		return !this.lockField.keyPressed(keyCode, scanCode, modifiers) && !this.lockField.canConsumeInput() ? super.keyPressed(keyCode, scanCode, modifiers) : true;
 	}
 
 	@Override
-	public void onClose() {
-		super.onClose();
-		this.minecraft.keyboardListener.enableRepeatEvents(false);
+	public void removed() {
+		super.removed();
+		this.minecraft.keyboardHandler.setSendRepeatsToGui(false);
 	}
 
 	@Override
@@ -109,19 +109,19 @@ public class LocksmithWorkbenchScreen extends ContainerScreen<LocksmithWorkbench
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		RenderSystem.disableBlend();
 		this.lockField.render(matrixStack, mouseX, mouseY, partialTicks);
-		this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+		this.renderTooltip(matrixStack, mouseX, mouseY);
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int x, int y) {
+	protected void renderBg(MatrixStack matrixStack, float partialTicks, int x, int y) {
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		this.minecraft.getTextureManager().bindTexture(GUI_TEXTURE);
-		int i = this.guiLeft;
-		int j = (this.height - this.ySize) / 2;
-		this.blit(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
+		this.minecraft.getTextureManager().bind(GUI_TEXTURE);
+		int i = this.leftPos;
+		int j = (this.height - this.imageHeight) / 2;
+		this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
 	}
 
 	@Override
-	public void sendWindowProperty(Container containerIn, int varToUpdate, int newValue) {
+	public void setContainerData(Container containerIn, int varToUpdate, int newValue) {
 	}
 }

@@ -27,19 +27,19 @@ public class LocksmithWorkbenchBlock extends Block {
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (worldIn.isRemote) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		if (worldIn.isClientSide) {
 			return ActionResultType.SUCCESS;
 		} else {
-			player.openContainer(state.getContainer(worldIn, pos));
-			player.addStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
+			player.openMenu(state.getMenuProvider(worldIn, pos));
+			player.awardStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
 			return ActionResultType.CONSUME;
 		}
 	}
 
-	public INamedContainerProvider getContainer(BlockState state, World worldIn, BlockPos pos) {
+	public INamedContainerProvider getMenuProvider(BlockState state, World worldIn, BlockPos pos) {
 		return new SimpleNamedContainerProvider((id, inventory, player) -> {
-			return new LocksmithWorkbenchContainer(id, inventory, IWorldPosCallable.of(worldIn, pos));
+			return new LocksmithWorkbenchContainer(id, inventory, IWorldPosCallable.create(worldIn, pos));
 		}, CONTAINER_NAME);
 	}
 

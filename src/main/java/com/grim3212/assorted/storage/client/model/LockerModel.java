@@ -19,32 +19,32 @@ public class LockerModel extends BaseStorageModel {
 	private ModelRenderer[] lockerInt = new ModelRenderer[5];
 
 	public LockerModel() {
-		super(RenderType::getEntityCutout);
+		super(RenderType::entityCutout);
 
-		this.lockerMain = new ModelRenderer(this, 0, 0).setTextureSize(128, 128);
-		this.lockerDoor = new ModelRenderer(this, 32, 32).setTextureSize(128, 128);
-		this.lockerHandle = new ModelRenderer(this, 48, 0).setTextureSize(128, 128);
-		this.lockerLock = new ModelRenderer(this, 64, 0).setTextureSize(128, 128);
-		this.lockerLeg1 = new ModelRenderer(this, 0, 0).setTextureSize(128, 128);
-		this.lockerLeg2 = new ModelRenderer(this, 0, 0).setTextureSize(128, 128);
-		this.lockerLeg3 = new ModelRenderer(this, 0, 0).setTextureSize(128, 128);
-		this.lockerLeg4 = new ModelRenderer(this, 0, 0).setTextureSize(128, 128);
-		this.lockerInt[0] = new ModelRenderer(this, 15, 79).setTextureSize(128, 128);
-		this.lockerInt[1] = new ModelRenderer(this, 16, 64).setTextureSize(128, 128);
-		this.lockerInt[2] = new ModelRenderer(this, 33, 64).setTextureSize(128, 128);
-		this.lockerInt[3] = new ModelRenderer(this, 0, 95).setTextureSize(128, 128);
-		this.lockerInt[4] = new ModelRenderer(this, 16, 95).setTextureSize(128, 128);
+		this.lockerMain = new ModelRenderer(this, 0, 0).setTexSize(128, 128);
+		this.lockerDoor = new ModelRenderer(this, 32, 32).setTexSize(128, 128);
+		this.lockerHandle = new ModelRenderer(this, 48, 0).setTexSize(128, 128);
+		this.lockerLock = new ModelRenderer(this, 64, 0).setTexSize(128, 128);
+		this.lockerLeg1 = new ModelRenderer(this, 0, 0).setTexSize(128, 128);
+		this.lockerLeg2 = new ModelRenderer(this, 0, 0).setTexSize(128, 128);
+		this.lockerLeg3 = new ModelRenderer(this, 0, 0).setTexSize(128, 128);
+		this.lockerLeg4 = new ModelRenderer(this, 0, 0).setTexSize(128, 128);
+		this.lockerInt[0] = new ModelRenderer(this, 15, 79).setTexSize(128, 128);
+		this.lockerInt[1] = new ModelRenderer(this, 16, 64).setTexSize(128, 128);
+		this.lockerInt[2] = new ModelRenderer(this, 33, 64).setTexSize(128, 128);
+		this.lockerInt[3] = new ModelRenderer(this, 0, 95).setTexSize(128, 128);
+		this.lockerInt[4] = new ModelRenderer(this, 16, 95).setTexSize(128, 128);
 
 		this.lockerMain.addBox(0.0F, 3.0F, 0.0F, 16, 13, 16);
 
 		this.lockerDoor.addBox(0.0F, 5.0F, 0.0F, 12, 9, 2, 0.0F);
-		this.lockerDoor.setRotationPoint(2.0F, 0.0F, 15.0F);
+		this.lockerDoor.setPos(2.0F, 0.0F, 15.0F);
 
 		this.lockerHandle.addBox(9.0F, 9.0F, 2.0F, 1, 3, 1, 0.0F);
-		this.lockerHandle.setRotationPoint(2.0F, 0.0F, 15.0F);
+		this.lockerHandle.setPos(2.0F, 0.0F, 15.0F);
 
 		this.lockerLock.addBox(9.0F, 6.0F, 1.0F, 3, 6, 1, 0.0F);
-		this.lockerLock.setRotationPoint(2.0F, 0.0F, 15.1F);
+		this.lockerLock.setPos(2.0F, 0.0F, 15.1F);
 
 		this.lockerLeg1.addBox(0.0F, 0.0F, 0.0F, 3, 3, 3);
 		this.lockerLeg2.addBox(13.0F, 0.0F, 0.0F, 3, 3, 3);
@@ -59,10 +59,10 @@ public class LockerModel extends BaseStorageModel {
 	}
 
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		this.lockerDoor.rotateAngleY = (-(this.doorAngle / 90.0F));
-		this.lockerHandle.rotateAngleY = (-(this.doorAngle / 90.0F));
-		this.lockerLock.rotateAngleY = (-(this.doorAngle / 90.0F));
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+		this.lockerDoor.yRot = (-(this.doorAngle / 90.0F));
+		this.lockerHandle.yRot = (-(this.doorAngle / 90.0F));
+		this.lockerLock.yRot = (-(this.doorAngle / 90.0F));
 		this.lockerMain.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		this.lockerDoor.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		if (this.renderHandle)

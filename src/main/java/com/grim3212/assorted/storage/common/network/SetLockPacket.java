@@ -17,16 +17,16 @@ public class SetLockPacket {
 	}
 
 	public static SetLockPacket decode(PacketBuffer buf) {
-		return new SetLockPacket(buf.readString(10));
+		return new SetLockPacket(buf.readUtf(10));
 	}
 
 	public void encode(PacketBuffer buf) {
-		buf.writeString(this.lock, 10);
+		buf.writeUtf(this.lock, 10);
 	}
 
 	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		if (ctx.get().getDirection().getReceptionSide() == LogicalSide.SERVER) {
-			ctx.get().enqueueWork(() -> ((LocksmithWorkbenchContainer) ctx.get().getSender().openContainer).updateLock(this.lock));
+			ctx.get().enqueueWork(() -> ((LocksmithWorkbenchContainer) ctx.get().getSender().containerMenu).updateLock(this.lock));
 			ctx.get().setPacketHandled(true);
 		}
 	}

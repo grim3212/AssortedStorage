@@ -57,7 +57,7 @@ public class AssortedStorage {
 	public static final ItemGroup ASSORTED_STORAGE_ITEM_GROUP = (new ItemGroup("assortedstorage") {
 		@Override
 		@OnlyIn(Dist.CLIENT)
-		public ItemStack createIcon() {
+		public ItemStack makeIcon() {
 			return new ItemStack(StorageBlocks.WOOD_CABINET.get());
 		}
 	});
@@ -83,15 +83,15 @@ public class AssortedStorage {
 	}
 
 	private void setupClient(final FMLClientSetupEvent event) {
-		ScreenManager.registerFactory(StorageContainerTypes.WOOD_CABINET.get(), GenericStorageScreen::new);
-		ScreenManager.registerFactory(StorageContainerTypes.GLASS_CABINET.get(), GenericStorageScreen::new);
-		ScreenManager.registerFactory(StorageContainerTypes.WAREHOUSE_CRATE.get(), GenericStorageScreen::new);
-		ScreenManager.registerFactory(StorageContainerTypes.GOLD_SAFE.get(), GoldSafeScreen::new);
-		ScreenManager.registerFactory(StorageContainerTypes.OBSIDIAN_SAFE.get(), GenericStorageScreen::new);
-		ScreenManager.registerFactory(StorageContainerTypes.LOCKER.get(), LockerScreen::new);
-		ScreenManager.registerFactory(StorageContainerTypes.DUAL_LOCKER.get(), DualLockerScreen::new);
-		ScreenManager.registerFactory(StorageContainerTypes.ITEM_TOWER.get(), ItemTowerScreen::new);
-		ScreenManager.registerFactory(StorageContainerTypes.LOCKSMITH_WORKBENCH.get(), LocksmithWorkbenchScreen::new);
+		ScreenManager.register(StorageContainerTypes.WOOD_CABINET.get(), GenericStorageScreen::new);
+		ScreenManager.register(StorageContainerTypes.GLASS_CABINET.get(), GenericStorageScreen::new);
+		ScreenManager.register(StorageContainerTypes.WAREHOUSE_CRATE.get(), GenericStorageScreen::new);
+		ScreenManager.register(StorageContainerTypes.GOLD_SAFE.get(), GoldSafeScreen::new);
+		ScreenManager.register(StorageContainerTypes.OBSIDIAN_SAFE.get(), GenericStorageScreen::new);
+		ScreenManager.register(StorageContainerTypes.LOCKER.get(), LockerScreen::new);
+		ScreenManager.register(StorageContainerTypes.DUAL_LOCKER.get(), DualLockerScreen::new);
+		ScreenManager.register(StorageContainerTypes.ITEM_TOWER.get(), ItemTowerScreen::new);
+		ScreenManager.register(StorageContainerTypes.LOCKSMITH_WORKBENCH.get(), LocksmithWorkbenchScreen::new);
 
 		ClientRegistry.bindTileEntityRenderer(StorageTileEntityTypes.WOOD_CABINET.get(), WoodCabinetTileEntityRenderer::new);
 		ClientRegistry.bindTileEntityRenderer(StorageTileEntityTypes.GLASS_CABINET.get(), GlassCabinetTileEntityRenderer::new);

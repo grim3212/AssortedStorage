@@ -16,16 +16,16 @@ import net.minecraft.world.World;
 public class CombinationItem extends Item {
 
 	public CombinationItem(Properties properties) {
-		super(properties.maxStackSize(16));
+		super(properties.stacksTo(16));
 	}
 
 	@Override
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		if (stack.hasTag()) {
 			String code = stack.getTag().contains("Storage_Lock", 8) ? stack.getTag().getString("Storage_Lock") : "";
 
 			if (!code.isEmpty()) {
-				tooltip.add(new TranslationTextComponent(AssortedStorage.MODID + ".info.combo", new StringTextComponent(code).mergeStyle(TextFormatting.AQUA)));
+				tooltip.add(new TranslationTextComponent(AssortedStorage.MODID + ".info.combo", new StringTextComponent(code).withStyle(TextFormatting.AQUA)));
 			}
 		}
 	}
