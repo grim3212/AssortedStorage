@@ -3,11 +3,13 @@ package com.grim3212.assorted.storage.common.data;
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 
-import net.minecraft.block.Block;
-import net.minecraft.data.BlockTagsProvider;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.tags.BlockTags;
 import net.minecraftforge.common.data.ExistingFileHelper;
+
+import net.minecraft.data.tags.TagsProvider.TagAppender;
 
 public class StorageBlockTagProvider extends BlockTagsProvider {
 
@@ -17,7 +19,7 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 
 	@Override
 	protected void addTags() {
-		Builder<Block> piglinBuilder = this.tag(BlockTags.GUARDED_BY_PIGLINS);
+		TagAppender<Block> piglinBuilder = this.tag(BlockTags.GUARDED_BY_PIGLINS);
 		piglinBuilder.add(StorageBlocks.ACACIA_WAREHOUSE_CRATE.get());
 		piglinBuilder.add(StorageBlocks.BIRCH_WAREHOUSE_CRATE.get());
 		piglinBuilder.add(StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get());
@@ -33,7 +35,7 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 		piglinBuilder.add(StorageBlocks.LOCKER.get());
 		piglinBuilder.add(StorageBlocks.ITEM_TOWER.get());
 
-		Builder<Block> doorBuilder = this.tag(BlockTags.DOORS);
+		TagAppender<Block> doorBuilder = this.tag(BlockTags.DOORS);
 		for (Block b : StorageBlocks.lockedDoors()) {
 			doorBuilder.add(b);
 		}

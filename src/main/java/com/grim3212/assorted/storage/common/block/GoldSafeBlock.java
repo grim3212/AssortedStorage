@@ -3,33 +3,33 @@ package com.grim3212.assorted.storage.common.block;
 import java.util.List;
 
 import com.grim3212.assorted.storage.AssortedStorage;
-import com.grim3212.assorted.storage.common.block.tileentity.GoldSafeTileEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.GoldSafeBlockEntity;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameters;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Containers;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class GoldSafeBlock extends BaseStorageBlock {
 
@@ -40,44 +40,44 @@ public class GoldSafeBlock extends BaseStorageBlock {
 	}
 
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return new GoldSafeTileEntity();
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		return new GoldSafeBlockEntity(pos, state);
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return ObsidianSafeBlock.SAFE_SHAPE;
 	}
 
 	@Override
-	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (!state.is(newState.getBlock())) {
-			TileEntity tileentity = worldIn.getBlockEntity(pos);
-			if (tileentity instanceof GoldSafeTileEntity) {
-				GoldSafeTileEntity goldsafetileentity = (GoldSafeTileEntity) tileentity;
+			BlockEntity tileentity = worldIn.getBlockEntity(pos);
+			if (tileentity instanceof GoldSafeBlockEntity) {
+				GoldSafeBlockEntity goldsafetileentity = (GoldSafeBlockEntity) tileentity;
 
 				if (goldsafetileentity.isLocked()) {
 					ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
-					CompoundNBT tag = new CompoundNBT();
+					CompoundTag tag = new CompoundTag();
 					new StorageLockCode(goldsafetileentity.getLockCode()).write(tag);
 					lockStack.setTag(tag);
-					InventoryHelper.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
+					Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
 				}
 
 				worldIn.updateNeighbourForOutputSignal(pos, state.getBlock());
 			}
 
-			if (state.hasTileEntity() && (!state.is(newState.getBlock()) || !newState.hasTileEntity())) {
+			if (state.hasBlockEntity() && (!state.is(newState.getBlock()) || !newState.hasBlockEntity())) {
 				worldIn.removeBlockEntity(pos);
 			}
 		}
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(IBlockReader worldIn, BlockPos pos, BlockState state) {
+	public ItemStack getCloneItemStack(BlockGetter worldIn, BlockPos pos, BlockState state) {
 		ItemStack itemstack = super.getCloneItemStack(worldIn, pos, state);
-		GoldSafeTileEntity goldsafetileentity = (GoldSafeTileEntity) worldIn.getBlockEntity(pos);
-		CompoundNBT compoundnbt = goldsafetileentity.saveToNbt(new CompoundNBT());
+		GoldSafeBlockEntity goldsafetileentity = (GoldSafeBlockEntity) worldIn.getBlockEntity(pos);
+		CompoundTag compoundnbt = goldsafetileentity.saveToNbt(new CompoundTag());
 		if (!compoundnbt.isEmpty()) {
 			itemstack.addTagElement("BlockEntityTag", compoundnbt);
 		}
@@ -86,13 +86,13 @@ public class GoldSafeBlock extends BaseStorageBlock {
 	}
 
 	@Override
-	public void playerWillDestroy(World worldIn, BlockPos pos, BlockState state, PlayerEntity player) {
-		TileEntity tileentity = worldIn.getBlockEntity(pos);
-		if (tileentity instanceof GoldSafeTileEntity) {
-			GoldSafeTileEntity goldsafetileentity = (GoldSafeTileEntity) tileentity;
+	public void playerWillDestroy(Level worldIn, BlockPos pos, BlockState state, Player player) {
+		BlockEntity tileentity = worldIn.getBlockEntity(pos);
+		if (tileentity instanceof GoldSafeBlockEntity) {
+			GoldSafeBlockEntity goldsafetileentity = (GoldSafeBlockEntity) tileentity;
 			if (!worldIn.isClientSide && player.isCreative() && !goldsafetileentity.isEmpty()) {
 				ItemStack itemstack = new ItemStack(StorageBlocks.GOLD_SAFE.get());
-				CompoundNBT compoundnbt = goldsafetileentity.saveToNbt(new CompoundNBT());
+				CompoundTag compoundnbt = goldsafetileentity.saveToNbt(new CompoundTag());
 				if (!compoundnbt.isEmpty()) {
 					itemstack.addTagElement("BlockEntityTag", compoundnbt);
 				}
@@ -112,9 +112,9 @@ public class GoldSafeBlock extends BaseStorageBlock {
 
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		TileEntity tileentity = builder.getOptionalParameter(LootParameters.BLOCK_ENTITY);
-		if (tileentity instanceof GoldSafeTileEntity) {
-			GoldSafeTileEntity goldsafetileentity = (GoldSafeTileEntity) tileentity;
+		BlockEntity tileentity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
+		if (tileentity instanceof GoldSafeBlockEntity) {
+			GoldSafeBlockEntity goldsafetileentity = (GoldSafeBlockEntity) tileentity;
 			builder = builder.withDynamicDrop(CONTENTS, (context, stackConsumer) -> {
 				for (int i = 0; i < goldsafetileentity.getContainerSize(); ++i) {
 					stackConsumer.accept(goldsafetileentity.getItem(i));
@@ -127,17 +127,17 @@ public class GoldSafeBlock extends BaseStorageBlock {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
-		CompoundNBT compoundnbt = stack.getTagElement("BlockEntityTag");
+		CompoundTag compoundnbt = stack.getTagElement("BlockEntityTag");
 		if (compoundnbt != null) {
 			if (compoundnbt.contains("LootTable", 8)) {
-				tooltip.add(new StringTextComponent("???????"));
+				tooltip.add(new TextComponent("???????"));
 			}
 
 			if (compoundnbt.contains("Items", 9)) {
 				NonNullList<ItemStack> nonnulllist = NonNullList.withSize(27, ItemStack.EMPTY);
-				ItemStackHelper.loadAllItems(compoundnbt, nonnulllist);
+				ContainerHelper.loadAllItems(compoundnbt, nonnulllist);
 				int i = 0;
 				int j = 0;
 
@@ -146,7 +146,7 @@ public class GoldSafeBlock extends BaseStorageBlock {
 						++j;
 						if (i <= 4) {
 							++i;
-							IFormattableTextComponent iformattabletextcomponent = itemstack.getHoverName().copy();
+							MutableComponent iformattabletextcomponent = itemstack.getHoverName().copy();
 							iformattabletextcomponent.append(" x").append(String.valueOf(itemstack.getCount()));
 							tooltip.add(iformattabletextcomponent);
 						}
@@ -154,7 +154,7 @@ public class GoldSafeBlock extends BaseStorageBlock {
 				}
 
 				if (j - i > 0) {
-					tooltip.add((new TranslationTextComponent("container.shulkerBox.more", j - i)).withStyle(TextFormatting.ITALIC));
+					tooltip.add((new TranslatableComponent("container.shulkerBox.more", j - i)).withStyle(ChatFormatting.ITALIC));
 				}
 			}
 		}

@@ -1,38 +1,38 @@
 package com.grim3212.assorted.storage.common.inventory;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class LockerContainer extends Container {
+public class LockerContainer extends AbstractContainerMenu {
 
-	private final IInventory inventory;
+	private final Container inventory;
 	private final int numRows;
 
-	public static LockerContainer createLockerContainer(int windowId, PlayerInventory playerInventory) {
-		return new LockerContainer(StorageContainerTypes.LOCKER.get(), windowId, playerInventory, new Inventory(45), 5);
+	public static LockerContainer createLockerContainer(int windowId, Inventory playerInventory) {
+		return new LockerContainer(StorageContainerTypes.LOCKER.get(), windowId, playerInventory, new SimpleContainer(45), 5);
 	}
 
-	public static LockerContainer createLockerContainer(int windowId, PlayerInventory playerInventory, IInventory inventory) {
+	public static LockerContainer createLockerContainer(int windowId, Inventory playerInventory, Container inventory) {
 		return new LockerContainer(StorageContainerTypes.LOCKER.get(), windowId, playerInventory, inventory, 5);
 	}
 
-	public static LockerContainer createDualLockerContainer(int windowId, PlayerInventory playerInventory) {
-		return new LockerContainer(StorageContainerTypes.DUAL_LOCKER.get(), windowId, playerInventory, new Inventory(90), 10);
+	public static LockerContainer createDualLockerContainer(int windowId, Inventory playerInventory) {
+		return new LockerContainer(StorageContainerTypes.DUAL_LOCKER.get(), windowId, playerInventory, new SimpleContainer(90), 10);
 	}
 
-	public static LockerContainer createDualLockerContainer(int windowId, PlayerInventory playerInventory, IInventory inventory) {
+	public static LockerContainer createDualLockerContainer(int windowId, Inventory playerInventory, Container inventory) {
 		return new LockerContainer(StorageContainerTypes.DUAL_LOCKER.get(), windowId, playerInventory, inventory, 10);
 	}
 
-	public LockerContainer(ContainerType<?> containerType, int windowId, PlayerInventory playerInventory, IInventory inventory, int numRows) {
+	public LockerContainer(MenuType<?> containerType, int windowId, Inventory playerInventory, Container inventory, int numRows) {
 		super(containerType, windowId);
 		this.inventory = inventory;
 		this.numRows = numRows;
@@ -82,12 +82,12 @@ public class LockerContainer extends Container {
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity playerIn) {
+	public boolean stillValid(Player playerIn) {
 		return this.inventory.stillValid(playerIn);
 	}
 
 	@Override
-	public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+	public ItemStack quickMoveStack(Player playerIn, int index) {
 		ItemStack itemstack = ItemStack.EMPTY;
 		Slot slot = this.slots.get(index);
 
@@ -115,7 +115,7 @@ public class LockerContainer extends Container {
 	}
 
 	@Override
-	public void removed(PlayerEntity playerIn) {
+	public void removed(Player playerIn) {
 		super.removed(playerIn);
 		this.inventory.stopOpen(playerIn);
 	}

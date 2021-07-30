@@ -1,36 +1,26 @@
 package com.grim3212.assorted.storage.common.block;
 
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.google.common.collect.Sets;
 import com.grim3212.assorted.storage.AssortedStorage;
-import com.grim3212.assorted.storage.client.tileentity.StorageItemStackRenderer;
-import com.grim3212.assorted.storage.common.block.tileentity.GlassCabinetTileEntity;
-import com.grim3212.assorted.storage.common.block.tileentity.GoldSafeTileEntity;
-import com.grim3212.assorted.storage.common.block.tileentity.ItemTowerTileEntity;
-import com.grim3212.assorted.storage.common.block.tileentity.LockerTileEntity;
-import com.grim3212.assorted.storage.common.block.tileentity.ObsidianSafeTileEntity;
-import com.grim3212.assorted.storage.common.block.tileentity.WarehouseCrateTileEntity;
-import com.grim3212.assorted.storage.common.block.tileentity.WoodCabinetTileEntity;
 import com.grim3212.assorted.storage.common.item.LockerItem;
+import com.grim3212.assorted.storage.common.item.StorageBlockItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
+import com.grim3212.assorted.storage.common.item.WarehouseCrateBlockItem;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.WoodType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
-import net.minecraft.client.renderer.tileentity.ItemStackTileEntityRenderer;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.properties.WoodType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
+import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -40,20 +30,20 @@ public class StorageBlocks {
 	public static final DeferredRegister<Item> ITEMS = StorageItems.ITEMS;
 
 	public static final RegistryObject<LocksmithWorkbenchBlock> LOCKSMITH_WORKBENCH = register("locksmith_workbench", () -> new LocksmithWorkbenchBlock(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD).strength(3.0f, 5.0f)));
-	public static final RegistryObject<WoodCabinetBlock> WOOD_CABINET = register("wood_cabinet", () -> new WoodCabinetBlock(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD)), () -> woodCabinetRenderer());
-	public static final RegistryObject<GlassCabinetBlock> GLASS_CABINET = register("glass_cabinet", () -> new GlassCabinetBlock(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD)), () -> glassCabinetRenderer());
-	public static final RegistryObject<GoldSafeBlock> GOLD_SAFE = register("gold_safe", () -> new GoldSafeBlock(Block.Properties.of(Material.METAL).sound(SoundType.METAL)), () -> goldSafeRenderer());
-	public static final RegistryObject<ObsidianSafeBlock> OBSIDIAN_SAFE = register("obsidian_safe", () -> new ObsidianSafeBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE)), () -> obsidianSafeRenderer());
+	public static final RegistryObject<WoodCabinetBlock> WOOD_CABINET = registerStorageItem("wood_cabinet", () -> new WoodCabinetBlock(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD)));
+	public static final RegistryObject<GlassCabinetBlock> GLASS_CABINET = registerStorageItem("glass_cabinet", () -> new GlassCabinetBlock(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD)));
+	public static final RegistryObject<GoldSafeBlock> GOLD_SAFE = registerStorageItem("gold_safe", () -> new GoldSafeBlock(Block.Properties.of(Material.METAL).sound(SoundType.METAL)));
+	public static final RegistryObject<ObsidianSafeBlock> OBSIDIAN_SAFE = registerStorageItem("obsidian_safe", () -> new ObsidianSafeBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE)));
 	public static final RegistryObject<LockerBlock> LOCKER = registerWithItem("locker", () -> new LockerBlock(Block.Properties.of(Material.METAL).sound(SoundType.METAL)), lockerItem());
-	public static final RegistryObject<ItemTowerBlock> ITEM_TOWER = register("item_tower", () -> new ItemTowerBlock(Block.Properties.of(Material.METAL).sound(SoundType.METAL)), () -> itemTowerRenderer());
-	public static final RegistryObject<WarehouseCrateBlock> OAK_WAREHOUSE_CRATE = register("oak_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.OAK), () -> oakWarehouseCrateRenderer());
-	public static final RegistryObject<WarehouseCrateBlock> BIRCH_WAREHOUSE_CRATE = register("birch_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.BIRCH), () -> birchWarehouseCrateRenderer());
-	public static final RegistryObject<WarehouseCrateBlock> SPRUCE_WAREHOUSE_CRATE = register("spruce_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.SPRUCE), () -> spruceWarehouseCrateRenderer());
-	public static final RegistryObject<WarehouseCrateBlock> ACACIA_WAREHOUSE_CRATE = register("acacia_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.ACACIA), () -> acaciaWarehouseCrateRenderer());
-	public static final RegistryObject<WarehouseCrateBlock> DARK_OAK_WAREHOUSE_CRATE = register("dark_oak_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.DARK_OAK), () -> darkOakWarehouseCrateRenderer());
-	public static final RegistryObject<WarehouseCrateBlock> JUNGLE_WAREHOUSE_CRATE = register("jungle_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.JUNGLE), () -> jungleWarehouseCrateRenderer());
-	public static final RegistryObject<WarehouseCrateBlock> WARPED_WAREHOUSE_CRATE = register("warped_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.WARPED), () -> warpedWarehouseCrateRenderer());
-	public static final RegistryObject<WarehouseCrateBlock> CRIMSON_WAREHOUSE_CRATE = register("crimson_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.CRIMSON), () -> crimsonWarehouseCrateRenderer());
+	public static final RegistryObject<ItemTowerBlock> ITEM_TOWER = registerStorageItem("item_tower", () -> new ItemTowerBlock(Block.Properties.of(Material.METAL).sound(SoundType.METAL)));
+	public static final RegistryObject<WarehouseCrateBlock> OAK_WAREHOUSE_CRATE = registerCrate("oak_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.OAK));
+	public static final RegistryObject<WarehouseCrateBlock> BIRCH_WAREHOUSE_CRATE = registerCrate("birch_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.BIRCH));
+	public static final RegistryObject<WarehouseCrateBlock> SPRUCE_WAREHOUSE_CRATE = registerCrate("spruce_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.SPRUCE));
+	public static final RegistryObject<WarehouseCrateBlock> ACACIA_WAREHOUSE_CRATE = registerCrate("acacia_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.ACACIA));
+	public static final RegistryObject<WarehouseCrateBlock> DARK_OAK_WAREHOUSE_CRATE = registerCrate("dark_oak_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.DARK_OAK));
+	public static final RegistryObject<WarehouseCrateBlock> JUNGLE_WAREHOUSE_CRATE = registerCrate("jungle_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.JUNGLE));
+	public static final RegistryObject<WarehouseCrateBlock> WARPED_WAREHOUSE_CRATE = registerCrate("warped_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.WARPED));
+	public static final RegistryObject<WarehouseCrateBlock> CRIMSON_WAREHOUSE_CRATE = registerCrate("crimson_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.CRIMSON));
 
 	public static final RegistryObject<LockedDoorBlock> LOCKED_OAK_DOOR = registerNoItem("locked_oak_door", () -> new LockedDoorBlock(Blocks.OAK_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.WOOD).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
 	public static final RegistryObject<LockedDoorBlock> LOCKED_SPRUCE_DOOR = registerNoItem("locked_spruce_door", () -> new LockedDoorBlock(Blocks.SPRUCE_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.PODZOL).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
@@ -74,8 +64,12 @@ public class StorageBlocks {
 		return register(name, sup, block -> item(block));
 	}
 
-	private static <T extends Block> RegistryObject<T> register(String name, Supplier<? extends T> sup, Supplier<Callable<ItemStackTileEntityRenderer>> renderMethod) {
-		return register(name, sup, block -> item(block, renderMethod));
+	private static <T extends Block> RegistryObject<T> registerCrate(String name, Supplier<? extends T> sup) {
+		return register(name, sup, block -> crateItem(block));
+	}
+
+	private static <T extends Block> RegistryObject<T> registerStorageItem(String name, Supplier<? extends T> sup) {
+		return register(name, sup, block -> storageItem(block));
 	}
 
 	private static <T extends Block> RegistryObject<T> registerWithItem(String name, Supplier<? extends T> sup, Supplier<BlockItem> blockItem) {
@@ -96,81 +90,15 @@ public class StorageBlocks {
 		return () -> new BlockItem(block.get(), new Item.Properties().tab(AssortedStorage.ASSORTED_STORAGE_ITEM_GROUP));
 	}
 
-	private static Supplier<BlockItem> item(final RegistryObject<? extends Block> block, final Supplier<Callable<ItemStackTileEntityRenderer>> renderMethod) {
-		return () -> new BlockItem(block.get(), new Item.Properties().tab(AssortedStorage.ASSORTED_STORAGE_ITEM_GROUP).setISTER(renderMethod));
+	private static Supplier<StorageBlockItem> storageItem(final RegistryObject<? extends Block> block) {
+		return () -> new StorageBlockItem(block.get(), new Item.Properties().tab(AssortedStorage.ASSORTED_STORAGE_ITEM_GROUP));
+	}
+
+	private static Supplier<WarehouseCrateBlockItem> crateItem(final RegistryObject<? extends Block> block) {
+		return () -> new WarehouseCrateBlockItem(block.get(), new Item.Properties().tab(AssortedStorage.ASSORTED_STORAGE_ITEM_GROUP));
 	}
 
 	private static Supplier<BlockItem> lockerItem() {
-		return () -> new LockerItem(new Item.Properties().tab(AssortedStorage.ASSORTED_STORAGE_ITEM_GROUP).setISTER(() -> lockerRenderer()));
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	private static Callable<ItemStackTileEntityRenderer> woodCabinetRenderer() {
-		return () -> new StorageItemStackRenderer<>(WoodCabinetTileEntity::new);
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	private static Callable<ItemStackTileEntityRenderer> glassCabinetRenderer() {
-		return () -> new StorageItemStackRenderer<>(GlassCabinetTileEntity::new);
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	private static Callable<ItemStackTileEntityRenderer> oakWarehouseCrateRenderer() {
-		return () -> new StorageItemStackRenderer<>(() -> new WarehouseCrateTileEntity(StorageBlocks.OAK_WAREHOUSE_CRATE.get()));
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	private static Callable<ItemStackTileEntityRenderer> birchWarehouseCrateRenderer() {
-		return () -> new StorageItemStackRenderer<>(() -> new WarehouseCrateTileEntity(StorageBlocks.BIRCH_WAREHOUSE_CRATE.get()));
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	private static Callable<ItemStackTileEntityRenderer> spruceWarehouseCrateRenderer() {
-		return () -> new StorageItemStackRenderer<>(() -> new WarehouseCrateTileEntity(StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get()));
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	private static Callable<ItemStackTileEntityRenderer> acaciaWarehouseCrateRenderer() {
-		return () -> new StorageItemStackRenderer<>(() -> new WarehouseCrateTileEntity(StorageBlocks.ACACIA_WAREHOUSE_CRATE.get()));
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	private static Callable<ItemStackTileEntityRenderer> darkOakWarehouseCrateRenderer() {
-		return () -> new StorageItemStackRenderer<>(() -> new WarehouseCrateTileEntity(StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get()));
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	private static Callable<ItemStackTileEntityRenderer> jungleWarehouseCrateRenderer() {
-		return () -> new StorageItemStackRenderer<>(() -> new WarehouseCrateTileEntity(StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get()));
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	private static Callable<ItemStackTileEntityRenderer> warpedWarehouseCrateRenderer() {
-		return () -> new StorageItemStackRenderer<>(() -> new WarehouseCrateTileEntity(StorageBlocks.WARPED_WAREHOUSE_CRATE.get()));
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	private static Callable<ItemStackTileEntityRenderer> crimsonWarehouseCrateRenderer() {
-		return () -> new StorageItemStackRenderer<>(() -> new WarehouseCrateTileEntity(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get()));
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	private static Callable<ItemStackTileEntityRenderer> goldSafeRenderer() {
-		return () -> new StorageItemStackRenderer<>(GoldSafeTileEntity::new);
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	private static Callable<ItemStackTileEntityRenderer> obsidianSafeRenderer() {
-		return () -> new StorageItemStackRenderer<>(ObsidianSafeTileEntity::new);
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	private static Callable<ItemStackTileEntityRenderer> lockerRenderer() {
-		return () -> new StorageItemStackRenderer<>(LockerTileEntity::new);
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	private static Callable<ItemStackTileEntityRenderer> itemTowerRenderer() {
-		return () -> new StorageItemStackRenderer<>(ItemTowerTileEntity::new);
+		return () -> new LockerItem(new Item.Properties().tab(AssortedStorage.ASSORTED_STORAGE_ITEM_GROUP));
 	}
 }

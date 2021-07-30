@@ -1,90 +1,70 @@
 package com.grim3212.assorted.storage.client.model;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.model.ModelRenderer;
 
 public class DualLockerModel extends BaseStorageModel {
 
-	private ModelRenderer lockerLower;
-	private ModelRenderer lockerUpper;
-	private ModelRenderer lockerDoor;
-	private ModelRenderer lockerHandle;
-	private ModelRenderer lockerLock;
-	private ModelRenderer lockerLeg1;
-	private ModelRenderer lockerLeg2;
-	private ModelRenderer lockerLeg3;
-	private ModelRenderer lockerLeg4;
-	private ModelRenderer lockerShelf;
-	private ModelRenderer[] lockerInt = new ModelRenderer[5];
+	private final ModelPart main;
+	private final ModelPart door;
+	private final ModelPart handle;
+	private final ModelPart lock;
 
-	public DualLockerModel() {
+	public DualLockerModel(ModelPart root) {
 		super(RenderType::entityCutout);
+		this.main = root.getChild("main");
 
-		this.lockerLower = new ModelRenderer(this, 64, 0).setTexSize(128, 128);
-		this.lockerUpper = new ModelRenderer(this, 64, 32).setTexSize(128, 128);
-		this.lockerDoor = new ModelRenderer(this, 0, 32).setTexSize(128, 128);
-		this.lockerHandle = new ModelRenderer(this, 48, 0).setTexSize(128, 128);
-		this.lockerLock = new ModelRenderer(this, 64, 0).setTexSize(128, 128);
-		this.lockerLeg1 = new ModelRenderer(this, 0, 0).setTexSize(128, 128);
-		this.lockerLeg2 = new ModelRenderer(this, 0, 0).setTexSize(128, 128);
-		this.lockerLeg3 = new ModelRenderer(this, 0, 0).setTexSize(128, 128);
-		this.lockerLeg4 = new ModelRenderer(this, 0, 0).setTexSize(128, 128);
-		this.lockerShelf = new ModelRenderer(this, 48, 112).setTexSize(128, 128);
-		this.lockerInt[0] = new ModelRenderer(this, 79, 79).setTexSize(128, 128);
-		this.lockerInt[1] = new ModelRenderer(this, 80, 64).setTexSize(128, 128);
-		this.lockerInt[2] = new ModelRenderer(this, 97, 64).setTexSize(128, 128);
-		this.lockerInt[3] = new ModelRenderer(this, 0, 95).setTexSize(128, 128);
-		this.lockerInt[4] = new ModelRenderer(this, 16, 95).setTexSize(128, 128);
+		this.door = root.getChild("door");
+		this.handle = root.getChild("handle");
+		this.lock = root.getChild("lock");
+	}
 
-		this.lockerLower.addBox(0.0F, 3.0F, 0.0F, 16, 13, 16);
-		this.lockerUpper.addBox(0.0F, 16.0F, 0.0F, 16, 16, 16);
-
-		this.lockerDoor.addBox(0.0F, 5.0F, 0.0F, 12, 25, 2, 0.0F);
-		this.lockerDoor.setPos(2.0F, 0.0F, 15.0F);
-
-		this.lockerHandle.addBox(9.0F, 15.0F, 2.0F, 1, 4, 1, 0.0F);
-		this.lockerHandle.setPos(2.0F, 0.0F, 15.0F);
-
-		this.lockerLock.addBox(9.0F, 12.0F, 1.0F, 3, 6, 1, 0.0F);
-		this.lockerLock.setPos(2.0F, 0.0F, 15.1F);
-
-		this.lockerLeg1.addBox(0.0F, 0.0F, 0.0F, 3, 3, 3);
-		this.lockerLeg2.addBox(13.0F, 0.0F, 0.0F, 3, 3, 3);
-		this.lockerLeg3.addBox(13.0F, 0.0F, 13.0F, 3, 3, 3);
-		this.lockerLeg4.addBox(0.0F, 0.0F, 13.0F, 3, 3, 3);
-
-		this.lockerShelf.addBox(1.01f, 15.502F, 1.01f, 13.98f, 0.98f, 14.98f);
-
-		this.lockerInt[0].addBox(0.01f, 2.01f, 0.01f, 15.98f, 28.98f, 0.98f);
-		this.lockerInt[1].addBox(0.01f, 2.01f, 0.01f, 0.98f, 28.98f, 15.98f);
-		this.lockerInt[2].addBox(15.01f, 2.01f, 0.01f, 0.98f, 28.98f, 15.98f);
-		this.lockerInt[3].addBox(0.01f, 3.01f, 0.01f, 15.98f, 0.98f, 15.98f);
-		this.lockerInt[4].addBox(0.01f, 31.01f, 0.01f, 15.98f, 0.98f, 15.98f);
+	public static LayerDefinition createBaseMeshDefinition() {
+		MeshDefinition meshdefinition = new MeshDefinition();
+		PartDefinition partdefinition = meshdefinition.getRoot();
+		PartDefinition partdefinition1 = partdefinition.addOrReplaceChild("main", CubeListBuilder.create().texOffs(64, 0).addBox(0.0F, 3.0F, 0.0F, 16, 13, 16), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("upper", CubeListBuilder.create().texOffs(64, 32).addBox(0.0F, 16.0F, 0.0F, 16, 16, 16), PartPose.ZERO);
+		partdefinition.addOrReplaceChild("door", CubeListBuilder.create().texOffs(0, 32).addBox(0.0F, 5.0F, 0.0F, 12, 25, 2), PartPose.offset(2.0F, 0.0F, 15.0F));
+		partdefinition1.addOrReplaceChild("leg1", CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 0.0F, 0.0F, 3, 3, 3), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("leg2", CubeListBuilder.create().texOffs(0, 0).addBox(13.0F, 0.0F, 0.0F, 3, 3, 3), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("leg3", CubeListBuilder.create().texOffs(0, 0).addBox(13.0F, 0.0F, 13.0F, 3, 3, 3), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("leg4", CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 0.0F, 13.0F, 3, 3, 3), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("shelf", CubeListBuilder.create().texOffs(48, 112).addBox(1.01f, 15.502F, 1.01f, 13.98f, 0.98f, 14.98f), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("wall1", CubeListBuilder.create().texOffs(79, 79).addBox(0.01f, 2.01f, 0.01f, 15.98f, 28.98f, 0.98f), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("wall2", CubeListBuilder.create().texOffs(80, 64).addBox(0.01f, 2.01f, 0.01f, 0.98f, 28.98f, 15.98f), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("wall3", CubeListBuilder.create().texOffs(97, 64).addBox(15.01f, 2.01f, 0.01f, 0.98f, 28.98f, 15.98f), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("wall4", CubeListBuilder.create().texOffs(0, 95).addBox(0.01f, 3.01f, 0.01f, 15.98f, 0.98f, 15.98f), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("wall5", CubeListBuilder.create().texOffs(16, 95).addBox(0.01f, 31.01f, 0.01f, 15.98f, 0.98f, 15.98f), PartPose.ZERO);
+		partdefinition.addOrReplaceChild("lock", CubeListBuilder.create().texOffs(64, 0).addBox(9.0F, 12.0F, 1.0F, 3, 6, 1), PartPose.offset(2.0F, 0.0F, 15.1F));
+		partdefinition.addOrReplaceChild("handle", CubeListBuilder.create().texOffs(48, 0).addBox(9.0F, 15.0F, 2.0F, 1, 4, 1), PartPose.offset(2.0F, 0.0F, 15.0F));
+		return LayerDefinition.create(meshdefinition, 128, 128);
 	}
 
 	@Override
-	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		this.lockerDoor.yRot = (-(this.doorAngle / 90.0F));
-		this.lockerHandle.yRot = (-(this.doorAngle / 90.0F));
-		this.lockerLock.yRot = (-(this.doorAngle / 90.0F));
-		this.lockerUpper.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.lockerLower.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.lockerDoor.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		if (this.renderHandle)
-			this.lockerHandle.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		else
-			this.lockerLock.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.lockerLeg1.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.lockerLeg2.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.lockerLeg3.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.lockerLeg4.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.lockerShelf.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+	public void renderToBuffer(PoseStack stack, VertexConsumer buffer, int p_225598_3_, int p_225598_4_, float p_225598_5_, float p_225598_6_, float p_225598_7_, float p_225598_8_) {
+		this.main.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
+		this.door.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
 
-		for (ModelRenderer model : this.lockerInt) {
-			model.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		if (this.renderHandle) {
+			this.handle.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
+		} else {
+			this.lock.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
 		}
 	}
+
+	@Override
+	public void handleRotations() {
+		this.door.yRot = (-(this.doorAngle / 90.0F));
+		this.handle.yRot = (-(this.doorAngle / 90.0F));
+		this.lock.yRot = (-(this.doorAngle / 90.0F));
+	}
+
 }

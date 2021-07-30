@@ -1,48 +1,48 @@
-package com.grim3212.assorted.storage.common.block.tileentity;
+package com.grim3212.assorted.storage.common.block.blockentity;
 
 import java.util.stream.IntStream;
 
 import com.grim3212.assorted.storage.AssortedStorage;
-import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.inventory.DualLockerInventory;
 import com.grim3212.assorted.storage.common.inventory.LockerContainer;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
-public class LockerTileEntity extends BaseStorageTileEntity {
+public class LockerBlockEntity extends BaseStorageBlockEntity {
 
-	public LockerTileEntity() {
-		super(StorageTileEntityTypes.LOCKER.get(), 45);
+	public LockerBlockEntity(BlockPos pos, BlockState state) {
+		super(StorageBlockEntityTypes.LOCKER.get(), pos, state, 45);
 	}
 
 	@Override
-	public Container createMenu(int windowId, PlayerInventory player, PlayerEntity playerEntity) {
-		TileEntity lockerUp = level.getBlockEntity(worldPosition.above());
+	public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
+		BlockEntity lockerUp = level.getBlockEntity(worldPosition.above());
 
-		if (lockerUp != null && lockerUp instanceof LockerTileEntity) {
-			return LockerContainer.createDualLockerContainer(windowId, player, new DualLockerInventory(this, (LockerTileEntity) lockerUp));
+		if (lockerUp != null && lockerUp instanceof LockerBlockEntity) {
+			return LockerContainer.createDualLockerContainer(windowId, player, new DualLockerInventory(this, (LockerBlockEntity) lockerUp));
 		}
 
 		return LockerContainer.createLockerContainer(windowId, player, this);
 	}
 
 	@Override
-	protected ITextComponent getDefaultName() {
-		return new TranslationTextComponent(AssortedStorage.MODID + ".container.locker");
+	protected Component getDefaultName() {
+		return new TranslatableComponent(AssortedStorage.MODID + ".container.locker");
 	}
 
 	@Override
@@ -56,14 +56,14 @@ public class LockerTileEntity extends BaseStorageTileEntity {
 	private LazyOptional<?> lockerItemHandler = LazyOptional.of(() -> createSidedHandler());
 
 	protected IItemHandler createSidedHandler() {
-		TileEntity lockerUp = level.getBlockEntity(worldPosition.above());
-		if (lockerUp != null && lockerUp instanceof LockerTileEntity) {
-			return new SidedInvWrapper(new DualLockerInventory(this, (LockerTileEntity) lockerUp), null);
+		BlockEntity lockerUp = level.getBlockEntity(worldPosition.above());
+		if (lockerUp != null && lockerUp instanceof LockerBlockEntity) {
+			return new SidedInvWrapper(new DualLockerInventory(this, (LockerBlockEntity) lockerUp), null);
 		}
 
-		TileEntity lockerDown = level.getBlockEntity(worldPosition.below());
-		if (lockerDown != null && lockerDown instanceof LockerTileEntity) {
-			return new SidedInvWrapper(new DualLockerInventory((LockerTileEntity) lockerDown, this), null);
+		BlockEntity lockerDown = level.getBlockEntity(worldPosition.below());
+		if (lockerDown != null && lockerDown instanceof LockerBlockEntity) {
+			return new SidedInvWrapper(new DualLockerInventory((LockerBlockEntity) lockerDown, this), null);
 		}
 
 		return super.createSidedHandler();
@@ -84,9 +84,9 @@ public class LockerTileEntity extends BaseStorageTileEntity {
 
 	@Override
 	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction) {
-		TileEntity lockerDown = level.getBlockEntity(worldPosition.below());
-		if (lockerDown != null && lockerDown instanceof LockerTileEntity) {
-			return ((LockerTileEntity) lockerDown).canPlaceItemThroughFace(index, itemStackIn, direction);
+		BlockEntity lockerDown = level.getBlockEntity(worldPosition.below());
+		if (lockerDown != null && lockerDown instanceof LockerBlockEntity) {
+			return ((LockerBlockEntity) lockerDown).canPlaceItemThroughFace(index, itemStackIn, direction);
 		}
 
 		return super.canPlaceItemThroughFace(index, itemStackIn, direction);
@@ -94,16 +94,16 @@ public class LockerTileEntity extends BaseStorageTileEntity {
 
 	@Override
 	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
-		TileEntity lockerDown = level.getBlockEntity(worldPosition.below());
-		if (lockerDown != null && lockerDown instanceof LockerTileEntity) {
-			return ((LockerTileEntity) lockerDown).canTakeItemThroughFace(index, stack, direction);
+		BlockEntity lockerDown = level.getBlockEntity(worldPosition.below());
+		if (lockerDown != null && lockerDown instanceof LockerBlockEntity) {
+			return ((LockerBlockEntity) lockerDown).canTakeItemThroughFace(index, stack, direction);
 		}
 
 		return super.canTakeItemThroughFace(index, stack, direction);
 	}
 
 	@Override
-	public AxisAlignedBB getRenderBoundingBox() {
+	public AABB getRenderBoundingBox() {
 		return hasUpperLocker() ? super.getRenderBoundingBox().expandTowards(0, 1, 0) : super.getRenderBoundingBox();
 	}
 
@@ -119,10 +119,10 @@ public class LockerTileEntity extends BaseStorageTileEntity {
 		return this.level.getBlockState(this.worldPosition.above()) == this.level.getBlockState(worldPosition);
 	}
 
-	public LockerTileEntity getUpperLocker() {
+	public LockerBlockEntity getUpperLocker() {
 		if (this.level == null || !hasUpperLocker())
 			return null;
-		return (LockerTileEntity) this.level.getBlockEntity(worldPosition.above());
+		return (LockerBlockEntity) this.level.getBlockEntity(worldPosition.above());
 	}
 
 	public boolean isBottomLocker() {
@@ -137,14 +137,9 @@ public class LockerTileEntity extends BaseStorageTileEntity {
 		return this.level.getBlockState(this.worldPosition.below()) == this.level.getBlockState(worldPosition);
 	}
 
-	public LockerTileEntity getBottomLocker() {
+	public LockerBlockEntity getBottomLocker() {
 		if (this.level == null || !hasUpperLocker())
 			return null;
-		return (LockerTileEntity) this.level.getBlockEntity(worldPosition.below());
-	}
-
-	@Override
-	public Block getBlockToUse() {
-		return StorageBlocks.LOCKER.get();
+		return (LockerBlockEntity) this.level.getBlockEntity(worldPosition.below());
 	}
 }

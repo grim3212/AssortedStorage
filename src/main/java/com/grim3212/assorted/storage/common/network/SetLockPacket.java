@@ -4,9 +4,9 @@ import java.util.function.Supplier;
 
 import com.grim3212.assorted.storage.common.inventory.LocksmithWorkbenchContainer;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 public class SetLockPacket {
 
@@ -16,11 +16,11 @@ public class SetLockPacket {
 		this.lock = lock;
 	}
 
-	public static SetLockPacket decode(PacketBuffer buf) {
+	public static SetLockPacket decode(FriendlyByteBuf buf) {
 		return new SetLockPacket(buf.readUtf(10));
 	}
 
-	public void encode(PacketBuffer buf) {
+	public void encode(FriendlyByteBuf buf) {
 		buf.writeUtf(this.lock, 10);
 	}
 

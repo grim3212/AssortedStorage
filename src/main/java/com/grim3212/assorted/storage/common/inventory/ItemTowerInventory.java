@@ -3,21 +3,21 @@ package com.grim3212.assorted.storage.common.inventory;
 import java.util.stream.IntStream;
 
 import com.grim3212.assorted.storage.AssortedStorage;
-import com.grim3212.assorted.storage.common.block.tileentity.ItemTowerTileEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.ItemTowerBlockEntity;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.BlockPos;
 
-public class ItemTowerInventory implements ISidedInventory {
+public class ItemTowerInventory implements WorldlyContainer {
 
-	private final NonNullList<ItemTowerTileEntity> itemTowers;
+	private final NonNullList<ItemTowerBlockEntity> itemTowers;
 	private final BlockPos openedFrom;
 
-	public ItemTowerInventory(NonNullList<ItemTowerTileEntity> itemTowers, BlockPos openedFrom) {
+	public ItemTowerInventory(NonNullList<ItemTowerBlockEntity> itemTowers, BlockPos openedFrom) {
 		this.itemTowers = itemTowers;
 		this.openedFrom = openedFrom;
 		// Grab the first element
@@ -26,12 +26,12 @@ public class ItemTowerInventory implements ISidedInventory {
 		}
 	}
 
-	public ISidedInventory getMainInventory() {
+	public WorldlyContainer getMainInventory() {
 		return this.itemTowers.get(0);
 	}
 
 	public void setAnimation(int animID) {
-		for (ItemTowerTileEntity inventory : this.itemTowers)
+		for (ItemTowerBlockEntity inventory : this.itemTowers)
 			inventory.animate(animID);
 	}
 
@@ -39,9 +39,9 @@ public class ItemTowerInventory implements ISidedInventory {
 		return slot % this.getMainInventory().getContainerSize();
 	}
 
-	private ISidedInventory getInvFromSlot(int slot) {
+	private WorldlyContainer getInvFromSlot(int slot) {
 		int inventoryIndex = (int) Math.floor(slot / this.getMainInventory().getContainerSize());
-		return (ISidedInventory) this.itemTowers.get(inventoryIndex);
+		return (WorldlyContainer) this.itemTowers.get(inventoryIndex);
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class ItemTowerInventory implements ISidedInventory {
 
 	@Override
 	public boolean isEmpty() {
-		for (ISidedInventory inv : itemTowers) {
+		for (WorldlyContainer inv : itemTowers) {
 			if (!inv.isEmpty()) {
 				return false;
 			}
@@ -87,30 +87,30 @@ public class ItemTowerInventory implements ISidedInventory {
 
 	@Override
 	public void setChanged() {
-		for (ISidedInventory inventory : this.itemTowers)
+		for (WorldlyContainer inventory : this.itemTowers)
 			inventory.setChanged();
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		return !(player.distanceToSqr((double) this.openedFrom.getX() + 0.5D, (double) this.openedFrom.getY() + 0.5D, (double) this.openedFrom.getZ() + 0.5D) > 64.0D);
 	}
 
 	@Override
-	public void startOpen(PlayerEntity player) {
-		for (ISidedInventory inventory : this.itemTowers)
+	public void startOpen(Player player) {
+		for (WorldlyContainer inventory : this.itemTowers)
 			inventory.startOpen(player);
 	}
 
 	@Override
-	public void stopOpen(PlayerEntity player) {
-		for (ISidedInventory inventory : this.itemTowers)
+	public void stopOpen(Player player) {
+		for (WorldlyContainer inventory : this.itemTowers)
 			inventory.stopOpen(player);
 	}
 
 	@Override
 	public void clearContent() {
-		for (ISidedInventory inv : itemTowers) {
+		for (WorldlyContainer inv : itemTowers) {
 			inv.clearContent();
 		}
 	}

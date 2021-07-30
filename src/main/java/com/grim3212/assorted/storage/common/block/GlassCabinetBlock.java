@@ -1,10 +1,10 @@
 package com.grim3212.assorted.storage.common.block;
 
-import com.grim3212.assorted.storage.common.block.tileentity.GlassCabinetTileEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.GlassCabinetBlockEntity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class GlassCabinetBlock extends BaseStorageBlock {
 
@@ -13,7 +13,7 @@ public class GlassCabinetBlock extends BaseStorageBlock {
 	}
 
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return new GlassCabinetTileEntity();
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		return new GlassCabinetBlockEntity(pos, state);
 	}
 }

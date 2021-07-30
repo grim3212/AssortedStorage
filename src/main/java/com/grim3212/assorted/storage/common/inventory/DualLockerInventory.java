@@ -2,17 +2,17 @@ package com.grim3212.assorted.storage.common.inventory;
 
 import java.util.stream.IntStream;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
 
-public class DualLockerInventory implements ISidedInventory {
+public class DualLockerInventory implements WorldlyContainer {
 
-	private final ISidedInventory topLocker;
-	private final ISidedInventory bottomLocker;
+	private final WorldlyContainer topLocker;
+	private final WorldlyContainer bottomLocker;
 
-	public DualLockerInventory(ISidedInventory bottomLocker, ISidedInventory topLocker) {
+	public DualLockerInventory(WorldlyContainer bottomLocker, WorldlyContainer topLocker) {
 		this.bottomLocker = bottomLocker;
 		this.topLocker = topLocker;
 	}
@@ -27,7 +27,7 @@ public class DualLockerInventory implements ISidedInventory {
 		return slot - this.topLocker.getContainerSize();
 	}
 
-	private ISidedInventory getInvFromSlot(int slot) {
+	private WorldlyContainer getInvFromSlot(int slot) {
 		return !hasTopLocker() ? this.bottomLocker : slot < this.topLocker.getContainerSize() ? this.topLocker : this.bottomLocker;
 	}
 
@@ -69,19 +69,19 @@ public class DualLockerInventory implements ISidedInventory {
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		return hasTopLocker() ? this.topLocker.stillValid(player) : true && this.bottomLocker.stillValid(player);
 	}
 
 	@Override
-	public void startOpen(PlayerEntity player) {
+	public void startOpen(Player player) {
 		this.bottomLocker.startOpen(player);
 		if (hasTopLocker())
 			this.topLocker.startOpen(player);
 	}
 
 	@Override
-	public void stopOpen(PlayerEntity player) {
+	public void stopOpen(Player player) {
 		this.bottomLocker.stopOpen(player);
 		if (hasTopLocker())
 			this.topLocker.stopOpen(player);

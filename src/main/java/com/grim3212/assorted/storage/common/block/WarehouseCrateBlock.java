@@ -1,16 +1,15 @@
 package com.grim3212.assorted.storage.common.block;
 
-import com.grim3212.assorted.storage.common.block.tileentity.WarehouseCrateTileEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.WarehouseCrateBlockEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.WoodType;
-import net.minecraft.block.material.Material;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.WoodType;
+import net.minecraft.world.level.material.Material;
 
 public class WarehouseCrateBlock extends BaseStorageBlock {
 
@@ -22,11 +21,11 @@ public class WarehouseCrateBlock extends BaseStorageBlock {
 	}
 
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return new WarehouseCrateTileEntity(this);
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		return new WarehouseCrateBlockEntity(pos, state);
 	}
 
-	protected boolean isDoorBlocked(IWorld world, BlockPos pos) {
+	protected boolean isDoorBlocked(LevelAccessor world, BlockPos pos) {
 		return isInvalidBlock(world, pos.above());
 	}
 

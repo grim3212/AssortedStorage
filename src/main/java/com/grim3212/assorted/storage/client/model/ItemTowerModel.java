@@ -3,12 +3,17 @@ package com.grim3212.assorted.storage.client.model;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import net.minecraft.client.model.Model;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.model.Model;
-import net.minecraft.client.renderer.model.ModelRenderer;
 
 public class ItemTowerModel extends Model {
 
@@ -16,91 +21,52 @@ public class ItemTowerModel extends Model {
 	public boolean bottomBlock = false;
 	public double nextRender = 0.0D;
 
-	public ModelRenderer towerMain;
-	public ModelRenderer towerMainInt;
-	public ModelRenderer[] towerPost = new ModelRenderer[4];
-	public ModelRenderer[] towerCap = new ModelRenderer[2];
-	public ModelRenderer[] towerSideBar = new ModelRenderer[8];
-	public ModelRenderer[] towerMidBar = new ModelRenderer[5];
-	public ModelRenderer[] towerShelf1 = new ModelRenderer[5];
-	public ModelRenderer[] towerShelf2 = new ModelRenderer[5];
-	public ModelRenderer[] towerShelf3 = new ModelRenderer[5];
-	public ModelRenderer[] towerShelf4 = new ModelRenderer[5];
-
 	public int frame = 0;
 	public boolean framedir = false;
 	public int FramesCount = 100;
-
 	public float[] BlankFrames = new float[100];
-
 	public float[] TopSectionFramesY = new float[100];
 	public float[] TopSectionFramesZ = new float[100];
-
 	public float[] MidSectionFramesY = new float[100];
 	public float[] MidSectionFramesZ = new float[100];
-
 	public float[] BottomSectionFramesY = new float[100];
 	public float[] BottomSectionFramesZ = new float[100];
 
-	public ItemTowerModel() {
+	private final ModelPart main;
+	private final ModelPart posts;
+	private final ModelPart cap1;
+	private final ModelPart cap2;
+	private final ModelPart shelf1;
+	private final ModelPart shelf2;
+	private final ModelPart shelf3;
+	private final ModelPart shelf4;
+	private final ModelPart[] sidebars;
+	private final ModelPart[] midbars;
+
+	public ItemTowerModel(ModelPart root) {
 		super(RenderType::entityCutout);
 
-		this.towerMain = new ModelRenderer(this, 0, 0).setTexSize(128, 128);
-		this.towerMainInt = new ModelRenderer(this, 0, 0).setTexSize(128, 128);
+		this.main = root.getChild("main");
+		this.posts = root.getChild("posts");
+		this.cap1 = root.getChild("cap1");
+		this.cap2 = root.getChild("cap2");
 
-		this.towerPost[0] = new ModelRenderer(this, 0, 80).setTexSize(128, 128);
-		this.towerPost[1] = new ModelRenderer(this, 12, 80).setTexSize(128, 128);
-		this.towerPost[2] = new ModelRenderer(this, 0, 99).setTexSize(128, 128);
-		this.towerPost[3] = new ModelRenderer(this, 12, 99).setTexSize(128, 128);
+		this.shelf1 = root.getChild("shelf_1");
+		this.shelf2 = root.getChild("shelf_2");
+		this.shelf3 = root.getChild("shelf_3");
+		this.shelf4 = root.getChild("shelf_4");
 
-		this.towerCap[0] = new ModelRenderer(this, 64, 0).setTexSize(128, 128);
-		this.towerCap[1] = new ModelRenderer(this, 64, 0).setTexSize(128, 128);
+		this.sidebars = new ModelPart[8];
+		ModelPart sidebarRoot = root.getChild("sidebars");
+		for (int i = 1; i <= 8; i++) {
+			this.sidebars[i - 1] = sidebarRoot.getChild("sidebar" + i);
+		}
 
-		this.towerSideBar[0] = new ModelRenderer(this, 0, 32).setTexSize(128, 128);
-		this.towerSideBar[1] = new ModelRenderer(this, 0, 34).setTexSize(128, 128);
-		this.towerSideBar[2] = new ModelRenderer(this, 0, 32).setTexSize(128, 128);
-		this.towerSideBar[3] = new ModelRenderer(this, 0, 34).setTexSize(128, 128);
-		this.towerSideBar[4] = new ModelRenderer(this, 0, 32).setTexSize(128, 128);
-		this.towerSideBar[5] = new ModelRenderer(this, 0, 34).setTexSize(128, 128);
-		this.towerSideBar[6] = new ModelRenderer(this, 0, 32).setTexSize(128, 128);
-		this.towerSideBar[7] = new ModelRenderer(this, 0, 34).setTexSize(128, 128);
-
-		this.towerMidBar[0] = new ModelRenderer(this, 0, 45).setTexSize(128, 128);
-		this.towerMidBar[1] = new ModelRenderer(this, 48, 32).setTexSize(128, 128);
-		this.towerMidBar[2] = new ModelRenderer(this, 48, 32).setTexSize(128, 128);
-		this.towerMidBar[3] = new ModelRenderer(this, 48, 32).setTexSize(128, 128);
-		this.towerMidBar[4] = new ModelRenderer(this, 48, 32).setTexSize(128, 128);
-
-		this.towerMain.addBox(0.0F, 0.0F, 0.0F, 16, 16, 16);
-		this.towerMainInt.addBox(16.01F, 16.01F, 16.01F, -16, -16, -16);
-
-		this.towerPost[0].addBox(0.0F, 0.0F, 0.0F, 3, 16, 3);
-		this.towerPost[1].addBox(0.0F, 0.0F, 13.0F, 3, 16, 3);
-		this.towerPost[2].addBox(13.0F, 0.0F, 0.0F, 3, 16, 3);
-		this.towerPost[3].addBox(13.0F, 0.0F, 13.0F, 3, 16, 3);
-
-		this.towerCap[0].addBox(0.0F, 0.0F, 0.0F, 16, 1, 16);
-		this.towerCap[1].addBox(0.0F, 15.0F, 0.0F, 16, 1, 16);
-
-		this.towerSideBar[0].addBox(3.0F, 0.0F, 0.0F, 10, 1, 1);
-		this.towerSideBar[1].addBox(0.0F, 0.0F, 3.0F, 1, 1, 10);
-		this.towerSideBar[2].addBox(3.0F, 0.0F, 15.0F, 10, 1, 1);
-		this.towerSideBar[3].addBox(15.0F, 0.0F, 3.0F, 1, 1, 10);
-		this.towerSideBar[4].addBox(3.0F, 15.0F, 0.0F, 10, 1, 1);
-		this.towerSideBar[5].addBox(0.0F, 15.0F, 3.0F, 1, 1, 10);
-		this.towerSideBar[6].addBox(3.0F, 15.0F, 15.0F, 10, 1, 1);
-		this.towerSideBar[7].addBox(15.0F, 15.0F, 3.0F, 1, 1, 10);
-
-		this.towerMidBar[0].addBox(0.0F, 7.0F, 7.0F, 16, 2, 2);
-		this.towerMidBar[1].addBox(6.0F, 0.0F, 6.0F, 4, 12, 4);
-		this.towerMidBar[2].addBox(6.0F, 0.0F, 6.0F, 4, 16, 4);
-		this.towerMidBar[3].addBox(6.0F, 4.0F, 6.0F, 4, 12, 4);
-		this.towerMidBar[4].addBox(6.0F, 1.0F, 6.0F, 4, 14, 4);
-
-		makeShelf(this.towerShelf1);
-		makeShelf(this.towerShelf2);
-		makeShelf(this.towerShelf3);
-		makeShelf(this.towerShelf4);
+		this.midbars = new ModelPart[5];
+		ModelPart midbarRoot = root.getChild("midbars");
+		for (int i = 1; i <= 5; i++) {
+			this.midbars[i - 1] = midbarRoot.getChild("midbar" + i);
+		}
 
 		List<Float> bottomy = Lists.newArrayList();
 		List<Float> bottomz = Lists.newArrayList();
@@ -184,82 +150,105 @@ public class ItemTowerModel extends Model {
 		}
 	}
 
-	public void makeShelf(ModelRenderer[] model) {
-		model[0] = new ModelRenderer(this, 0, 64).setTexSize(128, 128);
-		model[1] = new ModelRenderer(this, 0, 68).setTexSize(128, 128);
-		model[2] = new ModelRenderer(this, 0, 68).setTexSize(128, 128);
-		model[3] = new ModelRenderer(this, 0, 72).setTexSize(128, 128);
-		model[4] = new ModelRenderer(this, 0, 72).setTexSize(128, 128);
+	public static LayerDefinition createBaseMeshDefinition() {
+		MeshDefinition meshdefinition = new MeshDefinition();
+		PartDefinition partdefinition = meshdefinition.getRoot();
+		PartDefinition maindefinition = partdefinition.addOrReplaceChild("main", CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 0.0F, 0.0F, 16, 16, 16), PartPose.ZERO);
+		maindefinition.addOrReplaceChild("mainAlt", CubeListBuilder.create().texOffs(0, 0).addBox(16.01F, 16.01F, 16.01F, -16, -16, -16), PartPose.ZERO);
+		partdefinition.addOrReplaceChild("cap1", CubeListBuilder.create().texOffs(64, 0).addBox(0.0F, 0.0F, 0.0F, 16, 1, 16), PartPose.ZERO);
+		partdefinition.addOrReplaceChild("cap2", CubeListBuilder.create().texOffs(64, 0).addBox(0.0F, 15.0F, 0.0F, 16, 1, 16), PartPose.ZERO);
 
-		model[0].addBox(1.0F, 0.0F, 0.0F, 14, 1, 3);
-		model[1].addBox(1.0F, 1.0F, 0.0F, 1, 1, 3);
-		model[2].addBox(14.0F, 1.0F, 0.0F, 1, 1, 3);
-		model[3].addBox(2.0F, 1.0F, 0.0F, 12, 1, 1);
-		model[4].addBox(2.0F, 1.0F, 2.0F, 12, 1, 1);
+		PartDefinition postsdefinition = partdefinition.addOrReplaceChild("posts", CubeListBuilder.create(), PartPose.ZERO);
+		postsdefinition.addOrReplaceChild("post1", CubeListBuilder.create().texOffs(0, 80).addBox(0.0F, 0.0F, 0.0F, 3, 16, 3), PartPose.ZERO);
+		postsdefinition.addOrReplaceChild("post2", CubeListBuilder.create().texOffs(12, 80).addBox(0.0F, 0.0F, 13.0F, 3, 16, 3), PartPose.ZERO);
+		postsdefinition.addOrReplaceChild("post3", CubeListBuilder.create().texOffs(0, 99).addBox(13.0F, 0.0F, 0.0F, 3, 16, 3), PartPose.ZERO);
+		postsdefinition.addOrReplaceChild("post4", CubeListBuilder.create().texOffs(12, 99).addBox(13.0F, 0.0F, 13.0F, 3, 16, 3), PartPose.ZERO);
+
+		PartDefinition sidebarsdefinition = partdefinition.addOrReplaceChild("sidebars", CubeListBuilder.create(), PartPose.ZERO);
+		sidebarsdefinition.addOrReplaceChild("sidebar1", CubeListBuilder.create().texOffs(0, 32).addBox(3.0F, 0.0F, 0.0F, 10, 1, 1), PartPose.ZERO);
+		sidebarsdefinition.addOrReplaceChild("sidebar2", CubeListBuilder.create().texOffs(0, 34).addBox(0.0F, 0.0F, 3.0F, 1, 1, 10), PartPose.ZERO);
+		sidebarsdefinition.addOrReplaceChild("sidebar3", CubeListBuilder.create().texOffs(0, 32).addBox(3.0F, 0.0F, 15.0F, 10, 1, 1), PartPose.ZERO);
+		sidebarsdefinition.addOrReplaceChild("sidebar4", CubeListBuilder.create().texOffs(0, 34).addBox(15.0F, 0.0F, 3.0F, 1, 1, 10), PartPose.ZERO);
+		sidebarsdefinition.addOrReplaceChild("sidebar5", CubeListBuilder.create().texOffs(0, 32).addBox(3.0F, 15.0F, 0.0F, 10, 1, 1), PartPose.ZERO);
+		sidebarsdefinition.addOrReplaceChild("sidebar6", CubeListBuilder.create().texOffs(0, 34).addBox(0.0F, 15.0F, 3.0F, 1, 1, 10), PartPose.ZERO);
+		sidebarsdefinition.addOrReplaceChild("sidebar7", CubeListBuilder.create().texOffs(0, 32).addBox(3.0F, 15.0F, 15.0F, 10, 1, 1), PartPose.ZERO);
+		sidebarsdefinition.addOrReplaceChild("sidebar8", CubeListBuilder.create().texOffs(0, 34).addBox(15.0F, 15.0F, 3.0F, 1, 1, 10), PartPose.ZERO);
+
+		PartDefinition midbarsdefinition = partdefinition.addOrReplaceChild("midbars", CubeListBuilder.create(), PartPose.ZERO);
+		midbarsdefinition.addOrReplaceChild("midbar1", CubeListBuilder.create().texOffs(0, 45).addBox(0.0F, 7.0F, 7.0F, 16, 2, 2), PartPose.ZERO);
+		midbarsdefinition.addOrReplaceChild("midbar2", CubeListBuilder.create().texOffs(48, 32).addBox(6.0F, 0.0F, 6.0F, 4, 12, 4), PartPose.ZERO);
+		midbarsdefinition.addOrReplaceChild("midbar3", CubeListBuilder.create().texOffs(48, 32).addBox(6.0F, 0.0F, 6.0F, 4, 16, 4), PartPose.ZERO);
+		midbarsdefinition.addOrReplaceChild("midbar4", CubeListBuilder.create().texOffs(48, 32).addBox(6.0F, 4.0F, 6.0F, 4, 12, 4), PartPose.ZERO);
+		midbarsdefinition.addOrReplaceChild("midbar5", CubeListBuilder.create().texOffs(48, 32).addBox(6.0F, 1.0F, 6.0F, 4, 14, 4), PartPose.ZERO);
+
+		makeShelf(partdefinition, 1);
+		makeShelf(partdefinition, 2);
+		makeShelf(partdefinition, 3);
+		makeShelf(partdefinition, 4);
+
+		return LayerDefinition.create(meshdefinition, 128, 128);
 	}
 
-	public void renderModelInventory(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		this.towerMain.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.towerMainInt.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.towerMidBar[0].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.towerMidBar[4].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+	private static void makeShelf(PartDefinition partdefinition, int shelfNum) {
+		PartDefinition shelf = partdefinition.addOrReplaceChild("shelf_" + shelfNum, CubeListBuilder.create().texOffs(0, 64).addBox(1.0F, 0.0F, 0.0F, 14, 1, 3), PartPose.ZERO);
+		shelf.addOrReplaceChild("shelf_part2", CubeListBuilder.create().texOffs(0, 68).addBox(1.0F, 1.0F, 0.0F, 1, 1, 3), PartPose.ZERO);
+		shelf.addOrReplaceChild("shelf_part3", CubeListBuilder.create().texOffs(0, 68).addBox(14.0F, 1.0F, 0.0F, 1, 1, 3), PartPose.ZERO);
+		shelf.addOrReplaceChild("shelf_part4", CubeListBuilder.create().texOffs(0, 72).addBox(2.0F, 1.0F, 0.0F, 12, 1, 1), PartPose.ZERO);
+		shelf.addOrReplaceChild("shelf_part5", CubeListBuilder.create().texOffs(0, 72).addBox(2.0F, 1.0F, 2.0F, 12, 1, 1), PartPose.ZERO);
+	}
 
-		for (ModelRenderer model : this.towerPost) {
-			model.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		}
-
-		for (ModelRenderer model : this.towerCap) {
-			model.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		}
+	public void renderModelInventory(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+		this.main.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		this.posts.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		this.cap1.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		this.cap2.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		this.midbars[0].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		this.midbars[4].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}
 
 	@Override
-	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		if (this.bottomBlock && this.topBlock) {
-			this.towerMain.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.towerMainInt.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.towerMidBar[0].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.towerMidBar[2].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.main.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.midbars[0].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.midbars[2].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		}
 
 		if (!this.bottomBlock && !this.topBlock) {
-			this.towerMain.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.towerMainInt.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.towerMidBar[0].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.towerMidBar[4].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.main.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.midbars[0].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.midbars[4].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		}
 
 		if (this.bottomBlock && this.topBlock) {
-			for (ModelRenderer model : this.towerSideBar) {
+			for (ModelPart model : this.sidebars) {
 				model.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			}
 
 		}
 
 		if (this.bottomBlock && !this.topBlock) {
-			this.towerSideBar[0].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.towerSideBar[1].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.towerSideBar[2].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.towerSideBar[3].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.towerMidBar[1].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.sidebars[0].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.sidebars[1].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.sidebars[2].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.sidebars[3].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.midbars[1].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		}
 
 		if (!this.bottomBlock && this.topBlock) {
-			this.towerSideBar[4].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.towerSideBar[5].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.towerSideBar[6].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.towerSideBar[7].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.towerMidBar[3].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.sidebars[4].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.sidebars[5].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.sidebars[6].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.sidebars[7].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.midbars[3].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		}
 
-		for (ModelRenderer model : this.towerPost) {
-			model.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		}
+		this.posts.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 
 		if (!this.bottomBlock)
-			this.towerCap[0].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.cap1.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		if (!this.topBlock)
-			this.towerCap[1].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+			this.cap2.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 
 		processFrame(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}
@@ -276,7 +265,7 @@ public class ItemTowerModel extends Model {
 		}
 	}
 
-	public void processFrame(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void processFrame(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		if (System.currentTimeMillis() > this.nextRender && (this.topBlock || this.bottomBlock)) {
 			if (this.framedir) {
 				if (this.frame < 25) {
@@ -288,14 +277,14 @@ public class ItemTowerModel extends Model {
 
 		}
 
-		renderFramePosition(this.towerShelf1, this.frame, 5, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		renderFramePosition(this.towerShelf2, this.frame, 30, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		renderFramePosition(this.towerShelf3, this.frame, 55, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		renderFramePosition(this.towerShelf4, this.frame, 80, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		renderFramePosition(this.shelf1, this.frame, 5, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		renderFramePosition(this.shelf2, this.frame, 30, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		renderFramePosition(this.shelf3, this.frame, 55, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		renderFramePosition(this.shelf4, this.frame, 80, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		this.nextRender = (System.currentTimeMillis() + 1.0D);
 	}
 
-	public void renderFramePosition(ModelRenderer[] model, int frame, int i, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderFramePosition(ModelPart model, int frame, int i, PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		int i2 = frame;
 		i2 += i;
 		while (i2 > 100)
@@ -308,9 +297,7 @@ public class ItemTowerModel extends Model {
 		float z = getFrameZTable()[i2] / 16.0F;
 
 		matrixStackIn.translate(x, y, z);
-		for (ModelRenderer section : model) {
-			section.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		}
+		model.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		matrixStackIn.translate(-x, -y, -z);
 	}
 

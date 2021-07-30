@@ -1,4 +1,4 @@
-package com.grim3212.assorted.storage.common.block.tileentity;
+package com.grim3212.assorted.storage.common.block.blockentity;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;

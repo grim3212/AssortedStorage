@@ -1,7 +1,7 @@
 package com.grim3212.assorted.storage.common.inventory;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Slot;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -9,7 +9,7 @@ public class MoveableSlot extends Slot {
 
 	private boolean shouldRender = true;
 
-	public MoveableSlot(IInventory par1iInventory, int par2, int par3, int par4) {
+	public MoveableSlot(Container par1iInventory, int par2, int par3, int par4) {
 		super(par1iInventory, par2, par3, par4);
 	}
 

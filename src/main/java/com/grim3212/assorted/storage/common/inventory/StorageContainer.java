@@ -1,61 +1,61 @@
 package com.grim3212.assorted.storage.common.inventory;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
-public class StorageContainer extends Container {
+public class StorageContainer extends AbstractContainerMenu {
 
-	private final IInventory inventory;
+	private final Container inventory;
 
-	public static StorageContainer createGlassCabinetContainer(int windowId, PlayerInventory playerInventory) {
-		return new StorageContainer(StorageContainerTypes.GLASS_CABINET.get(), windowId, playerInventory, new Inventory(27));
+	public static StorageContainer createGlassCabinetContainer(int windowId, Inventory playerInventory) {
+		return new StorageContainer(StorageContainerTypes.GLASS_CABINET.get(), windowId, playerInventory, new SimpleContainer(27));
 	}
 
-	public static StorageContainer createGlassCabinetContainer(int windowId, PlayerInventory playerInventory, IInventory inventory) {
+	public static StorageContainer createGlassCabinetContainer(int windowId, Inventory playerInventory, Container inventory) {
 		return new StorageContainer(StorageContainerTypes.GLASS_CABINET.get(), windowId, playerInventory, inventory);
 	}
 
-	public static StorageContainer createWoodCabinetContainer(int windowId, PlayerInventory playerInventory) {
-		return new StorageContainer(StorageContainerTypes.WOOD_CABINET.get(), windowId, playerInventory, new Inventory(27));
+	public static StorageContainer createWoodCabinetContainer(int windowId, Inventory playerInventory) {
+		return new StorageContainer(StorageContainerTypes.WOOD_CABINET.get(), windowId, playerInventory, new SimpleContainer(27));
 	}
 
-	public static StorageContainer createWoodCabinetContainer(int windowId, PlayerInventory playerInventory, IInventory inventory) {
+	public static StorageContainer createWoodCabinetContainer(int windowId, Inventory playerInventory, Container inventory) {
 		return new StorageContainer(StorageContainerTypes.WOOD_CABINET.get(), windowId, playerInventory, inventory);
 	}
 
-	public static StorageContainer createWarehouseCrateContainer(int windowId, PlayerInventory playerInventory) {
-		return new StorageContainer(StorageContainerTypes.WAREHOUSE_CRATE.get(), windowId, playerInventory, new Inventory(27));
+	public static StorageContainer createWarehouseCrateContainer(int windowId, Inventory playerInventory) {
+		return new StorageContainer(StorageContainerTypes.WAREHOUSE_CRATE.get(), windowId, playerInventory, new SimpleContainer(27));
 	}
 
-	public static StorageContainer createWarehouseCrateContainer(int windowId, PlayerInventory playerInventory, IInventory inventory) {
+	public static StorageContainer createWarehouseCrateContainer(int windowId, Inventory playerInventory, Container inventory) {
 		return new StorageContainer(StorageContainerTypes.WAREHOUSE_CRATE.get(), windowId, playerInventory, inventory);
 	}
 
-	public static StorageContainer createGoldSafeContainer(int windowId, PlayerInventory playerInventory) {
-		return new StorageContainer(StorageContainerTypes.GOLD_SAFE.get(), windowId, playerInventory, new Inventory(36));
+	public static StorageContainer createGoldSafeContainer(int windowId, Inventory playerInventory) {
+		return new StorageContainer(StorageContainerTypes.GOLD_SAFE.get(), windowId, playerInventory, new SimpleContainer(36));
 	}
 
-	public static StorageContainer createGoldSafeContainer(int windowId, PlayerInventory playerInventory, IInventory inventory) {
+	public static StorageContainer createGoldSafeContainer(int windowId, Inventory playerInventory, Container inventory) {
 		return new StorageContainer(StorageContainerTypes.GOLD_SAFE.get(), windowId, playerInventory, inventory);
 	}
 
-	public static StorageContainer createObsidianSafeContainer(int windowId, PlayerInventory playerInventory) {
-		return new StorageContainer(StorageContainerTypes.OBSIDIAN_SAFE.get(), windowId, playerInventory, new Inventory(27));
+	public static StorageContainer createObsidianSafeContainer(int windowId, Inventory playerInventory) {
+		return new StorageContainer(StorageContainerTypes.OBSIDIAN_SAFE.get(), windowId, playerInventory, new SimpleContainer(27));
 	}
 
-	public static StorageContainer createObsidianSafeContainer(int windowId, PlayerInventory playerInventory, IInventory inventory) {
+	public static StorageContainer createObsidianSafeContainer(int windowId, Inventory playerInventory, Container inventory) {
 		return new StorageContainer(StorageContainerTypes.OBSIDIAN_SAFE.get(), windowId, playerInventory, inventory);
 	}
 	
 	
 
-	public StorageContainer(ContainerType<?> containerType, int windowId, PlayerInventory playerInventory, IInventory inventory) {
+	public StorageContainer(MenuType<?> containerType, int windowId, Inventory playerInventory, Container inventory) {
 		super(containerType, windowId);
 		this.inventory = inventory;
 
@@ -85,12 +85,12 @@ public class StorageContainer extends Container {
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity playerIn) {
+	public boolean stillValid(Player playerIn) {
 		return this.inventory.stillValid(playerIn);
 	}
 
 	@Override
-	public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+	public ItemStack quickMoveStack(Player playerIn, int index) {
 		ItemStack itemstack = ItemStack.EMPTY;
 		Slot slot = this.slots.get(index);
 
@@ -118,7 +118,7 @@ public class StorageContainer extends Container {
 	}
 
 	@Override
-	public void removed(PlayerEntity playerIn) {
+	public void removed(Player playerIn) {
 		super.removed(playerIn);
 		this.inventory.stopOpen(playerIn);
 	}

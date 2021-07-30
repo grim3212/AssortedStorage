@@ -1,48 +1,48 @@
 package com.grim3212.assorted.storage.common.inventory;
 
-import com.grim3212.assorted.storage.common.block.tileentity.ItemTowerTileEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.ItemTowerBlockEntity;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.network.IContainerFactory;
+import net.minecraftforge.fmllegacy.network.IContainerFactory;
 
-public class ItemTowerContainer extends Container {
+public class ItemTowerContainer extends AbstractContainerMenu {
 
-	private final IInventory inventory;
+	private final Container inventory;
 
-	public static class ItemTowerContainerFactory<T extends Container> implements IContainerFactory<ItemTowerContainer> {
+	public static class ItemTowerContainerFactory<T extends AbstractContainerMenu> implements IContainerFactory<ItemTowerContainer> {
 		@Override
-		public ItemTowerContainer create(int windowId, PlayerInventory inv, PacketBuffer data) {
-			World world = inv.player.level;
+		public ItemTowerContainer create(int windowId, Inventory inv, FriendlyByteBuf data) {
+			Level world = inv.player.level;
 			BlockPos pos = data.readBlockPos();
 
-			TileEntity te = world.getBlockEntity(pos);
-			if (te != null && te instanceof ItemTowerTileEntity) {
-				ItemTowerTileEntity towerTileEntity = (ItemTowerTileEntity) te;
+			BlockEntity te = world.getBlockEntity(pos);
+			if (te != null && te instanceof ItemTowerBlockEntity) {
+				ItemTowerBlockEntity towerTileEntity = (ItemTowerBlockEntity) te;
 				return new ItemTowerContainer(StorageContainerTypes.ITEM_TOWER.get(), windowId, inv, new ItemTowerInventory(towerTileEntity.getItemTowers(), pos));
 			}
 
-			return new ItemTowerContainer(StorageContainerTypes.ITEM_TOWER.get(), windowId, inv, new Inventory(18));
+			return new ItemTowerContainer(StorageContainerTypes.ITEM_TOWER.get(), windowId, inv, new SimpleContainer(18));
 		}
 	}
 
-	public static ItemTowerContainer createItemTowerContainer(int windowId, PlayerInventory playerInventory, IInventory inventory) {
+	public static ItemTowerContainer createItemTowerContainer(int windowId, Inventory playerInventory, Container inventory) {
 		return new ItemTowerContainer(StorageContainerTypes.ITEM_TOWER.get(), windowId, playerInventory, inventory);
 	}
 
-	public ItemTowerContainer(ContainerType<?> containerType, int windowId, PlayerInventory playerInventory, IInventory inventory) {
+	public ItemTowerContainer(MenuType<?> containerType, int windowId, Inventory playerInventory, Container inventory) {
 		super(containerType, windowId);
 		this.inventory = inventory;
 
@@ -74,7 +74,7 @@ public class ItemTowerContainer extends Container {
 			setDisplayRow(0);
 	}
 
-	public IInventory getItemTowerInventory() {
+	public Container getItemTowerInventory() {
 		return inventory;
 	}
 
@@ -111,12 +111,12 @@ public class ItemTowerContainer extends Container {
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity playerIn) {
+	public boolean stillValid(Player playerIn) {
 		return this.inventory.stillValid(playerIn);
 	}
 
 	@Override
-	public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+	public ItemStack quickMoveStack(Player playerIn, int index) {
 		ItemStack itemstack = ItemStack.EMPTY;
 		Slot slot = this.slots.get(index);
 
@@ -144,7 +144,7 @@ public class ItemTowerContainer extends Container {
 	}
 
 	@Override
-	public void removed(PlayerEntity playerIn) {
+	public void removed(Player playerIn) {
 		super.removed(playerIn);
 		this.inventory.stopOpen(playerIn);
 	}

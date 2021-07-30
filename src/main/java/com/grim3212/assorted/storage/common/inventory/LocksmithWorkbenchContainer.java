@@ -6,37 +6,37 @@ import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.CombinationItem;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.CraftResultInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.IWorldPosCallable;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.ResultContainer;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
-public class LocksmithWorkbenchContainer extends Container {
+public class LocksmithWorkbenchContainer extends AbstractContainerMenu {
 
-	private final IInventory craftMatrix = new Inventory(1) {
+	private final Container craftMatrix = new SimpleContainer(1) {
 		public void setChanged() {
 			super.setChanged();
 			LocksmithWorkbenchContainer.this.slotsChanged(this);
 		};
 	};
-	private final CraftResultInventory craftResult = new CraftResultInventory();
-	private final IWorldPosCallable worldPosCallable;
+	private final ResultContainer craftResult = new ResultContainer();
+	private final ContainerLevelAccess worldPosCallable;
 	private String lock = "";
 
-	public LocksmithWorkbenchContainer(int id, PlayerInventory playerInventory) {
-		this(id, playerInventory, IWorldPosCallable.NULL);
+	public LocksmithWorkbenchContainer(int id, Inventory playerInventory) {
+		this(id, playerInventory, ContainerLevelAccess.NULL);
 	}
 
-	public LocksmithWorkbenchContainer(int id, PlayerInventory playerInventory, IWorldPosCallable p_i50090_3_) {
+	public LocksmithWorkbenchContainer(int id, Inventory playerInventory, ContainerLevelAccess p_i50090_3_) {
 		super(StorageContainerTypes.LOCKSMITH_WORKBENCH.get(), id);
 		this.worldPosCallable = p_i50090_3_;
-		
+
 		this.addSlot(new Slot(this.craftResult, 0, 120, 35) {
 			@Override
 			public boolean mayPlace(ItemStack stack) {
@@ -44,9 +44,9 @@ public class LocksmithWorkbenchContainer extends Container {
 			}
 
 			@Override
-			public ItemStack onTake(PlayerEntity thePlayer, ItemStack stack) {
+			public void onTake(Player thePlayer, ItemStack stack) {
 				LocksmithWorkbenchContainer.this.onTake();
-				return super.onTake(thePlayer, stack);
+				super.onTake(thePlayer, stack);
 			}
 		});
 
@@ -69,11 +69,11 @@ public class LocksmithWorkbenchContainer extends Container {
 
 	}
 
-	public static LocksmithWorkbenchContainer createContainer(int windowId, PlayerInventory playerInventory) {
+	public static LocksmithWorkbenchContainer createContainer(int windowId, Inventory playerInventory) {
 		return new LocksmithWorkbenchContainer(windowId, playerInventory);
 	}
 
-	public static LocksmithWorkbenchContainer createContainer(int windowId, PlayerInventory playerInventory, IWorldPosCallable worldPosCallable) {
+	public static LocksmithWorkbenchContainer createContainer(int windowId, Inventory playerInventory, ContainerLevelAccess worldPosCallable) {
 		return new LocksmithWorkbenchContainer(windowId, playerInventory, worldPosCallable);
 	}
 
@@ -82,7 +82,7 @@ public class LocksmithWorkbenchContainer extends Container {
 	}
 
 	@Override
-	public void slotsChanged(IInventory inventoryIn) {
+	public void slotsChanged(Container inventoryIn) {
 		super.slotsChanged(inventoryIn);
 
 		if (inventoryIn == this.craftMatrix) {
@@ -91,15 +91,15 @@ public class LocksmithWorkbenchContainer extends Container {
 	}
 
 	@Override
-	public void removed(PlayerEntity playerIn) {
+	public void removed(Player playerIn) {
 		super.removed(playerIn);
 		this.worldPosCallable.execute((p_217068_2_, p_217068_3_) -> {
-			this.clearContainer(playerIn, p_217068_2_, this.craftMatrix);
+			this.clearContainer(playerIn, craftMatrix);
 		});
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity playerIn) {
+	public boolean stillValid(Player playerIn) {
 		return stillValid(this.worldPosCallable, playerIn, StorageBlocks.LOCKSMITH_WORKBENCH.get());
 	}
 
@@ -108,7 +108,7 @@ public class LocksmithWorkbenchContainer extends Container {
 	 * moves the stack between the player inventory and the other inventory(s).
 	 */
 	@Override
-	public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+	public ItemStack quickMoveStack(Player playerIn, int index) {
 		ItemStack itemstack = ItemStack.EMPTY;
 		Slot slot = this.slots.get(index);
 		if (slot != null && slot.hasItem()) {
@@ -147,10 +147,7 @@ public class LocksmithWorkbenchContainer extends Container {
 				return ItemStack.EMPTY;
 			}
 
-			ItemStack itemstack2 = slot.onTake(playerIn, itemstack1);
-			if (index == 0) {
-				playerIn.drop(itemstack2, false);
-			}
+			slot.onTake(playerIn, itemstack1);
 		}
 
 		return itemstack;
@@ -179,7 +176,7 @@ public class LocksmithWorkbenchContainer extends Container {
 				if (output.hasTag()) {
 					code.write(output.getTag());
 				} else {
-					CompoundNBT tag = new CompoundNBT();
+					CompoundTag tag = new CompoundTag();
 					code.write(tag);
 					output.setTag(tag);
 				}

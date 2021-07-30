@@ -1,4 +1,4 @@
-package com.grim3212.assorted.storage.common.block.tileentity;
+package com.grim3212.assorted.storage.common.block.blockentity;
 
 import java.util.stream.IntStream;
 
@@ -8,29 +8,29 @@ import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
 import com.grim3212.assorted.storage.common.inventory.StorageContainer;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.INameable;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.Nameable;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
@@ -40,7 +40,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
 @OnlyIn(value = Dist.CLIENT, _interface = IStorage.class)
-public abstract class BaseStorageTileEntity extends TileEntity implements ISidedInventory, INamedContainerProvider, INameable, IStorage, ITickableTileEntity {
+public abstract class BaseStorageBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider, Nameable, IStorage {
 
 	private NonNullList<ItemStack> chestContents;
 	protected int numPlayersUsing;
@@ -48,14 +48,14 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	protected float rotation;
 	protected float prevRotation;
 	private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
-	private ITextComponent customName;
+	private Component customName;
 
-	protected BaseStorageTileEntity(TileEntityType<?> typeIn) {
-		this(typeIn, 27);
+	protected BaseStorageBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
+		this(typeIn, pos, state, 27);
 	}
 
-	protected BaseStorageTileEntity(TileEntityType<?> typeIn, int inventorySize) {
-		super(typeIn);
+	protected BaseStorageBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state, int inventorySize) {
+		super(typeIn, pos, state);
 
 		this.chestContents = NonNullList.<ItemStack>withSize(inventorySize, ItemStack.EMPTY);
 	}
@@ -91,9 +91,8 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 		return true;
 	}
 
-	protected abstract ITextComponent getDefaultName();
+	protected abstract Component getDefaultName();
 
-	@Override
 	public void tick() {
 		int i = this.worldPosition.getX();
 		int j = this.worldPosition.getY();
@@ -130,10 +129,10 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public float getRotation(float partialTicks) {
-		return MathHelper.lerp(partialTicks, this.prevRotation, this.rotation);
+		return Mth.lerp(partialTicks, this.prevRotation, this.rotation);
 	}
 
-	public static int getNumberOfPlayersUsing(World worldIn, BaseStorageTileEntity lockableTileEntity, int ticksSinceSync, int x, int y, int z, int numPlayersUsing) {
+	public static int getNumberOfPlayersUsing(Level worldIn, BaseStorageBlockEntity lockableTileEntity, int ticksSinceSync, int x, int y, int z, int numPlayersUsing) {
 		if (!worldIn.isClientSide && numPlayersUsing != 0 && (ticksSinceSync + x + y + z) % 200 == 0) {
 			numPlayersUsing = getNumberOfPlayersUsing(worldIn, lockableTileEntity, x, y, z);
 		}
@@ -141,10 +140,10 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 		return numPlayersUsing;
 	}
 
-	public static int getNumberOfPlayersUsing(World world, BaseStorageTileEntity lockableTileEntity, int x, int y, int z) {
+	public static int getNumberOfPlayersUsing(Level world, BaseStorageBlockEntity lockableTileEntity, int x, int y, int z) {
 		int i = 0;
 
-		for (PlayerEntity playerentity : world.getEntitiesOfClass(PlayerEntity.class, new AxisAlignedBB((double) ((float) x - 5.0F), (double) ((float) y - 5.0F), (double) ((float) z - 5.0F), (double) ((float) (x + 1) + 5.0F), (double) ((float) (y + 1) + 5.0F), (double) ((float) (z + 1) + 5.0F)))) {
+		for (Player playerentity : world.getEntitiesOfClass(Player.class, new AABB((double) ((float) x - 5.0F), (double) ((float) y - 5.0F), (double) ((float) z - 5.0F), (double) ((float) (x + 1) + 5.0F), (double) ((float) (y + 1) + 5.0F), (double) ((float) (z + 1) + 5.0F)))) {
 			if (playerentity.containerMenu instanceof StorageContainer) {
 				++i;
 			}
@@ -158,7 +157,7 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 		double d1 = (double) this.worldPosition.getY() + 0.5D;
 		double d2 = (double) this.worldPosition.getZ() + 0.5D;
 
-		this.level.playSound((PlayerEntity) null, d0, d1, d2, soundIn, SoundCategory.BLOCKS, 0.5F, this.level.random.nextFloat() * 0.1F + 0.9F);
+		this.level.playSound((Player) null, d0, d1, d2, soundIn, SoundSource.BLOCKS, 0.5F, this.level.random.nextFloat() * 0.1F + 0.9F);
 	}
 
 	@Override
@@ -172,7 +171,7 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	}
 
 	@Override
-	public void startOpen(PlayerEntity player) {
+	public void startOpen(Player player) {
 		if (!player.isSpectator()) {
 			if (this.numPlayersUsing < 0) {
 				this.numPlayersUsing = 0;
@@ -184,7 +183,7 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	}
 
 	@Override
-	public void stopOpen(PlayerEntity player) {
+	public void stopOpen(Player player) {
 		if (!player.isSpectator()) {
 			--this.numPlayersUsing;
 			this.onOpenOrClose();
@@ -204,30 +203,28 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 		return this.chestContents;
 	}
 
-	public abstract Block getBlockToUse();
-
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		this.chestContents = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
 
-		ItemStackHelper.loadAllItems(nbt, this.chestContents);
+		ContainerHelper.loadAllItems(nbt, this.chestContents);
 
 		if (nbt.contains("CustomName", 8)) {
-			this.customName = ITextComponent.Serializer.fromJson(nbt.getString("CustomName"));
+			this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"));
 		}
 
 		this.readPacketNBT(nbt);
 	}
 
 	@Override
-	public CompoundNBT save(CompoundNBT compound) {
+	public CompoundTag save(CompoundTag compound) {
 		super.save(compound);
 
-		ItemStackHelper.saveAllItems(compound, this.chestContents);
+		ContainerHelper.saveAllItems(compound, this.chestContents);
 
 		if (this.customName != null) {
-			compound.putString("CustomName", ITextComponent.Serializer.toJson(this.customName));
+			compound.putString("CustomName", Component.Serializer.toJson(this.customName));
 		}
 
 		this.writePacketNBT(compound);
@@ -235,33 +232,33 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 		return compound;
 	}
 
-	public CompoundNBT saveToNbt(CompoundNBT compound) {
-		ItemStackHelper.saveAllItems(compound, this.chestContents, false);
+	public CompoundTag saveToNbt(CompoundTag compound) {
+		ContainerHelper.saveAllItems(compound, this.chestContents, false);
 		return compound;
 	}
 
-	public void writePacketNBT(CompoundNBT cmp) {
+	public void writePacketNBT(CompoundTag cmp) {
 		this.lockCode.write(cmp);
 	}
 
-	public void readPacketNBT(CompoundNBT cmp) {
+	public void readPacketNBT(CompoundTag cmp) {
 		this.lockCode = StorageLockCode.read(cmp);
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return save(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return save(new CompoundTag());
 	}
 
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		CompoundNBT nbtTagCompound = new CompoundNBT();
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		CompoundTag nbtTagCompound = new CompoundTag();
 		writePacketNBT(nbtTagCompound);
-		return new SUpdateTileEntityPacket(this.worldPosition, 1, nbtTagCompound);
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 1, nbtTagCompound);
 	}
 
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		this.readPacketNBT(pkt.getTag());
 	}
 
@@ -293,20 +290,20 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 		this.getItems().clear();
 	}
 
-	public void setCustomName(ITextComponent name) {
+	public void setCustomName(Component name) {
 		this.customName = name;
 	}
 
-	public ITextComponent getName() {
+	public Component getName() {
 		return this.customName != null ? this.customName : this.getDefaultName();
 	}
 
-	public ITextComponent getDisplayName() {
+	public Component getDisplayName() {
 		return this.getName();
 	}
 
 	@Nullable
-	public ITextComponent getCustomName() {
+	public Component getCustomName() {
 		return this.customName;
 	}
 
@@ -317,7 +314,7 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 
 	@Override
 	public ItemStack removeItem(int index, int count) {
-		ItemStack itemstack = ItemStackHelper.removeItem(this.getItems(), index, count);
+		ItemStack itemstack = ContainerHelper.removeItem(this.getItems(), index, count);
 		if (!itemstack.isEmpty()) {
 			this.setChanged();
 		}
@@ -327,7 +324,7 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 
 	@Override
 	public ItemStack removeItemNoUpdate(int index) {
-		return ItemStackHelper.takeItem(this.getItems(), index);
+		return ContainerHelper.takeItem(this.getItems(), index);
 	}
 
 	@Override
@@ -341,7 +338,7 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		if (this.level.getBlockEntity(this.worldPosition) != this) {
 			return false;
 		} else {

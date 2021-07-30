@@ -2,25 +2,25 @@ package com.grim3212.assorted.storage.client.screen;
 
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.inventory.LockerContainer;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.gui.IHasContainer;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.MenuAccess;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class DualLockerScreen extends ContainerScreen<LockerContainer> implements IHasContainer<LockerContainer> {
+public class DualLockerScreen extends AbstractContainerScreen<LockerContainer> implements MenuAccess<LockerContainer> {
 
 	private static final ResourceLocation LOCKER_TEXTURE = new ResourceLocation(AssortedStorage.MODID, "textures/gui/container/locker.png");
 	private int rowId = 0;
 
-	public DualLockerScreen(LockerContainer container, PlayerInventory playerInventory, ITextComponent title) {
+	public DualLockerScreen(LockerContainer container, Inventory playerInventory, Component title) {
 		super(container, playerInventory, title);
 
 		this.imageWidth += 17;
@@ -31,23 +31,22 @@ public class DualLockerScreen extends ContainerScreen<LockerContainer> implement
 	}
 
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		this.renderBackground(matrixStack);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		this.renderTooltip(matrixStack, mouseX, mouseY);
 	}
 
 	@Override
-	protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
+	protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
 		this.font.draw(matrixStack, this.title, 8.0F, 6.0F, 4210752);
-
-		this.font.draw(matrixStack, this.inventory.getDisplayName(), 8.0F, (float) (this.imageHeight - 96 + 2), 4210752);
+		this.font.draw(matrixStack, this.playerInventoryTitle, 8.0F, (float) (this.imageHeight - 96 + 2), 4210752);
 	}
 
 	@Override
-	protected void renderBg(MatrixStack matrixStack, float partialTicks, int x, int y) {
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		this.minecraft.getTextureManager().bind(LOCKER_TEXTURE);
+	protected void renderBg(PoseStack matrixStack, float partialTicks, int x, int y) {
+		RenderSystem.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderTexture(0, LOCKER_TEXTURE);
 
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;

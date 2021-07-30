@@ -2,52 +2,55 @@ package com.grim3212.assorted.storage.common.block;
 
 import javax.annotation.Nullable;
 
-import com.grim3212.assorted.storage.common.block.tileentity.BaseStorageTileEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.pathfinding.PathType;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.StateContainer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
-public abstract class BaseStorageBlock extends Block {
+public abstract class BaseStorageBlock extends Block implements EntityBlock {
 
-	public static final DirectionProperty FACING = HorizontalBlock.FACING;
+	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 	public static final VoxelShape FAKE_SIDES_AND_BOTTOM = Block.box(0.01D, 0.01D, 0.01D, 16.0D, 16.0D, 16.0D);
 
 	public BaseStorageBlock(Properties properties) {
@@ -56,44 +59,44 @@ public abstract class BaseStorageBlock extends Block {
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		if (context == ISelectionContext.empty())
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+		if (context == CollisionContext.empty())
 			return FAKE_SIDES_AND_BOTTOM;
 
 		return super.getShape(state, worldIn, pos, context);
 	}
 
-	protected boolean isInvalidBlock(IWorld world, BlockPos pos) {
+	protected boolean isInvalidBlock(LevelAccessor world, BlockPos pos) {
 		return !world.isEmptyBlock(pos) && world.getBlockState(pos).isSolidRender(world, pos);
 	}
 
-	protected boolean isDoorBlocked(IWorld world, BlockPos pos) {
+	protected boolean isDoorBlocked(LevelAccessor world, BlockPos pos) {
 		return isInvalidBlock(world, pos.relative(world.getBlockState(pos).getValue(FACING)));
 	}
 
 	@Override
-	public BlockRenderType getRenderShape(BlockState state) {
-		return BlockRenderType.ENTITYBLOCK_ANIMATED;
+	public RenderShape getRenderShape(BlockState state) {
+		return RenderShape.ENTITYBLOCK_ANIMATED;
 	}
 
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		Direction direction = context.getHorizontalDirection().getOpposite();
 
 		return this.defaultBlockState().setValue(FACING, direction);
 	}
 
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(FACING);
 	}
 
 	@Override
-	public float getDestroyProgress(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
-		TileEntity te = worldIn.getBlockEntity(pos);
+	public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
+		BlockEntity te = worldIn.getBlockEntity(pos);
 
-		if (te instanceof BaseStorageTileEntity) {
-			BaseStorageTileEntity tileentity = (BaseStorageTileEntity) te;
+		if (te instanceof BaseStorageBlockEntity) {
+			BaseStorageBlockEntity tileentity = (BaseStorageBlockEntity) te;
 
 			if (tileentity.isLocked() && !this.canAccess(worldIn, pos, player))
 				return -1.0F;
@@ -103,33 +106,33 @@ public abstract class BaseStorageBlock extends Block {
 	}
 
 	@Override
-	public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-		TileEntity tileentity = worldIn.getBlockEntity(pos);
+	public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+		BlockEntity tileentity = worldIn.getBlockEntity(pos);
 
-		if (tileentity instanceof BaseStorageTileEntity) {
+		if (tileentity instanceof BaseStorageBlockEntity) {
 			if (stack.hasCustomHoverName()) {
-				((BaseStorageTileEntity) tileentity).setCustomName(stack.getHoverName());
+				((BaseStorageBlockEntity) tileentity).setCustomName(stack.getHoverName());
 			}
 		}
 	}
 
 	@Override
-	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
-			TileEntity tileentity = worldIn.getBlockEntity(pos);
+			BlockEntity tileentity = worldIn.getBlockEntity(pos);
 
-			if (tileentity instanceof BaseStorageTileEntity) {
-				BaseStorageTileEntity teStorage = (BaseStorageTileEntity) tileentity;
+			if (tileentity instanceof BaseStorageBlockEntity) {
+				BaseStorageBlockEntity teStorage = (BaseStorageBlockEntity) tileentity;
 
 				if (teStorage.isLocked()) {
 					ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
-					CompoundNBT tag = new CompoundNBT();
+					CompoundTag tag = new CompoundTag();
 					new StorageLockCode(teStorage.getLockCode()).write(tag);
 					lockStack.setTag(tag);
-					InventoryHelper.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
+					Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
 				}
 
-				InventoryHelper.dropContents(worldIn, pos, (BaseStorageTileEntity) tileentity);
+				Containers.dropContents(worldIn, pos, (BaseStorageBlockEntity) tileentity);
 				worldIn.updateNeighbourForOutputSignal(pos, this);
 			}
 
@@ -137,25 +140,25 @@ public abstract class BaseStorageBlock extends Block {
 		}
 	}
 
-	protected boolean canBeLocked(World worldIn, BlockPos pos) {
-		return !((BaseStorageTileEntity) worldIn.getBlockEntity(pos)).isLocked();
+	protected boolean canBeLocked(Level worldIn, BlockPos pos) {
+		return !((BaseStorageBlockEntity) worldIn.getBlockEntity(pos)).isLocked();
 	}
 
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		if (this.canBeLocked(worldIn, pos) && player.getItemInHand(handIn).getItem() == StorageItems.LOCKSMITH_LOCK.get()) {
 			if (tryPlaceLock(worldIn, pos, player, handIn))
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 		}
 
 		if (player.isShiftKeyDown() && this.canAccess(worldIn, pos, player)) {
-			TileEntity tileentity = worldIn.getBlockEntity(pos);
-			if (tileentity instanceof BaseStorageTileEntity) {
-				BaseStorageTileEntity teStorage = (BaseStorageTileEntity) worldIn.getBlockEntity(pos);
+			BlockEntity tileentity = worldIn.getBlockEntity(pos);
+			if (tileentity instanceof BaseStorageBlockEntity) {
+				BaseStorageBlockEntity teStorage = (BaseStorageBlockEntity) worldIn.getBlockEntity(pos);
 
 				if (teStorage.isLocked()) {
 					ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
-					CompoundNBT tag = new CompoundNBT();
+					CompoundTag tag = new CompoundTag();
 					new StorageLockCode(teStorage.getLockCode()).write(tag);
 					lockStack.setTag(tag);
 
@@ -167,7 +170,7 @@ public abstract class BaseStorageBlock extends Block {
 								blockDropped.playerTouch(player);
 							}
 						}
-						return ActionResultType.SUCCESS;
+						return InteractionResult.SUCCESS;
 					}
 				}
 			}
@@ -175,14 +178,14 @@ public abstract class BaseStorageBlock extends Block {
 
 		if (!isDoorBlocked(worldIn, pos) && this.canAccess(worldIn, pos, player)) {
 			if (!worldIn.isClientSide) {
-				INamedContainerProvider inamedcontainerprovider = this.getMenuProvider(state, worldIn, pos);
+				MenuProvider inamedcontainerprovider = this.getMenuProvider(state, worldIn, pos);
 				if (inamedcontainerprovider != null) {
-					NetworkHooks.openGui((ServerPlayerEntity) player, inamedcontainerprovider, pos);
+					NetworkHooks.openGui((ServerPlayer) player, inamedcontainerprovider, pos);
 					player.awardStat(this.getOpenStat());
 				}
 			}
 		}
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
 	// TODO: Create custom stat for this
@@ -192,20 +195,24 @@ public abstract class BaseStorageBlock extends Block {
 
 	@Override
 	@Nullable
-	public INamedContainerProvider getMenuProvider(BlockState state, World world, BlockPos pos) {
-		TileEntity tileentity = world.getBlockEntity(pos);
-		return tileentity instanceof INamedContainerProvider ? (INamedContainerProvider) tileentity : null;
+	public MenuProvider getMenuProvider(BlockState state, Level world, BlockPos pos) {
+		BlockEntity tileentity = world.getBlockEntity(pos);
+		return tileentity instanceof MenuProvider ? (MenuProvider) tileentity : null;
 	}
 
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+		return (level1, blockPos, blockState, t) -> {
+			if (t instanceof BaseStorageBlockEntity storage) {
+				storage.tick();
+			}
+		};
 	}
 
 	@Override
-	public boolean triggerEvent(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+	public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
 		super.triggerEvent(state, worldIn, pos, id, param);
-		TileEntity tileentity = worldIn.getBlockEntity(pos);
+		BlockEntity tileentity = worldIn.getBlockEntity(pos);
 		return tileentity == null ? false : tileentity.triggerEvent(id, param);
 	}
 
@@ -215,8 +222,8 @@ public abstract class BaseStorageBlock extends Block {
 	}
 
 	@Override
-	public int getAnalogOutputSignal(BlockState blockState, World worldIn, BlockPos pos) {
-		return Container.getRedstoneSignalFromContainer((IInventory) worldIn.getBlockEntity(pos));
+	public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
+		return AbstractContainerMenu.getRedstoneSignalFromContainer((Container) worldIn.getBlockEntity(pos));
 	}
 
 	@Override
@@ -230,19 +237,19 @@ public abstract class BaseStorageBlock extends Block {
 	}
 
 	@Override
-	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, BlockGetter worldIn, BlockPos pos, PathComputationType type) {
 		return false;
 	}
 
-	private boolean removeLock(World worldIn, BlockPos pos, PlayerEntity entityplayer) {
-		BaseStorageTileEntity tileentity = (BaseStorageTileEntity) worldIn.getBlockEntity(pos);
+	private boolean removeLock(Level worldIn, BlockPos pos, Player entityplayer) {
+		BaseStorageBlockEntity tileentity = (BaseStorageBlockEntity) worldIn.getBlockEntity(pos);
 		tileentity.setLockCode("");
-		tileentity.getLevel().playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundCategory.BLOCKS, 0.5F, tileentity.getLevel().random.nextFloat() * 0.1F + 0.9F);
+		tileentity.getLevel().playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, tileentity.getLevel().random.nextFloat() * 0.1F + 0.9F);
 		return true;
 	}
 
-	private boolean tryPlaceLock(World worldIn, BlockPos pos, PlayerEntity entityplayer, Hand hand) {
-		BaseStorageTileEntity tileentity = (BaseStorageTileEntity) worldIn.getBlockEntity(pos);
+	private boolean tryPlaceLock(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
+		BaseStorageBlockEntity tileentity = (BaseStorageBlockEntity) worldIn.getBlockEntity(pos);
 		ItemStack itemstack = entityplayer.getItemInHand(hand);
 
 		if (itemstack.hasTag()) {
@@ -251,7 +258,7 @@ public abstract class BaseStorageBlock extends Block {
 				if (!entityplayer.isCreative())
 					itemstack.shrink(1);
 				tileentity.setLockCode(code);
-				tileentity.getLevel().playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundCategory.BLOCKS, 0.5F, tileentity.getLevel().random.nextFloat() * 0.1F + 0.9F);
+				tileentity.getLevel().playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, tileentity.getLevel().random.nextFloat() * 0.1F + 0.9F);
 				return true;
 			}
 
@@ -260,12 +267,12 @@ public abstract class BaseStorageBlock extends Block {
 		return false;
 	}
 
-	private boolean canAccess(IBlockReader worldIn, BlockPos pos, PlayerEntity entityplayer) {
-		BaseStorageTileEntity tileentity = (BaseStorageTileEntity) worldIn.getBlockEntity(pos);
+	private boolean canAccess(BlockGetter worldIn, BlockPos pos, Player entityplayer) {
+		BaseStorageBlockEntity tileentity = (BaseStorageBlockEntity) worldIn.getBlockEntity(pos);
 
 		if (tileentity.isLocked()) {
-			for (int slot = 0; slot < entityplayer.inventory.getContainerSize(); slot++) {
-				ItemStack itemstack = entityplayer.inventory.getItem(slot);
+			for (int slot = 0; slot < entityplayer.getInventory().getContainerSize(); slot++) {
+				ItemStack itemstack = entityplayer.getInventory().getItem(slot);
 
 				if ((!itemstack.isEmpty()) && (itemstack.getItem() == StorageItems.LOCKSMITH_KEY.get())) {
 					if (itemstack.hasTag()) {

@@ -1,81 +1,67 @@
 package com.grim3212.assorted.storage.client.model;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.model.ModelRenderer;
 
 public class SafeModel extends BaseStorageModel {
 
-	private ModelRenderer safeMain;
-	private ModelRenderer safeDoor;
-	private ModelRenderer safeHandle;
-	private ModelRenderer safeLock;
-	private ModelRenderer safeLeg1;
-	private ModelRenderer safeLeg2;
-	private ModelRenderer safeLeg3;
-	private ModelRenderer safeLeg4;
-	private ModelRenderer[] safeInt = new ModelRenderer[5];
+	private final ModelPart main;
+	private final ModelPart door;
+	private final ModelPart handle;
+	private final ModelPart lock;
 
-	public SafeModel() {
+	public SafeModel(ModelPart root) {
 		super(RenderType::entityCutout);
+		this.main = root.getChild("main");
 
-		this.safeMain = new ModelRenderer(this, 0, 0).setTexSize(64, 48);
-		this.safeDoor = new ModelRenderer(this, 0, 32).setTexSize(64, 48);
-		this.safeHandle = new ModelRenderer(this, 48, 0).setTexSize(64, 48);
-		this.safeLock = new ModelRenderer(this, 48, 29).setTexSize(64, 48);
-		this.safeLeg1 = new ModelRenderer(this, 0, 0).setTexSize(64, 48);
-		this.safeLeg2 = new ModelRenderer(this, 0, 0).setTexSize(64, 48);
-		this.safeLeg3 = new ModelRenderer(this, 0, 0).setTexSize(64, 48);
-		this.safeLeg4 = new ModelRenderer(this, 0, 0).setTexSize(64, 48);
-		this.safeInt[0] = new ModelRenderer(this, 14, 15).setTexSize(64, 48);
-		this.safeInt[1] = new ModelRenderer(this, 14, 0).setTexSize(64, 48);
-		this.safeInt[2] = new ModelRenderer(this, 33, 0).setTexSize(64, 48);
-		this.safeInt[3] = new ModelRenderer(this, 0, 0).setTexSize(64, 48);
-		this.safeInt[4] = new ModelRenderer(this, 16, 0).setTexSize(64, 48);
+		this.door = root.getChild("door");
+		this.handle = root.getChild("handle");
+		this.lock = root.getChild("lock");
+	}
 
-		this.safeMain.addBox(0.0F, 3.0F, 0.0F, 16, 13, 16);
-
-		this.safeDoor.addBox(0.0F, 6.0F, 0.0F, 10, 7, 2, 0.0F);
-		this.safeDoor.setPos(3.0F, 0.0F, 15.0F);
-
-		this.safeHandle.addBox(7.0F, 8.0F, 2.0F, 1, 3, 1, 0.0F);
-		this.safeHandle.setPos(3.0F, 0.0F, 15.0F);
-
-		this.safeLock.addBox(6.0F, 6.0F, 1.0F, 3, 6, 1, 0.0F);
-		this.safeLock.setPos(3.0F, 0.0F, 15.1F);
-
-		this.safeLeg1.addBox(0.0F, 0.0F, 0.0F, 3, 3, 3);
-		this.safeLeg2.addBox(13.0F, 0.0F, 0.0F, 3, 3, 3);
-		this.safeLeg3.addBox(13.0F, 0.0F, 13.0F, 3, 3, 3);
-		this.safeLeg4.addBox(0.0F, 0.0F, 13.0F, 3, 3, 3);
-
-		this.safeInt[0].addBox(0.01f, 3.01f, 0.01f, 15.98f, 12.98f, 0.98f);
-		this.safeInt[1].addBox(0.01f, 3.01f, 0.01f, 0.98f, 12.98f, 15.98f);
-		this.safeInt[2].addBox(14.998F, 3.01f, 0.01f, 0.98f, 12.98f, 15.98f);
-		this.safeInt[3].addBox(0.01f, 3.01f, 0.01f, 15.98f, 0.98f, 15.98f);
-		this.safeInt[4].addBox(0.01f, 15.0F, 0.01f, 15.98f, 0.98f, 15.98f);
+	public static LayerDefinition createBaseMeshDefinition() {
+		MeshDefinition meshdefinition = new MeshDefinition();
+		PartDefinition partdefinition = meshdefinition.getRoot();
+		PartDefinition partdefinition1 = partdefinition.addOrReplaceChild("main", CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 3.0F, 0.0F, 16, 13, 16), PartPose.ZERO);
+		partdefinition.addOrReplaceChild("door", CubeListBuilder.create().texOffs(0, 32).addBox(0.0F, 6.0F, 0.0F, 10, 7, 2), PartPose.offset(3.0F, 0.0F, 15.0F));
+		partdefinition1.addOrReplaceChild("leg1", CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 0.0F, 0.0F, 3, 3, 3), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("leg2", CubeListBuilder.create().texOffs(0, 0).addBox(13.0F, 0.0F, 0.0F, 3, 3, 3), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("leg3", CubeListBuilder.create().texOffs(0, 0).addBox(13.0F, 0.0F, 13.0F, 3, 3, 3), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("leg4", CubeListBuilder.create().texOffs(0, 0).addBox(0.0F, 0.0F, 13.0F, 3, 3, 3), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("wall1", CubeListBuilder.create().texOffs(14, 15).addBox(0.01f, 3.01f, 0.01f, 15.98f, 12.98f, 0.98f), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("wall2", CubeListBuilder.create().texOffs(14, 0).addBox(0.01f, 3.01f, 0.01f, 0.98f, 12.98f, 15.98f), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("wall3", CubeListBuilder.create().texOffs(33, 0).addBox(14.998F, 3.01f, 0.01f, 0.98f, 12.98f, 15.98f), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("wall4", CubeListBuilder.create().texOffs(0, 0).addBox(0.01f, 3.01f, 0.01f, 15.98f, 0.98f, 15.98f), PartPose.ZERO);
+		partdefinition1.addOrReplaceChild("wall5", CubeListBuilder.create().texOffs(16, 0).addBox(0.01f, 15.0F, 0.01f, 15.98f, 0.98f, 15.98f), PartPose.ZERO);
+		partdefinition.addOrReplaceChild("lock", CubeListBuilder.create().texOffs(48, 29).addBox(6.0F, 6.0F, 1.0F, 3, 6, 1), PartPose.offset(3.0F, 0.0F, 15.1F));
+		partdefinition.addOrReplaceChild("handle", CubeListBuilder.create().texOffs(48, 0).addBox(7.0F, 8.0F, 2.0F, 1, 3, 1), PartPose.offset(3.0F, 0.0F, 15.0F));
+		return LayerDefinition.create(meshdefinition, 64, 48);
 	}
 
 	@Override
-	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		this.safeDoor.yRot = (-(this.doorAngle / 90.0F));
-		this.safeHandle.yRot = (-(this.doorAngle / 90.0F));
-		this.safeLock.yRot = (-(this.doorAngle / 90.0F));
-		this.safeMain.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.safeDoor.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		if (this.renderHandle)
-			this.safeHandle.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		else
-			this.safeLock.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.safeLeg1.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.safeLeg2.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.safeLeg3.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.safeLeg4.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+	public void renderToBuffer(PoseStack stack, VertexConsumer buffer, int p_225598_3_, int p_225598_4_, float p_225598_5_, float p_225598_6_, float p_225598_7_, float p_225598_8_) {
+		this.main.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
+		this.door.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
 
-		for (ModelRenderer model : this.safeInt) {
-			model.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		if (this.renderHandle) {
+			this.handle.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
+		} else {
+			this.lock.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
 		}
+	}
+
+	@Override
+	public void handleRotations() {
+		this.door.yRot = (-(this.doorAngle / 90.0F));
+		this.handle.yRot = (-(this.doorAngle / 90.0F));
+		this.lock.yRot = (-(this.doorAngle / 90.0F));
 	}
 }
