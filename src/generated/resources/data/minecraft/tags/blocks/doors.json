@@ -1,15 +1,15 @@
 {
   "replace": false,
   "values": [
-    "assortedstorage:locked_birch_door",
-    "assortedstorage:locked_iron_door",
-    "assortedstorage:locked_quartz_door",
-    "assortedstorage:locked_oak_door",
-    "assortedstorage:locked_dark_oak_door",
-    "assortedstorage:locked_crimson_door",
-    "assortedstorage:locked_warped_door",
     "assortedstorage:locked_acacia_door",
     "assortedstorage:locked_jungle_door",
+    "assortedstorage:locked_quartz_door",
+    "assortedstorage:locked_iron_door",
+    "assortedstorage:locked_oak_door",
+    "assortedstorage:locked_crimson_door",
+    "assortedstorage:locked_birch_door",
+    "assortedstorage:locked_warped_door",
+    "assortedstorage:locked_dark_oak_door",
     "assortedstorage:locked_spruce_door"
   ]
 }

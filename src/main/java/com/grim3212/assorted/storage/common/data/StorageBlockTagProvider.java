@@ -3,13 +3,11 @@ package com.grim3212.assorted.storage.common.data;
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.ExistingFileHelper;
-
-import net.minecraft.data.tags.TagsProvider.TagAppender;
 
 public class StorageBlockTagProvider extends BlockTagsProvider {
 
@@ -40,6 +38,7 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 			doorBuilder.add(b);
 		}
 
+		this.tag(BlockTags.MINEABLE_WITH_PICKAXE).add(StorageBlocks.ITEM_TOWER.get(), StorageBlocks.LOCKER.get(), StorageBlocks.GOLD_SAFE.get(), StorageBlocks.OBSIDIAN_SAFE.get(), StorageBlocks.LOCKED_IRON_DOOR.get(), StorageBlocks.LOCKED_QUARTZ_DOOR.get());
 	}
 
 	@Override

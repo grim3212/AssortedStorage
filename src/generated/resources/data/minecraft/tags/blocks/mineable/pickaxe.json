@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "assortedstorage:item_tower",
+    "assortedstorage:locker",
+    "assortedstorage:gold_safe",
+    "assortedstorage:obsidian_safe",
+    "assortedstorage:locked_iron_door",
+    "assortedstorage:locked_quartz_door"
+  ]
+}
