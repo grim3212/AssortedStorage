@@ -3,6 +3,7 @@ package com.grim3212.assorted.storage.common.block;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseLockedBlockEntity;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
+import com.grim3212.assorted.storage.common.util.StorageUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -78,7 +79,7 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock {
 
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
-		if (player.isShiftKeyDown() && this.canAccess(worldIn, pos, player)) {
+		if (player.isShiftKeyDown() && StorageUtil.canAccess(worldIn, pos, player)) {
 			BlockEntity tileentity = worldIn.getBlockEntity(pos);
 			if (tileentity instanceof BaseLockedBlockEntity) {
 				BaseLockedBlockEntity teStorage = (BaseLockedBlockEntity) worldIn.getBlockEntity(pos);
@@ -91,7 +92,7 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock {
 			}
 		}
 
-		if (this.canAccess(worldIn, pos, player)) {
+		if (StorageUtil.canAccess(worldIn, pos, player)) {
 			state = state.cycle(OPEN);
 			worldIn.setBlock(pos, state, 10);
 			worldIn.levelEvent(player, state.getValue(OPEN) ? this.getOpenSound() : this.getCloseSound(), pos, 0);
@@ -108,7 +109,7 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock {
 		if (te instanceof BaseLockedBlockEntity) {
 			BaseLockedBlockEntity tileentity = (BaseLockedBlockEntity) te;
 
-			if (tileentity.isLocked() && !this.canAccess(worldIn, pos, player))
+			if (tileentity.isLocked() && !StorageUtil.canAccess(worldIn, pos, player))
 				return -1.0F;
 		}
 
@@ -164,29 +165,6 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock {
 			worldIn.setBlock(pos.below(), toPlace.setValue(HALF, DoubleBlockHalf.LOWER), 3);
 		} else {
 			worldIn.setBlock(pos.above(), toPlace.setValue(HALF, DoubleBlockHalf.UPPER), 3);
-		}
-
-		return true;
-	}
-
-	private boolean canAccess(BlockGetter worldIn, BlockPos pos, Player entityplayer) {
-		BaseLockedBlockEntity tileentity = (BaseLockedBlockEntity) worldIn.getBlockEntity(pos);
-
-		if (tileentity != null && tileentity.isLocked()) {
-			for (int slot = 0; slot < entityplayer.getInventory().getContainerSize(); slot++) {
-				ItemStack itemstack = entityplayer.getInventory().getItem(slot);
-
-				if ((!itemstack.isEmpty()) && (itemstack.getItem() == StorageItems.LOCKSMITH_KEY.get())) {
-					if (itemstack.hasTag()) {
-						String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
-						if (!code.isEmpty()) {
-							return tileentity.getLockCode().equals(code);
-						}
-					}
-				}
-			}
-
-			return false;
 		}
 
 		return true;

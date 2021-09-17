@@ -8,6 +8,7 @@ import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.GlassCabinetBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.GoldSafeBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.ItemTowerBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.LockedEnderChestBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.ObsidianSafeBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.WoodCabinetBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -36,6 +37,7 @@ public class StorageBEWLR extends BlockEntityWithoutLevelRenderer {
 	private final GoldSafeBlockEntity goldSafeBlockEntity = new GoldSafeBlockEntity(BlockPos.ZERO, StorageBlocks.GOLD_SAFE.get().defaultBlockState());
 	private final ObsidianSafeBlockEntity obsidianSafeBlockEntity = new ObsidianSafeBlockEntity(BlockPos.ZERO, StorageBlocks.OBSIDIAN_SAFE.get().defaultBlockState());
 	private final ItemTowerBlockEntity itemTowerBlockEntity = new ItemTowerBlockEntity(BlockPos.ZERO, StorageBlocks.ITEM_TOWER.get().defaultBlockState());
+	private final LockedEnderChestBlockEntity enderChestBlockEntity = new LockedEnderChestBlockEntity(BlockPos.ZERO, StorageBlocks.LOCKED_ENDER_CHEST.get().defaultBlockState());
 
 	public StorageBEWLR(Supplier<BlockEntityRenderDispatcher> dispatcher, Supplier<EntityModelSet> modelSet) {
 		super(dispatcher.get(), modelSet.get());
@@ -58,6 +60,8 @@ public class StorageBEWLR extends BlockEntityWithoutLevelRenderer {
 				blockentity = this.goldSafeBlockEntity;
 			} else if (blockstate.is(StorageBlocks.OBSIDIAN_SAFE.get())) {
 				blockentity = this.obsidianSafeBlockEntity;
+			} else if (blockstate.is(StorageBlocks.LOCKED_ENDER_CHEST.get())) {
+				blockentity = this.enderChestBlockEntity;
 			} else {
 				blockentity = this.itemTowerBlockEntity;
 			}

@@ -1,9 +1,9 @@
 package com.grim3212.assorted.storage.common.inventory;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
@@ -45,6 +45,14 @@ public class StorageContainer extends AbstractContainerMenu {
 		return new StorageContainer(StorageContainerTypes.GOLD_SAFE.get(), windowId, playerInventory, inventory);
 	}
 
+	public static StorageContainer createEnderChestContainer(int windowId, Inventory playerInventory) {
+		return new StorageContainer(StorageContainerTypes.LOCKED_ENDER_CHEST.get(), windowId, playerInventory, new SimpleContainer(27));
+	}
+
+	public static StorageContainer createEnderChestContainer(int windowId, Inventory playerInventory, Container inventory) {
+		return new StorageContainer(StorageContainerTypes.LOCKED_ENDER_CHEST.get(), windowId, playerInventory, inventory);
+	}
+
 	public static StorageContainer createObsidianSafeContainer(int windowId, Inventory playerInventory) {
 		return new StorageContainer(StorageContainerTypes.OBSIDIAN_SAFE.get(), windowId, playerInventory, new SimpleContainer(27));
 	}
@@ -52,8 +60,6 @@ public class StorageContainer extends AbstractContainerMenu {
 	public static StorageContainer createObsidianSafeContainer(int windowId, Inventory playerInventory, Container inventory) {
 		return new StorageContainer(StorageContainerTypes.OBSIDIAN_SAFE.get(), windowId, playerInventory, inventory);
 	}
-	
-	
 
 	public StorageContainer(MenuType<?> containerType, int windowId, Inventory playerInventory, Container inventory) {
 		super(containerType, windowId);

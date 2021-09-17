@@ -13,4 +13,5 @@ public class StorageModelLayers {
 	public static final ModelLayerLocation DUAL_LOCKER = new ModelLayerLocation(new ResourceLocation(AssortedStorage.MODID, "dual_locker"), "main");
 	public static final ModelLayerLocation WAREHOUSE_CRATE = new ModelLayerLocation(new ResourceLocation(AssortedStorage.MODID, "warehouse_crate"), "main");
 	public static final ModelLayerLocation ITEM_TOWER = new ModelLayerLocation(new ResourceLocation(AssortedStorage.MODID, "item_tower"), "main");
+	public static final ModelLayerLocation LOCKED_ENDER_CHEST = new ModelLayerLocation(new ResourceLocation(AssortedStorage.MODID, "locked_ender_chest"), "main");
 }
