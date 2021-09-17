@@ -21,7 +21,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.Nameable;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -40,7 +39,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
 @OnlyIn(value = Dist.CLIENT, _interface = IStorage.class)
-public abstract class BaseStorageBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider, Nameable, IStorage {
+public abstract class BaseStorageBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider, INamed, IStorage, ILockeable {
 
 	private NonNullList<ItemStack> chestContents;
 	protected int numPlayersUsing;
@@ -57,17 +56,26 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 	protected BaseStorageBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state, int inventorySize) {
 		super(typeIn, pos, state);
 
-		this.chestContents = NonNullList.<ItemStack>withSize(inventorySize, ItemStack.EMPTY);
+		if (this.selfInventory())
+			this.chestContents = NonNullList.<ItemStack>withSize(inventorySize, ItemStack.EMPTY);
 	}
 
+	@Override
 	public boolean isLocked() {
 		return this.lockCode != null && this.lockCode != StorageLockCode.EMPTY_CODE;
 	}
 
-	public String getLockCode() {
-		return this.lockCode.getLockCode();
+	@Override
+	public StorageLockCode getStorageLockCode() {
+		return this.lockCode;
 	}
 
+	@Override
+	public String getLockCode() {
+		return this.getStorageLockCode().getLockCode();
+	}
+
+	@Override
 	public void setLockCode(String s) {
 		if (s == null || s.isEmpty())
 			this.lockCode = StorageLockCode.EMPTY_CODE;
@@ -88,6 +96,10 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 			}
 		}
 
+		return true;
+	}
+
+	protected boolean selfInventory() {
 		return true;
 	}
 
@@ -206,9 +218,11 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 	@Override
 	public void load(CompoundTag nbt) {
 		super.load(nbt);
-		this.chestContents = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
+		if (this.selfInventory()) {
+			this.chestContents = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
 
-		ContainerHelper.loadAllItems(nbt, this.chestContents);
+			ContainerHelper.loadAllItems(nbt, this.chestContents);
+		}
 
 		if (nbt.contains("CustomName", 8)) {
 			this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"));
@@ -221,7 +235,9 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 	public CompoundTag save(CompoundTag compound) {
 		super.save(compound);
 
-		ContainerHelper.saveAllItems(compound, this.chestContents);
+		if (this.selfInventory()) {
+			ContainerHelper.saveAllItems(compound, this.chestContents);
+		}
 
 		if (this.customName != null) {
 			compound.putString("CustomName", Component.Serializer.toJson(this.customName));
@@ -290,18 +306,22 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 		this.getItems().clear();
 	}
 
+	@Override
 	public void setCustomName(Component name) {
 		this.customName = name;
 	}
 
+	@Override
 	public Component getName() {
 		return this.customName != null ? this.customName : this.getDefaultName();
 	}
 
+	@Override
 	public Component getDisplayName() {
 		return this.getName();
 	}
 
+	@Override
 	@Nullable
 	public Component getCustomName() {
 		return this.customName;

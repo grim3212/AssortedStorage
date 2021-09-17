@@ -14,6 +14,7 @@
     "assortedstorage:gold_safe",
     "assortedstorage:obsidian_safe",
     "assortedstorage:locker",
-    "assortedstorage:item_tower"
+    "assortedstorage:item_tower",
+    "assortedstorage:locked_ender_chest"
   ]
 }

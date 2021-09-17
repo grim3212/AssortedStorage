@@ -29,10 +29,12 @@ import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.functions.CopyNameFunction;
 import net.minecraft.world.level.storage.loot.functions.CopyNameFunction.NameSource;
+import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
 import net.minecraft.world.level.storage.loot.functions.SetContainerContents;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
+import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 public class StorageLootProvider implements DataProvider {
@@ -69,6 +71,8 @@ public class StorageLootProvider implements DataProvider {
 		}
 
 		tables.put(StorageBlocks.GOLD_SAFE.getId(), genInventoryStorage(StorageBlocks.GOLD_SAFE.get()));
+
+		tables.put(StorageBlocks.LOCKED_ENDER_CHEST.getId(), genInventoryCode(StorageBlocks.LOCKED_ENDER_CHEST.get()));
 
 		for (Map.Entry<ResourceLocation, LootTable.Builder> e : tables.entrySet()) {
 			Path path = getPath(generator.getOutputFolder(), e.getKey());
@@ -111,6 +115,13 @@ public class StorageLootProvider implements DataProvider {
 	private static LootTable.Builder genInventoryStorage(Block b) {
 		LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b).apply(CopyNameFunction.copyName(NameSource.BLOCK_ENTITY)).apply(SetContainerContents.setContents().withEntry(DynamicLoot.dynamicEntry(GoldSafeBlock.CONTENTS)));
 		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantValue.exactly(1)).add(entry).when(ExplosionCondition.survivesExplosion());
+		return LootTable.lootTable().withPool(pool);
+	}
+
+	private static LootTable.Builder genInventoryCode(Block b) {
+		LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b);
+		CopyNbtFunction.Builder func = CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Storage_Lock", "Storage_Lock");
+		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantValue.exactly(1)).add(entry).when(ExplosionCondition.survivesExplosion()).apply(func);
 		return LootTable.lootTable().withPool(pool);
 	}
 

@@ -3,8 +3,11 @@ package com.grim3212.assorted.storage.common.block;
 import javax.annotation.Nullable;
 
 import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.ILockeable;
+import com.grim3212.assorted.storage.common.block.blockentity.INamed;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
+import com.grim3212.assorted.storage.common.util.StorageUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,6 +23,7 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -54,7 +58,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock {
 	public static final VoxelShape FAKE_SIDES_AND_BOTTOM = Block.box(0.01D, 0.01D, 0.01D, 16.0D, 16.0D, 16.0D);
 
 	public BaseStorageBlock(Properties properties) {
-		super(properties.strength(3.0f, 5.0f));
+		super(properties);
 		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
 	}
 
@@ -95,10 +99,10 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock {
 	public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
 		BlockEntity te = worldIn.getBlockEntity(pos);
 
-		if (te instanceof BaseStorageBlockEntity) {
-			BaseStorageBlockEntity tileentity = (BaseStorageBlockEntity) te;
+		if (te instanceof ILockeable) {
+			ILockeable tileentity = (ILockeable) te;
 
-			if (tileentity.isLocked() && !this.canAccess(worldIn, pos, player))
+			if (tileentity.isLocked() && !StorageUtil.canAccess(worldIn, pos, player))
 				return -1.0F;
 		}
 
@@ -109,9 +113,9 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock {
 	public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		BlockEntity tileentity = worldIn.getBlockEntity(pos);
 
-		if (tileentity instanceof BaseStorageBlockEntity) {
+		if (tileentity instanceof INamed) {
 			if (stack.hasCustomHoverName()) {
-				((BaseStorageBlockEntity) tileentity).setCustomName(stack.getHoverName());
+				((INamed) tileentity).setCustomName(stack.getHoverName());
 			}
 		}
 	}
@@ -121,8 +125,8 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock {
 		if (state.getBlock() != newState.getBlock()) {
 			BlockEntity tileentity = worldIn.getBlockEntity(pos);
 
-			if (tileentity instanceof BaseStorageBlockEntity) {
-				BaseStorageBlockEntity teStorage = (BaseStorageBlockEntity) tileentity;
+			if (tileentity instanceof ILockeable) {
+				ILockeable teStorage = (ILockeable) tileentity;
 
 				if (teStorage.isLocked()) {
 					ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
@@ -132,7 +136,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock {
 					Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
 				}
 
-				Containers.dropContents(worldIn, pos, (BaseStorageBlockEntity) tileentity);
+				Containers.dropContents(worldIn, pos, (WorldlyContainer) tileentity);
 				worldIn.updateNeighbourForOutputSignal(pos, this);
 			}
 
@@ -141,7 +145,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock {
 	}
 
 	protected boolean canBeLocked(Level worldIn, BlockPos pos) {
-		return !((BaseStorageBlockEntity) worldIn.getBlockEntity(pos)).isLocked();
+		return !((ILockeable) worldIn.getBlockEntity(pos)).isLocked();
 	}
 
 	@Override
@@ -151,10 +155,10 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock {
 				return InteractionResult.SUCCESS;
 		}
 
-		if (player.isShiftKeyDown() && this.canAccess(worldIn, pos, player)) {
+		if (player.isShiftKeyDown() && StorageUtil.canAccess(worldIn, pos, player)) {
 			BlockEntity tileentity = worldIn.getBlockEntity(pos);
-			if (tileentity instanceof BaseStorageBlockEntity) {
-				BaseStorageBlockEntity teStorage = (BaseStorageBlockEntity) worldIn.getBlockEntity(pos);
+			if (tileentity instanceof ILockeable) {
+				ILockeable teStorage = (ILockeable) tileentity;
 
 				if (teStorage.isLocked()) {
 					ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
@@ -176,7 +180,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock {
 			}
 		}
 
-		if (!isDoorBlocked(worldIn, pos) && this.canAccess(worldIn, pos, player)) {
+		if (!isDoorBlocked(worldIn, pos) && StorageUtil.canAccess(worldIn, pos, player)) {
 			if (!worldIn.isClientSide) {
 				MenuProvider inamedcontainerprovider = this.getMenuProvider(state, worldIn, pos);
 				if (inamedcontainerprovider != null) {
@@ -241,52 +245,27 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock {
 		return false;
 	}
 
-	private boolean removeLock(Level worldIn, BlockPos pos, Player entityplayer) {
-		BaseStorageBlockEntity tileentity = (BaseStorageBlockEntity) worldIn.getBlockEntity(pos);
+	protected boolean removeLock(Level worldIn, BlockPos pos, Player entityplayer) {
+		ILockeable tileentity = (ILockeable) worldIn.getBlockEntity(pos);
 		tileentity.setLockCode("");
-		tileentity.getLevel().playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, tileentity.getLevel().random.nextFloat() * 0.1F + 0.9F);
+		worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
 		return true;
 	}
 
 	private boolean tryPlaceLock(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
-		BaseStorageBlockEntity tileentity = (BaseStorageBlockEntity) worldIn.getBlockEntity(pos);
+		BlockEntity tileentity = worldIn.getBlockEntity(pos);
+		ILockeable lockeable = (ILockeable) tileentity;
 		ItemStack itemstack = entityplayer.getItemInHand(hand);
+		String code = StorageUtil.getCode(itemstack);
 
-		if (itemstack.hasTag()) {
-			String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
-			if (!code.isEmpty()) {
-				if (!entityplayer.isCreative())
-					itemstack.shrink(1);
-				tileentity.setLockCode(code);
-				tileentity.getLevel().playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, tileentity.getLevel().random.nextFloat() * 0.1F + 0.9F);
-				return true;
-			}
-
+		if (!code.isEmpty()) {
+			if (!entityplayer.isCreative())
+				itemstack.shrink(1);
+			lockeable.setLockCode(code);
+			worldIn.playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+			return true;
 		}
 
 		return false;
-	}
-
-	private boolean canAccess(BlockGetter worldIn, BlockPos pos, Player entityplayer) {
-		BaseStorageBlockEntity tileentity = (BaseStorageBlockEntity) worldIn.getBlockEntity(pos);
-
-		if (tileentity.isLocked()) {
-			for (int slot = 0; slot < entityplayer.getInventory().getContainerSize(); slot++) {
-				ItemStack itemstack = entityplayer.getInventory().getItem(slot);
-
-				if ((!itemstack.isEmpty()) && (itemstack.getItem() == StorageItems.LOCKSMITH_KEY.get())) {
-					if (itemstack.hasTag()) {
-						String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
-						if (!code.isEmpty()) {
-							return tileentity.getLockCode().equals(code);
-						}
-					}
-				}
-			}
-
-			return false;
-		}
-
-		return true;
 	}
 }

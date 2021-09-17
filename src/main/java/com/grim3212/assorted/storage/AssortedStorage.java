@@ -8,6 +8,7 @@ import com.grim3212.assorted.storage.client.data.StorageItemModelProvider;
 import com.grim3212.assorted.storage.client.proxy.ClientProxy;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
+import com.grim3212.assorted.storage.common.crafting.StorageRecipeSerializers;
 import com.grim3212.assorted.storage.common.data.StorageBlockTagProvider;
 import com.grim3212.assorted.storage.common.data.StorageItemTagProvider;
 import com.grim3212.assorted.storage.common.data.StorageLootProvider;
@@ -59,6 +60,7 @@ public class AssortedStorage {
 		StorageBlocks.ITEMS.register(modBus);
 		StorageBlockEntityTypes.BLOCK_ENTITIES.register(modBus);
 		StorageContainerTypes.CONTAINERS.register(modBus);
+		StorageRecipeSerializers.RECIPES.register(modBus);
 	}
 
 	private void setup(final FMLCommonSetupEvent event) {
