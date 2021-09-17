@@ -22,7 +22,6 @@ import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.INameable;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -40,7 +39,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
 @OnlyIn(value = Dist.CLIENT, _interface = IStorage.class)
-public abstract class BaseStorageTileEntity extends TileEntity implements ISidedInventory, INamedContainerProvider, INameable, IStorage, ITickableTileEntity {
+public abstract class BaseStorageTileEntity extends TileEntity implements ISidedInventory, INamedContainerProvider, INamed, IStorage, ITickableTileEntity, ILockeable {
 
 	private NonNullList<ItemStack> chestContents;
 	protected int numPlayersUsing;
@@ -60,14 +59,17 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 		this.chestContents = NonNullList.<ItemStack>withSize(inventorySize, ItemStack.EMPTY);
 	}
 
+	@Override
 	public boolean isLocked() {
 		return this.lockCode != null && this.lockCode != StorageLockCode.EMPTY_CODE;
 	}
 
+	@Override
 	public String getLockCode() {
 		return this.lockCode.getLockCode();
 	}
 
+	@Override
 	public void setLockCode(String s) {
 		if (s == null || s.isEmpty())
 			this.lockCode = StorageLockCode.EMPTY_CODE;
@@ -204,8 +206,6 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 		return this.chestContents;
 	}
 
-	public abstract Block getBlockToUse();
-
 	@Override
 	public void load(BlockState state, CompoundNBT nbt) {
 		super.load(state, nbt);
@@ -293,18 +293,22 @@ public abstract class BaseStorageTileEntity extends TileEntity implements ISided
 		this.getItems().clear();
 	}
 
+	@Override
 	public void setCustomName(ITextComponent name) {
 		this.customName = name;
 	}
 
+	@Override
 	public ITextComponent getName() {
 		return this.customName != null ? this.customName : this.getDefaultName();
 	}
 
+	@Override
 	public ITextComponent getDisplayName() {
 		return this.getName();
 	}
 
+	@Override
 	@Nullable
 	public ITextComponent getCustomName() {
 		return this.customName;

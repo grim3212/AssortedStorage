@@ -31,6 +31,7 @@ import net.minecraft.loot.conditions.BlockStateProperty;
 import net.minecraft.loot.conditions.SurvivesExplosion;
 import net.minecraft.loot.functions.CopyName;
 import net.minecraft.loot.functions.CopyName.Source;
+import net.minecraft.loot.functions.CopyNbt;
 import net.minecraft.loot.functions.SetContents;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.util.ResourceLocation;
@@ -69,6 +70,8 @@ public class StorageLootProvider implements IDataProvider {
 		}
 
 		tables.put(StorageBlocks.GOLD_SAFE.getId(), genInventoryStorage(StorageBlocks.GOLD_SAFE.get()));
+
+		tables.put(StorageBlocks.LOCKED_ENDER_CHEST.getId(), genInventoryCode(StorageBlocks.LOCKED_ENDER_CHEST.get()));
 
 		for (Map.Entry<ResourceLocation, LootTable.Builder> e : tables.entrySet()) {
 			Path path = getPath(generator.getOutputFolder(), e.getKey());
@@ -111,6 +114,13 @@ public class StorageLootProvider implements IDataProvider {
 	private static LootTable.Builder genInventoryStorage(Block b) {
 		LootEntry.Builder<?> entry = ItemLootEntry.lootTableItem(b).apply(CopyName.copyName(Source.BLOCK_ENTITY)).apply(SetContents.setContents().withEntry(DynamicLootEntry.dynamicEntry(GoldSafeBlock.CONTENTS)));
 		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantRange.exactly(1)).add(entry).when(SurvivesExplosion.survivesExplosion());
+		return LootTable.lootTable().withPool(pool);
+	}
+
+	private static LootTable.Builder genInventoryCode(Block b) {
+		LootEntry.Builder<?> entry = ItemLootEntry.lootTableItem(b);
+		CopyNbt.Builder func = CopyNbt.copyData(CopyNbt.Source.BLOCK_ENTITY).copy("Storage_Lock", "Storage_Lock");
+		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantRange.exactly(1)).add(entry).when(SurvivesExplosion.survivesExplosion()).apply(func);
 		return LootTable.lootTable().withPool(pool);
 	}
 

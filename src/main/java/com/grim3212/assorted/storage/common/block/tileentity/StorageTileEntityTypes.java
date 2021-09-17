@@ -22,6 +22,8 @@ public class StorageTileEntityTypes {
 	public static final RegistryObject<TileEntityType<LockerTileEntity>> LOCKER = TILE_ENTITIES.register("locker", () -> new TileEntityType<>(LockerTileEntity::new, Sets.newHashSet(StorageBlocks.LOCKER.get()), null));
 	public static final RegistryObject<TileEntityType<ItemTowerTileEntity>> ITEM_TOWER = TILE_ENTITIES.register("item_tower", () -> new TileEntityType<>(ItemTowerTileEntity::new, Sets.newHashSet(StorageBlocks.ITEM_TOWER.get()), null));
 
+	public static final RegistryObject<TileEntityType<LockedEnderChestTileEntity>> LOCKED_ENDER_CHEST = TILE_ENTITIES.register("locked_ender_chest", () -> new TileEntityType<>(LockedEnderChestTileEntity::new, Sets.newHashSet(StorageBlocks.LOCKED_ENDER_CHEST.get()), null));
+
 	public static final RegistryObject<TileEntityType<WarehouseCrateTileEntity>> WAREHOUSE_CRATE = TILE_ENTITIES.register("warehouse_crate", () -> new TileEntityType<>(WarehouseCrateTileEntity::new, getWarehouseCrates(), null));
 
 	public static final RegistryObject<TileEntityType<BaseLockedTileEntity>> BASE_LOCKED = TILE_ENTITIES.register("base_locked", () -> new TileEntityType<>(BaseLockedTileEntity::new, StorageBlocks.lockedDoors(), null));

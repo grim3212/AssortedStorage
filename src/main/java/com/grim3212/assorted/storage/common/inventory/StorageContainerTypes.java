@@ -1,8 +1,10 @@
 package com.grim3212.assorted.storage.common.inventory;
 
 import com.grim3212.assorted.storage.AssortedStorage;
+import com.grim3212.assorted.storage.common.inventory.keyring.KeyRingContainer;
 
 import net.minecraft.inventory.container.ContainerType;
+import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -19,4 +21,6 @@ public class StorageContainerTypes {
 	public static final RegistryObject<ContainerType<LockerContainer>> DUAL_LOCKER = CONTAINERS.register("dual_locker", () -> new ContainerType<>(LockerContainer::createDualLockerContainer));
 	public static final RegistryObject<ContainerType<ItemTowerContainer>> ITEM_TOWER = CONTAINERS.register("item_tower", () -> new ContainerType<>(new ItemTowerContainer.ItemTowerContainerFactory<>()));
 	public static final RegistryObject<ContainerType<LocksmithWorkbenchContainer>> LOCKSMITH_WORKBENCH = CONTAINERS.register("locksmith_workbench", () -> new ContainerType<>(LocksmithWorkbenchContainer::createContainer));
+	public static final RegistryObject<ContainerType<KeyRingContainer>> KEY_RING = CONTAINERS.register("key_ring", () -> IForgeContainerType.create(KeyRingContainer::new));
+	public static final RegistryObject<ContainerType<StorageContainer>> LOCKED_ENDER_CHEST = CONTAINERS.register("locked_ender_chest", () -> new ContainerType<>(StorageContainer::createEnderChestContainer));
 }

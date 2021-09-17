@@ -9,7 +9,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 
-public class BaseLockedTileEntity extends TileEntity {
+public class BaseLockedTileEntity extends TileEntity implements ILockeable {
 
 	private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
 
@@ -17,14 +17,17 @@ public class BaseLockedTileEntity extends TileEntity {
 		super(StorageTileEntityTypes.BASE_LOCKED.get());
 	}
 
+	@Override
 	public boolean isLocked() {
 		return this.lockCode != null && this.lockCode != StorageLockCode.EMPTY_CODE;
 	}
 
+	@Override
 	public String getLockCode() {
 		return this.lockCode.getLockCode();
 	}
 
+	@Override
 	public void setLockCode(String s) {
 		if (s == null || s.isEmpty())
 			this.lockCode = StorageLockCode.EMPTY_CODE;

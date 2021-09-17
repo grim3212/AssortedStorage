@@ -2,7 +2,7 @@ package com.grim3212.assorted.storage.client.tileentity;
 
 import com.grim3212.assorted.storage.client.model.BaseStorageModel;
 import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
-import com.grim3212.assorted.storage.common.block.tileentity.BaseStorageTileEntity;
+import com.grim3212.assorted.storage.common.block.tileentity.ILockeable;
 import com.grim3212.assorted.storage.common.block.tileentity.IStorage;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -31,12 +31,13 @@ public class StorageTileEntityRenderer<T extends TileEntity & IStorage> extends 
 
 	@Override
 	public void render(T tileEntityIn, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
-		BaseStorageTileEntity tileEntity = (BaseStorageTileEntity) tileEntityIn;
+		IStorage storage = (IStorage) tileEntityIn;
+		ILockeable lockeable = (ILockeable) tileEntityIn;
 
-		World world = tileEntity.getLevel();
+		World world = tileEntityIn.getLevel();
 		boolean flag = world != null;
 
-		BlockState blockstate = flag ? tileEntity.getBlockState() : (BlockState) tileEntity.getBlockToUse().defaultBlockState().setValue(BaseStorageBlock.FACING, Direction.SOUTH);
+		BlockState blockstate = flag ? tileEntityIn.getBlockState() : (BlockState) storage.getBlockToUse().defaultBlockState().setValue(BaseStorageBlock.FACING, Direction.SOUTH);
 		Block block = blockstate.getBlock();
 
 		if (block instanceof BaseStorageBlock) {
@@ -46,13 +47,13 @@ public class StorageTileEntityRenderer<T extends TileEntity & IStorage> extends 
 			matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(-f));
 			matrixStackIn.translate(-0.5D, -0.5D, -0.5D);
 
-			float angle = tileEntity.getRotation(partialTicks);
+			float angle = storage.getRotation(partialTicks);
 			angle *= 90f;
 
 			IVertexBuilder ivertexbuilder = bufferIn.getBuffer(this.model.renderType(this.textureLocation));
 
 			this.model.doorAngle = angle;
-			this.model.renderHandle = !tileEntity.isLocked();
+			this.model.renderHandle = !lockeable.isLocked();
 
 			this.model.renderToBuffer(matrixStackIn, ivertexbuilder, combinedLightIn, combinedOverlayIn, 1, 1, 1, 1);
 

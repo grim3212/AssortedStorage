@@ -12,6 +12,8 @@
 	"assortedstorage.container.item_tower": "Item Tower",
 	"assortedstorage.container.item_tower.row": " - Row %s of",
 	"assortedstorage.container.locksmith_workbench": "Locksmith Workbench",
+	"assortedstorage.container.locked_ender_chest": "Ender Chest",
+	"assortedstorage.container.key_ring": "Key Ring",
 	
 	"block.assortedstorage.wood_cabinet": "Wood Cabinet",
 	"block.assortedstorage.glass_cabinet": "Glass Cabinet",
@@ -37,7 +39,9 @@
 	"block.assortedstorage.locked_dark_oak_door": "Locked Dark Oak Door",
 	"block.assortedstorage.locked_crimson_door": "Locked Crimson Door",
 	"block.assortedstorage.locked_warped_door": "Locked Warped Door",
+	"block.assortedstorage.locked_ender_chest": "Locked Ender Chest",
 	
 	"item.assortedstorage.locksmith_key": "Locksmith Key",
-	"item.assortedstorage.locksmith_lock": "Locksmith Lock"
+	"item.assortedstorage.locksmith_lock": "Locksmith Lock",
+	"item.assortedstorage.key_ring": "Key Ring"
 }

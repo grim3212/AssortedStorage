@@ -3,6 +3,7 @@ package com.grim3212.assorted.storage.common.block;
 import com.grim3212.assorted.storage.common.block.tileentity.BaseLockedTileEntity;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
+import com.grim3212.assorted.storage.common.util.StorageUtil;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -76,7 +77,7 @@ public class QuartzDoorBlock extends DoorBlock {
 				return ActionResultType.SUCCESS;
 		}
 
-		if (player.isShiftKeyDown() && this.canAccess(worldIn, pos, player)) {
+		if (player.isShiftKeyDown() && StorageUtil.canAccess(worldIn, pos, player)) {
 			TileEntity tileentity = worldIn.getBlockEntity(pos);
 			if (tileentity instanceof BaseLockedTileEntity) {
 				BaseLockedTileEntity teStorage = (BaseLockedTileEntity) worldIn.getBlockEntity(pos);
@@ -101,7 +102,7 @@ public class QuartzDoorBlock extends DoorBlock {
 			}
 		}
 
-		if (this.canAccess(worldIn, pos, player)) {
+		if (StorageUtil.canAccess(worldIn, pos, player)) {
 			state = state.cycle(OPEN);
 			worldIn.setBlock(pos, state, 10);
 			worldIn.levelEvent(player, state.getValue(OPEN) ? this.getOpenSound() : this.getCloseSound(), pos, 0);
@@ -126,7 +127,7 @@ public class QuartzDoorBlock extends DoorBlock {
 		if (te instanceof BaseLockedTileEntity) {
 			BaseLockedTileEntity tileentity = (BaseLockedTileEntity) te;
 
-			if (tileentity.isLocked() && !this.canAccess(worldIn, pos, player))
+			if (tileentity.isLocked() && !StorageUtil.canAccess(worldIn, pos, player))
 				return -1.0F;
 		}
 
@@ -255,28 +256,5 @@ public class QuartzDoorBlock extends DoorBlock {
 		}
 
 		return false;
-	}
-
-	private boolean canAccess(IBlockReader worldIn, BlockPos pos, PlayerEntity entityplayer) {
-		BaseLockedTileEntity tileentity = (BaseLockedTileEntity) worldIn.getBlockEntity(pos);
-
-		if (tileentity.isLocked()) {
-			for (int slot = 0; slot < entityplayer.inventory.getContainerSize(); slot++) {
-				ItemStack itemstack = entityplayer.inventory.getItem(slot);
-
-				if ((!itemstack.isEmpty()) && (itemstack.getItem() == StorageItems.LOCKSMITH_KEY.get())) {
-					if (itemstack.hasTag()) {
-						String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
-						if (!code.isEmpty()) {
-							return tileentity.getLockCode().equals(code);
-						}
-					}
-				}
-			}
-
-			return false;
-		}
-
-		return true;
 	}
 }

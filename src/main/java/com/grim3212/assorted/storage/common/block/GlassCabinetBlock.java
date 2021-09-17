@@ -9,7 +9,7 @@ import net.minecraft.world.IBlockReader;
 public class GlassCabinetBlock extends BaseStorageBlock {
 
 	public GlassCabinetBlock(Properties properties) {
-		super(properties);
+		super(properties.strength(3.0f, 5.0f));
 	}
 
 	@Override

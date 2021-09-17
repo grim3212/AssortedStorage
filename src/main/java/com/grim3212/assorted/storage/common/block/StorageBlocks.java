@@ -11,6 +11,7 @@ import com.grim3212.assorted.storage.client.tileentity.StorageItemStackRenderer;
 import com.grim3212.assorted.storage.common.block.tileentity.GlassCabinetTileEntity;
 import com.grim3212.assorted.storage.common.block.tileentity.GoldSafeTileEntity;
 import com.grim3212.assorted.storage.common.block.tileentity.ItemTowerTileEntity;
+import com.grim3212.assorted.storage.common.block.tileentity.LockedEnderChestTileEntity;
 import com.grim3212.assorted.storage.common.block.tileentity.LockerTileEntity;
 import com.grim3212.assorted.storage.common.block.tileentity.ObsidianSafeTileEntity;
 import com.grim3212.assorted.storage.common.block.tileentity.WarehouseCrateTileEntity;
@@ -54,6 +55,10 @@ public class StorageBlocks {
 	public static final RegistryObject<WarehouseCrateBlock> JUNGLE_WAREHOUSE_CRATE = register("jungle_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.JUNGLE), () -> jungleWarehouseCrateRenderer());
 	public static final RegistryObject<WarehouseCrateBlock> WARPED_WAREHOUSE_CRATE = register("warped_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.WARPED), () -> warpedWarehouseCrateRenderer());
 	public static final RegistryObject<WarehouseCrateBlock> CRIMSON_WAREHOUSE_CRATE = register("crimson_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.CRIMSON), () -> crimsonWarehouseCrateRenderer());
+
+	public static final RegistryObject<LockedEnderChestBlock> LOCKED_ENDER_CHEST = register("locked_ender_chest", () -> new LockedEnderChestBlock(Block.Properties.of(Material.STONE).requiresCorrectToolForDrops().strength(22.5F, 600.0F).lightLevel((state) -> {
+		return 7;
+	})), () -> lockedEnderChestRenderer());
 
 	public static final RegistryObject<LockedDoorBlock> LOCKED_OAK_DOOR = registerNoItem("locked_oak_door", () -> new LockedDoorBlock(Blocks.OAK_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.WOOD).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
 	public static final RegistryObject<LockedDoorBlock> LOCKED_SPRUCE_DOOR = registerNoItem("locked_spruce_door", () -> new LockedDoorBlock(Blocks.SPRUCE_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.PODZOL).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
@@ -157,6 +162,11 @@ public class StorageBlocks {
 	@OnlyIn(Dist.CLIENT)
 	private static Callable<ItemStackTileEntityRenderer> goldSafeRenderer() {
 		return () -> new StorageItemStackRenderer<>(GoldSafeTileEntity::new);
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	private static Callable<ItemStackTileEntityRenderer> lockedEnderChestRenderer() {
+		return () -> new StorageItemStackRenderer<>(LockedEnderChestTileEntity::new);
 	}
 
 	@OnlyIn(Dist.CLIENT)

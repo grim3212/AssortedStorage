@@ -29,6 +29,7 @@ public class StorageItemModelProvider extends ItemModelProvider {
 		items.add(StorageBlocks.WOOD_CABINET.get().asItem().asItem());
 		items.add(StorageBlocks.GLASS_CABINET.get().asItem());
 		items.add(StorageBlocks.GOLD_SAFE.get().asItem());
+		items.add(StorageBlocks.LOCKED_ENDER_CHEST.get().asItem());
 		items.add(StorageBlocks.OBSIDIAN_SAFE.get().asItem());
 		items.add(StorageBlocks.LOCKER.get().asItem());
 		items.add(StorageBlocks.ITEM_TOWER.get().asItem());
@@ -53,6 +54,7 @@ public class StorageItemModelProvider extends ItemModelProvider {
 
 		generatedItem(StorageItems.LOCKSMITH_KEY.get());
 		generatedItem(StorageItems.LOCKSMITH_LOCK.get());
+		generatedItem(StorageItems.KEY_RING.get());
 	}
 
 	private ItemModelBuilder generatedItem(String name) {

@@ -17,7 +17,7 @@ public class WarehouseCrateBlock extends BaseStorageBlock {
 	private final WoodType type;
 
 	public WarehouseCrateBlock(WoodType type) {
-		super(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD));
+		super(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD).strength(3.0f, 5.0f));
 		this.type = type;
 	}
 

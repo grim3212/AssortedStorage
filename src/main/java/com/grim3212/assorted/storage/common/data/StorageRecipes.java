@@ -4,9 +4,11 @@ import java.util.function.Consumer;
 
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
+import com.grim3212.assorted.storage.common.crafting.LockedEnderChestRecipe;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.data.CustomRecipeBuilder;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.data.RecipeProvider;
@@ -41,8 +43,11 @@ public class StorageRecipes extends RecipeProvider {
 
 		ShapedRecipeBuilder.shaped(StorageItems.LOCKSMITH_LOCK.get(), 3).define('X', Tags.Items.INGOTS_IRON).pattern(" X ").pattern("X X").pattern("XXX").unlockedBy("has_iron", has(Tags.Items.INGOTS_IRON)).save(consumer);
 		ShapedRecipeBuilder.shaped(StorageItems.LOCKSMITH_KEY.get(), 3).define('X', Tags.Items.INGOTS_IRON).pattern("XX").pattern("XX").pattern("X ").unlockedBy("has_iron", has(Tags.Items.INGOTS_IRON)).save(consumer);
+		ShapedRecipeBuilder.shaped(StorageItems.KEY_RING.get(), 1).define('X', Tags.Items.INGOTS_IRON).define('K', StorageItems.LOCKSMITH_KEY.get()).pattern(" X ").pattern("XKX").pattern(" X ").unlockedBy("has_iron", has(Tags.Items.INGOTS_IRON)).unlockedBy("has_key", has(StorageItems.LOCKSMITH_KEY.get())).save(consumer);
 		ShapedRecipeBuilder.shaped(StorageBlocks.LOCKSMITH_WORKBENCH.get(), 1).define('L', StorageItems.LOCKSMITH_LOCK.get()).define('K', StorageItems.LOCKSMITH_KEY.get()).define('W', Blocks.CRAFTING_TABLE).pattern("L").pattern("K").pattern("W").unlockedBy("has_lock", has(StorageItems.LOCKSMITH_LOCK.get())).save(consumer);
 		ShapedRecipeBuilder.shaped(StorageBlocks.LOCKSMITH_WORKBENCH.get(), 1).define('L', StorageItems.LOCKSMITH_LOCK.get()).define('K', StorageItems.LOCKSMITH_KEY.get()).define('W', Blocks.CRAFTING_TABLE).pattern("K").pattern("L").pattern("W").unlockedBy("has_lock", has(StorageItems.LOCKSMITH_LOCK.get())).save(consumer, new ResourceLocation(AssortedStorage.MODID, "locksmith_workbench_alt"));
+
+		CustomRecipeBuilder.special(LockedEnderChestRecipe.SERIALIZER).save(consumer, new ResourceLocation(AssortedStorage.MODID, "locked_ender_chest").toString());
 	}
 
 	@Override

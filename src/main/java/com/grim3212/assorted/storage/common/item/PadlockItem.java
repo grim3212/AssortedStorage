@@ -5,11 +5,13 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.tileentity.BaseLockedTileEntity;
+import com.grim3212.assorted.storage.common.block.tileentity.ILockeable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.DoorBlock;
+import net.minecraft.block.EnderChestBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
@@ -25,32 +27,33 @@ import net.minecraft.world.World;
 
 public class PadlockItem extends CombinationItem {
 
-	private final Map<Block, Block> doorMapping;
+	private final Map<Block, Block> lockMappings;
 
 	public PadlockItem(Properties properties) {
 		super(properties);
 
 		// Populate map so that we can properly map unlocked doors to locked doors
-		this.doorMapping = Maps.newHashMap();
-		doorMapping.put(Blocks.OAK_DOOR, StorageBlocks.LOCKED_OAK_DOOR.get());
-		doorMapping.put(Blocks.SPRUCE_DOOR, StorageBlocks.LOCKED_SPRUCE_DOOR.get());
-		doorMapping.put(Blocks.BIRCH_DOOR, StorageBlocks.LOCKED_BIRCH_DOOR.get());
-		doorMapping.put(Blocks.ACACIA_DOOR, StorageBlocks.LOCKED_ACACIA_DOOR.get());
-		doorMapping.put(Blocks.JUNGLE_DOOR, StorageBlocks.LOCKED_JUNGLE_DOOR.get());
-		doorMapping.put(Blocks.DARK_OAK_DOOR, StorageBlocks.LOCKED_DARK_OAK_DOOR.get());
-		doorMapping.put(Blocks.CRIMSON_DOOR, StorageBlocks.LOCKED_CRIMSON_DOOR.get());
-		doorMapping.put(Blocks.WARPED_DOOR, StorageBlocks.LOCKED_WARPED_DOOR.get());
-		doorMapping.put(Blocks.IRON_DOOR, StorageBlocks.LOCKED_IRON_DOOR.get());
+		this.lockMappings = Maps.newHashMap();
+		lockMappings.put(Blocks.OAK_DOOR, StorageBlocks.LOCKED_OAK_DOOR.get());
+		lockMappings.put(Blocks.SPRUCE_DOOR, StorageBlocks.LOCKED_SPRUCE_DOOR.get());
+		lockMappings.put(Blocks.BIRCH_DOOR, StorageBlocks.LOCKED_BIRCH_DOOR.get());
+		lockMappings.put(Blocks.ACACIA_DOOR, StorageBlocks.LOCKED_ACACIA_DOOR.get());
+		lockMappings.put(Blocks.JUNGLE_DOOR, StorageBlocks.LOCKED_JUNGLE_DOOR.get());
+		lockMappings.put(Blocks.DARK_OAK_DOOR, StorageBlocks.LOCKED_DARK_OAK_DOOR.get());
+		lockMappings.put(Blocks.CRIMSON_DOOR, StorageBlocks.LOCKED_CRIMSON_DOOR.get());
+		lockMappings.put(Blocks.WARPED_DOOR, StorageBlocks.LOCKED_WARPED_DOOR.get());
+		lockMappings.put(Blocks.IRON_DOOR, StorageBlocks.LOCKED_IRON_DOOR.get());
+		lockMappings.put(Blocks.ENDER_CHEST, StorageBlocks.LOCKED_ENDER_CHEST.get());
 
 		Block quartzDoor = Registry.BLOCK.get(new ResourceLocation("assorteddecor:quartz_door"));
 		if (quartzDoor != Blocks.AIR) {
-			doorMapping.put(quartzDoor, StorageBlocks.LOCKED_QUARTZ_DOOR.get());
+			lockMappings.put(quartzDoor, StorageBlocks.LOCKED_QUARTZ_DOOR.get());
 		}
 	}
 
-	private Block getMatchingDoor(Block doorIn) {
-		if (this.doorMapping.containsKey(doorIn)) {
-			return this.doorMapping.get(doorIn);
+	private Block getMatchingBlock(Block doorIn) {
+		if (this.lockMappings.containsKey(doorIn)) {
+			return this.lockMappings.get(doorIn);
 		}
 		return Blocks.AIR;
 	}
@@ -64,7 +67,11 @@ public class PadlockItem extends CombinationItem {
 		Hand hand = context.getHand();
 
 		if (world.getBlockState(pos).getBlock() instanceof DoorBlock) {
-			if (tryPlaceLock(world, pos, player, hand)) {
+			if (tryPlaceLockOnDoor(world, pos, player, hand)) {
+				return ActionResultType.SUCCESS;
+			}
+		} else if (world.getBlockState(pos).getBlock() == Blocks.ENDER_CHEST) {
+			if (tryPlaceLockOnBlock(world, pos, player, hand)) {
 				return ActionResultType.SUCCESS;
 			}
 		}
@@ -72,7 +79,36 @@ public class PadlockItem extends CombinationItem {
 		return super.useOn(context);
 	}
 
-	private boolean tryPlaceLock(World worldIn, BlockPos pos, PlayerEntity entityplayer, Hand hand) {
+	private boolean tryPlaceLockOnBlock(World worldIn, BlockPos pos, PlayerEntity entityplayer, Hand hand) {
+		ItemStack itemstack = entityplayer.getItemInHand(hand);
+
+		if (itemstack.hasTag()) {
+			String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
+			if (!code.isEmpty()) {
+				BlockState currentBlockState = worldIn.getBlockState(pos);
+
+				Block newBlock = getMatchingBlock(currentBlockState.getBlock());
+				if (newBlock == Blocks.AIR) {
+					return false;
+				}
+
+				if (!entityplayer.isCreative())
+					itemstack.shrink(1);
+
+				worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(EnderChestBlock.FACING, currentBlockState.getValue(EnderChestBlock.FACING)), 3);
+				worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundCategory.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+				ILockeable currentTE = (ILockeable) worldIn.getBlockEntity(pos);
+				currentTE.setLockCode(code);
+
+				return true;
+			}
+
+		}
+
+		return false;
+	}
+
+	private boolean tryPlaceLockOnDoor(World worldIn, BlockPos pos, PlayerEntity entityplayer, Hand hand) {
 		ItemStack itemstack = entityplayer.getItemInHand(hand);
 
 		if (itemstack.hasTag()) {
@@ -80,7 +116,7 @@ public class PadlockItem extends CombinationItem {
 			if (!code.isEmpty()) {
 				BlockState currentDoor = worldIn.getBlockState(pos);
 
-				Block newDoor = getMatchingDoor(currentDoor.getBlock());
+				Block newDoor = getMatchingBlock(currentDoor.getBlock());
 				if (newDoor == Blocks.AIR) {
 					return false;
 				}

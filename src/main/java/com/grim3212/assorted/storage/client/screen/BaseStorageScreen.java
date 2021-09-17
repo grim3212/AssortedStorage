@@ -42,7 +42,6 @@ public abstract class BaseStorageScreen<T extends Container> extends ContainerSc
 	@Override
 	protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
 		this.font.draw(matrixStack, this.title, 8.0F, 6.0F, 4210752);
-
 		this.font.draw(matrixStack, this.inventory.getDisplayName(), 8.0F, (float) (this.imageHeight - 96 + 2), 4210752);
 	}
 

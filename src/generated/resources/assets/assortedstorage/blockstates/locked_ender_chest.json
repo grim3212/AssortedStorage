@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "assortedstorage:block/locked_ender_chest"
+    }
+  }
+}

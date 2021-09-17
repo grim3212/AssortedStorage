@@ -26,7 +26,7 @@ public class ObsidianSafeTileEntity extends BaseStorageTileEntity {
 	protected ITextComponent getDefaultName() {
 		return new TranslationTextComponent(AssortedStorage.MODID + ".container.obsidian_safe");
 	}
-	
+
 	@Override
 	public Block getBlockToUse() {
 		return StorageBlocks.OBSIDIAN_SAFE.get();

@@ -7,6 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.data.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.tags.BlockTags;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class StorageBlockTagProvider extends BlockTagsProvider {
@@ -32,12 +33,14 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 		piglinBuilder.add(StorageBlocks.OBSIDIAN_SAFE.get());
 		piglinBuilder.add(StorageBlocks.LOCKER.get());
 		piglinBuilder.add(StorageBlocks.ITEM_TOWER.get());
+		piglinBuilder.add(StorageBlocks.LOCKED_ENDER_CHEST.get());
 
 		Builder<Block> doorBuilder = this.tag(BlockTags.DOORS);
 		for (Block b : StorageBlocks.lockedDoors()) {
 			doorBuilder.add(b);
 		}
 
+		this.tag(Tags.Blocks.CHESTS_ENDER).add(StorageBlocks.LOCKED_ENDER_CHEST.get());
 	}
 
 	@Override

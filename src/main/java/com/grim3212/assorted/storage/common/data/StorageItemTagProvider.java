@@ -7,6 +7,7 @@ import net.minecraft.data.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.ItemTagsProvider;
 import net.minecraft.tags.ItemTags;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class StorageItemTagProvider extends ItemTagsProvider {
@@ -18,6 +19,8 @@ public class StorageItemTagProvider extends ItemTagsProvider {
 	@Override
 	protected void addTags() {
 		this.tag(ItemTags.PIGLIN_LOVED).add(StorageBlocks.GOLD_SAFE.get().asItem());
+
+		this.tag(Tags.Items.CHESTS_ENDER).add(StorageBlocks.LOCKED_ENDER_CHEST.get().asItem());
 	}
 
 	@Override

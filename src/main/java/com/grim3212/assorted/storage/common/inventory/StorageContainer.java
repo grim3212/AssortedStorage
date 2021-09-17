@@ -45,6 +45,14 @@ public class StorageContainer extends Container {
 		return new StorageContainer(StorageContainerTypes.GOLD_SAFE.get(), windowId, playerInventory, inventory);
 	}
 
+	public static StorageContainer createEnderChestContainer(int windowId, PlayerInventory playerInventory) {
+		return new StorageContainer(StorageContainerTypes.LOCKED_ENDER_CHEST.get(), windowId, playerInventory, new Inventory(27));
+	}
+
+	public static StorageContainer createEnderChestContainer(int windowId, PlayerInventory playerInventory, IInventory inventory) {
+		return new StorageContainer(StorageContainerTypes.LOCKED_ENDER_CHEST.get(), windowId, playerInventory, inventory);
+	}
+
 	public static StorageContainer createObsidianSafeContainer(int windowId, PlayerInventory playerInventory) {
 		return new StorageContainer(StorageContainerTypes.OBSIDIAN_SAFE.get(), windowId, playerInventory, new Inventory(27));
 	}
@@ -52,8 +60,6 @@ public class StorageContainer extends Container {
 	public static StorageContainer createObsidianSafeContainer(int windowId, PlayerInventory playerInventory, IInventory inventory) {
 		return new StorageContainer(StorageContainerTypes.OBSIDIAN_SAFE.get(), windowId, playerInventory, inventory);
 	}
-	
-	
 
 	public StorageContainer(ContainerType<?> containerType, int windowId, PlayerInventory playerInventory, IInventory inventory) {
 		super(containerType, windowId);
