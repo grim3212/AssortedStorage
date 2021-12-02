@@ -12,7 +12,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundEvent;
@@ -228,13 +227,12 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 			this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"));
 		}
 
-		this.readPacketNBT(nbt);
+		this.lockCode = StorageLockCode.read(nbt);
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag compound) {
-		super.save(compound);
-
+	protected void saveAdditional(CompoundTag compound) {
+		super.saveAdditional(compound);
 		if (this.selfInventory()) {
 			ContainerHelper.saveAllItems(compound, this.chestContents);
 		}
@@ -243,39 +241,17 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 			compound.putString("CustomName", Component.Serializer.toJson(this.customName));
 		}
 
-		this.writePacketNBT(compound);
-
-		return compound;
+		this.lockCode.write(compound);
 	}
-
+	
 	public CompoundTag saveToNbt(CompoundTag compound) {
 		ContainerHelper.saveAllItems(compound, this.chestContents, false);
 		return compound;
 	}
 
-	public void writePacketNBT(CompoundTag cmp) {
-		this.lockCode.write(cmp);
-	}
-
-	public void readPacketNBT(CompoundTag cmp) {
-		this.lockCode = StorageLockCode.read(cmp);
-	}
-
-	@Override
-	public CompoundTag getUpdateTag() {
-		return save(new CompoundTag());
-	}
-
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
-		CompoundTag nbtTagCompound = new CompoundTag();
-		writePacketNBT(nbtTagCompound);
-		return new ClientboundBlockEntityDataPacket(this.worldPosition, 1, nbtTagCompound);
-	}
-
-	@Override
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-		this.readPacketNBT(pkt.getTag());
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	@Override

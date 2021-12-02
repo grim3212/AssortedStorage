@@ -22,6 +22,8 @@ public class StorageLockCode {
 	}
 
 	public static StorageLockCode read(CompoundTag nbt) {
+		if(nbt == null) return EMPTY_CODE;
+		
 		return nbt.contains("Storage_Lock", 8) ? new StorageLockCode(nbt.getString("Storage_Lock")) : EMPTY_CODE;
 	}
 }

@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class BaseLockedBlockEntity extends BlockEntity {
+public class BaseLockedBlockEntity extends BlockEntity implements ILockeable {
 
 	private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
 
@@ -48,45 +48,31 @@ public class BaseLockedBlockEntity extends BlockEntity {
 	@Override
 	public void load(CompoundTag nbt) {
 		super.load(nbt);
-
-		this.readPacketNBT(nbt);
+		this.lockCode = StorageLockCode.read(nbt);
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag compound) {
-		super.save(compound);
-
-		this.writePacketNBT(compound);
-
-		return compound;
-	}
-
-	public void writePacketNBT(CompoundTag cmp) {
+	protected void saveAdditional(CompoundTag cmp) {
+		super.saveAdditional(cmp);
 		this.lockCode.write(cmp);
-	}
-
-	public void readPacketNBT(CompoundTag cmp) {
-		this.lockCode = StorageLockCode.read(cmp);
-	}
-
-	@Override
-	public CompoundTag getUpdateTag() {
-		return save(new CompoundTag());
 	}
 
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
-		CompoundTag nbtTagCompound = new CompoundTag();
-		writePacketNBT(nbtTagCompound);
-		return new ClientboundBlockEntityDataPacket(this.worldPosition, 1, nbtTagCompound);
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-		this.readPacketNBT(pkt.getTag());
+		super.onDataPacket(net, pkt);
 		requestModelDataUpdate();
 		if (level instanceof ClientLevel) {
 			level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
 		}
+	}
+
+	@Override
+	public StorageLockCode getStorageLockCode() {
+		return this.lockCode;
 	}
 }

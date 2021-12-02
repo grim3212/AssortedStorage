@@ -4,10 +4,10 @@ import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.inventory.keyring.KeyRingContainer;
 
 import net.minecraft.world.inventory.MenuType;
-import net.minecraftforge.common.extensions.IForgeContainerType;
-import net.minecraftforge.fmllegacy.RegistryObject;
+import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class StorageContainerTypes {
 	public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, AssortedStorage.MODID);
@@ -21,6 +21,6 @@ public class StorageContainerTypes {
 	public static final RegistryObject<MenuType<LockerContainer>> DUAL_LOCKER = CONTAINERS.register("dual_locker", () -> new MenuType<>(LockerContainer::createDualLockerContainer));
 	public static final RegistryObject<MenuType<ItemTowerContainer>> ITEM_TOWER = CONTAINERS.register("item_tower", () -> new MenuType<>(new ItemTowerContainer.ItemTowerContainerFactory<>()));
 	public static final RegistryObject<MenuType<LocksmithWorkbenchContainer>> LOCKSMITH_WORKBENCH = CONTAINERS.register("locksmith_workbench", () -> new MenuType<>(LocksmithWorkbenchContainer::createContainer));
-	public static final RegistryObject<MenuType<KeyRingContainer>> KEY_RING = CONTAINERS.register("key_ring", () -> IForgeContainerType.create(KeyRingContainer::new));
+	public static final RegistryObject<MenuType<KeyRingContainer>> KEY_RING = CONTAINERS.register("key_ring", () -> IForgeMenuType.create(KeyRingContainer::new));
 	public static final RegistryObject<MenuType<StorageContainer>> LOCKED_ENDER_CHEST = CONTAINERS.register("locked_ender_chest", () -> new MenuType<>(StorageContainer::createEnderChestContainer));
 }

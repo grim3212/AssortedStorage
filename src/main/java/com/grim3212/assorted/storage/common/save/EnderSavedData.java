@@ -11,13 +11,13 @@ import com.grim3212.assorted.storage.common.util.StorageLockCode;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public class EnderSavedData extends SavedData implements IEnderData {
@@ -118,7 +118,7 @@ public class EnderSavedData extends SavedData implements IEnderData {
 
 		@Override
 		public void deserializeNBT(CompoundTag nbt) {
-			ListTag enderChestsNBT = nbt.getList(LOCKED_ENDER_TAG, Constants.NBT.TAG_COMPOUND);
+			ListTag enderChestsNBT = nbt.getList(LOCKED_ENDER_TAG, Tag.TAG_COMPOUND);
 
 			this.enderChests.clear();
 

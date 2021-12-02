@@ -6,7 +6,7 @@ import com.grim3212.assorted.storage.common.inventory.LocksmithWorkbenchContaine
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 public class SetLockPacket {
 

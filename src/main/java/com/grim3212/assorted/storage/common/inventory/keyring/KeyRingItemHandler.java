@@ -4,8 +4,8 @@ import javax.annotation.Nonnull;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.ItemStackHandler;
 
 public class KeyRingItemHandler extends ItemStackHandler {
@@ -79,7 +79,7 @@ public class KeyRingItemHandler extends ItemStackHandler {
 	@Override
 	public void deserializeNBT(CompoundTag nbt) {
 		setSize(KEY_RING_SIZE);
-		ListTag tagList = nbt.getList("Items", Constants.NBT.TAG_COMPOUND);
+		ListTag tagList = nbt.getList("Items", Tag.TAG_COMPOUND);
 		for (int i = 0; i < tagList.size(); i++) {
 			CompoundTag itemTags = tagList.getCompound(i);
 			int slot = itemTags.getInt("Slot");

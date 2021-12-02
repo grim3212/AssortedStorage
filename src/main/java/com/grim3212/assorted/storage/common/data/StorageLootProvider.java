@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.grim3212.assorted.storage.common.block.GoldSafeBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
+import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.data.DataGenerator;
@@ -70,7 +71,7 @@ public class StorageLootProvider implements DataProvider {
 			tables.put(b.getRegistryName(), genRegular(b));
 		}
 
-		tables.put(StorageBlocks.GOLD_SAFE.getId(), genInventoryStorage(StorageBlocks.GOLD_SAFE.get()));
+		tables.put(StorageBlocks.GOLD_SAFE.getId(), genGoldSafe(StorageBlocks.GOLD_SAFE.get()));
 
 		tables.put(StorageBlocks.LOCKED_ENDER_CHEST.getId(), genInventoryCode(StorageBlocks.LOCKED_ENDER_CHEST.get()));
 
@@ -112,8 +113,8 @@ public class StorageLootProvider implements DataProvider {
 		return LootTable.lootTable().withPool(pool);
 	}
 
-	private static LootTable.Builder genInventoryStorage(Block b) {
-		LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b).apply(CopyNameFunction.copyName(NameSource.BLOCK_ENTITY)).apply(SetContainerContents.setContents().withEntry(DynamicLoot.dynamicEntry(GoldSafeBlock.CONTENTS)));
+	private static LootTable.Builder genGoldSafe(Block b) {
+		LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b).apply(CopyNameFunction.copyName(NameSource.BLOCK_ENTITY)).apply(SetContainerContents.setContents(StorageBlockEntityTypes.GOLD_SAFE.get()).withEntry(DynamicLoot.dynamicEntry(GoldSafeBlock.CONTENTS)));
 		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantValue.exactly(1)).add(entry).when(ExplosionCondition.survivesExplosion());
 		return LootTable.lootTable().withPool(pool);
 	}
