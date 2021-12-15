@@ -15,6 +15,7 @@
             },
             {
               "function": "minecraft:set_contents",
+              "type": "assortedstorage:gold_safe",
               "entries": [
                 {
                   "type": "minecraft:dynamic",
@@ -30,8 +31,7 @@
         {
           "condition": "minecraft:survives_explosion"
         }
-      ],
-      "functions": []
+      ]
     }
   ]
 }
