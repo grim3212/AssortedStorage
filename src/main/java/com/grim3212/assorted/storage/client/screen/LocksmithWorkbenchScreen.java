@@ -18,7 +18,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -53,11 +52,6 @@ public class LocksmithWorkbenchScreen extends AbstractContainerScreen<LocksmithW
 
 	private void onNameChanged(String lock) {
 		String s = lock;
-		Slot slot = this.menu.getSlot(0);
-		if (slot != null && slot.hasItem() && !slot.getItem().hasTag()) {
-			s = "";
-		}
-
 		this.menu.updateLock(s);
 		PacketHandler.sendToServer(new SetLockPacket(s));
 	}

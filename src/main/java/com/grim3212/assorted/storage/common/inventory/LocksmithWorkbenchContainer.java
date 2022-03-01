@@ -28,6 +28,7 @@ public class LocksmithWorkbenchContainer extends AbstractContainerMenu {
 	private final ResultContainer craftResult = new ResultContainer();
 	private final ContainerLevelAccess worldPosCallable;
 	private String lock = "";
+	private final Slot resultSlot;
 
 	public LocksmithWorkbenchContainer(int id, Inventory playerInventory) {
 		this(id, playerInventory, ContainerLevelAccess.NULL);
@@ -37,7 +38,14 @@ public class LocksmithWorkbenchContainer extends AbstractContainerMenu {
 		super(StorageContainerTypes.LOCKSMITH_WORKBENCH.get(), id);
 		this.worldPosCallable = p_i50090_3_;
 
-		this.addSlot(new Slot(this.craftResult, 0, 120, 35) {
+		this.addSlot(new Slot(this.craftMatrix, 0, 41, 17 + 18) {
+			@Override
+			public boolean mayPlace(ItemStack stack) {
+				return stack.getItem() instanceof CombinationItem;
+			}
+		});
+
+		this.resultSlot = this.addSlot(new Slot(this.craftResult, 1, 120, 35) {
 			@Override
 			public boolean mayPlace(ItemStack stack) {
 				return false;
@@ -47,13 +55,6 @@ public class LocksmithWorkbenchContainer extends AbstractContainerMenu {
 			public void onTake(Player thePlayer, ItemStack stack) {
 				LocksmithWorkbenchContainer.this.onTake();
 				super.onTake(thePlayer, stack);
-			}
-		});
-
-		this.addSlot(new Slot(this.craftMatrix, 0, 41, 17 + 18) {
-			@Override
-			public boolean mayPlace(ItemStack stack) {
-				return stack.getItem() instanceof CombinationItem;
 			}
 		});
 
@@ -114,7 +115,7 @@ public class LocksmithWorkbenchContainer extends AbstractContainerMenu {
 		if (slot != null && slot.hasItem()) {
 			ItemStack itemstack1 = slot.getItem();
 			itemstack = itemstack1.copy();
-			if (index == 0) {
+			if (index == 1) {
 				this.worldPosCallable.execute((p_217067_2_, p_217067_3_) -> {
 					itemstack1.getItem().onCraftedBy(itemstack1, p_217067_2_, playerIn);
 				});
@@ -123,17 +124,19 @@ public class LocksmithWorkbenchContainer extends AbstractContainerMenu {
 				}
 
 				slot.onQuickCraft(itemstack1, itemstack);
-			} else if (index >= 2 && index < 38) {
-				if (!this.moveItemStackTo(itemstack1, 1, 2, false)) {
-					if (index < 37) {
-						if (!this.moveItemStackTo(itemstack1, 29, 38, false)) {
-							return ItemStack.EMPTY;
-						}
-					} else if (!this.moveItemStackTo(itemstack1, 2, 29, false)) {
-						return ItemStack.EMPTY;
-					}
+			} else if (index == 0) {
+				if (!this.moveItemStackTo(itemstack1, 2, 38, false)) {
+					return ItemStack.EMPTY;
 				}
-			} else if (!this.moveItemStackTo(itemstack1, 2, 38, false)) {
+			} else if (itemstack1.getItem() instanceof CombinationItem) {
+				if (!this.moveItemStackTo(itemstack1, 0, 1, false)) {
+					return ItemStack.EMPTY;
+				}
+			} else if (index >= 2 && index < 29) {
+				if (!this.moveItemStackTo(itemstack1, 29, 38, false)) {
+					return ItemStack.EMPTY;
+				}
+			} else if (index >= 29 && index < 38 && !this.moveItemStackTo(itemstack1, 2, 29, false)) {
 				return ItemStack.EMPTY;
 			}
 
@@ -181,14 +184,14 @@ public class LocksmithWorkbenchContainer extends AbstractContainerMenu {
 					output.setTag(tag);
 				}
 
-				this.craftResult.setItem(0, output);
+				this.resultSlot.set(output);
 			} else {
-				this.craftResult.setItem(0, ItemStack.EMPTY);
+				this.resultSlot.set(ItemStack.EMPTY);
 			}
 		} else {
-			this.craftResult.setItem(0, ItemStack.EMPTY);
+			this.resultSlot.set(ItemStack.EMPTY);
 		}
-
+		
 		this.broadcastChanges();
 	}
 
