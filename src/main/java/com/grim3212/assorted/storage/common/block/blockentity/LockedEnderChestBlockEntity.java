@@ -54,10 +54,6 @@ public class LockedEnderChestBlockEntity extends BaseStorageBlockEntity {
 		inventoryLazy = LazyOptional.of(this::getInventory);
 
 		releasePreviousInventory();
-		setChanged();
-
-		BlockState state = level.getBlockState(worldPosition);
-		level.sendBlockUpdated(worldPosition, state, state, 3);
 	}
 
 	private void releasePreviousInventory() {
@@ -139,7 +135,7 @@ public class LockedEnderChestBlockEntity extends BaseStorageBlockEntity {
 
 		this.setChanged();
 	}
-	
+
 	@Override
 	protected boolean selfInventory() {
 		return false;

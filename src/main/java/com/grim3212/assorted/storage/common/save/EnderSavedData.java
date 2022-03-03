@@ -5,14 +5,12 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.Maps;
-import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.inventory.LockedEnderChestInventory;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -22,7 +20,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 public class EnderSavedData extends SavedData implements IEnderData {
 
-	private static final String ID = new ResourceLocation(AssortedStorage.MODID, "ender_saved_data").toString();
+	private static final String ID = "locked_ender_saved_data";
 	private static final String LOCKED_ENDER_TAG = "LockedEnderChests";
 
 	private EnderData enderData = new EnderData();
@@ -79,7 +77,6 @@ public class EnderSavedData extends SavedData implements IEnderData {
 		CompoundTag data = enderData.serializeNBT();
 
 		nbt.put(LOCKED_ENDER_TAG, data.get(LOCKED_ENDER_TAG));
-
 		return nbt;
 	}
 

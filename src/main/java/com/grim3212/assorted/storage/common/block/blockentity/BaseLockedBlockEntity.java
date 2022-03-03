@@ -23,26 +23,29 @@ public class BaseLockedBlockEntity extends BlockEntity implements ILockeable {
 		super(StorageBlockEntityTypes.BASE_LOCKED.get(), pos, state);
 	}
 
+	@Override
 	public boolean isLocked() {
 		return this.lockCode != null && this.lockCode != StorageLockCode.EMPTY_CODE;
 	}
 
+	@Override
 	public String getLockCode() {
 		return this.lockCode.getLockCode();
 	}
 
+	@Override
 	public void setLockCode(String s) {
 		if (s == null || s.isEmpty())
 			this.lockCode = StorageLockCode.EMPTY_CODE;
 		else
 			this.lockCode = new StorageLockCode(s);
 
-		if (level != null) {
-			level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-			if (!level.isClientSide) {
-				level.blockUpdated(worldPosition, getBlockState().getBlock());
-			}
-		}
+		this.setChanged();
+	}
+	
+	@Override
+	public StorageLockCode getStorageLockCode() {
+		return this.lockCode;
 	}
 
 	@Override
@@ -61,6 +64,11 @@ public class BaseLockedBlockEntity extends BlockEntity implements ILockeable {
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
 		return ClientboundBlockEntityDataPacket.create(this);
 	}
+	
+	@Override
+	public CompoundTag getUpdateTag() {
+		return this.saveWithoutMetadata();
+	}
 
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
@@ -69,10 +77,5 @@ public class BaseLockedBlockEntity extends BlockEntity implements ILockeable {
 		if (level instanceof ClientLevel) {
 			level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
 		}
-	}
-
-	@Override
-	public StorageLockCode getStorageLockCode() {
-		return this.lockCode;
 	}
 }

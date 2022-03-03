@@ -18,7 +18,6 @@ public class StorageLockCode {
 		if (!this.lock.isEmpty()) {
 			nbt.putString("Storage_Lock", this.lock);
 		}
-
 	}
 
 	public static StorageLockCode read(CompoundTag nbt) {
