@@ -5,12 +5,14 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.Maps;
+import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.inventory.LockedEnderChestInventory;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -20,6 +22,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 public class EnderSavedData extends SavedData implements IEnderData {
 
+	private static final String OLD_ID = new ResourceLocation(AssortedStorage.MODID, "ender_saved_data").toString();
 	private static final String ID = "locked_ender_saved_data";
 	private static final String LOCKED_ENDER_TAG = "LockedEnderChests";
 
@@ -59,6 +62,13 @@ public class EnderSavedData extends SavedData implements IEnderData {
 		ServerLevel overworld = world.getServer().overworld();
 
 		DimensionDataStorage storage = overworld.getDataStorage();
+		EnderSavedData oldData = storage.get(EnderSavedData::new, OLD_ID);
+		EnderSavedData newData = storage.get(EnderSavedData::new, ID);
+		
+		if(oldData != null && newData == null) {
+			return storage.computeIfAbsent(EnderSavedData::new, () -> oldData, ID);
+		}
+		
 		return storage.computeIfAbsent(EnderSavedData::new, EnderSavedData::new, ID);
 	}
 
