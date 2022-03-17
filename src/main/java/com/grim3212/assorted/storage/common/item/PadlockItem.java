@@ -8,7 +8,6 @@ import com.grim3212.assorted.storage.common.block.blockentity.BaseLockedBlockEnt
 import com.grim3212.assorted.storage.common.block.blockentity.ILockeable;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -24,6 +23,7 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.EnderChestBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class PadlockItem extends CombinationItem {
 
@@ -45,7 +45,7 @@ public class PadlockItem extends CombinationItem {
 		lockMappings.put(Blocks.IRON_DOOR, StorageBlocks.LOCKED_IRON_DOOR.get());
 		lockMappings.put(Blocks.ENDER_CHEST, StorageBlocks.LOCKED_ENDER_CHEST.get());
 
-		Block quartzDoor = Registry.BLOCK.get(new ResourceLocation("assorteddecor:quartz_door"));
+		Block quartzDoor = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("assorteddecor:quartz_door"));
 		if (quartzDoor != Blocks.AIR) {
 			lockMappings.put(quartzDoor, StorageBlocks.LOCKED_QUARTZ_DOOR.get());
 		}

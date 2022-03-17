@@ -7,7 +7,6 @@ import com.grim3212.assorted.storage.common.util.StorageUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -32,6 +31,7 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class LockedDoorBlock extends DoorBlock implements EntityBlock {
 
@@ -46,7 +46,7 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock {
 	public LockedDoorBlock(ResourceLocation parent, Properties builder) {
 		super(builder);
 		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(OPEN, false).setValue(HINGE, DoorHingeSide.LEFT).setValue(POWERED, false).setValue(HALF, DoubleBlockHalf.LOWER));
-		this.parent = Registry.BLOCK.get(parent);
+		this.parent = ForgeRegistries.BLOCKS.getValue(parent);
 	}
 
 	@Override

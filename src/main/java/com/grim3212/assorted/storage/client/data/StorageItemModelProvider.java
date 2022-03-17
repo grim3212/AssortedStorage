@@ -8,14 +8,14 @@ import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 
 import net.minecraft.data.DataGenerator;
-import net.minecraft.world.item.Item;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.Registry;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class StorageItemModelProvider extends ItemModelProvider {
 
@@ -66,11 +66,7 @@ public class StorageItemModelProvider extends ItemModelProvider {
 	}
 
 	private static String name(Item i) {
-		return Registry.ITEM.getKey(i).getPath();
-	}
-
-	private String prefix(String name) {
-		return resource(name).toString();
+		return ForgeRegistries.ITEMS.getKey(i).getPath();
 	}
 
 	private ResourceLocation resource(String name) {

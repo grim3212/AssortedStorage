@@ -8,12 +8,10 @@ import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
 import com.grim3212.assorted.storage.common.inventory.StorageContainer;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundEvent;
@@ -82,10 +80,10 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 			this.lockCode = StorageLockCode.EMPTY_CODE;
 		else
 			this.lockCode = new StorageLockCode(s);
-		
+
 		this.setChanged();
 	}
-	
+
 	@Override
 	public void load(CompoundTag nbt) {
 		super.load(nbt);
@@ -115,7 +113,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 
 		this.lockCode.write(compound);
 	}
-	
+
 	public CompoundTag saveToNbt(CompoundTag compound) {
 		ContainerHelper.saveAllItems(compound, this.chestContents, false);
 		return compound;
@@ -262,7 +260,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 	public NonNullList<ItemStack> getItems() {
 		return this.chestContents;
 	}
-	
+
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 		if (!this.remove && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
