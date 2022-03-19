@@ -49,6 +49,21 @@ public class PadlockItem extends CombinationItem {
 		if (quartzDoor != Blocks.AIR) {
 			lockMappings.put(quartzDoor, StorageBlocks.LOCKED_QUARTZ_DOOR.get());
 		}
+
+		Block glassDoor = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("assorteddecor:glass_door"));
+		if (glassDoor != Blocks.AIR) {
+			lockMappings.put(glassDoor, StorageBlocks.LOCKED_GLASS_DOOR.get());
+		}
+
+		Block steelDoor = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("assorteddecor:steel_door"));
+		if (steelDoor != Blocks.AIR) {
+			lockMappings.put(steelDoor, StorageBlocks.LOCKED_STEEL_DOOR.get());
+		}
+
+		Block chainLinkDoor = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("assorteddecor:chain_link_door"));
+		if (chainLinkDoor != Blocks.AIR) {
+			lockMappings.put(chainLinkDoor, StorageBlocks.LOCKED_CHAIN_LINK_DOOR.get());
+		}
 	}
 
 	private Block getMatchingBlock(Block doorIn) {
