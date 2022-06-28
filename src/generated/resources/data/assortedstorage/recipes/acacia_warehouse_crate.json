@@ -1,18 +1,18 @@
 {
   "type": "minecraft:crafting_shaped",
+  "key": {
+    "L": {
+      "tag": "minecraft:acacia_logs"
+    },
+    "P": {
+      "item": "minecraft:acacia_planks"
+    }
+  },
   "pattern": [
     "LLL",
     "P P",
     "PPP"
   ],
-  "key": {
-    "P": {
-      "item": "minecraft:acacia_planks"
-    },
-    "L": {
-      "tag": "minecraft:acacia_logs"
-    }
-  },
   "result": {
     "item": "assortedstorage:acacia_warehouse_crate"
   }

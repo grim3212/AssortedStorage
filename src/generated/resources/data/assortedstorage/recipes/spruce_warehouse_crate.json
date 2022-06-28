@@ -1,18 +1,18 @@
 {
   "type": "minecraft:crafting_shaped",
+  "key": {
+    "L": {
+      "tag": "minecraft:spruce_logs"
+    },
+    "P": {
+      "item": "minecraft:spruce_planks"
+    }
+  },
   "pattern": [
     "LLL",
     "P P",
     "PPP"
   ],
-  "key": {
-    "P": {
-      "item": "minecraft:spruce_planks"
-    },
-    "L": {
-      "tag": "minecraft:spruce_logs"
-    }
-  },
   "result": {
     "item": "assortedstorage:spruce_warehouse_crate"
   }

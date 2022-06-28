@@ -71,17 +71,15 @@ public class AssortedStorage {
 		DataGenerator datagenerator = event.getGenerator();
 		ExistingFileHelper fileHelper = event.getExistingFileHelper();
 
-		if (event.includeServer()) {
-			datagenerator.addProvider(new StorageRecipes(datagenerator));
-			StorageBlockTagProvider blockTagProvider = new StorageBlockTagProvider(datagenerator, fileHelper);
-			datagenerator.addProvider(blockTagProvider);
-			datagenerator.addProvider(new StorageItemTagProvider(datagenerator, blockTagProvider, fileHelper));
-			datagenerator.addProvider(new StorageLootProvider(datagenerator));
-		}
+		// Server
+		datagenerator.addProvider(event.includeServer(), new StorageRecipes(datagenerator));
+		StorageBlockTagProvider blockTagProvider = new StorageBlockTagProvider(datagenerator, fileHelper);
+		datagenerator.addProvider(event.includeServer(), blockTagProvider);
+		datagenerator.addProvider(event.includeServer(), new StorageItemTagProvider(datagenerator, blockTagProvider, fileHelper));
+		datagenerator.addProvider(event.includeServer(), new StorageLootProvider(datagenerator));
 
-		if (event.includeClient()) {
-			datagenerator.addProvider(new StorageBlockstateProvider(datagenerator, fileHelper));
-			datagenerator.addProvider(new StorageItemModelProvider(datagenerator, fileHelper));
-		}
+		// Client
+		datagenerator.addProvider(event.includeClient(), new StorageBlockstateProvider(datagenerator, fileHelper));
+		datagenerator.addProvider(event.includeClient(), new StorageItemModelProvider(datagenerator, fileHelper));
 	}
 }

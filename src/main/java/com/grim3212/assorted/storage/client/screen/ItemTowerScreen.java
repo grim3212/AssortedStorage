@@ -9,8 +9,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.Container;
@@ -46,9 +45,9 @@ public class ItemTowerScreen extends AbstractContainerScreen<ItemTowerContainer>
 
 	@Override
 	protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
-		TextComponent title = new TextComponent(this.title.getString());
+		MutableComponent title = Component.literal(this.title.getString());
 		if (this.towerInventory.getContainerSize() > 18) {
-			title.append(new TranslatableComponent(AssortedStorage.MODID + ".container.item_tower.row", this.rowId + 1));
+			title.append(Component.translatable(AssortedStorage.MODID + ".container.item_tower.row", this.rowId + 1));
 			title.append(" " + this.towerInventory.getContainerSize() / 9);
 		}
 

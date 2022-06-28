@@ -1,18 +1,18 @@
 {
   "type": "minecraft:crafting_shaped",
+  "key": {
+    "L": {
+      "tag": "minecraft:jungle_logs"
+    },
+    "P": {
+      "item": "minecraft:jungle_planks"
+    }
+  },
   "pattern": [
     "LLL",
     "P P",
     "PPP"
   ],
-  "key": {
-    "P": {
-      "item": "minecraft:jungle_planks"
-    },
-    "L": {
-      "tag": "minecraft:jungle_logs"
-    }
-  },
   "result": {
     "item": "assortedstorage:jungle_warehouse_crate"
   }

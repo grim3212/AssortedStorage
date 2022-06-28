@@ -11,7 +11,6 @@ import com.grim3212.assorted.storage.common.inventory.StorageContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -32,7 +31,7 @@ public class GoldSafeBlockEntity extends BaseStorageBlockEntity {
 
 	@Override
 	protected Component getDefaultName() {
-		return new TranslatableComponent(AssortedStorage.MODID + ".container.gold_safe");
+		return Component.translatable(AssortedStorage.MODID + ".container.gold_safe");
 	}
 
 	protected static final int[] GOLD_SAFE_SLOTS = IntStream.range(0, 36).toArray();

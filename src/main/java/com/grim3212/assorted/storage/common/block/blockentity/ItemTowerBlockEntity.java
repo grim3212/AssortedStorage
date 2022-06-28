@@ -13,7 +13,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -51,7 +50,7 @@ public class ItemTowerBlockEntity extends BaseStorageBlockEntity {
 
 	@Override
 	protected Component getDefaultName() {
-		return new TranslatableComponent(AssortedStorage.MODID + ".container.item_tower");
+		return Component.translatable(AssortedStorage.MODID + ".container.item_tower");
 	}
 
 	protected static final int[] ITEM_TOWER_SLOTS = IntStream.range(0, 18).toArray();

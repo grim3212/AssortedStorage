@@ -7,16 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.grim3212.assorted.storage.common.block.GoldSafeBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.HashCache;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -37,10 +35,10 @@ import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class StorageLootProvider implements DataProvider {
 
-	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private final DataGenerator generator;
 	private final List<Block> blocks = new ArrayList<>();
 
@@ -64,11 +62,11 @@ public class StorageLootProvider implements DataProvider {
 	}
 
 	@Override
-	public void run(HashCache cache) throws IOException {
+	public void run(CachedOutput cache) throws IOException {
 		Map<ResourceLocation, LootTable.Builder> tables = new HashMap<>();
 
 		for (Block b : blocks) {
-			tables.put(b.getRegistryName(), genRegular(b));
+			tables.put(ForgeRegistries.BLOCKS.getKey(b), genRegular(b));
 		}
 
 		tables.put(StorageBlocks.GOLD_SAFE.getId(), genGoldSafe(StorageBlocks.GOLD_SAFE.get()));
@@ -77,7 +75,7 @@ public class StorageLootProvider implements DataProvider {
 
 		for (Map.Entry<ResourceLocation, LootTable.Builder> e : tables.entrySet()) {
 			Path path = getPath(generator.getOutputFolder(), e.getKey());
-			DataProvider.save(GSON, cache, LootTables.serialize(e.getValue().setParamSet(LootContextParamSets.BLOCK).build()), path);
+			DataProvider.saveStable(cache, LootTables.serialize(e.getValue().setParamSet(LootContextParamSets.BLOCK).build()), path);
 		}
 
 		door(StorageBlocks.LOCKED_IRON_DOOR.get(), Blocks.IRON_DOOR, cache);
@@ -91,9 +89,9 @@ public class StorageLootProvider implements DataProvider {
 		door(StorageBlocks.LOCKED_WARPED_DOOR.get(), Blocks.WARPED_DOOR, cache);
 	}
 
-	private void door(Block b, Block out, HashCache cache) throws IOException {
-		Path doorPath = getPath(generator.getOutputFolder(), b.getRegistryName());
-		DataProvider.save(GSON, cache, LootTables.serialize(genDoor(b, out).setParamSet(LootContextParamSets.BLOCK).build()), doorPath);
+	private void door(Block b, Block out, CachedOutput cache) throws IOException {
+		Path doorPath = getPath(generator.getOutputFolder(), ForgeRegistries.BLOCKS.getKey(b));
+		DataProvider.saveStable(cache, LootTables.serialize(genDoor(b, out).setParamSet(LootContextParamSets.BLOCK).build()), doorPath);
 	}
 
 	private static Path getPath(Path root, ResourceLocation id) {

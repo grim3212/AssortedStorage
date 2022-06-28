@@ -2,11 +2,11 @@
   "parent": "minecraft:block/cube",
   "textures": {
     "down": "minecraft:block/oak_planks",
-    "up": "assortedstorage:block/locksmith_top",
-    "north": "assortedstorage:block/locksmith_front",
-    "south": "assortedstorage:block/locksmith_side",
     "east": "assortedstorage:block/locksmith_side",
-    "west": "assortedstorage:block/locksmith_front",
-    "particle": "assortedstorage:block/locksmith_front"
+    "north": "assortedstorage:block/locksmith_front",
+    "particle": "assortedstorage:block/locksmith_front",
+    "south": "assortedstorage:block/locksmith_side",
+    "up": "assortedstorage:block/locksmith_top",
+    "west": "assortedstorage:block/locksmith_front"
   }
 }

@@ -1,21 +1,21 @@
 {
   "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": {
+      "tag": "forge:chests/wooden"
+    },
+    "G": {
+      "tag": "forge:glass"
+    },
+    "X": {
+      "tag": "minecraft:planks"
+    }
+  },
   "pattern": [
     " X ",
     "GCG",
     " X "
   ],
-  "key": {
-    "X": {
-      "tag": "minecraft:planks"
-    },
-    "G": {
-      "tag": "forge:glass"
-    },
-    "C": {
-      "tag": "forge:chests/wooden"
-    }
-  },
   "result": {
     "item": "assortedstorage:glass_cabinet"
   }

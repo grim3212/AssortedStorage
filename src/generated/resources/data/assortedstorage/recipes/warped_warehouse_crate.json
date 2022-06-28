@@ -1,18 +1,18 @@
 {
   "type": "minecraft:crafting_shaped",
+  "key": {
+    "L": {
+      "item": "minecraft:warped_stem"
+    },
+    "P": {
+      "item": "minecraft:warped_planks"
+    }
+  },
   "pattern": [
     "LLL",
     "P P",
     "PPP"
   ],
-  "key": {
-    "P": {
-      "item": "minecraft:warped_planks"
-    },
-    "L": {
-      "item": "minecraft:warped_stem"
-    }
-  },
   "result": {
     "item": "assortedstorage:warped_warehouse_crate"
   }

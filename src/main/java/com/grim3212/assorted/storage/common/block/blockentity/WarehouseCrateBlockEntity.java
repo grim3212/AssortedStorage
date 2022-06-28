@@ -5,7 +5,6 @@ import com.grim3212.assorted.storage.common.inventory.StorageContainer;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -24,6 +23,6 @@ public class WarehouseCrateBlockEntity extends BaseStorageBlockEntity {
 
 	@Override
 	protected Component getDefaultName() {
-		return new TranslatableComponent(AssortedStorage.MODID + ".container.warehouse_crate");
+		return Component.translatable(AssortedStorage.MODID + ".container.warehouse_crate");
 	}
 }

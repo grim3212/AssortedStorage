@@ -1,17 +1,17 @@
 {
   "type": "minecraft:crafting_shaped",
-  "pattern": [
-    " X ",
-    "X X",
-    "XXX"
-  ],
   "key": {
     "X": {
       "tag": "forge:ingots/iron"
     }
   },
+  "pattern": [
+    " X ",
+    "X X",
+    "XXX"
+  ],
   "result": {
-    "item": "assortedstorage:locksmith_lock",
-    "count": 3
+    "count": 3,
+    "item": "assortedstorage:locksmith_lock"
   }
 }

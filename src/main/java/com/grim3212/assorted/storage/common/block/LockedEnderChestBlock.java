@@ -1,7 +1,6 @@
 package com.grim3212.assorted.storage.common.block;
 
 import java.util.List;
-import java.util.Random;
 
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.blockentity.ILockeable;
@@ -13,10 +12,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
@@ -68,7 +66,7 @@ public class LockedEnderChestBlock extends BaseStorageBlock {
 		String code = StorageUtil.getCode(stack);
 
 		if (!code.isEmpty()) {
-			tooltip.add(new TranslatableComponent(AssortedStorage.MODID + ".info.combo", new TextComponent(code).withStyle(ChatFormatting.AQUA)));
+			tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.combo", Component.literal(code).withStyle(ChatFormatting.AQUA)));
 		}
 	}
 
@@ -109,7 +107,7 @@ public class LockedEnderChestBlock extends BaseStorageBlock {
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
+	public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
 		for (int i = 0; i < 3; ++i) {
 			int j = random.nextInt(2) * 2 - 1;
 			int k = random.nextInt(2) * 2 - 1;

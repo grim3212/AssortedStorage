@@ -1,18 +1,18 @@
 {
   "type": "minecraft:crafting_shaped",
+  "key": {
+    "K": {
+      "item": "assortedstorage:locksmith_key"
+    },
+    "X": {
+      "tag": "forge:ingots/iron"
+    }
+  },
   "pattern": [
     " X ",
     "XKX",
     " X "
   ],
-  "key": {
-    "X": {
-      "tag": "forge:ingots/iron"
-    },
-    "K": {
-      "item": "assortedstorage:locksmith_key"
-    }
-  },
   "result": {
     "item": "assortedstorage:key_ring"
   }

@@ -13,7 +13,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -39,7 +38,7 @@ public class LocksmithWorkbenchScreen extends AbstractContainerScreen<LocksmithW
 		super.init();
 
 		this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
-		this.lockField = new EditBox(this.font, this.leftPos + 67, this.topPos + 39, 42, 12, new TranslatableComponent(AssortedStorage.MODID + ".container.keycode"));
+		this.lockField = new EditBox(this.font, this.leftPos + 67, this.topPos + 39, 42, 12, Component.translatable(AssortedStorage.MODID + ".container.keycode"));
 		this.lockField.setCanLoseFocus(false);
 		this.lockField.setTextColor(-1);
 		this.lockField.setTextColorUneditable(-1);
