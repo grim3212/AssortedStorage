@@ -7,12 +7,12 @@ import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 
+import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -41,6 +41,7 @@ public class StorageItemModelProvider extends ItemModelProvider {
 		items.add(StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get().asItem());
 		items.add(StorageBlocks.WARPED_WAREHOUSE_CRATE.get().asItem());
 		items.add(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get().asItem());
+		items.add(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get().asItem());
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public class StorageItemModelProvider extends ItemModelProvider {
 
 	private void builtinEntity(Item i) {
 		String name = name(i);
-		getBuilder(name).parent(new ModelFile.UncheckedModelFile("builtin/entity")).transforms().transform(ModelBuilder.Perspective.GUI).rotation(30, 45, 0).scale(0.625F).end().transform(ModelBuilder.Perspective.GROUND).translation(0, 3, 0).scale(0.25F).end().transform(ModelBuilder.Perspective.HEAD).rotation(0, 180, 0).end().transform(ModelBuilder.Perspective.FIXED).rotation(0, 180, 0).scale(0.5F).end().transform(ModelBuilder.Perspective.THIRDPERSON_RIGHT).rotation(75, 315, 0)
-				.translation(0, 2.5F, 0).scale(0.375F).end().transform(ModelBuilder.Perspective.FIRSTPERSON_RIGHT).rotation(0, 315, 0).scale(0.4F).end().end();
+		getBuilder(name).parent(new ModelFile.UncheckedModelFile("builtin/entity")).transforms().transform(TransformType.GUI).rotation(30, 45, 0).scale(0.625F).end().transform(TransformType.GROUND).translation(0, 3, 0).scale(0.25F).end().transform(TransformType.HEAD).rotation(0, 180, 0).end().transform(TransformType.FIXED).rotation(0, 180, 0).scale(0.5F).end().transform(TransformType.THIRD_PERSON_RIGHT_HAND).rotation(75, 315, 0).translation(0, 2.5F, 0).scale(0.375F).end()
+				.transform(TransformType.FIRST_PERSON_RIGHT_HAND).rotation(0, 315, 0).scale(0.4F).end().end();
 	}
 }

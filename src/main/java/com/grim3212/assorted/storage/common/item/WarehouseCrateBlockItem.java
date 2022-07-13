@@ -7,7 +7,7 @@ import com.grim3212.assorted.storage.client.blockentity.item.WarehouseCrateBEWLR
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.IItemRenderProperties;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 
 public class WarehouseCrateBlockItem extends BlockItem {
 
@@ -16,10 +16,10 @@ public class WarehouseCrateBlockItem extends BlockItem {
 	}
 
 	@Override
-	public void initializeClient(Consumer<IItemRenderProperties> consumer) {
-		consumer.accept(new IItemRenderProperties() {
+	public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+		consumer.accept(new IClientItemExtensions() {
 			@Override
-			public BlockEntityWithoutLevelRenderer getItemStackRenderer() {
+			public BlockEntityWithoutLevelRenderer getCustomRenderer() {
 				return WarehouseCrateBEWLR.WAREHOUSE_CRATE_ITEM_RENDERER;
 			}
 		});

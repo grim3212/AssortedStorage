@@ -27,6 +27,7 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 		piglinBuilder.add(StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get());
 		piglinBuilder.add(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get());
 		piglinBuilder.add(StorageBlocks.WARPED_WAREHOUSE_CRATE.get());
+		piglinBuilder.add(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get());
 		piglinBuilder.add(StorageBlocks.GLASS_CABINET.get());
 		piglinBuilder.add(StorageBlocks.WOOD_CABINET.get());
 		piglinBuilder.add(StorageBlocks.GOLD_SAFE.get());

@@ -25,6 +25,7 @@
 	"block.assortedstorage.jungle_warehouse_crate": "Jungle Warehouse Crate",
 	"block.assortedstorage.warped_warehouse_crate": "Warped Warehouse Crate",
 	"block.assortedstorage.crimson_warehouse_crate": "Crimson Warehouse Crate",
+	"block.assortedstorage.mangrove_warehouse_crate": "Mangrove Warehouse Crate",
 	"block.assortedstorage.gold_safe": "§6Gold Safe",
 	"block.assortedstorage.obsidian_safe": "§5Obsidian Safe",
 	"block.assortedstorage.locker": "Locker",
@@ -42,6 +43,7 @@
 	"block.assortedstorage.locked_dark_oak_door": "Locked Dark Oak Door",
 	"block.assortedstorage.locked_crimson_door": "Locked Crimson Door",
 	"block.assortedstorage.locked_warped_door": "Locked Warped Door",
+	"block.assortedstorage.locked_mangrove_door": "Locked Mangrove Door",
 	"block.assortedstorage.locked_ender_chest": "Locked Ender Chest",
 	
 	"item.assortedstorage.locksmith_key": "Locksmith Key",

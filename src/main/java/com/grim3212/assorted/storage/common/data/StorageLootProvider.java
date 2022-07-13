@@ -59,6 +59,7 @@ public class StorageLootProvider implements DataProvider {
 		blocks.add(StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get());
 		blocks.add(StorageBlocks.WARPED_WAREHOUSE_CRATE.get());
 		blocks.add(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get());
+		blocks.add(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get());
 	}
 
 	@Override
@@ -86,6 +87,7 @@ public class StorageLootProvider implements DataProvider {
 		door(StorageBlocks.LOCKED_JUNGLE_DOOR.get(), Blocks.JUNGLE_DOOR, cache);
 		door(StorageBlocks.LOCKED_DARK_OAK_DOOR.get(), Blocks.DARK_OAK_DOOR, cache);
 		door(StorageBlocks.LOCKED_CRIMSON_DOOR.get(), Blocks.CRIMSON_DOOR, cache);
+		door(StorageBlocks.LOCKED_MANGROVE_DOOR.get(), Blocks.MANGROVE_DOOR, cache);
 		door(StorageBlocks.LOCKED_WARPED_DOOR.get(), Blocks.WARPED_DOOR, cache);
 	}
 

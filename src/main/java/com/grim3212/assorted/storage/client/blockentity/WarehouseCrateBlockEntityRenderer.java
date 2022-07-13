@@ -33,6 +33,7 @@ public class WarehouseCrateBlockEntityRenderer<T extends BlockEntity & IStorage>
 	private static final ResourceLocation JUNGLE = new ResourceLocation(AssortedStorage.MODID, "textures/model/warehouse_crate/jungle.png");
 	private static final ResourceLocation WARPED = new ResourceLocation(AssortedStorage.MODID, "textures/model/warehouse_crate/warped.png");
 	private static final ResourceLocation CRIMSON = new ResourceLocation(AssortedStorage.MODID, "textures/model/warehouse_crate/crimson.png");
+	private static final ResourceLocation MANGROVE = new ResourceLocation(AssortedStorage.MODID, "textures/model/warehouse_crate/mangrove.png");
 
 	public WarehouseCrateBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
 		this.model = new WarehouseCrateModel(context.getModelSet().bakeLayer(StorageModelLayers.WAREHOUSE_CRATE));
@@ -90,6 +91,8 @@ public class WarehouseCrateBlockEntityRenderer<T extends BlockEntity & IStorage>
 				return CRIMSON;
 			case "warped":
 				return WARPED;
+			case "mangrove":
+				return MANGROVE;
 			default:
 				return OAK;
 		}

@@ -40,6 +40,7 @@ public class StorageRecipes extends RecipeProvider {
 		ShapedRecipeBuilder.shaped(StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get()).define('P', Items.JUNGLE_PLANKS).define('L', ItemTags.JUNGLE_LOGS).pattern("LLL").pattern("P P").pattern("PPP").unlockedBy("has_jungle_planks", has(Items.JUNGLE_PLANKS)).save(consumer);
 		ShapedRecipeBuilder.shaped(StorageBlocks.WARPED_WAREHOUSE_CRATE.get()).define('P', Items.WARPED_PLANKS).define('L', Items.WARPED_STEM).pattern("LLL").pattern("P P").pattern("PPP").unlockedBy("has_warped_planks", has(Items.WARPED_PLANKS)).save(consumer);
 		ShapedRecipeBuilder.shaped(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get()).define('P', Items.CRIMSON_PLANKS).define('L', Items.CRIMSON_STEM).pattern("LLL").pattern("P P").pattern("PPP").unlockedBy("has_crimson_planks", has(Items.CRIMSON_PLANKS)).save(consumer);
+		ShapedRecipeBuilder.shaped(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get()).define('P', Items.MANGROVE_PLANKS).define('L', Items.MANGROVE_LOG).pattern("LLL").pattern("P P").pattern("PPP").unlockedBy("has_mangrove_planks", has(Items.MANGROVE_PLANKS)).save(consumer);
 
 		ShapedRecipeBuilder.shaped(StorageItems.LOCKSMITH_LOCK.get(), 3).define('X', Tags.Items.INGOTS_IRON).pattern(" X ").pattern("X X").pattern("XXX").unlockedBy("has_iron", has(Tags.Items.INGOTS_IRON)).save(consumer);
 		ShapedRecipeBuilder.shaped(StorageItems.LOCKSMITH_KEY.get(), 3).define('X', Tags.Items.INGOTS_IRON).pattern("XX").pattern("XX").pattern("X ").unlockedBy("has_iron", has(Tags.Items.INGOTS_IRON)).save(consumer);

@@ -35,6 +35,7 @@ public class WarehouseCrateBEWLR extends BlockEntityWithoutLevelRenderer {
 	private final WarehouseCrateBlockEntity jungleCrateBlockEntity = new WarehouseCrateBlockEntity(BlockPos.ZERO, StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get().defaultBlockState());
 	private final WarehouseCrateBlockEntity crimsonCrateBlockEntity = new WarehouseCrateBlockEntity(BlockPos.ZERO, StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get().defaultBlockState());
 	private final WarehouseCrateBlockEntity warpedCrateBlockEntity = new WarehouseCrateBlockEntity(BlockPos.ZERO, StorageBlocks.WARPED_WAREHOUSE_CRATE.get().defaultBlockState());
+	private final WarehouseCrateBlockEntity mangroveCrateBlockEntity = new WarehouseCrateBlockEntity(BlockPos.ZERO, StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get().defaultBlockState());
 
 	public WarehouseCrateBEWLR(Supplier<BlockEntityRenderDispatcher> dispatcher, Supplier<EntityModelSet> modelSet) {
 		super(dispatcher.get(), modelSet.get());
@@ -63,6 +64,8 @@ public class WarehouseCrateBEWLR extends BlockEntityWithoutLevelRenderer {
 				blockentity = this.crimsonCrateBlockEntity;
 			} else if (blockstate.is(StorageBlocks.WARPED_WAREHOUSE_CRATE.get())) {
 				blockentity = this.warpedCrateBlockEntity;
+			} else if (blockstate.is(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get())) {
+				blockentity = this.mangroveCrateBlockEntity;
 			} else {
 				blockentity = this.oakCrateBlockEntity;
 			}
