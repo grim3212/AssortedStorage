@@ -10,7 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 
 public class StorageUtil {
@@ -71,7 +71,7 @@ public class StorageUtil {
 							return true;
 						}
 					} else if (itemstack.getItem() == StorageItems.KEY_RING.get()) {
-						IItemHandler itemHandler = itemstack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
+						IItemHandler itemHandler = itemstack.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
 
 						if (itemHandler instanceof KeyRingItemHandler) {
 							KeyRingItemHandler handler = (KeyRingItemHandler) itemHandler;

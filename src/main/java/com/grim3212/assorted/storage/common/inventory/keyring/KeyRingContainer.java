@@ -12,7 +12,7 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 
 public class KeyRingContainer extends AbstractContainerMenu {
@@ -38,7 +38,7 @@ public class KeyRingContainer extends AbstractContainerMenu {
 			return;
 		}
 
-		IItemHandler itemHandler = stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
+		IItemHandler itemHandler = stack.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
 
 		if (itemHandler instanceof KeyRingItemHandler) {
 			handler = (KeyRingItemHandler) itemHandler;
