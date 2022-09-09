@@ -1,7 +1,12 @@
 package com.grim3212.assorted.storage.common.data;
 
+import java.util.Map.Entry;
+
 import com.grim3212.assorted.storage.AssortedStorage;
+import com.grim3212.assorted.storage.common.block.LockedChest;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
+import com.grim3212.assorted.storage.common.util.StorageMaterial;
+import com.grim3212.assorted.storage.common.util.StorageTags;
 
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.tags.BlockTagsProvider;
@@ -9,6 +14,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.RegistryObject;
 
 public class StorageBlockTagProvider extends BlockTagsProvider {
 
@@ -35,6 +41,33 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 		piglinBuilder.add(StorageBlocks.LOCKER.get());
 		piglinBuilder.add(StorageBlocks.ITEM_TOWER.get());
 		piglinBuilder.add(StorageBlocks.LOCKED_ENDER_CHEST.get());
+
+		for (Entry<StorageMaterial, RegistryObject<LockedChest>> chest : StorageBlocks.CHESTS.entrySet()) {
+			Block block = chest.getValue().get();
+			piglinBuilder.add(block);
+			this.tag(BlockTags.MINEABLE_WITH_PICKAXE).add(block);
+
+			switch (chest.getKey().getStorageLevel()) {
+				case 1:
+					this.tag(StorageTags.Blocks.CHESTS_LEVEL_1).add(block);
+					break;
+				case 2:
+					this.tag(StorageTags.Blocks.CHESTS_LEVEL_2).add(block);
+					break;
+				case 3:
+					this.tag(StorageTags.Blocks.CHESTS_LEVEL_3).add(block);
+					break;
+				case 4:
+					this.tag(StorageTags.Blocks.CHESTS_LEVEL_4).add(block);
+					break;
+				default:
+					this.tag(StorageTags.Blocks.CHESTS_LEVEL_0).add(block);
+					break;
+			}
+		}
+
+		this.tag(StorageTags.Blocks.CHESTS_LEVEL_0).addTag(Tags.Blocks.CHESTS_WOODEN);
+		this.tag(Tags.Blocks.CHESTS).addTags(StorageTags.Blocks.CHESTS_LEVEL_0, StorageTags.Blocks.CHESTS_LEVEL_1, StorageTags.Blocks.CHESTS_LEVEL_2, StorageTags.Blocks.CHESTS_LEVEL_3, StorageTags.Blocks.CHESTS_LEVEL_4);
 
 		TagAppender<Block> doorBuilder = this.tag(BlockTags.DOORS);
 		for (Block b : StorageBlocks.lockedDoors()) {

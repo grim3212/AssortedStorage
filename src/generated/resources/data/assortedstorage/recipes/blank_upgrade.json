@@ -1,0 +1,32 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "upgrades"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "key": {
+          "P": {
+            "tag": "minecraft:planks"
+          },
+          "W": {
+            "tag": "forge:paper"
+          }
+        },
+        "pattern": [
+          "PPP",
+          "PWP",
+          "PPP"
+        ],
+        "result": {
+          "item": "assortedstorage:blank_upgrade"
+        }
+      }
+    }
+  ]
+}

@@ -1,7 +1,12 @@
 package com.grim3212.assorted.storage.common.inventory;
 
+import java.util.Map;
+import java.util.stream.Stream;
+
+import com.google.common.collect.Maps;
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.inventory.keyring.KeyRingContainer;
+import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
@@ -23,4 +28,10 @@ public class StorageContainerTypes {
 	public static final RegistryObject<MenuType<LocksmithWorkbenchContainer>> LOCKSMITH_WORKBENCH = CONTAINERS.register("locksmith_workbench", () -> new MenuType<>(LocksmithWorkbenchContainer::createContainer));
 	public static final RegistryObject<MenuType<KeyRingContainer>> KEY_RING = CONTAINERS.register("key_ring", () -> IForgeMenuType.create(KeyRingContainer::new));
 	public static final RegistryObject<MenuType<StorageContainer>> LOCKED_ENDER_CHEST = CONTAINERS.register("locked_ender_chest", () -> new MenuType<>(StorageContainer::createEnderChestContainer));
+
+	public static final Map<StorageMaterial, RegistryObject<MenuType<LockedChestContainer>>> CHESTS = Maps.newHashMap();
+
+	static {
+		Stream.of(StorageMaterial.values()).forEach((type) -> CHESTS.put(type, CONTAINERS.register(type.toString() + "_locked_chest", () -> IForgeMenuType.create((syncId, inv, c) -> new LockedChestContainer(syncId, inv, type)))));
+	}
 }

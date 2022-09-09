@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.grim3212.assorted.storage.common.block.GoldSafeBlock;
+import com.grim3212.assorted.storage.common.block.LockedChest;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 
@@ -36,6 +37,7 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePrope
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class StorageLootProvider implements DataProvider {
 
@@ -60,6 +62,10 @@ public class StorageLootProvider implements DataProvider {
 		blocks.add(StorageBlocks.WARPED_WAREHOUSE_CRATE.get());
 		blocks.add(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get());
 		blocks.add(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get());
+
+		for (RegistryObject<LockedChest> b : StorageBlocks.CHESTS.values()) {
+			blocks.add(b.get());
+		}
 	}
 
 	@Override

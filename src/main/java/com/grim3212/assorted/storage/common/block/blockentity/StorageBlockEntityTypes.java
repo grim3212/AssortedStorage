@@ -1,6 +1,7 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Sets;
 import com.grim3212.assorted.storage.AssortedStorage;
@@ -28,7 +29,13 @@ public class StorageBlockEntityTypes {
 
 	public static final RegistryObject<BlockEntityType<LockedEnderChestBlockEntity>> LOCKED_ENDER_CHEST = BLOCK_ENTITIES.register("locked_ender_chest", () -> new BlockEntityType<>(LockedEnderChestBlockEntity::new, Sets.newHashSet(StorageBlocks.LOCKED_ENDER_CHEST.get()), null));
 
+	public static final RegistryObject<BlockEntityType<LockedChestBlockEntity>> LOCKED_CHEST = BLOCK_ENTITIES.register("locked_chest", () -> new BlockEntityType<>(LockedChestBlockEntity::new, getChests(), null));
+
 	private static Set<Block> getWarehouseCrates() {
 		return Sets.newHashSet(StorageBlocks.OAK_WAREHOUSE_CRATE.get(), StorageBlocks.BIRCH_WAREHOUSE_CRATE.get(), StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get(), StorageBlocks.ACACIA_WAREHOUSE_CRATE.get(), StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get(), StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get(), StorageBlocks.WARPED_WAREHOUSE_CRATE.get(), StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get(), StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get());
+	}
+
+	private static Set<Block> getChests() {
+		return StorageBlocks.CHESTS.values().stream().map((b) -> b.get()).collect(Collectors.toSet());
 	}
 }

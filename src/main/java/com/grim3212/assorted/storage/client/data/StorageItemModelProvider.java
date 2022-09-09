@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.grim3212.assorted.storage.AssortedStorage;
+import com.grim3212.assorted.storage.common.block.LockedChest;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.StorageItems;
+import com.grim3212.assorted.storage.common.item.LevelUpgradeItem;
 
 import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.data.DataGenerator;
@@ -16,6 +18,7 @@ import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class StorageItemModelProvider extends ItemModelProvider {
 
@@ -42,6 +45,10 @@ public class StorageItemModelProvider extends ItemModelProvider {
 		items.add(StorageBlocks.WARPED_WAREHOUSE_CRATE.get().asItem());
 		items.add(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get().asItem());
 		items.add(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get().asItem());
+
+		for (RegistryObject<LockedChest> b : StorageBlocks.CHESTS.values()) {
+			items.add(b.get().asItem());
+		}
 	}
 
 	@Override
@@ -56,6 +63,11 @@ public class StorageItemModelProvider extends ItemModelProvider {
 		generatedItem(StorageItems.LOCKSMITH_KEY.get());
 		generatedItem(StorageItems.LOCKSMITH_LOCK.get());
 		generatedItem(StorageItems.KEY_RING.get());
+
+		generatedItem(StorageItems.BLANK_UPGRADE.get());
+		for (RegistryObject<LevelUpgradeItem> levelUpgrade : StorageItems.LEVEL_UPGRADES.values()) {
+			generatedItem(levelUpgrade.get());
+		}
 	}
 
 	private ItemModelBuilder generatedItem(String name) {

@@ -1,15 +1,20 @@
 package com.grim3212.assorted.storage.common.block;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.grim3212.assorted.storage.AssortedStorage;
+import com.grim3212.assorted.storage.common.item.ChestBlockItem;
 import com.grim3212.assorted.storage.common.item.LockerItem;
 import com.grim3212.assorted.storage.common.item.StorageBlockItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.item.WarehouseCrateBlockItem;
+import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -66,9 +71,15 @@ public class StorageBlocks {
 	public static final RegistryObject<LockedDoorBlock> LOCKED_STEEL_DOOR = registerNoItem("locked_steel_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:steel_door"), Block.Properties.of(Material.METAL).strength(1.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
 	public static final RegistryObject<LockedDoorBlock> LOCKED_CHAIN_LINK_DOOR = registerNoItem("locked_chain_link_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:chain_link_door"), Block.Properties.of(Material.DECORATION).strength(0.5F, 5.0F).sound(SoundType.METAL).noOcclusion()));
 
+	public static final Map<StorageMaterial, RegistryObject<LockedChest>> CHESTS = Maps.newHashMap();
+
+	static {
+		Stream.of(StorageMaterial.values()).forEach((type) -> CHESTS.put(type, registerChest("chest_" + type.toString(), () -> new LockedChest(type))));
+	}
+
 	public static Set<Block> lockedDoors() {
-		return Sets.newHashSet(StorageBlocks.LOCKED_OAK_DOOR.get(), StorageBlocks.LOCKED_SPRUCE_DOOR.get(), StorageBlocks.LOCKED_BIRCH_DOOR.get(), StorageBlocks.LOCKED_JUNGLE_DOOR.get(), StorageBlocks.LOCKED_ACACIA_DOOR.get(), StorageBlocks.LOCKED_DARK_OAK_DOOR.get(), StorageBlocks.LOCKED_CRIMSON_DOOR.get(), StorageBlocks.LOCKED_WARPED_DOOR.get(), StorageBlocks.LOCKED_MANGROVE_DOOR.get(), StorageBlocks.LOCKED_IRON_DOOR.get(), StorageBlocks.LOCKED_QUARTZ_DOOR.get(), StorageBlocks.LOCKED_GLASS_DOOR.get(),
-				StorageBlocks.LOCKED_STEEL_DOOR.get(), StorageBlocks.LOCKED_CHAIN_LINK_DOOR.get());
+		return Sets.newHashSet(StorageBlocks.LOCKED_OAK_DOOR.get(), StorageBlocks.LOCKED_SPRUCE_DOOR.get(), StorageBlocks.LOCKED_BIRCH_DOOR.get(), StorageBlocks.LOCKED_JUNGLE_DOOR.get(), StorageBlocks.LOCKED_ACACIA_DOOR.get(), StorageBlocks.LOCKED_DARK_OAK_DOOR.get(), StorageBlocks.LOCKED_CRIMSON_DOOR.get(), StorageBlocks.LOCKED_WARPED_DOOR.get(), StorageBlocks.LOCKED_MANGROVE_DOOR.get(), StorageBlocks.LOCKED_IRON_DOOR.get(), StorageBlocks.LOCKED_QUARTZ_DOOR.get(),
+				StorageBlocks.LOCKED_GLASS_DOOR.get(), StorageBlocks.LOCKED_STEEL_DOOR.get(), StorageBlocks.LOCKED_CHAIN_LINK_DOOR.get());
 	}
 
 	private static <T extends Block> RegistryObject<T> register(String name, Supplier<? extends T> sup) {
@@ -81,6 +92,10 @@ public class StorageBlocks {
 
 	private static <T extends Block> RegistryObject<T> registerStorageItem(String name, Supplier<? extends T> sup) {
 		return register(name, sup, block -> storageItem(block));
+	}
+
+	private static <T extends LockedChest> RegistryObject<T> registerChest(String name, Supplier<? extends T> sup) {
+		return register(name, sup, block -> chestItem(block));
 	}
 
 	private static <T extends Block> RegistryObject<T> registerWithItem(String name, Supplier<? extends T> sup, Supplier<BlockItem> blockItem) {
@@ -107,6 +122,10 @@ public class StorageBlocks {
 
 	private static Supplier<WarehouseCrateBlockItem> crateItem(final RegistryObject<? extends Block> block) {
 		return () -> new WarehouseCrateBlockItem(block.get(), new Item.Properties().tab(AssortedStorage.ASSORTED_STORAGE_ITEM_GROUP));
+	}
+
+	private static Supplier<ChestBlockItem> chestItem(final RegistryObject<? extends Block> block) {
+		return () -> new ChestBlockItem(block.get(), new Item.Properties().tab(AssortedStorage.ASSORTED_STORAGE_ITEM_GROUP));
 	}
 
 	private static Supplier<BlockItem> lockerItem() {

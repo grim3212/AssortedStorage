@@ -1,0 +1,32 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "upgrades"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "key": {
+          "B": {
+            "item": "assortedstorage:blank_upgrade"
+          },
+          "M": {
+            "tag": "forge:ingots/netherite"
+          }
+        },
+        "pattern": [
+          "MMM",
+          "MBM",
+          "MMM"
+        ],
+        "result": {
+          "item": "assortedstorage:level_upgrade_netherite"
+        }
+      }
+    }
+  ]
+}

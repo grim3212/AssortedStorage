@@ -1,0 +1,9 @@
+{
+  "values": [
+    "#forge:storage/level_0_upgrades",
+    "#forge:storage/level_1_upgrades",
+    "#forge:storage/level_2_upgrades",
+    "#forge:storage/level_3_upgrades",
+    "#forge:storage/level_4_upgrades"
+  ]
+}

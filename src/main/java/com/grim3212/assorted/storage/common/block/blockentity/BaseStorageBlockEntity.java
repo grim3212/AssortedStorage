@@ -56,7 +56,25 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 		super(typeIn, pos, state);
 
 		if (this.selfInventory())
-			this.chestContents = NonNullList.<ItemStack>withSize(inventorySize, ItemStack.EMPTY);
+			setStartingContents(inventorySize);
+	}
+
+	public void setStartingContents(int inventorySize) {
+		this.chestContents = NonNullList.<ItemStack>withSize(inventorySize, ItemStack.EMPTY);
+	}
+
+	public void setItems(NonNullList<ItemStack> itemsIn) {
+		if (itemsIn.size() == this.chestContents.size()) {
+			this.chestContents = itemsIn;
+		}
+
+		this.chestContents = NonNullList.<ItemStack>withSize(this.chestContents.size(), ItemStack.EMPTY);
+
+		for (int i = 0; i < itemsIn.size(); i++) {
+			this.chestContents.set(i, itemsIn.get(i));
+		}
+
+		this.setChanged();
 	}
 
 	@Override
@@ -190,7 +208,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 		return Mth.lerp(partialTicks, this.prevRotation, this.rotation);
 	}
 
-	public static int getNumberOfPlayersUsing(Level worldIn, BaseStorageBlockEntity lockableTileEntity, int ticksSinceSync, int x, int y, int z, int numPlayersUsing) {
+	public int getNumberOfPlayersUsing(Level worldIn, BaseStorageBlockEntity lockableTileEntity, int ticksSinceSync, int x, int y, int z, int numPlayersUsing) {
 		if (!worldIn.isClientSide && numPlayersUsing != 0 && (ticksSinceSync + x + y + z) % 200 == 0) {
 			numPlayersUsing = getNumberOfPlayersUsing(worldIn, lockableTileEntity, x, y, z);
 		}
@@ -198,7 +216,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 		return numPlayersUsing;
 	}
 
-	public static int getNumberOfPlayersUsing(Level world, BaseStorageBlockEntity lockableTileEntity, int x, int y, int z) {
+	public int getNumberOfPlayersUsing(Level world, BaseStorageBlockEntity lockableTileEntity, int x, int y, int z) {
 		int i = 0;
 
 		for (Player playerentity : world.getEntitiesOfClass(Player.class, new AABB((double) ((float) x - 5.0F), (double) ((float) y - 5.0F), (double) ((float) z - 5.0F), (double) ((float) (x + 1) + 5.0F), (double) ((float) (y + 1) + 5.0F), (double) ((float) (z + 1) + 5.0F)))) {
@@ -208,6 +226,14 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 		}
 
 		return i;
+	}
+
+	public int getNumberOfPlayersUsing(Level world, BaseStorageBlockEntity lockableTileEntity) {
+		if (lockableTileEntity != null) {
+			return this.getNumberOfPlayersUsing(world, lockableTileEntity, lockableTileEntity.worldPosition.getX(), lockableTileEntity.worldPosition.getY(), lockableTileEntity.worldPosition.getZ());
+		}
+
+		return 0;
 	}
 
 	private void playSound(SoundEvent soundIn) {

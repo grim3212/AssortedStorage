@@ -1,5 +1,7 @@
 {
   "values": [
-    "assortedstorage:gold_safe"
+    "assortedstorage:gold_safe",
+    "assortedstorage:chest_gold",
+    "assortedstorage:level_upgrade_gold"
   ]
 }

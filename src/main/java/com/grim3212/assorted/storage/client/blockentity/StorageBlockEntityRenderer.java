@@ -51,12 +51,16 @@ public class StorageBlockEntityRenderer<T extends BlockEntity & IStorage> implem
 			VertexConsumer ivertexbuilder = bufferIn.getBuffer(this.model.renderType(this.textureLocation));
 
 			this.model.doorAngle = angle;
-			this.model.renderHandle = !tileEntity.isLocked();
+			this.model.renderHandle = !alwaysLocked() ? !tileEntity.isLocked() : false;
 
 			this.model.handleRotations();
 			this.model.renderToBuffer(matrixStackIn, ivertexbuilder, combinedLightIn, combinedOverlayIn, 1, 1, 1, 1);
 
 			matrixStackIn.popPose();
 		}
+	}
+	
+	protected boolean alwaysLocked () {
+		return false;
 	}
 }

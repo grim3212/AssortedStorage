@@ -1,0 +1,32 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "chests"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "key": {
+          "C": {
+            "tag": "assortedstorage:chests/level_2"
+          },
+          "M": {
+            "tag": "forge:ingots/steel"
+          }
+        },
+        "pattern": [
+          "MMM",
+          "MCM",
+          "MMM"
+        ],
+        "result": {
+          "item": "assortedstorage:chest_steel"
+        }
+      }
+    }
+  ]
+}
