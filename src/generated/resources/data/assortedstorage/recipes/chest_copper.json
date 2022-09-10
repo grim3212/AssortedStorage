@@ -9,7 +9,7 @@
         }
       ],
       "recipe": {
-        "type": "minecraft:crafting_shaped",
+        "type": "assortedstorage:locked_upgrading",
         "key": {
           "C": {
             "tag": "assortedstorage:chests/level_0"

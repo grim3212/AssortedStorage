@@ -1,8 +1,8 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
 import com.grim3212.assorted.storage.AssortedStorage;
-import com.grim3212.assorted.storage.common.block.LockedChest;
-import com.grim3212.assorted.storage.common.inventory.LockedChestContainer;
+import com.grim3212.assorted.storage.common.block.LockedChestBlock;
+import com.grim3212.assorted.storage.common.inventory.LockedMaterialContainer;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
@@ -22,23 +22,27 @@ public class LockedChestBlockEntity extends BaseStorageBlockEntity {
 	public LockedChestBlockEntity(BlockPos pos, BlockState state) {
 		super(StorageBlockEntityTypes.LOCKED_CHEST.get(), pos, state);
 
-		if (state.getBlock()instanceof LockedChest lockedChest) {
+		if (state.getBlock()instanceof LockedChestBlock lockedChest) {
 			this.storageMaterial = lockedChest.getStorageMaterial();
+			setStartingContents(this.storageMaterial != null ? this.storageMaterial.totalItems() : 27);
 		} else {
-			// Default to worst
-			this.storageMaterial = StorageMaterial.STONE;
+			// Default to regular chest
+			this.storageMaterial = null;
+			this.setStartingContents(27);
 		}
-
-		setStartingContents(this.storageMaterial.totalItems());
 	}
 
 	@Override
 	public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
-		return new LockedChestContainer(StorageContainerTypes.CHESTS.get(storageMaterial).get(), windowId, player, this, storageMaterial);
+		return new LockedMaterialContainer(StorageContainerTypes.CHESTS.get(storageMaterial).get(), windowId, player, this, storageMaterial, false);
 	}
 
 	@Override
 	protected Component getDefaultName() {
+		if (this.storageMaterial == null) {
+			return Component.translatable(AssortedStorage.MODID + ".container.locked_chest");
+		}
+
 		return Component.translatable(AssortedStorage.MODID + ".container.chest_" + this.storageMaterial.toString());
 	}
 
@@ -47,7 +51,7 @@ public class LockedChestBlockEntity extends BaseStorageBlockEntity {
 		int i = 0;
 
 		for (Player playerentity : world.getEntitiesOfClass(Player.class, new AABB((double) ((float) x - 5.0F), (double) ((float) y - 5.0F), (double) ((float) z - 5.0F), (double) ((float) (x + 1) + 5.0F), (double) ((float) (y + 1) + 5.0F), (double) ((float) (z + 1) + 5.0F)))) {
-			if (playerentity.containerMenu instanceof LockedChestContainer) {
+			if (playerentity.containerMenu instanceof LockedMaterialContainer) {
 				++i;
 			}
 		}

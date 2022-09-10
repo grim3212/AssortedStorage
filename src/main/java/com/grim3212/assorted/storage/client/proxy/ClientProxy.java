@@ -5,6 +5,7 @@ import com.grim3212.assorted.storage.client.blockentity.GoldSafeBlockEntityRende
 import com.grim3212.assorted.storage.client.blockentity.ItemTowerBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.LockedChestBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.LockedEnderChestBlockEntityRenderer;
+import com.grim3212.assorted.storage.client.blockentity.LockedShulkerBoxBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.LockerBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.ObsidianSafeBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.WarehouseCrateBlockEntityRenderer;
@@ -15,6 +16,7 @@ import com.grim3212.assorted.storage.client.model.DualLockerModel;
 import com.grim3212.assorted.storage.client.model.ItemTowerModel;
 import com.grim3212.assorted.storage.client.model.LockerModel;
 import com.grim3212.assorted.storage.client.model.SafeModel;
+import com.grim3212.assorted.storage.client.model.ShulkerBoxModel;
 import com.grim3212.assorted.storage.client.model.StorageModelLayers;
 import com.grim3212.assorted.storage.client.model.WarehouseCrateModel;
 import com.grim3212.assorted.storage.client.screen.DualLockerScreen;
@@ -22,8 +24,8 @@ import com.grim3212.assorted.storage.client.screen.GenericStorageScreen;
 import com.grim3212.assorted.storage.client.screen.GoldSafeScreen;
 import com.grim3212.assorted.storage.client.screen.ItemTowerScreen;
 import com.grim3212.assorted.storage.client.screen.KeyRingScreen;
-import com.grim3212.assorted.storage.client.screen.LockedChestScreen;
 import com.grim3212.assorted.storage.client.screen.LockedEnderChestScreen;
+import com.grim3212.assorted.storage.client.screen.LockedMaterialScreen;
 import com.grim3212.assorted.storage.client.screen.LockerScreen;
 import com.grim3212.assorted.storage.client.screen.LocksmithWorkbenchScreen;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
@@ -61,6 +63,7 @@ public class ClientProxy implements IProxy {
 		event.registerLayerDefinition(StorageModelLayers.WAREHOUSE_CRATE, WarehouseCrateModel::createBaseMeshDefinition);
 		event.registerLayerDefinition(StorageModelLayers.ITEM_TOWER, ItemTowerModel::createBaseMeshDefinition);
 		event.registerLayerDefinition(StorageModelLayers.LOCKED_CHEST, ChestModel::createBaseMeshDefinition);
+		event.registerLayerDefinition(StorageModelLayers.LOCKED_SHULKER_BOX, ShulkerBoxModel::createBaseMeshDefinition);
 	}
 
 	public void setupClient(final FMLClientSetupEvent event) {
@@ -77,7 +80,11 @@ public class ClientProxy implements IProxy {
 		MenuScreens.register(StorageContainerTypes.LOCKED_ENDER_CHEST.get(), LockedEnderChestScreen::new);
 
 		StorageContainerTypes.CHESTS.forEach((material, menu) -> {
-			MenuScreens.register(menu.get(), LockedChestScreen::new);
+			MenuScreens.register(menu.get(), LockedMaterialScreen::new);
+		});
+
+		StorageContainerTypes.SHULKERS.forEach((material, menu) -> {
+			MenuScreens.register(menu.get(), LockedMaterialScreen::new);
 		});
 
 		BlockEntityRenderers.register(StorageBlockEntityTypes.WOOD_CABINET.get(), WoodCabinetBlockEntityRenderer::new);
@@ -89,6 +96,7 @@ public class ClientProxy implements IProxy {
 		BlockEntityRenderers.register(StorageBlockEntityTypes.ITEM_TOWER.get(), ItemTowerBlockEntityRenderer::new);
 		BlockEntityRenderers.register(StorageBlockEntityTypes.LOCKED_ENDER_CHEST.get(), LockedEnderChestBlockEntityRenderer::new);
 		BlockEntityRenderers.register(StorageBlockEntityTypes.LOCKED_CHEST.get(), LockedChestBlockEntityRenderer::new);
+		BlockEntityRenderers.register(StorageBlockEntityTypes.LOCKED_SHULKER_BOX.get(), LockedShulkerBoxBlockEntityRenderer::new);
 
 		for (Block b : StorageBlocks.lockedDoors()) {
 			ItemBlockRenderTypes.setRenderLayer(b, RenderType.cutout());

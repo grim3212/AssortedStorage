@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.grim3212.assorted.storage.AssortedStorage;
-import com.grim3212.assorted.storage.common.block.LockedChest;
+import com.grim3212.assorted.storage.common.block.LockedChestBlock;
+import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
-import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.item.LevelUpgradeItem;
+import com.grim3212.assorted.storage.common.item.StorageItems;
 
 import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.data.DataGenerator;
@@ -45,8 +46,14 @@ public class StorageItemModelProvider extends ItemModelProvider {
 		items.add(StorageBlocks.WARPED_WAREHOUSE_CRATE.get().asItem());
 		items.add(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get().asItem());
 		items.add(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get().asItem());
+		items.add(StorageBlocks.LOCKED_CHEST.get().asItem());
+		items.add(StorageBlocks.LOCKED_SHULKER_BOX.get().asItem());
 
-		for (RegistryObject<LockedChest> b : StorageBlocks.CHESTS.values()) {
+		for (RegistryObject<LockedChestBlock> b : StorageBlocks.CHESTS.values()) {
+			items.add(b.get().asItem());
+		}
+
+		for (RegistryObject<LockedShulkerBoxBlock> b : StorageBlocks.SHULKERS.values()) {
 			items.add(b.get().asItem());
 		}
 	}

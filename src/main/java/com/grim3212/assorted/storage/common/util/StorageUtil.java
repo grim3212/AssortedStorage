@@ -1,6 +1,6 @@
 package com.grim3212.assorted.storage.common.util;
 
-import com.grim3212.assorted.storage.common.block.blockentity.ILockeable;
+import com.grim3212.assorted.storage.common.block.blockentity.ILockable;
 import com.grim3212.assorted.storage.common.inventory.keyring.KeyRingItemHandler;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 
@@ -33,9 +33,23 @@ public class StorageUtil {
 		return output;
 	}
 
+	public static void writeCodeToStack(String code, ItemStack stack) {
+		writeCodeToStack(new StorageLockCode(code), stack);
+	}
+
+	public static void writeCodeToStack(StorageLockCode code, ItemStack stack) {
+		if (stack.hasTag()) {
+			code.write(stack.getTag());
+		} else {
+			CompoundTag tag = new CompoundTag();
+			code.write(tag);
+			stack.setTag(tag);
+		}
+	}
+
 	public static String getCode(BlockEntity te) {
-		if (te instanceof ILockeable) {
-			return ((ILockeable) te).getLockCode();
+		if (te instanceof ILockable) {
+			return ((ILockable) te).getLockCode();
 		}
 		return "";
 	}
@@ -59,7 +73,7 @@ public class StorageUtil {
 	}
 
 	public static boolean canAccess(BlockGetter worldIn, BlockPos pos, Player entityplayer) {
-		ILockeable lockeable = (ILockeable) worldIn.getBlockEntity(pos);
+		ILockable lockeable = (ILockable) worldIn.getBlockEntity(pos);
 
 		if (lockeable.isLocked()) {
 			for (int slot = 0; slot < entityplayer.getInventory().getContainerSize(); slot++) {

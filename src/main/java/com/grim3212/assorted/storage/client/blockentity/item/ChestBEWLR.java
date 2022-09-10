@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
 import com.grim3212.assorted.storage.common.block.blockentity.LockedChestBlockEntity;
+import com.grim3212.assorted.storage.common.util.StorageUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.model.geom.EntityModelSet;
@@ -30,7 +31,12 @@ public class ChestBEWLR extends BlockEntityWithoutLevelRenderer {
 
 	@Override
 	public void renderByItem(@Nonnull ItemStack stack, @Nonnull TransformType transformType, @Nonnull PoseStack matrix, @Nonnull MultiBufferSource renderer, int light, int overlayLight) {
-		if (this.blockEntity != null)
+		if (this.blockEntity != null) {
+			if (StorageUtil.hasCode(stack)) {
+				this.blockEntity.setLockCode(StorageUtil.getCode(stack));
+			}
+
 			this.blockEntityRenderDispatcher.get().renderItem(this.blockEntity, matrix, renderer, light, overlayLight);
+		}
 	}
 }

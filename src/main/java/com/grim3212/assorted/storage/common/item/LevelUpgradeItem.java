@@ -4,11 +4,12 @@ import java.util.List;
 
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
-import com.grim3212.assorted.storage.common.block.IStorageMaterial;
-import com.grim3212.assorted.storage.common.block.IStorageMaterial.StorageType;
+import com.grim3212.assorted.storage.common.block.LockedChestBlock;
+import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedChestBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.LockedShulkerBoxBlockEntity;
 import com.grim3212.assorted.storage.common.handler.StorageConfig;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 import com.grim3212.assorted.storage.common.util.StorageTags;
@@ -32,8 +33,10 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -108,11 +111,12 @@ public class LevelUpgradeItem extends Item {
 		BlockState newState = null;
 		BlockEntity newBlockEntity = null;
 
-		if (world.getBlockState(pos).getBlock()instanceof IStorageMaterial materialBlock) {
-			if (materialBlock.getStorageMaterial().getStorageLevel() == this.storageMaterial.getStorageLevel() - 1) {
+		if (world.getBlockState(pos).getBlock()instanceof LockedChestBlock chestBlock) {
+			int currentStorageLevel = chestBlock.getStorageMaterial() != null ? chestBlock.getStorageMaterial().getStorageLevel() : 0;
 
+			if (currentStorageLevel == this.storageMaterial.getStorageLevel() - 1) {
 				BlockEntity blockEntity = world.getBlockEntity(pos);
-				if (blockEntity != null && blockEntity instanceof BaseStorageBlockEntity storageBE) {
+				if (blockEntity != null && blockEntity instanceof LockedChestBlockEntity storageBE) {
 					if (storageBE.getNumberOfPlayersUsing(world, storageBE) > 0) {
 						return InteractionResult.PASS;
 					}
@@ -125,10 +129,33 @@ public class LevelUpgradeItem extends Item {
 					currentCustomName = storageBE.getCustomName();
 					currentItems = storageBE.getItems();
 
-					if (materialBlock.getStorageType() == StorageType.CHEST) {
-						newState = StorageBlocks.CHESTS.get(storageMaterial).get().defaultBlockState().setValue(BaseStorageBlock.FACING, world.getBlockState(pos).getValue(BaseStorageBlock.FACING));
-						newBlockEntity = new LockedChestBlockEntity(pos, newState);
+					newState = StorageBlocks.CHESTS.get(storageMaterial).get().defaultBlockState().setValue(BaseStorageBlock.FACING, world.getBlockState(pos).getValue(BaseStorageBlock.FACING));
+					newBlockEntity = new LockedChestBlockEntity(pos, newState);
+				}
+			}
+		} else if (world.getBlockState(pos).getBlock()instanceof LockedShulkerBoxBlock chestBlock) {
+			int currentStorageLevel = chestBlock.getStorageMaterial() != null ? chestBlock.getStorageMaterial().getStorageLevel() : -1;
+
+			if (currentStorageLevel == this.storageMaterial.getStorageLevel() - 1) {
+				BlockEntity blockEntity = world.getBlockEntity(pos);
+				if (blockEntity != null && blockEntity instanceof LockedShulkerBoxBlockEntity storageBE) {
+					if (!storageBE.isClosed()) {
+						return InteractionResult.PASS;
 					}
+
+					if (storageBE.isLocked() && !StorageUtil.canAccess(world, pos, player)) {
+						return InteractionResult.PASS;
+					}
+
+					currentLockCode = storageBE.getLockCode();
+					currentCustomName = storageBE.getCustomName();
+					currentItems = storageBE.getItems();
+
+					newState = StorageBlocks.SHULKERS.get(storageMaterial).get().defaultBlockState().setValue(ShulkerBoxBlock.FACING, world.getBlockState(pos).getValue(ShulkerBoxBlock.FACING));
+
+					LockedShulkerBoxBlockEntity newShulkerEntity = new LockedShulkerBoxBlockEntity(pos, newState);
+					newShulkerEntity.setColor(storageBE.getColor());
+					newBlockEntity = newShulkerEntity;
 				}
 			}
 		} else if (world.getBlockState(pos).getBlock()instanceof ChestBlock chestToUpgrade) {
@@ -155,6 +182,32 @@ public class LevelUpgradeItem extends Item {
 					newBlockEntity = new LockedChestBlockEntity(pos, newState);
 				}
 			}
+		} else if (world.getBlockState(pos).getBlock()instanceof ShulkerBoxBlock shulkerToUpgrade) {
+			if (this.storageMaterial.getStorageLevel() == 0 || this.storageMaterial.getStorageLevel() == 1) {
+				BlockEntity blockEntity = world.getBlockEntity(pos);
+				if (blockEntity != null && blockEntity instanceof ShulkerBoxBlockEntity shulkerBE) {
+					if (!shulkerBE.isClosed()) {
+						return InteractionResult.PASS;
+					}
+
+					if (!shulkerBE.canOpen(player)) {
+						return InteractionResult.PASS;
+					}
+
+					currentCustomName = shulkerBE.getCustomName();
+
+					currentItems = NonNullList.withSize(shulkerBE.getContainerSize(), ItemStack.EMPTY);
+
+					for (int slot = 0; slot < shulkerBE.getContainerSize(); slot++) {
+						currentItems.set(slot, shulkerBE.getItem(slot));
+					}
+
+					newState = StorageBlocks.SHULKERS.get(storageMaterial).get().defaultBlockState().setValue(ShulkerBoxBlock.FACING, world.getBlockState(pos).getValue(ShulkerBoxBlock.FACING));
+					LockedShulkerBoxBlockEntity newShulkerEntity = new LockedShulkerBoxBlockEntity(pos, newState);
+					newShulkerEntity.setColor(ShulkerBoxBlock.getColorFromBlock(shulkerToUpgrade));
+					newBlockEntity = newShulkerEntity;
+				}
+			}
 		}
 
 		if (newState == null || newBlockEntity == null) {
@@ -171,17 +224,29 @@ public class LevelUpgradeItem extends Item {
 
 		BlockEntity freshlySetBE = world.getBlockEntity(pos);
 
-		if (freshlySetBE instanceof BaseStorageBlockEntity newStorageBE) {
+		if (freshlySetBE instanceof LockedChestBlockEntity chestBE) {
 			if (currentCustomName != null) {
-				newStorageBE.setCustomName(currentCustomName);
+				chestBE.setCustomName(currentCustomName);
 			}
 
-			newStorageBE.setItems(currentItems);
-			newStorageBE.setLockCode(currentLockCode);
+			chestBE.setItems(currentItems);
+			chestBE.setLockCode(currentLockCode);
 
 			if (!player.isCreative())
 				itemstack.shrink(1);
-			
+
+			world.playSound(player, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
+		} else if (freshlySetBE instanceof LockedShulkerBoxBlockEntity shulkerBE) {
+			if (currentCustomName != null) {
+				shulkerBE.setCustomName(currentCustomName);
+			}
+
+			shulkerBE.setItems(currentItems);
+			shulkerBE.setLockCode(currentLockCode);
+
+			if (!player.isCreative())
+				itemstack.shrink(1);
+
 			world.playSound(player, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
 		}
 		return InteractionResult.SUCCESS;

@@ -18,6 +18,13 @@ public class StorageTags {
 		public static final TagKey<Block> CHESTS_LEVEL_3 = storageTag("chests/level_3");
 		public static final TagKey<Block> CHESTS_LEVEL_4 = storageTag("chests/level_4");
 
+		public static final TagKey<Block> SHULKERS_NORMAL = storageTag("shulkers/normal");
+		public static final TagKey<Block> SHULKERS_LEVEL_0 = storageTag("shulkers/level_0");
+		public static final TagKey<Block> SHULKERS_LEVEL_1 = storageTag("shulkers/level_1");
+		public static final TagKey<Block> SHULKERS_LEVEL_2 = storageTag("shulkers/level_2");
+		public static final TagKey<Block> SHULKERS_LEVEL_3 = storageTag("shulkers/level_3");
+		public static final TagKey<Block> SHULKERS_LEVEL_4 = storageTag("shulkers/level_4");
+
 		public static TagKey<Block> forgeTag(String name) {
 			return BlockTags.create(new ResourceLocation("forge", name));
 		}
@@ -42,9 +49,9 @@ public class StorageTags {
 		public static final TagKey<Item> GEMS_SAPPHIRE = forgeTag("gems/sapphire");
 		public static final TagKey<Item> GEMS_TOPAZ = forgeTag("gems/topaz");
 		public static final TagKey<Item> GEMS_PERIDOT = forgeTag("gems/peridot");
-		
+
 		public static final TagKey<Item> PAPER = forgeTag("paper");
-		
+
 		public static final TagKey<Item> CAN_UPGRADE_LEVEL_0 = storageTag("can_upgrade/level_0");
 		public static final TagKey<Item> CAN_UPGRADE_LEVEL_1 = storageTag("can_upgrade/level_1");
 		public static final TagKey<Item> CAN_UPGRADE_LEVEL_2 = storageTag("can_upgrade/level_2");
@@ -56,6 +63,13 @@ public class StorageTags {
 		public static final TagKey<Item> CHESTS_LEVEL_2 = storageTag("chests/level_2");
 		public static final TagKey<Item> CHESTS_LEVEL_3 = storageTag("chests/level_3");
 		public static final TagKey<Item> CHESTS_LEVEL_4 = storageTag("chests/level_4");
+
+		public static final TagKey<Item> SHULKERS_NORMAL = storageTag("shulkers/normal");
+		public static final TagKey<Item> SHULKERS_LEVEL_0 = storageTag("shulkers/level_0");
+		public static final TagKey<Item> SHULKERS_LEVEL_1 = storageTag("shulkers/level_1");
+		public static final TagKey<Item> SHULKERS_LEVEL_2 = storageTag("shulkers/level_2");
+		public static final TagKey<Item> SHULKERS_LEVEL_3 = storageTag("shulkers/level_3");
+		public static final TagKey<Item> SHULKERS_LEVEL_4 = storageTag("shulkers/level_4");
 
 		public static final TagKey<Item> STORAGE_LEVEL_UPGRADES = forgeTag("storage/level_upgrades");
 		public static final TagKey<Item> STORAGE_LEVEL_0_UPGRADES = forgeTag("storage/level_0_upgrades");

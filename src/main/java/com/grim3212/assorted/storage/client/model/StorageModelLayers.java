@@ -15,4 +15,6 @@ public class StorageModelLayers {
 	public static final ModelLayerLocation ITEM_TOWER = new ModelLayerLocation(new ResourceLocation(AssortedStorage.MODID, "item_tower"), "main");
 	// Used by both locked chests and locked ender chests
 	public static final ModelLayerLocation LOCKED_CHEST = new ModelLayerLocation(new ResourceLocation(AssortedStorage.MODID, "locked_chest"), "main");
+	
+	public static final ModelLayerLocation LOCKED_SHULKER_BOX = new ModelLayerLocation(new ResourceLocation(AssortedStorage.MODID, "locked_shulker_box"), "main");
 }

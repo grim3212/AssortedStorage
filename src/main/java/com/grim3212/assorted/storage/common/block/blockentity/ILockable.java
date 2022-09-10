@@ -2,7 +2,7 @@ package com.grim3212.assorted.storage.common.block.blockentity;
 
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 
-public interface ILockeable {
+public interface ILockable {
 
 	public boolean isLocked();
 

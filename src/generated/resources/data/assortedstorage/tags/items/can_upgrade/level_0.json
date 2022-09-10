@@ -1,5 +1,6 @@
 {
   "values": [
-    "#forge:chests/wooden"
+    "#forge:chests/wooden",
+    "#assortedstorage:shulkers/normal"
   ]
 }

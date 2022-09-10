@@ -3,8 +3,9 @@ package com.grim3212.assorted.storage.common.block;
 import javax.annotation.Nullable;
 
 import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
-import com.grim3212.assorted.storage.common.block.blockentity.ILockeable;
+import com.grim3212.assorted.storage.common.block.blockentity.ILockable;
 import com.grim3212.assorted.storage.common.block.blockentity.INamed;
+import com.grim3212.assorted.storage.common.block.blockentity.LockedShulkerBoxBlockEntity;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 import com.grim3212.assorted.storage.common.util.StorageUtil;
@@ -120,8 +121,8 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
 	public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
 		BlockEntity te = worldIn.getBlockEntity(pos);
 
-		if (te instanceof ILockeable) {
-			ILockeable tileentity = (ILockeable) te;
+		if (te instanceof ILockable) {
+			ILockable tileentity = (ILockable) te;
 
 			if (tileentity.isLocked() && !StorageUtil.canAccess(worldIn, pos, player))
 				return -1.0F;
@@ -143,11 +144,11 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
 
 	@Override
 	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-		if (state.getBlock() != newState.getBlock()) {
+		if (!state.is(newState.getBlock())) {
 			BlockEntity tileentity = worldIn.getBlockEntity(pos);
 
-			if (tileentity instanceof ILockeable) {
-				ILockeable teStorage = (ILockeable) tileentity;
+			if (tileentity instanceof ILockable) {
+				ILockable teStorage = (ILockable) tileentity;
 
 				if (teStorage.isLocked()) {
 					ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
@@ -165,10 +166,6 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
 		}
 	}
 
-	protected boolean canBeLocked(Level worldIn, BlockPos pos) {
-		return !((ILockeable) worldIn.getBlockEntity(pos)).isLocked();
-	}
-
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		if (this.canBeLocked(worldIn, pos) && player.getItemInHand(handIn).getItem() == StorageItems.LOCKSMITH_LOCK.get()) {
@@ -178,8 +175,8 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
 
 		if (player.isShiftKeyDown() && StorageUtil.canAccess(worldIn, pos, player)) {
 			BlockEntity tileentity = worldIn.getBlockEntity(pos);
-			if (tileentity instanceof ILockeable) {
-				ILockeable teStorage = (ILockeable) tileentity;
+			if (tileentity instanceof ILockable) {
+				ILockable teStorage = (ILockable) tileentity;
 
 				if (teStorage.isLocked()) {
 					ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
@@ -266,16 +263,24 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
 		return false;
 	}
 
+	protected boolean canBeLocked(Level worldIn, BlockPos pos) {
+		return !((ILockable) worldIn.getBlockEntity(pos)).isLocked();
+	}
+
 	protected boolean removeLock(Level worldIn, BlockPos pos, Player entityplayer) {
-		ILockeable tileentity = (ILockeable) worldIn.getBlockEntity(pos);
+		return tryRemoveLock(worldIn, pos, entityplayer);
+	}
+
+	public static boolean tryRemoveLock(Level worldIn, BlockPos pos, Player entityplayer) {
+		ILockable tileentity = (ILockable) worldIn.getBlockEntity(pos);
 		tileentity.setLockCode("");
 		worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
 		return true;
 	}
 
-	private boolean tryPlaceLock(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
+	public static boolean tryPlaceLock(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
 		BlockEntity tileentity = worldIn.getBlockEntity(pos);
-		ILockeable lockeable = (ILockeable) tileentity;
+		ILockable lockeable = (ILockable) tileentity;
 		ItemStack itemstack = entityplayer.getItemInHand(hand);
 		String code = StorageUtil.getCode(itemstack);
 

@@ -8,34 +8,52 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.ShulkerBoxSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-public class LockedChestContainer extends AbstractContainerMenu {
+public class LockedMaterialContainer extends AbstractContainerMenu {
 
 	private final Container inventory;
 	private final StorageMaterial storageMaterial;
 
-	public LockedChestContainer(int windowId, Inventory inventory, StorageMaterial storageMaterial) {
-		this(StorageContainerTypes.CHESTS.get(storageMaterial).get(), windowId, inventory, new SimpleContainer(storageMaterial.totalItems()), storageMaterial);
+	public static LockedMaterialContainer createChestContainer(int windowId, Inventory playerInventory, StorageMaterial storageMaterial) {
+		return new LockedMaterialContainer(StorageContainerTypes.CHESTS.get(storageMaterial).get(), windowId, playerInventory, new SimpleContainer(storageMaterial == null ? 27 : storageMaterial.totalItems()), storageMaterial, false);
 	}
 
-	public LockedChestContainer(MenuType<LockedChestContainer> menuType, int windowId, Inventory playerInventory, Container inventory, StorageMaterial storageMaterial) {
+	public static LockedMaterialContainer createShulkerContainer(int windowId, Inventory playerInventory, StorageMaterial storageMaterial) {
+		return new LockedMaterialContainer(StorageContainerTypes.SHULKERS.get(storageMaterial).get(), windowId, playerInventory, new SimpleContainer(storageMaterial == null ? 27 : storageMaterial.totalItems()), storageMaterial, true);
+	}
+
+	public LockedMaterialContainer(MenuType<LockedMaterialContainer> menuType, int windowId, Inventory playerInventory, Container inventory, StorageMaterial storageMaterial, boolean useShulkerSlots) {
 		super(menuType, windowId);
 		this.inventory = inventory;
 		this.storageMaterial = storageMaterial;
 
+		int xRows = 3;
+		int yCols = 9;
+
+		if (this.storageMaterial != null) {
+			xRows = storageMaterial.getXRows();
+			yCols = storageMaterial.getYCols();
+		}
+
 		inventory.startOpen(playerInventory.player);
 
-		for (int chestRow = 0; chestRow < storageMaterial.getXRows(); chestRow++) {
-			for (int chestCol = 0; chestCol < storageMaterial.getYCols(); chestCol++) {
-				this.addSlot(new Slot(inventory, chestCol + chestRow * storageMaterial.getYCols(), 8 + chestCol * 18, 18 + chestRow * 18));
+		for (int chestRow = 0; chestRow < xRows; chestRow++) {
+			for (int chestCol = 0; chestCol < yCols; chestCol++) {
+				if (useShulkerSlots) {
+					this.addSlot(new ShulkerBoxSlot(inventory, chestCol + chestRow * yCols, 8 + chestCol * 18, 18 + chestRow * 18));
+				} else {
+					this.addSlot(new Slot(inventory, chestCol + chestRow * yCols, 8 + chestCol * 18, 18 + chestRow * 18));
+				}
+
 			}
 		}
 
-		int leftOffset = Math.max(storageMaterial.getYCols() - 9, 0) * 9;
+		int leftOffset = Math.max(yCols - 9, 0) * 9;
 		int leftCol = ((184 - 168) / 2) + leftOffset;
-		int heighOffset = 113 + storageMaterial.getXRows() * 18;
+		int heighOffset = 113 + xRows * 18;
 
 		for (int playerInvRow = 0; playerInvRow < 3; playerInvRow++) {
 			for (int playerInvCol = 0; playerInvCol < 9; playerInvCol++) {

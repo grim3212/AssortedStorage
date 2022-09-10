@@ -11,17 +11,21 @@ import com.google.common.collect.Sets;
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.item.ChestBlockItem;
 import com.grim3212.assorted.storage.common.item.LockerItem;
+import com.grim3212.assorted.storage.common.item.ShulkerBoxBlockItem;
 import com.grim3212.assorted.storage.common.item.StorageBlockItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.item.WarehouseCrateBlockItem;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
+import net.minecraft.core.dispenser.ShulkerBoxDispenseBehavior;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
@@ -55,6 +59,9 @@ public class StorageBlocks {
 		return 7;
 	})));
 
+	public static final RegistryObject<LockedChestBlock> LOCKED_CHEST = registerChest("locked_chest", () -> new LockedChestBlock(null, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
+	public static final RegistryObject<LockedShulkerBoxBlock> LOCKED_SHULKER_BOX = registerShulker("locked_shulker_box", () -> new LockedShulkerBoxBlock(null, BlockBehaviour.Properties.of(Material.SHULKER_SHELL)));
+
 	public static final RegistryObject<LockedDoorBlock> LOCKED_OAK_DOOR = registerNoItem("locked_oak_door", () -> new LockedDoorBlock(Blocks.OAK_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.WOOD).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
 	public static final RegistryObject<LockedDoorBlock> LOCKED_SPRUCE_DOOR = registerNoItem("locked_spruce_door", () -> new LockedDoorBlock(Blocks.SPRUCE_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.PODZOL).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
 	public static final RegistryObject<LockedDoorBlock> LOCKED_BIRCH_DOOR = registerNoItem("locked_birch_door", () -> new LockedDoorBlock(Blocks.BIRCH_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.SAND).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
@@ -71,10 +78,19 @@ public class StorageBlocks {
 	public static final RegistryObject<LockedDoorBlock> LOCKED_STEEL_DOOR = registerNoItem("locked_steel_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:steel_door"), Block.Properties.of(Material.METAL).strength(1.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
 	public static final RegistryObject<LockedDoorBlock> LOCKED_CHAIN_LINK_DOOR = registerNoItem("locked_chain_link_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:chain_link_door"), Block.Properties.of(Material.DECORATION).strength(0.5F, 5.0F).sound(SoundType.METAL).noOcclusion()));
 
-	public static final Map<StorageMaterial, RegistryObject<LockedChest>> CHESTS = Maps.newHashMap();
-
+	public static final Map<StorageMaterial, RegistryObject<LockedChestBlock>> CHESTS = Maps.newHashMap();
+	public static final Map<StorageMaterial, RegistryObject<LockedShulkerBoxBlock>> SHULKERS = Maps.newHashMap();
 	static {
-		Stream.of(StorageMaterial.values()).forEach((type) -> CHESTS.put(type, registerChest("chest_" + type.toString(), () -> new LockedChest(type))));
+		Stream.of(StorageMaterial.values()).forEach((type) -> {
+			CHESTS.put(type, registerChest("chest_" + type.toString(), () -> new LockedChestBlock(type)));
+			SHULKERS.put(type, registerShulker("shulker_box_" + type.toString(), () -> new LockedShulkerBoxBlock(type)));
+		});
+	}
+
+	public static void initDispenserHandlers() {
+		for (RegistryObject<LockedShulkerBoxBlock> b : SHULKERS.values()) {
+			DispenserBlock.registerBehavior(b.get(), new ShulkerBoxDispenseBehavior());
+		}
 	}
 
 	public static Set<Block> lockedDoors() {
@@ -94,8 +110,12 @@ public class StorageBlocks {
 		return register(name, sup, block -> storageItem(block));
 	}
 
-	private static <T extends LockedChest> RegistryObject<T> registerChest(String name, Supplier<? extends T> sup) {
+	private static <T extends LockedChestBlock> RegistryObject<T> registerChest(String name, Supplier<? extends T> sup) {
 		return register(name, sup, block -> chestItem(block));
+	}
+
+	private static <T extends LockedShulkerBoxBlock> RegistryObject<T> registerShulker(String name, Supplier<? extends T> sup) {
+		return register(name, sup, block -> shulkerItem(block));
 	}
 
 	private static <T extends Block> RegistryObject<T> registerWithItem(String name, Supplier<? extends T> sup, Supplier<BlockItem> blockItem) {
@@ -126,6 +146,10 @@ public class StorageBlocks {
 
 	private static Supplier<ChestBlockItem> chestItem(final RegistryObject<? extends Block> block) {
 		return () -> new ChestBlockItem(block.get(), new Item.Properties().tab(AssortedStorage.ASSORTED_STORAGE_ITEM_GROUP));
+	}
+
+	private static Supplier<ShulkerBoxBlockItem> shulkerItem(final RegistryObject<? extends Block> block) {
+		return () -> new ShulkerBoxBlockItem(block.get(), new Item.Properties().tab(AssortedStorage.ASSORTED_STORAGE_ITEM_GROUP));
 	}
 
 	private static Supplier<BlockItem> lockerItem() {

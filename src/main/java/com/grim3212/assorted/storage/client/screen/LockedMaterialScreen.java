@@ -1,7 +1,7 @@
 package com.grim3212.assorted.storage.client.screen;
 
 import com.grim3212.assorted.storage.AssortedStorage;
-import com.grim3212.assorted.storage.common.inventory.LockedChestContainer;
+import com.grim3212.assorted.storage.common.inventory.LockedMaterialContainer;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -16,7 +16,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class LockedChestScreen extends AbstractContainerScreen<LockedChestContainer> implements MenuAccess<LockedChestContainer> {
+public class LockedMaterialScreen extends AbstractContainerScreen<LockedMaterialContainer> implements MenuAccess<LockedMaterialContainer> {
 
 	private static final ResourceLocation CHEST_GUI_TEXTURE_9_COLS = new ResourceLocation(AssortedStorage.MODID, "textures/gui/container/generic_9x9.png");
 	private static final ResourceLocation CHEST_GUI_TEXTURE_10_COLS = new ResourceLocation(AssortedStorage.MODID, "textures/gui/container/generic_9x10.png");
@@ -32,15 +32,23 @@ public class LockedChestScreen extends AbstractContainerScreen<LockedChestContai
 	private final int startOfPlayerInventoryY = 180;
 	private final int heightOfPlayerInvetory = 96;
 
-	public LockedChestScreen(LockedChestContainer container, Inventory playerInventory, Component title) {
+	public LockedMaterialScreen(LockedMaterialContainer container, Inventory playerInventory, Component title) {
 		super(container, playerInventory, title);
 		this.storageMaterial = container.getStorageMaterial();
 
-		this.imageHeight = 114 + storageMaterial.getXRows() * 18;
-		this.imageWidth = 14 + storageMaterial.getYCols() * 18;
+		int xRows = 3;
+		int yCols = 9;
+
+		if (storageMaterial != null) {
+			xRows = storageMaterial.getXRows();
+			yCols = storageMaterial.getYCols();
+		}
+
+		this.imageHeight = 114 + xRows * 18;
+		this.imageWidth = 14 + yCols * 18;
 		this.inventoryLabelY = this.imageHeight - 94;
 
-		switch (storageMaterial.getYCols()) {
+		switch (yCols) {
 			case (10):
 				this.textureXSize = 256;
 				this.textureYSize = 276;
@@ -97,7 +105,10 @@ public class LockedChestScreen extends AbstractContainerScreen<LockedChestContai
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
 
-		blit(matrixStack, i, j, 0, 0, this.imageWidth, storageMaterial.getXRows() * 18 + 17, this.textureXSize, this.textureYSize);
-		blit(matrixStack, i, j + storageMaterial.getXRows() * 18 + 17, 0, startOfPlayerInventoryY, this.imageWidth, heightOfPlayerInvetory, this.textureXSize, this.textureYSize);
+		int xRows = storageMaterial == null ? 3 : storageMaterial.getXRows();
+		int yCols = storageMaterial == null ? 9 : storageMaterial.getYCols();
+
+		blit(matrixStack, i, j, 0, 0, this.imageWidth, yCols * 18, this.textureXSize, this.textureYSize);
+		blit(matrixStack, i, j + xRows * 18 + 17, 0, startOfPlayerInventoryY, this.imageWidth, heightOfPlayerInvetory, this.textureXSize, this.textureYSize);
 	}
 }

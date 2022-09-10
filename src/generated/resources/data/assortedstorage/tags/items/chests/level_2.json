@@ -1,10 +1,10 @@
 {
   "values": [
-    "assortedstorage:chest_amethyst",
-    "assortedstorage:chest_gold",
-    "assortedstorage:chest_peridot",
-    "assortedstorage:chest_nickel",
     "assortedstorage:chest_sapphire",
-    "assortedstorage:chest_lead"
+    "assortedstorage:chest_gold",
+    "assortedstorage:chest_nickel",
+    "assortedstorage:chest_lead",
+    "assortedstorage:chest_peridot",
+    "assortedstorage:chest_amethyst"
   ]
 }

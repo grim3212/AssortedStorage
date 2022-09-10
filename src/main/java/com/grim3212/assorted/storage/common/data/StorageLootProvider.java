@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.grim3212.assorted.storage.common.block.GoldSafeBlock;
-import com.grim3212.assorted.storage.common.block.LockedChest;
+import com.grim3212.assorted.storage.common.block.LockedChestBlock;
+import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 
@@ -63,7 +64,7 @@ public class StorageLootProvider implements DataProvider {
 		blocks.add(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get());
 		blocks.add(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get());
 
-		for (RegistryObject<LockedChest> b : StorageBlocks.CHESTS.values()) {
+		for (RegistryObject<LockedChestBlock> b : StorageBlocks.CHESTS.values()) {
 			blocks.add(b.get());
 		}
 	}
@@ -78,7 +79,13 @@ public class StorageLootProvider implements DataProvider {
 
 		tables.put(StorageBlocks.GOLD_SAFE.getId(), genGoldSafe(StorageBlocks.GOLD_SAFE.get()));
 
+		tables.put(StorageBlocks.LOCKED_CHEST.getId(), genRegular(Blocks.CHEST));
 		tables.put(StorageBlocks.LOCKED_ENDER_CHEST.getId(), genInventoryCode(StorageBlocks.LOCKED_ENDER_CHEST.get()));
+
+		tables.put(StorageBlocks.LOCKED_SHULKER_BOX.getId(), genShulker(StorageBlocks.LOCKED_SHULKER_BOX.get()));
+		for (RegistryObject<LockedShulkerBoxBlock> b : StorageBlocks.SHULKERS.values()) {
+			tables.put(b.getId(), genShulker(b.get()));
+		}
 
 		for (Map.Entry<ResourceLocation, LootTable.Builder> e : tables.entrySet()) {
 			Path path = getPath(generator.getOutputFolder(), e.getKey());
@@ -121,6 +128,14 @@ public class StorageLootProvider implements DataProvider {
 
 	private static LootTable.Builder genGoldSafe(Block b) {
 		LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b).apply(CopyNameFunction.copyName(NameSource.BLOCK_ENTITY)).apply(SetContainerContents.setContents(StorageBlockEntityTypes.GOLD_SAFE.get()).withEntry(DynamicLoot.dynamicEntry(GoldSafeBlock.CONTENTS)));
+		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantValue.exactly(1)).add(entry).when(ExplosionCondition.survivesExplosion());
+		return LootTable.lootTable().withPool(pool);
+	}
+
+	private static LootTable.Builder genShulker(Block b) {
+		CopyNbtFunction.Builder colorFunc = CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Color", "Color");
+		CopyNbtFunction.Builder func = CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Storage_Lock", "Storage_Lock");
+		LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b).apply(func).apply(colorFunc).apply(CopyNameFunction.copyName(NameSource.BLOCK_ENTITY)).apply(SetContainerContents.setContents(StorageBlockEntityTypes.LOCKED_SHULKER_BOX.get()).withEntry(DynamicLoot.dynamicEntry(LockedShulkerBoxBlock.CONTENTS)));
 		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantValue.exactly(1)).add(entry).when(ExplosionCondition.survivesExplosion());
 		return LootTable.lootTable().withPool(pool);
 	}

@@ -74,6 +74,10 @@ public class AssortedStorage {
 
 	private void setup(final FMLCommonSetupEvent event) {
 		PacketHandler.init();
+
+		event.enqueueWork(() -> {
+			StorageBlocks.initDispenserHandlers();
+		});
 	}
 
 	private void gatherData(GatherDataEvent event) {

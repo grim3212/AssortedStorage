@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.grim3212.assorted.storage.AssortedStorage;
-import com.grim3212.assorted.storage.common.block.LockedChest;
+import com.grim3212.assorted.storage.common.block.LockedChestBlock;
+import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 
 import net.minecraft.data.DataGenerator;
@@ -42,8 +43,14 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 		blocks.put(StorageBlocks.WARPED_WAREHOUSE_CRATE.get(), new ResourceLocation("block/warped_stem_top"));
 		blocks.put(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get(), new ResourceLocation("block/crimson_stem_top"));
 		blocks.put(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get(), new ResourceLocation("block/mangrove_log_top"));
+		blocks.put(StorageBlocks.LOCKED_CHEST.get(), new ResourceLocation("block/oak_planks"));
+		blocks.put(StorageBlocks.LOCKED_SHULKER_BOX.get(), new ResourceLocation("block/shulker_box"));
 
-		for (RegistryObject<LockedChest> b : StorageBlocks.CHESTS.values()) {
+		for (RegistryObject<LockedChestBlock> b : StorageBlocks.CHESTS.values()) {
+			blocks.put(b.get(), b.get().getStorageMaterial().getParticle());
+		}
+
+		for (RegistryObject<LockedShulkerBoxBlock> b : StorageBlocks.SHULKERS.values()) {
 			blocks.put(b.get(), b.get().getStorageMaterial().getParticle());
 		}
 	}

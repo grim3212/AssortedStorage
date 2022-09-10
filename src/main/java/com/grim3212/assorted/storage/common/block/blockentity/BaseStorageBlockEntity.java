@@ -38,7 +38,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
 @OnlyIn(value = Dist.CLIENT, _interface = IStorage.class)
-public abstract class BaseStorageBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider, INamed, IStorage, ILockeable {
+public abstract class BaseStorageBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider, INamed, IStorage, ILockable {
 
 	private NonNullList<ItemStack> chestContents;
 	protected int numPlayersUsing;

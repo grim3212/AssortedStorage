@@ -1,0 +1,32 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "shulkers"
+        }
+      ],
+      "recipe": {
+        "type": "assortedstorage:locked_upgrading",
+        "key": {
+          "C": {
+            "tag": "assortedstorage:shulkers/level_2"
+          },
+          "M": {
+            "tag": "forge:ingots/bronze"
+          }
+        },
+        "pattern": [
+          "MMM",
+          "MCM",
+          "MMM"
+        ],
+        "result": {
+          "item": "assortedstorage:shulker_box_bronze"
+        }
+      }
+    }
+  ]
+}
