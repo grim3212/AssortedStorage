@@ -1,16 +1,28 @@
 {
   "values": [
-    "assortedstorage:chest_sapphire",
+    "assortedstorage:chest_amethyst",
     "assortedstorage:chest_gold",
+    "assortedstorage:chest_emerald",
+    "assortedstorage:chest_bronze",
     "assortedstorage:chest_nickel",
     "assortedstorage:chest_lead",
+    "assortedstorage:chest_sapphire",
     "assortedstorage:chest_peridot",
-    "assortedstorage:chest_amethyst",
-    "assortedstorage:shulker_box_sapphire",
+    "assortedstorage:barrel_amethyst",
+    "assortedstorage:barrel_gold",
+    "assortedstorage:barrel_emerald",
+    "assortedstorage:barrel_bronze",
+    "assortedstorage:barrel_nickel",
+    "assortedstorage:barrel_lead",
+    "assortedstorage:barrel_sapphire",
+    "assortedstorage:barrel_peridot",
+    "assortedstorage:shulker_box_amethyst",
     "assortedstorage:shulker_box_gold",
+    "assortedstorage:shulker_box_emerald",
+    "assortedstorage:shulker_box_bronze",
     "assortedstorage:shulker_box_nickel",
     "assortedstorage:shulker_box_lead",
-    "assortedstorage:shulker_box_peridot",
-    "assortedstorage:shulker_box_amethyst"
+    "assortedstorage:shulker_box_sapphire",
+    "assortedstorage:shulker_box_peridot"
   ]
 }

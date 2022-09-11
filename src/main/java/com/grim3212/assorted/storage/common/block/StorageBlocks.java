@@ -9,7 +9,9 @@ import java.util.stream.Stream;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.grim3212.assorted.storage.AssortedStorage;
+import com.grim3212.assorted.storage.common.handler.EnabledCondition;
 import com.grim3212.assorted.storage.common.item.ChestBlockItem;
+import com.grim3212.assorted.storage.common.item.EnabledBlockItem;
 import com.grim3212.assorted.storage.common.item.LockerItem;
 import com.grim3212.assorted.storage.common.item.ShulkerBoxBlockItem;
 import com.grim3212.assorted.storage.common.item.StorageBlockItem;
@@ -61,6 +63,7 @@ public class StorageBlocks {
 
 	public static final RegistryObject<LockedChestBlock> LOCKED_CHEST = registerChest("locked_chest", () -> new LockedChestBlock(null, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
 	public static final RegistryObject<LockedShulkerBoxBlock> LOCKED_SHULKER_BOX = registerShulker("locked_shulker_box", () -> new LockedShulkerBoxBlock(null, BlockBehaviour.Properties.of(Material.SHULKER_SHELL)));
+	public static final RegistryObject<LockedBarrelBlock> LOCKED_BARREL = register("locked_barrel", EnabledCondition.BARRELS_CONDITION, () -> new LockedBarrelBlock(null, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
 
 	public static final RegistryObject<LockedDoorBlock> LOCKED_OAK_DOOR = registerNoItem("locked_oak_door", () -> new LockedDoorBlock(Blocks.OAK_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.WOOD).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
 	public static final RegistryObject<LockedDoorBlock> LOCKED_SPRUCE_DOOR = registerNoItem("locked_spruce_door", () -> new LockedDoorBlock(Blocks.SPRUCE_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.PODZOL).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
@@ -79,10 +82,12 @@ public class StorageBlocks {
 	public static final RegistryObject<LockedDoorBlock> LOCKED_CHAIN_LINK_DOOR = registerNoItem("locked_chain_link_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:chain_link_door"), Block.Properties.of(Material.DECORATION).strength(0.5F, 5.0F).sound(SoundType.METAL).noOcclusion()));
 
 	public static final Map<StorageMaterial, RegistryObject<LockedChestBlock>> CHESTS = Maps.newHashMap();
+	public static final Map<StorageMaterial, RegistryObject<LockedBarrelBlock>> BARRELS = Maps.newHashMap();
 	public static final Map<StorageMaterial, RegistryObject<LockedShulkerBoxBlock>> SHULKERS = Maps.newHashMap();
 	static {
 		Stream.of(StorageMaterial.values()).forEach((type) -> {
 			CHESTS.put(type, registerChest("chest_" + type.toString(), () -> new LockedChestBlock(type)));
+			BARRELS.put(type, register("barrel_" + type.toString(), EnabledCondition.BARRELS_CONDITION, () -> new LockedBarrelBlock(type)));
 			SHULKERS.put(type, registerShulker("shulker_box_" + type.toString(), () -> new LockedShulkerBoxBlock(type)));
 		});
 	}
@@ -100,6 +105,10 @@ public class StorageBlocks {
 
 	private static <T extends Block> RegistryObject<T> register(String name, Supplier<? extends T> sup) {
 		return register(name, sup, block -> item(block));
+	}
+
+	private static <T extends Block> RegistryObject<T> register(String name, String condition, Supplier<? extends T> sup) {
+		return register(name, sup, block -> enabledItem(condition, block));
 	}
 
 	private static <T extends Block> RegistryObject<T> registerCrate(String name, Supplier<? extends T> sup) {
@@ -134,6 +143,10 @@ public class StorageBlocks {
 
 	private static Supplier<BlockItem> item(final RegistryObject<? extends Block> block) {
 		return () -> new BlockItem(block.get(), new Item.Properties().tab(AssortedStorage.ASSORTED_STORAGE_ITEM_GROUP));
+	}
+
+	private static Supplier<BlockItem> enabledItem(final String condition, final RegistryObject<? extends Block> block) {
+		return () -> new EnabledBlockItem(condition, block.get(), new Item.Properties().tab(AssortedStorage.ASSORTED_STORAGE_ITEM_GROUP));
 	}
 
 	private static Supplier<StorageBlockItem> storageItem(final RegistryObject<? extends Block> block) {

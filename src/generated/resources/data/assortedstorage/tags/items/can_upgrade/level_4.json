@@ -1,20 +1,22 @@
 {
   "values": [
+    "assortedstorage:chest_silver",
+    "assortedstorage:chest_diamond",
+    "assortedstorage:chest_ruby",
+    "assortedstorage:chest_steel",
     "assortedstorage:chest_electrum",
     "assortedstorage:chest_invar",
-    "assortedstorage:chest_emerald",
-    "assortedstorage:chest_diamond",
-    "assortedstorage:chest_steel",
-    "assortedstorage:chest_ruby",
-    "assortedstorage:chest_silver",
-    "assortedstorage:chest_bronze",
-    "assortedstorage:shulker_box_electrum",
-    "assortedstorage:shulker_box_invar",
-    "assortedstorage:shulker_box_emerald",
-    "assortedstorage:shulker_box_diamond",
-    "assortedstorage:shulker_box_steel",
-    "assortedstorage:shulker_box_ruby",
+    "assortedstorage:barrel_silver",
+    "assortedstorage:barrel_diamond",
+    "assortedstorage:barrel_ruby",
+    "assortedstorage:barrel_steel",
+    "assortedstorage:barrel_electrum",
+    "assortedstorage:barrel_invar",
     "assortedstorage:shulker_box_silver",
-    "assortedstorage:shulker_box_bronze"
+    "assortedstorage:shulker_box_diamond",
+    "assortedstorage:shulker_box_ruby",
+    "assortedstorage:shulker_box_steel",
+    "assortedstorage:shulker_box_electrum",
+    "assortedstorage:shulker_box_invar"
   ]
 }

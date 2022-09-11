@@ -5,7 +5,6 @@ import javax.annotation.Nullable;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.ILockable;
 import com.grim3212.assorted.storage.common.block.blockentity.INamed;
-import com.grim3212.assorted.storage.common.block.blockentity.LockedShulkerBoxBlockEntity;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 import com.grim3212.assorted.storage.common.util.StorageUtil;
@@ -27,6 +26,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
@@ -204,6 +204,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
 				if (inamedcontainerprovider != null) {
 					NetworkHooks.openScreen((ServerPlayer) player, inamedcontainerprovider, pos);
 					player.awardStat(this.getOpenStat());
+					PiglinAi.angerNearbyPiglins(player, true);
 				}
 			}
 		}

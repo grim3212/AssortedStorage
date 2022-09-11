@@ -5,6 +5,7 @@ import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 
 import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
+import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.inventory.StorageContainer;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 
@@ -24,6 +25,7 @@ import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -169,6 +171,14 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 
 	protected abstract Component getDefaultName();
 
+	protected SoundEvent openSound() {
+		return SoundEvents.CHEST_OPEN;
+	}
+
+	protected SoundEvent closeSound() {
+		return SoundEvents.CHEST_CLOSE;
+	}
+
 	public void tick() {
 		int i = this.worldPosition.getX();
 		int j = this.worldPosition.getY();
@@ -177,7 +187,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 		this.numPlayersUsing = getNumberOfPlayersUsing(this.level, this, this.ticksSinceSync, i, j, k, this.numPlayersUsing);
 		this.prevRotation = this.rotation;
 		if (this.numPlayersUsing > 0 && this.rotation == 0.0F) {
-			this.playSound(SoundEvents.CHEST_OPEN);
+			this.playSound(openSound());
 		}
 
 		if (this.numPlayersUsing == 0 && this.rotation > 0.0F || this.numPlayersUsing > 0 && this.rotation < 1.0F) {
@@ -193,7 +203,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 			}
 
 			if (this.rotation < 0.5F && f1 >= 0.5F) {
-				this.playSound(SoundEvents.CHEST_CLOSE);
+				this.playSound(closeSound());
 			}
 
 			if (this.rotation < 0.0F) {
@@ -280,6 +290,8 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 		if (block instanceof BaseStorageBlock) {
 			this.level.blockEvent(this.worldPosition, block, 1, this.numPlayersUsing);
 			this.level.updateNeighborsAt(this.worldPosition, block);
+		} else if (block instanceof LockedBarrelBlock) {
+			this.level.setBlock(this.getBlockPos(), getBlockState().setValue(BarrelBlock.OPEN, this.numPlayersUsing > 0), 3);
 		}
 	}
 

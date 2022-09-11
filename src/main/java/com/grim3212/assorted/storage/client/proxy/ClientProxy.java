@@ -19,6 +19,7 @@ import com.grim3212.assorted.storage.client.model.SafeModel;
 import com.grim3212.assorted.storage.client.model.ShulkerBoxModel;
 import com.grim3212.assorted.storage.client.model.StorageModelLayers;
 import com.grim3212.assorted.storage.client.model.WarehouseCrateModel;
+import com.grim3212.assorted.storage.client.model.baked.LockedBarrelModel;
 import com.grim3212.assorted.storage.client.screen.DualLockerScreen;
 import com.grim3212.assorted.storage.client.screen.GenericStorageScreen;
 import com.grim3212.assorted.storage.client.screen.GoldSafeScreen;
@@ -41,6 +42,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -52,6 +54,11 @@ public class ClientProxy implements IProxy {
 		final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
 		modBus.addListener(this::setupClient);
 		modBus.addListener(this::registerLayers);
+		modBus.addListener(this::registerLoaders);
+	}
+
+	private void registerLoaders(final ModelEvent.RegisterGeometryLoaders event) {
+		event.register("models/barrel", LockedBarrelModel.Loader.INSTANCE);
 	}
 
 	private void registerLayers(final EntityRenderersEvent.RegisterLayerDefinitions event) {
@@ -80,6 +87,10 @@ public class ClientProxy implements IProxy {
 		MenuScreens.register(StorageContainerTypes.LOCKED_ENDER_CHEST.get(), LockedEnderChestScreen::new);
 
 		StorageContainerTypes.CHESTS.forEach((material, menu) -> {
+			MenuScreens.register(menu.get(), LockedMaterialScreen::new);
+		});
+
+		StorageContainerTypes.BARRELS.forEach((material, menu) -> {
 			MenuScreens.register(menu.get(), LockedMaterialScreen::new);
 		});
 

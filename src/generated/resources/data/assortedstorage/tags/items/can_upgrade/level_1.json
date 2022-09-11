@@ -2,6 +2,8 @@
   "values": [
     "assortedstorage:chest_stone",
     "#forge:chests/wooden",
+    "assortedstorage:barrel_stone",
+    "#forge:barrels/wooden",
     "assortedstorage:shulker_box_stone",
     "minecraft:shulker_box",
     "minecraft:black_shulker_box",

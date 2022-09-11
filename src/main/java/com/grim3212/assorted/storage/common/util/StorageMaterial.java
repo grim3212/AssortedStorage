@@ -23,7 +23,7 @@ public enum StorageMaterial {
 	IRON(() -> Tags.Items.INGOTS_IRON, new ResourceLocation("block/iron_block"), 1, 5, 9, 5.0F, 6.0F),
 	AMETHYST(() -> Tags.Items.GEMS_AMETHYST, new ResourceLocation("block/amethyst_block"), 2, 7, 9, () -> Block.Properties.of(Material.AMETHYST).sound(SoundType.AMETHYST).requiresCorrectToolForDrops().strength(1.5F)),
 	GOLD(() -> Tags.Items.INGOTS_GOLD, new ResourceLocation("block/gold_block"), 2, 8, 9, () -> Block.Properties.of(Material.METAL, MaterialColor.GOLD).sound(SoundType.METAL).requiresCorrectToolForDrops().strength(3.0F, 6.0F)),
-	EMERALD(() -> Tags.Items.GEMS_EMERALD, new ResourceLocation("block/emerald_block"), 3, 9, 9, () -> Block.Properties.of(Material.METAL, MaterialColor.EMERALD).sound(SoundType.METAL).requiresCorrectToolForDrops().strength(5.0F, 6.0F)),
+	EMERALD(() -> Tags.Items.GEMS_EMERALD, new ResourceLocation("block/emerald_block"), 2, 8, 9, () -> Block.Properties.of(Material.METAL, MaterialColor.EMERALD).sound(SoundType.METAL).requiresCorrectToolForDrops().strength(5.0F, 6.0F)),
 	DIAMOND(() -> Tags.Items.GEMS_DIAMOND, new ResourceLocation("block/diamond_block"), 3, 9, 11, () -> Block.Properties.of(Material.METAL, MaterialColor.DIAMOND).sound(SoundType.METAL).requiresCorrectToolForDrops().strength(5.0F, 6.0F)),
 	NETHERITE(() -> Tags.Items.INGOTS_NETHERITE, new ResourceLocation("block/netherite_block"), 4, 9, 14, () -> Block.Properties.of(Material.METAL, MaterialColor.COLOR_BLACK).sound(SoundType.NETHERITE_BLOCK).requiresCorrectToolForDrops().strength(50.0F, 1200.0F)),
 
@@ -35,7 +35,7 @@ public enum StorageMaterial {
 	LEAD(() -> StorageTags.Items.INGOTS_LEAD, new ResourceLocation(AssortedStorage.MODID, "block/particle/lead_block"), 2, 6, 9, 5.0F, 6.0F),
 	NICKEL(() -> StorageTags.Items.INGOTS_NICKEL, new ResourceLocation(AssortedStorage.MODID, "block/particle/nickel_block"), 2, 6, 10, 5.0F, 6.0F),
 	SAPPHIRE(() -> StorageTags.Items.GEMS_SAPPHIRE, new ResourceLocation(AssortedStorage.MODID, "block/particle/sapphire_block"), 2, 7, 9, () -> Block.Properties.of(Material.METAL, MaterialColor.COLOR_BLUE).sound(SoundType.METAL).requiresCorrectToolForDrops().strength(5.0F, 6.0F)),
-	BRONZE(() -> StorageTags.Items.INGOTS_BRONZE, new ResourceLocation(AssortedStorage.MODID, "block/particle/bronze_block"), 3, 9, 9, 5.0F, 6.0F),
+	BRONZE(() -> StorageTags.Items.INGOTS_BRONZE, new ResourceLocation(AssortedStorage.MODID, "block/particle/bronze_block"), 2, 9, 9, 5.0F, 6.0F),
 	RUBY(() -> StorageTags.Items.GEMS_RUBY, new ResourceLocation(AssortedStorage.MODID, "block/particle/ruby_block"), 3, 9, 10, () -> Block.Properties.of(Material.METAL, MaterialColor.COLOR_RED).sound(SoundType.METAL).requiresCorrectToolForDrops().strength(5.0F, 6.0F)),
 	INVAR(() -> StorageTags.Items.INGOTS_INVAR, new ResourceLocation(AssortedStorage.MODID, "block/particle/invar_block"), 3, 9, 10, 5.0F, 6.0F),
 	SILVER(() -> StorageTags.Items.INGOTS_SILVER, new ResourceLocation(AssortedStorage.MODID, "block/particle/silver_block"), 3, 9, 11, 5.0F, 6.0F),

@@ -82,13 +82,15 @@ public class LockedChestBlock extends BaseStorageBlock implements IStorageMateri
 		if (!code.isEmpty()) {
 			tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.combo", Component.literal(code).withStyle(ChatFormatting.AQUA)));
 		}
+
+		tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.level_upgrade_level", Component.literal("" + (material == null ? 0 : material.getStorageLevel())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
 	}
 
 	@Override
 	public ItemStack getCloneItemStack(BlockGetter worldIn, BlockPos pos, BlockState state) {
 		if (this.getStorageMaterial() == null) {
 			String lockCode = StorageUtil.getCode(worldIn.getBlockEntity(pos));
-			ItemStack output = new ItemStack(StorageBlocks.LOCKED_ENDER_CHEST.get());
+			ItemStack output = new ItemStack(StorageBlocks.LOCKED_CHEST.get());
 			return StorageUtil.setCodeOnStack(lockCode, output);
 		}
 		return super.getCloneItemStack(worldIn, pos, state);

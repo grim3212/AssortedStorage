@@ -14,6 +14,7 @@ public class EnabledCondition implements ICondition {
 	private final String part;
 
 	public static final String CHESTS_CONDITION = "chests";
+	public static final String BARRELS_CONDITION = "barrels";
 	public static final String SHULKERS_CONDITION = "shulkers";
 	public static final String UPGRADES_CONDITION = "upgrades";
 
@@ -31,6 +32,8 @@ public class EnabledCondition implements ICondition {
 		switch (part) {
 			case CHESTS_CONDITION:
 				return StorageConfig.COMMON.chestsEnabled.get();
+			case BARRELS_CONDITION:
+				return StorageConfig.COMMON.barrelsEnabled.get();
 			case SHULKERS_CONDITION:
 				return StorageConfig.COMMON.shulkersEnabled.get();
 			case UPGRADES_CONDITION:

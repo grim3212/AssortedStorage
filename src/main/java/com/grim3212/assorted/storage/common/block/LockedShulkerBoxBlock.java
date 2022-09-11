@@ -337,6 +337,8 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
 		if (!code.isEmpty()) {
 			tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.combo", Component.literal(code).withStyle(ChatFormatting.AQUA)));
 		}
+		
+		tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.level_upgrade_level", Component.literal("" + (material == null ? 0 : material.getStorageLevel())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
 
 		CompoundTag compoundnbt = stack.getTagElement("BlockEntityTag");
 		if (compoundnbt != null) {

@@ -1,14 +1,19 @@
 {
   "values": [
-    "assortedstorage:chest_topaz",
+    "assortedstorage:chest_copper",
     "assortedstorage:chest_tin",
     "assortedstorage:chest_iron",
     "assortedstorage:chest_aluminum",
-    "assortedstorage:chest_copper",
-    "assortedstorage:shulker_box_topaz",
+    "assortedstorage:chest_topaz",
+    "assortedstorage:barrel_copper",
+    "assortedstorage:barrel_tin",
+    "assortedstorage:barrel_iron",
+    "assortedstorage:barrel_aluminum",
+    "assortedstorage:barrel_topaz",
+    "assortedstorage:shulker_box_copper",
     "assortedstorage:shulker_box_tin",
     "assortedstorage:shulker_box_iron",
     "assortedstorage:shulker_box_aluminum",
-    "assortedstorage:shulker_box_copper"
+    "assortedstorage:shulker_box_topaz"
   ]
 }

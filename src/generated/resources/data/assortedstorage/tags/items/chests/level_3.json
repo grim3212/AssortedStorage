@@ -1,12 +1,10 @@
 {
   "values": [
-    "assortedstorage:chest_electrum",
-    "assortedstorage:chest_invar",
-    "assortedstorage:chest_emerald",
-    "assortedstorage:chest_diamond",
-    "assortedstorage:chest_steel",
-    "assortedstorage:chest_ruby",
     "assortedstorage:chest_silver",
-    "assortedstorage:chest_bronze"
+    "assortedstorage:chest_diamond",
+    "assortedstorage:chest_ruby",
+    "assortedstorage:chest_steel",
+    "assortedstorage:chest_electrum",
+    "assortedstorage:chest_invar"
   ]
 }

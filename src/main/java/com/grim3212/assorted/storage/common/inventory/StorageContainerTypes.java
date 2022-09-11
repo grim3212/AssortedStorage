@@ -31,13 +31,16 @@ public class StorageContainerTypes {
 
 	public static final Map<StorageMaterial, RegistryObject<MenuType<LockedMaterialContainer>>> CHESTS = Maps.newHashMap();
 	public static final Map<StorageMaterial, RegistryObject<MenuType<LockedMaterialContainer>>> SHULKERS = Maps.newHashMap();
+	public static final Map<StorageMaterial, RegistryObject<MenuType<LockedMaterialContainer>>> BARRELS = Maps.newHashMap();
 
 	static {
 		CHESTS.put(null, CONTAINERS.register("locked_chest", () -> IForgeMenuType.create((syncId, inv, c) -> LockedMaterialContainer.createChestContainer(syncId, inv, null))));
 		SHULKERS.put(null, CONTAINERS.register("locked_shulker_box", () -> IForgeMenuType.create((syncId, inv, c) -> LockedMaterialContainer.createShulkerContainer(syncId, inv, null))));
+		BARRELS.put(null, CONTAINERS.register("locked_barrel", () -> IForgeMenuType.create((syncId, inv, c) -> LockedMaterialContainer.createBarrelContainer(syncId, inv, null))));
 
 		Stream.of(StorageMaterial.values()).forEach((type) -> {
 			CHESTS.put(type, CONTAINERS.register(type.toString() + "_locked_chest", () -> IForgeMenuType.create((syncId, inv, c) -> LockedMaterialContainer.createChestContainer(syncId, inv, type))));
+			BARRELS.put(type, CONTAINERS.register(type.toString() + "_locked_barrel", () -> IForgeMenuType.create((syncId, inv, c) -> LockedMaterialContainer.createBarrelContainer(syncId, inv, type))));
 			SHULKERS.put(type, CONTAINERS.register(type.toString() + "_locked_shulker_box", () -> IForgeMenuType.create((syncId, inv, c) -> LockedMaterialContainer.createShulkerContainer(syncId, inv, type))));
 		});
 	}

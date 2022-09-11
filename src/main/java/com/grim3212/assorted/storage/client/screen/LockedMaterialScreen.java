@@ -106,9 +106,8 @@ public class LockedMaterialScreen extends AbstractContainerScreen<LockedMaterial
 		int j = (this.height - this.imageHeight) / 2;
 
 		int xRows = storageMaterial == null ? 3 : storageMaterial.getXRows();
-		int yCols = storageMaterial == null ? 9 : storageMaterial.getYCols();
 
-		blit(matrixStack, i, j, 0, 0, this.imageWidth, yCols * 18, this.textureXSize, this.textureYSize);
+		blit(matrixStack, i, j, 0, 0, this.imageWidth, xRows * 18 + 17, this.textureXSize, this.textureYSize);
 		blit(matrixStack, i, j + xRows * 18 + 17, 0, startOfPlayerInventoryY, this.imageWidth, heightOfPlayerInvetory, this.textureXSize, this.textureYSize);
 	}
 }

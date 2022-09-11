@@ -1,0 +1,9 @@
+{
+  "loader": "assortedstorage:models/barrel",
+  "locked": {
+    "parent": "assortedstorage:block/barrel_diamond_locked"
+  },
+  "unlocked": {
+    "parent": "assortedstorage:block/barrel_diamond_unlocked"
+  }
+}

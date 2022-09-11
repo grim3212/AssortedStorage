@@ -4,25 +4,23 @@ import java.util.List;
 
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
+import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.block.LockedChestBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
-import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.LockedBarrelBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedChestBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedShulkerBoxBlockEntity;
 import com.grim3212.assorted.storage.common.handler.StorageConfig;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
-import com.grim3212.assorted.storage.common.util.StorageTags;
 import com.grim3212.assorted.storage.common.util.StorageUtil;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -32,13 +30,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.level.block.entity.BarrelBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class LevelUpgradeItem extends Item {
 
@@ -55,35 +54,7 @@ public class LevelUpgradeItem extends Item {
 
 	@Override
 	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-		if (!Screen.hasShiftDown()) {
-			tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.level_upgrade_shift").withStyle(ChatFormatting.GRAY));
-		} else {
-			tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.level_upgrade"));
-
-			TagKey<Item> supportedBlocksTag = null;
-
-			switch (storageMaterial.getStorageLevel()) {
-				case 1:
-					supportedBlocksTag = StorageTags.Items.CAN_UPGRADE_LEVEL_1;
-					break;
-				case 2:
-					supportedBlocksTag = StorageTags.Items.CAN_UPGRADE_LEVEL_2;
-					break;
-				case 3:
-					supportedBlocksTag = StorageTags.Items.CAN_UPGRADE_LEVEL_3;
-					break;
-				case 4:
-					supportedBlocksTag = StorageTags.Items.CAN_UPGRADE_LEVEL_4;
-					break;
-				default:
-					supportedBlocksTag = StorageTags.Items.CAN_UPGRADE_LEVEL_0;
-					break;
-			}
-
-			ForgeRegistries.ITEMS.tags().getTag(supportedBlocksTag).forEach((i) -> {
-				tooltip.add(Component.literal(" * ").append(i.getDescription()).withStyle(ChatFormatting.AQUA));
-			});
-		}
+		tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.level_upgrade_level", Component.literal("" + storageMaterial.getStorageLevel()).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
 	}
 
 	@Override
@@ -113,8 +84,10 @@ public class LevelUpgradeItem extends Item {
 
 		if (world.getBlockState(pos).getBlock()instanceof LockedChestBlock chestBlock) {
 			int currentStorageLevel = chestBlock.getStorageMaterial() != null ? chestBlock.getStorageMaterial().getStorageLevel() : 0;
+			boolean startingUpgrade = this.storageMaterial.getStorageLevel() == 0 || this.storageMaterial.getStorageLevel() == 1;
+			boolean canUpgrade = (startingUpgrade && (chestBlock.getStorageMaterial() == null || chestBlock.getStorageMaterial().getStorageLevel() == 0)) || currentStorageLevel == this.storageMaterial.getStorageLevel() - 1;
 
-			if (currentStorageLevel == this.storageMaterial.getStorageLevel() - 1) {
+			if (canUpgrade) {
 				BlockEntity blockEntity = world.getBlockEntity(pos);
 				if (blockEntity != null && blockEntity instanceof LockedChestBlockEntity storageBE) {
 					if (storageBE.getNumberOfPlayersUsing(world, storageBE) > 0) {
@@ -133,10 +106,36 @@ public class LevelUpgradeItem extends Item {
 					newBlockEntity = new LockedChestBlockEntity(pos, newState);
 				}
 			}
-		} else if (world.getBlockState(pos).getBlock()instanceof LockedShulkerBoxBlock chestBlock) {
-			int currentStorageLevel = chestBlock.getStorageMaterial() != null ? chestBlock.getStorageMaterial().getStorageLevel() : 0;
+		} else if (world.getBlockState(pos).getBlock()instanceof LockedBarrelBlock barrelBlock) {
+			int currentStorageLevel = barrelBlock.getStorageMaterial() != null ? barrelBlock.getStorageMaterial().getStorageLevel() : 0;
+			boolean startingUpgrade = this.storageMaterial.getStorageLevel() == 0 || this.storageMaterial.getStorageLevel() == 1;
+			boolean canUpgrade = (startingUpgrade && (barrelBlock.getStorageMaterial() == null || barrelBlock.getStorageMaterial().getStorageLevel() == 0)) || currentStorageLevel == this.storageMaterial.getStorageLevel() - 1;
 
-			if (currentStorageLevel == this.storageMaterial.getStorageLevel() - 1) {
+			if (canUpgrade) {
+				BlockEntity blockEntity = world.getBlockEntity(pos);
+				if (blockEntity != null && blockEntity instanceof LockedBarrelBlockEntity barrelBE) {
+					if (barrelBE.getNumberOfPlayersUsing(world, barrelBE) > 0) {
+						return InteractionResult.PASS;
+					}
+
+					if (barrelBE.isLocked() && !StorageUtil.canAccess(world, pos, player)) {
+						return InteractionResult.PASS;
+					}
+
+					currentLockCode = barrelBE.getLockCode();
+					currentCustomName = barrelBE.getCustomName();
+					currentItems = barrelBE.getItems();
+
+					newState = StorageBlocks.BARRELS.get(storageMaterial).get().defaultBlockState().setValue(LockedBarrelBlock.FACING, world.getBlockState(pos).getValue(LockedBarrelBlock.FACING));
+					newBlockEntity = new LockedBarrelBlockEntity(pos, newState);
+				}
+			}
+		} else if (world.getBlockState(pos).getBlock()instanceof LockedShulkerBoxBlock shulkerBlock) {
+			int currentStorageLevel = shulkerBlock.getStorageMaterial() != null ? shulkerBlock.getStorageMaterial().getStorageLevel() : 0;
+			boolean startingUpgrade = this.storageMaterial.getStorageLevel() == 0 || this.storageMaterial.getStorageLevel() == 1;
+			boolean canUpgrade = (startingUpgrade && (shulkerBlock.getStorageMaterial() == null || shulkerBlock.getStorageMaterial().getStorageLevel() == 0)) || currentStorageLevel == this.storageMaterial.getStorageLevel() - 1;
+
+			if (canUpgrade) {
 				BlockEntity blockEntity = world.getBlockEntity(pos);
 				if (blockEntity != null && blockEntity instanceof LockedShulkerBoxBlockEntity storageBE) {
 					if (!storageBE.isClosed()) {
@@ -175,11 +174,35 @@ public class LevelUpgradeItem extends Item {
 					currentItems = NonNullList.withSize(chestBE.getContainerSize(), ItemStack.EMPTY);
 
 					for (int slot = 0; slot < chestBE.getContainerSize(); slot++) {
-						currentItems.set(slot, chestBE.getItem(slot));
+						currentItems.set(slot, chestBE.getItem(slot).copy());
 					}
 
 					newState = StorageBlocks.CHESTS.get(storageMaterial).get().defaultBlockState().setValue(BaseStorageBlock.FACING, world.getBlockState(pos).getValue(ChestBlock.FACING));
 					newBlockEntity = new LockedChestBlockEntity(pos, newState);
+				}
+			}
+		} else if (world.getBlockState(pos).getBlock()instanceof BarrelBlock barrelToUpgrade) {
+			if (this.storageMaterial.getStorageLevel() == 0 || this.storageMaterial.getStorageLevel() == 1) {
+				BlockEntity blockEntity = world.getBlockEntity(pos);
+				if (blockEntity != null && blockEntity instanceof BarrelBlockEntity barrelBE) {
+					if (barrelBE.openersCounter.getOpenerCount() > 0) {
+						return InteractionResult.PASS;
+					}
+
+					if (!barrelBE.canOpen(player)) {
+						return InteractionResult.PASS;
+					}
+
+					currentCustomName = barrelBE.getCustomName();
+
+					currentItems = NonNullList.withSize(barrelBE.getContainerSize(), ItemStack.EMPTY);
+
+					for (int slot = 0; slot < barrelBE.getContainerSize(); slot++) {
+						currentItems.set(slot, barrelBE.getItem(slot).copy());
+					}
+
+					newState = StorageBlocks.BARRELS.get(storageMaterial).get().defaultBlockState().setValue(LockedBarrelBlock.FACING, world.getBlockState(pos).getValue(BarrelBlock.FACING));
+					newBlockEntity = new LockedBarrelBlockEntity(pos, newState);
 				}
 			}
 		} else if (world.getBlockState(pos).getBlock()instanceof ShulkerBoxBlock shulkerToUpgrade) {
@@ -199,7 +222,7 @@ public class LevelUpgradeItem extends Item {
 					currentItems = NonNullList.withSize(shulkerBE.getContainerSize(), ItemStack.EMPTY);
 
 					for (int slot = 0; slot < shulkerBE.getContainerSize(); slot++) {
-						currentItems.set(slot, shulkerBE.getItem(slot));
+						currentItems.set(slot, shulkerBE.getItem(slot).copy());
 					}
 
 					newState = StorageBlocks.SHULKERS.get(storageMaterial).get().defaultBlockState().setValue(ShulkerBoxBlock.FACING, world.getBlockState(pos).getValue(ShulkerBoxBlock.FACING));
@@ -231,6 +254,18 @@ public class LevelUpgradeItem extends Item {
 
 			chestBE.setItems(currentItems);
 			chestBE.setLockCode(currentLockCode);
+
+			if (!player.isCreative())
+				itemstack.shrink(1);
+
+			world.playSound(player, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
+		} else if (freshlySetBE instanceof LockedBarrelBlockEntity barrelBE) {
+			if (currentCustomName != null) {
+				barrelBE.setCustomName(currentCustomName);
+			}
+
+			barrelBE.setItems(currentItems);
+			barrelBE.setLockCode(currentLockCode);
 
 			if (!player.isCreative())
 				itemstack.shrink(1);

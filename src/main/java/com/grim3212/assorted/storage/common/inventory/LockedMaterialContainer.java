@@ -25,6 +25,10 @@ public class LockedMaterialContainer extends AbstractContainerMenu {
 		return new LockedMaterialContainer(StorageContainerTypes.SHULKERS.get(storageMaterial).get(), windowId, playerInventory, new SimpleContainer(storageMaterial == null ? 27 : storageMaterial.totalItems()), storageMaterial, true);
 	}
 
+	public static LockedMaterialContainer createBarrelContainer(int windowId, Inventory playerInventory, StorageMaterial storageMaterial) {
+		return new LockedMaterialContainer(StorageContainerTypes.BARRELS.get(storageMaterial).get(), windowId, playerInventory, new SimpleContainer(storageMaterial == null ? 27 : storageMaterial.totalItems()), storageMaterial, true);
+	}
+
 	public LockedMaterialContainer(MenuType<LockedMaterialContainer> menuType, int windowId, Inventory playerInventory, Container inventory, StorageMaterial storageMaterial, boolean useShulkerSlots) {
 		super(menuType, windowId);
 		this.inventory = inventory;

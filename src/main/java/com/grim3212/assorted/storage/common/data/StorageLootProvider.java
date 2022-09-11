@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.grim3212.assorted.storage.common.block.GoldSafeBlock;
+import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.block.LockedChestBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
@@ -67,6 +68,10 @@ public class StorageLootProvider implements DataProvider {
 		for (RegistryObject<LockedChestBlock> b : StorageBlocks.CHESTS.values()) {
 			blocks.add(b.get());
 		}
+
+		for (RegistryObject<LockedBarrelBlock> b : StorageBlocks.BARRELS.values()) {
+			blocks.add(b.get());
+		}
 	}
 
 	@Override
@@ -80,6 +85,7 @@ public class StorageLootProvider implements DataProvider {
 		tables.put(StorageBlocks.GOLD_SAFE.getId(), genGoldSafe(StorageBlocks.GOLD_SAFE.get()));
 
 		tables.put(StorageBlocks.LOCKED_CHEST.getId(), genRegular(Blocks.CHEST));
+		tables.put(StorageBlocks.LOCKED_BARREL.getId(), genRegular(Blocks.BARREL));
 		tables.put(StorageBlocks.LOCKED_ENDER_CHEST.getId(), genInventoryCode(StorageBlocks.LOCKED_ENDER_CHEST.get()));
 
 		tables.put(StorageBlocks.LOCKED_SHULKER_BOX.getId(), genShulker(StorageBlocks.LOCKED_SHULKER_BOX.get()));
