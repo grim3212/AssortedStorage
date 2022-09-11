@@ -134,7 +134,7 @@ public class LevelUpgradeItem extends Item {
 				}
 			}
 		} else if (world.getBlockState(pos).getBlock()instanceof LockedShulkerBoxBlock chestBlock) {
-			int currentStorageLevel = chestBlock.getStorageMaterial() != null ? chestBlock.getStorageMaterial().getStorageLevel() : -1;
+			int currentStorageLevel = chestBlock.getStorageMaterial() != null ? chestBlock.getStorageMaterial().getStorageLevel() : 0;
 
 			if (currentStorageLevel == this.storageMaterial.getStorageLevel() - 1) {
 				BlockEntity blockEntity = world.getBlockEntity(pos);
