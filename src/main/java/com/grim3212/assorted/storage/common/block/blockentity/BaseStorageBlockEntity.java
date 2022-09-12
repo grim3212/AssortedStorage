@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
+import com.grim3212.assorted.storage.common.inventory.LockedSidedInvWrapper;
 import com.grim3212.assorted.storage.common.inventory.StorageContainer;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 

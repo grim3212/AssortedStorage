@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.LockedChestBlock;
+import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.LevelUpgradeItem;
@@ -71,6 +72,10 @@ public class StorageItemModelProvider extends ItemModelProvider {
 		generatedItem(StorageItems.LOCKSMITH_LOCK.get());
 		generatedItem(StorageItems.KEY_RING.get());
 		generatedItem(StorageBlocks.LOCKED_HOPPER.get().asItem());
+		
+		for (RegistryObject<LockedHopperBlock> b : StorageBlocks.HOPPERS.values()) {
+			generatedItem(b.get().asItem());
+		}
 
 		generatedItem(StorageItems.BLANK_UPGRADE.get());
 		for (RegistryObject<LevelUpgradeItem> levelUpgrade : StorageItems.LEVEL_UPGRADES.values()) {

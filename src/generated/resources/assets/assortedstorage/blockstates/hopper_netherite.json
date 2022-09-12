@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "assortedstorage:block/hopper_netherite"
+    },
+    "facing=east": {
+      "model": "assortedstorage:block/hopper_netherite_side",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "assortedstorage:block/hopper_netherite_side"
+    },
+    "facing=south": {
+      "model": "assortedstorage:block/hopper_netherite_side",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "assortedstorage:block/hopper_netherite_side",
+      "y": 270
+    }
+  }
+}

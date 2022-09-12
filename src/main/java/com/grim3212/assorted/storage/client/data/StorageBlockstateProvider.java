@@ -99,26 +99,59 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 		}
 
 		createNormalHopper(StorageBlocks.LOCKED_HOPPER.get());
+		for (RegistryObject<LockedHopperBlock> b : StorageBlocks.HOPPERS.values()) {
+			createMaterialHopper(b.get());
+		}
 
 		this.loaderModels.previousModels();
 	}
 
 	private void createNormalHopper(LockedHopperBlock b) {
-//		ModelFile unlocked = models().getExistingFile(new ResourceLocation("block/hopper"));
-//		ModelFile locked = models().withExistingParent(name(b) + "_locked", new ResourceLocation("block/hopper")).texture("side", new ResourceLocation(prefix("block/hoppers/locked_hopper_outside")));
-//		ModelFile unlockedSide = models().getExistingFile(new ResourceLocation("block/hopper_side"));
-//		ModelFile lockedSide = models().withExistingParent(name(b) + "_locked_side", new ResourceLocation("block/hopper_side")).texture("side", new ResourceLocation(prefix("block/hoppers/locked_hopper_outside")));
-
 		ModelFile unlocked = models().getExistingFile(new ResourceLocation("block/hopper"));
 		ModelFile locked = models().withExistingParent(name(b) + "_locked", new ResourceLocation(prefix("block/template_hopper")));
 		ModelFile unlockedSide = models().getExistingFile(new ResourceLocation("block/hopper_side"));
 		ModelFile lockedSide = models().withExistingParent(name(b) + "_locked_side", new ResourceLocation(prefix("block/template_hopper_side")));
 
-		
 		LockedModelBuilder hopperModel = this.loaderModels.getBuilder(name(b)).unlockedModel(unlocked.getLocation()).lockedModel(locked.getLocation());
 		LockedModelBuilder hopperSideModel = this.loaderModels.getBuilder(name(b) + "_side").unlockedModel(unlockedSide.getLocation()).lockedModel(lockedSide.getLocation());
 
 		getVariantBuilder(StorageBlocks.LOCKED_HOPPER.get()).forAllStatesExcept(state -> {
+			Direction dir = state.getValue(LockedHopperBlock.FACING);
+			int rotation = 0;
+			switch (dir) {
+				case EAST:
+					rotation = 90;
+					break;
+				case WEST:
+					rotation = 270;
+					break;
+				case SOUTH:
+					rotation = 180;
+					break;
+				default:
+					rotation = 0;
+					break;
+			}
+			return ConfiguredModel.builder().modelFile(dir == Direction.DOWN ? hopperModel : hopperSideModel).rotationY(rotation).build();
+		}, LockedHopperBlock.ENABLED);
+	}
+
+	private void createMaterialHopper(LockedHopperBlock b) {
+		StorageMaterial material = b.getStorageMaterial();
+
+		ModelFile unlocked = models().withExistingParent(name(b) + "_unlocked", new ResourceLocation("block/hopper")).texture("particle", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("top", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_top"))).texture("side", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("inside",
+				new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_inside")));
+		ModelFile locked = models().withExistingParent(name(b) + "_locked", new ResourceLocation(prefix("block/template_hopper"))).texture("particle", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("top", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_top"))).texture("side", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside")))
+				.texture("inside", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_inside"))).texture("topsides", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/locked_hopper_outside")));
+		ModelFile unlockedSide = models().withExistingParent(name(b) + "_unlocked_side", new ResourceLocation("block/hopper_side")).texture("particle", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("top", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_top"))).texture("side", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("inside",
+				new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_inside")));
+		ModelFile lockedSide = models().withExistingParent(name(b) + "_locked_side", new ResourceLocation(prefix("block/template_hopper_side"))).texture("particle", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("top", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_top"))).texture("side", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside")))
+				.texture("inside", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_inside"))).texture("topsides", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/locked_hopper_outside")));
+
+		LockedModelBuilder hopperModel = this.loaderModels.getBuilder(name(b)).unlockedModel(unlocked.getLocation()).lockedModel(locked.getLocation());
+		LockedModelBuilder hopperSideModel = this.loaderModels.getBuilder(name(b) + "_side").unlockedModel(unlockedSide.getLocation()).lockedModel(lockedSide.getLocation());
+
+		getVariantBuilder(b).forAllStatesExcept(state -> {
 			Direction dir = state.getValue(LockedHopperBlock.FACING);
 			int rotation = 0;
 			switch (dir) {

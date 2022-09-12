@@ -57,7 +57,7 @@ public class StorageBlockEntityTypes {
 	}
 
 	private static Set<Block> getHoppers() {
-		Set<Block> barrels = Sets.newHashSet();
+		Set<Block> barrels = StorageBlocks.HOPPERS.values().stream().map((b) -> b.get()).collect(Collectors.toSet());
 		barrels.add(StorageBlocks.LOCKED_HOPPER.get());
 		return barrels;
 	}

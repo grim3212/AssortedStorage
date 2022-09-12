@@ -5,7 +5,6 @@ import java.util.stream.Stream;
 
 import com.google.common.collect.Maps;
 import com.grim3212.assorted.storage.AssortedStorage;
-import com.grim3212.assorted.storage.common.handler.StorageConfig;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
 import net.minecraft.client.renderer.Sheets;
@@ -25,19 +24,18 @@ public class StorageModels {
 		SHULKER_LOCATIONS.put(null, new ResourceLocation(AssortedStorage.MODID, "model/shulkers/normal"));
 		Stream.of(StorageMaterial.values()).forEach((type) -> {
 			CHEST_LOCATIONS.put(type, new ResourceLocation(AssortedStorage.MODID, "model/chests/" + type.toString()));
-
 			SHULKER_LOCATIONS.put(type, new ResourceLocation(AssortedStorage.MODID, "model/shulkers/" + type.toString()));
 		});
 	}
 
 	@SubscribeEvent
 	public static void onStitch(TextureStitchEvent.Pre event) {
-		if (StorageConfig.COMMON.chestsEnabled.get() && event.getAtlas().location().equals(Sheets.CHEST_SHEET)) {
+		if (event.getAtlas().location().equals(Sheets.CHEST_SHEET)) {
 			for (ResourceLocation tex : CHEST_LOCATIONS.values()) {
 				event.addSprite(tex);
 			}
 		}
-		if (StorageConfig.COMMON.shulkersEnabled.get() && event.getAtlas().location().equals(Sheets.SHULKER_SHEET)) {
+		if (event.getAtlas().location().equals(Sheets.SHULKER_SHEET)) {
 			for (ResourceLocation tex : SHULKER_LOCATIONS.values()) {
 				event.addSprite(tex);
 			}

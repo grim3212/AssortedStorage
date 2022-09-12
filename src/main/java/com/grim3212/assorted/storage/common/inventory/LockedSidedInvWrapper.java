@@ -1,7 +1,10 @@
-package com.grim3212.assorted.storage.common.block.blockentity;
+package com.grim3212.assorted.storage.common.inventory;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.grim3212.assorted.storage.common.block.blockentity.LockedItemHandler;
+import com.grim3212.assorted.storage.common.block.blockentity.LockedWorldlyContainer;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;

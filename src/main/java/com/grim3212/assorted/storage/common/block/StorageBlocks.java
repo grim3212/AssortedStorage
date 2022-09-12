@@ -84,11 +84,13 @@ public class StorageBlocks {
 
 	public static final Map<StorageMaterial, RegistryObject<LockedChestBlock>> CHESTS = Maps.newHashMap();
 	public static final Map<StorageMaterial, RegistryObject<LockedBarrelBlock>> BARRELS = Maps.newHashMap();
+	public static final Map<StorageMaterial, RegistryObject<LockedHopperBlock>> HOPPERS = Maps.newHashMap();
 	public static final Map<StorageMaterial, RegistryObject<LockedShulkerBoxBlock>> SHULKERS = Maps.newHashMap();
 	static {
 		Stream.of(StorageMaterial.values()).forEach((type) -> {
 			CHESTS.put(type, registerChest("chest_" + type.toString(), () -> new LockedChestBlock(type)));
 			BARRELS.put(type, register("barrel_" + type.toString(), EnabledCondition.BARRELS_CONDITION, () -> new LockedBarrelBlock(type)));
+			HOPPERS.put(type, register("hopper_" + type.toString(), EnabledCondition.HOPPERS_CONDITION, () -> new LockedHopperBlock(type)));
 			SHULKERS.put(type, registerShulker("shulker_box_" + type.toString(), () -> new LockedShulkerBoxBlock(type)));
 		});
 	}

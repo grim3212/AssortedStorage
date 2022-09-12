@@ -29,17 +29,17 @@ public class LockedHopperContainer extends AbstractContainerMenu {
 		int yCols = 5;
 
 		if (this.storageMaterial != null) {
-			xRows = Math.max(1, storageMaterial.getXRows() / 3);
-			yCols = Math.max(1, storageMaterial.getYCols() / 3) + 2;
+			xRows = storageMaterial.hopperXRows();
+			yCols = storageMaterial.hopperYCols();
 		}
-		
-		int startOffset = yCols < 9 ? 8 + (9 - yCols) / 2 * 18 : 8;
 
+		float startOffset = yCols < 9 ? 8 + (float)(9 - yCols) / 2 * 18 : 8;
+		
 		inventory.startOpen(playerInventory.player);
 
 		for (int chestRow = 0; chestRow < xRows; chestRow++) {
 			for (int chestCol = 0; chestCol < yCols; chestCol++) {
-				this.addSlot(new Slot(inventory, chestCol + chestRow * yCols, startOffset + chestCol * 18, 18 + chestRow * 18));
+				this.addSlot(new Slot(inventory, chestCol + chestRow * yCols, (int)startOffset + chestCol * 18, 18 + chestRow * 18));
 			}
 		}
 

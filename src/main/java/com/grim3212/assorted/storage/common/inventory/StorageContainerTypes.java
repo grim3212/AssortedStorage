@@ -44,6 +44,7 @@ public class StorageContainerTypes {
 			CHESTS.put(type, CONTAINERS.register(type.toString() + "_locked_chest", () -> IForgeMenuType.create((syncId, inv, c) -> LockedMaterialContainer.createChestContainer(syncId, inv, type))));
 			BARRELS.put(type, CONTAINERS.register(type.toString() + "_locked_barrel", () -> IForgeMenuType.create((syncId, inv, c) -> LockedMaterialContainer.createBarrelContainer(syncId, inv, type))));
 			SHULKERS.put(type, CONTAINERS.register(type.toString() + "_locked_shulker_box", () -> IForgeMenuType.create((syncId, inv, c) -> LockedMaterialContainer.createShulkerContainer(syncId, inv, type))));
+			HOPPERS.put(type, CONTAINERS.register(type.toString() + "_locked_hopper", () -> IForgeMenuType.create((syncId, inv, c) -> LockedHopperContainer.createHopperContainer(syncId, inv, type))));
 		});
 	}
 }

@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.block.LockedChestBlock;
+import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
@@ -66,6 +67,9 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 				case 4:
 					this.tag(StorageTags.Blocks.CHESTS_LEVEL_4).add(block);
 					break;
+				case 5:
+					this.tag(StorageTags.Blocks.CHESTS_LEVEL_5).add(block);
+					break;
 				default:
 					this.tag(StorageTags.Blocks.CHESTS_LEVEL_0).add(block);
 					break;
@@ -91,8 +95,39 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 				case 4:
 					this.tag(StorageTags.Blocks.BARRELS_LEVEL_4).add(block);
 					break;
+				case 5:
+					this.tag(StorageTags.Blocks.BARRELS_LEVEL_5).add(block);
+					break;
 				default:
 					this.tag(StorageTags.Blocks.BARRELS_LEVEL_0).add(block);
+					break;
+			}
+		}
+		
+		for (Entry<StorageMaterial, RegistryObject<LockedHopperBlock>> barrel : StorageBlocks.HOPPERS.entrySet()) {
+			Block block = barrel.getValue().get();
+			piglinBuilder.add(block);
+			this.tag(StorageTags.Blocks.HOPPERS).add(block);
+			this.tag(BlockTags.MINEABLE_WITH_PICKAXE).add(block);
+
+			switch (barrel.getKey().getStorageLevel()) {
+				case 1:
+					this.tag(StorageTags.Blocks.HOPPERS_LEVEL_1).add(block);
+					break;
+				case 2:
+					this.tag(StorageTags.Blocks.HOPPERS_LEVEL_2).add(block);
+					break;
+				case 3:
+					this.tag(StorageTags.Blocks.HOPPERS_LEVEL_3).add(block);
+					break;
+				case 4:
+					this.tag(StorageTags.Blocks.HOPPERS_LEVEL_4).add(block);
+					break;
+				case 5:
+					this.tag(StorageTags.Blocks.HOPPERS_LEVEL_5).add(block);
+					break;
+				default:
+					this.tag(StorageTags.Blocks.HOPPERS_LEVEL_0).add(block);
 					break;
 			}
 		}
@@ -115,6 +150,9 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 					break;
 				case 4:
 					this.tag(StorageTags.Blocks.SHULKERS_LEVEL_4).add(block);
+					break;
+				case 5:
+					this.tag(StorageTags.Blocks.SHULKERS_LEVEL_5).add(block);
 					break;
 				default:
 					this.tag(StorageTags.Blocks.SHULKERS_LEVEL_0).add(block);

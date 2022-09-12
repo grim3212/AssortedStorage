@@ -15,6 +15,7 @@ import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.inventory.LockedHopperContainer;
 import com.grim3212.assorted.storage.common.inventory.LockedMaterialContainer;
+import com.grim3212.assorted.storage.common.inventory.LockedSidedInvWrapper;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
@@ -53,7 +54,6 @@ import net.minecraftforge.items.VanillaInventoryCodeHooks;
 
 public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements Hopper {
 
-	public static final int MOVE_ITEM_SPEED = 8;
 	private int cooldownTime = -1;
 	private long tickedGameTime;
 
@@ -185,7 +185,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
 				}
 
 				if (flag) {
-					hopperBE.setCooldown(8);
+					hopperBE.setCooldown(hopperBE.storageMaterial.hopperCooldown());
 					setChanged(level, pos, state);
 					return true;
 				}
@@ -267,7 +267,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
 									k = 1;
 								}
 							}
-							hopperBE.setCooldown(8 - k);
+							hopperBE.setCooldown(hopperBE.storageMaterial.hopperCooldown() - k);
 						}
 					}
 				}
@@ -297,7 +297,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
 										k = 1;
 									}
 								}
-								hopperBE.setCooldown(8 - k);
+								hopperBE.setCooldown(hopperBE.storageMaterial.hopperCooldown() - k);
 							}
 						}
 					}
@@ -557,7 +557,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
 								}
 							}
 
-							hopperblockentity1.setCooldown(8 - k);
+							hopperblockentity1.setCooldown(hopperblockentity1.storageMaterial.hopperCooldown() - k);
 						}
 					}
 				}
@@ -652,7 +652,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
 	}
 
 	public boolean isOnCustomCooldown() {
-		return this.cooldownTime > 8;
+		return this.cooldownTime > storageMaterial.hopperCooldown();
 	}
 
 	public static void entityInside(Level level, BlockPos pos, BlockState state, Entity entity, LockedHopperBlockEntity hopperBE) {
@@ -688,13 +688,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
 
 				if (wasEmpty && originalStackSize > stack.getCount()) {
 					if (!hopper.isOnCustomCooldown()) {
-						// This cooldown is always set to 8 in vanilla with one exception:
-						// Hopper -> Hopper transfer sets this cooldown to 7 when this hopper
-						// has not been updated as recently as the one pushing items into it.
-						// This vanilla behavior is preserved by VanillaInventoryCodeHooks#insertStack,
-						// the cooldown is set properly by the hopper that is pushing items into this
-						// one.
-						hopper.setCooldown(8);
+						hopper.setCooldown(hopper.storageMaterial.hopperCooldown());
 					}
 				}
 

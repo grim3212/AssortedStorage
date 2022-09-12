@@ -40,8 +40,8 @@ public class LockedHopperScreen extends AbstractContainerScreen<LockedHopperCont
 		int yCols = 5;
 
 		if (storageMaterial != null) {
-			xRows = Math.max(1, storageMaterial.getXRows() / 3);
-			yCols = Math.max(1, storageMaterial.getYCols() / 3) + 2;
+			xRows = storageMaterial.hopperXRows();
+			yCols = storageMaterial.hopperYCols();
 		}
 
 		this.imageHeight = 114 + xRows * 18;
@@ -96,7 +96,7 @@ public class LockedHopperScreen extends AbstractContainerScreen<LockedHopperCont
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
 
-		int xRows = storageMaterial == null ? 1 : Math.max(1, storageMaterial.getXRows() / 3);
+		int xRows = storageMaterial == null ? 1 : storageMaterial.hopperXRows();
 
 		blit(matrixStack, i, j, 0, 0, this.imageWidth, xRows * 18 + 17, this.textureXSize, this.textureYSize);
 		blit(matrixStack, i, j + xRows * 18 + 17, 0, startOfPlayerInventoryY, this.imageWidth, heightOfPlayerInvetory, this.textureXSize, this.textureYSize);

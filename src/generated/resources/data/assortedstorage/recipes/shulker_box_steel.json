@@ -12,7 +12,7 @@
         "type": "assortedstorage:locked_upgrading",
         "key": {
           "C": {
-            "tag": "assortedstorage:shulkers/level_2"
+            "tag": "assortedstorage:shulkers/level_3"
           },
           "M": {
             "tag": "forge:ingots/steel"

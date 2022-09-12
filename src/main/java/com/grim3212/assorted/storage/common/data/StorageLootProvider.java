@@ -10,6 +10,7 @@ import java.util.Map;
 import com.grim3212.assorted.storage.common.block.GoldSafeBlock;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.block.LockedChestBlock;
+import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
@@ -70,6 +71,10 @@ public class StorageLootProvider implements DataProvider {
 		}
 
 		for (RegistryObject<LockedBarrelBlock> b : StorageBlocks.BARRELS.values()) {
+			blocks.add(b.get());
+		}
+
+		for (RegistryObject<LockedHopperBlock> b : StorageBlocks.HOPPERS.values()) {
 			blocks.add(b.get());
 		}
 	}

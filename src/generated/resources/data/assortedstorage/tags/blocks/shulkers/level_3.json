@@ -1,10 +1,8 @@
 {
   "values": [
-    "assortedstorage:shulker_box_invar",
-    "assortedstorage:shulker_box_electrum",
-    "assortedstorage:shulker_box_diamond",
+    "assortedstorage:shulker_box_gold",
     "assortedstorage:shulker_box_silver",
-    "assortedstorage:shulker_box_steel",
+    "assortedstorage:shulker_box_bronze",
     "assortedstorage:shulker_box_ruby"
   ]
 }

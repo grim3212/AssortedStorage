@@ -1,6 +1,8 @@
 {
   "values": [
-    "assortedstorage:chest_platinum",
-    "assortedstorage:chest_netherite"
+    "assortedstorage:chest_diamond",
+    "assortedstorage:chest_steel",
+    "assortedstorage:chest_electrum",
+    "assortedstorage:chest_invar"
   ]
 }

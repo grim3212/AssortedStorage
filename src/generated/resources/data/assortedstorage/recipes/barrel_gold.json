@@ -12,7 +12,7 @@
         "type": "assortedstorage:locked_upgrading",
         "key": {
           "C": {
-            "tag": "assortedstorage:barrels/level_1"
+            "tag": "assortedstorage:barrels/level_2"
           },
           "M": {
             "tag": "forge:ingots/gold"

@@ -1,5 +1,6 @@
 {
   "values": [
+    "assortedstorage:hopper_stone",
     "minecraft:hopper",
     "assortedstorage:locked_hopper"
   ]

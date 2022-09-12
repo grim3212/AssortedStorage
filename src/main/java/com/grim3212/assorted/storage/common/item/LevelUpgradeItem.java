@@ -6,10 +6,12 @@ import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.block.LockedChestBlock;
+import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedBarrelBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedChestBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.LockedHopperBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedShulkerBoxBlockEntity;
 import com.grim3212.assorted.storage.common.handler.StorageConfig;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
@@ -32,10 +34,12 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.BarrelBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -130,6 +134,30 @@ public class LevelUpgradeItem extends Item {
 					newBlockEntity = new LockedBarrelBlockEntity(pos, newState);
 				}
 			}
+		} else if (world.getBlockState(pos).getBlock()instanceof LockedHopperBlock hopperBlock) {
+			int currentStorageLevel = hopperBlock.getStorageMaterial() != null ? hopperBlock.getStorageMaterial().getStorageLevel() : 0;
+			boolean startingUpgrade = this.storageMaterial.getStorageLevel() == 0 || this.storageMaterial.getStorageLevel() == 1;
+			boolean canUpgrade = (startingUpgrade && (hopperBlock.getStorageMaterial() == null || hopperBlock.getStorageMaterial().getStorageLevel() == 0)) || currentStorageLevel == this.storageMaterial.getStorageLevel() - 1;
+
+			if (canUpgrade) {
+				BlockEntity blockEntity = world.getBlockEntity(pos);
+				if (blockEntity != null && blockEntity instanceof LockedHopperBlockEntity hopperBE) {
+					if (hopperBE.getNumberOfPlayersUsing(world, hopperBE) > 0) {
+						return InteractionResult.PASS;
+					}
+
+					if (hopperBE.isLocked() && !StorageUtil.canAccess(world, pos, player)) {
+						return InteractionResult.PASS;
+					}
+
+					currentLockCode = hopperBE.getLockCode();
+					currentCustomName = hopperBE.getCustomName();
+					currentItems = hopperBE.getItems();
+
+					newState = StorageBlocks.HOPPERS.get(storageMaterial).get().defaultBlockState().setValue(LockedHopperBlock.FACING, world.getBlockState(pos).getValue(LockedHopperBlock.FACING)).setValue(LockedHopperBlock.ENABLED, world.getBlockState(pos).getValue(LockedHopperBlock.ENABLED));
+					newBlockEntity = new LockedHopperBlockEntity(pos, newState);
+				}
+			}
 		} else if (world.getBlockState(pos).getBlock()instanceof LockedShulkerBoxBlock shulkerBlock) {
 			int currentStorageLevel = shulkerBlock.getStorageMaterial() != null ? shulkerBlock.getStorageMaterial().getStorageLevel() : 0;
 			boolean startingUpgrade = this.storageMaterial.getStorageLevel() == 0 || this.storageMaterial.getStorageLevel() == 1;
@@ -203,6 +231,25 @@ public class LevelUpgradeItem extends Item {
 
 					newState = StorageBlocks.BARRELS.get(storageMaterial).get().defaultBlockState().setValue(LockedBarrelBlock.FACING, world.getBlockState(pos).getValue(BarrelBlock.FACING));
 					newBlockEntity = new LockedBarrelBlockEntity(pos, newState);
+				}
+			}
+		} else if (world.getBlockState(pos).getBlock()instanceof HopperBlock hopperToUpgrade) {
+			if (this.storageMaterial.getStorageLevel() == 0 || this.storageMaterial.getStorageLevel() == 1) {
+				BlockEntity blockEntity = world.getBlockEntity(pos);
+				if (blockEntity != null && blockEntity instanceof HopperBlockEntity hopperBE) {
+					if (!hopperBE.canOpen(player)) {
+						return InteractionResult.PASS;
+					}
+
+					currentCustomName = hopperBE.getCustomName();
+					currentItems = NonNullList.withSize(hopperBE.getContainerSize(), ItemStack.EMPTY);
+
+					for (int slot = 0; slot < hopperBE.getContainerSize(); slot++) {
+						currentItems.set(slot, hopperBE.getItem(slot).copy());
+					}
+
+					newState = StorageBlocks.HOPPERS.get(storageMaterial).get().defaultBlockState().setValue(LockedHopperBlock.FACING, world.getBlockState(pos).getValue(HopperBlock.FACING)).setValue(LockedHopperBlock.ENABLED, world.getBlockState(pos).getValue(HopperBlock.ENABLED));
+					newBlockEntity = new LockedHopperBlockEntity(pos, newState);
 				}
 			}
 		} else if (world.getBlockState(pos).getBlock()instanceof ShulkerBoxBlock shulkerToUpgrade) {

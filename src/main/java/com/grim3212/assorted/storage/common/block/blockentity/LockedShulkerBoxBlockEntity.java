@@ -9,6 +9,7 @@ import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.IStorageMaterial;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.inventory.LockedMaterialContainer;
+import com.grim3212.assorted.storage.common.inventory.LockedSidedInvWrapper;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
