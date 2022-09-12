@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.GoldSafeBlock;
+import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.inventory.StorageContainer;
 
 import net.minecraft.core.BlockPos;
@@ -16,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class GoldSafeBlockEntity extends BaseStorageBlockEntity {
@@ -43,6 +45,11 @@ public class GoldSafeBlockEntity extends BaseStorageBlockEntity {
 
 	@Override
 	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, @Nullable Direction direction) {
-		return !(Block.byItem(itemStackIn.getItem()) instanceof GoldSafeBlock) && super.canPlaceItemThroughFace(index, itemStackIn, direction);
+		return !(Block.byItem(itemStackIn.getItem()) instanceof LockedShulkerBoxBlock || Block.byItem(itemStackIn.getItem()) instanceof ShulkerBoxBlock || Block.byItem(itemStackIn.getItem()) instanceof GoldSafeBlock) && super.canPlaceItemThroughFace(index, itemStackIn, direction);
+	}
+
+	@Override
+	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, @Nullable Direction direction, String lockCode, boolean force) {
+		return !(Block.byItem(itemStackIn.getItem()) instanceof LockedShulkerBoxBlock || Block.byItem(itemStackIn.getItem()) instanceof ShulkerBoxBlock || Block.byItem(itemStackIn.getItem()) instanceof GoldSafeBlock) && itemStackIn.getItem().canFitInsideContainerItems() && super.canPlaceItemThroughFace(index, itemStackIn, direction, lockCode, force);
 	}
 }

@@ -2,6 +2,7 @@
   "values": [
     "#forge:chests/wooden",
     "#forge:barrels/wooden",
+    "#forge:hoppers",
     "#assortedstorage:shulkers/normal"
   ]
 }

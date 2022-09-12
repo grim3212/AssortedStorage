@@ -21,7 +21,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -37,10 +36,9 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
 @OnlyIn(value = Dist.CLIENT, _interface = IStorage.class)
-public abstract class BaseStorageBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider, INamed, IStorage, ILockable {
+public abstract class BaseStorageBlockEntity extends BlockEntity implements LockedWorldlyContainer, MenuProvider, INamed, IStorage, ILockable {
 
 	private NonNullList<ItemStack> chestContents;
 	protected int numPlayersUsing;
@@ -310,7 +308,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 	private LazyOptional<?> storageItemHandler = LazyOptional.of(() -> createSidedHandler());
 
 	protected IItemHandler createSidedHandler() {
-		return new SidedInvWrapper(this, null);
+		return new LockedSidedInvWrapper(this, null);
 	}
 
 	/**
@@ -402,5 +400,15 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 	@Override
 	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
 		return !this.isLocked();
+	}
+
+	@Override
+	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction, String code, boolean force) {
+		return force || (this.isLocked() ? this.lockCode.getLockCode().equals(code) : true);
+	}
+
+	@Override
+	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction, String code, boolean force) {
+		return force || (this.isLocked() ? this.lockCode.getLockCode().equals(code) : true);
 	}
 }

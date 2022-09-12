@@ -9,21 +9,19 @@ import com.grim3212.assorted.storage.common.save.EnderSavedData;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
-@OnlyIn(value = Dist.CLIENT, _interface = IStorage.class)
 public class LockedEnderChestBlockEntity extends BaseStorageBlockEntity {
 
 	private LockedEnderChestInventory inventory;
@@ -111,18 +109,8 @@ public class LockedEnderChestBlockEntity extends BaseStorageBlockEntity {
 	}
 
 	@Override
-	public ItemStack removeItem(int index, int count) {
-		ItemStack stack = this.getInventory().extractItem(index, count, false);
-		if (!stack.isEmpty()) {
-			this.setChanged();
-		}
-
-		return stack;
-	}
-
-	@Override
-	public ItemStack removeItemNoUpdate(int index) {
-		return this.getInventory().extractItem(index, 1, false);
+	public NonNullList<ItemStack> getItems() {
+		return this.inventory.getItems();
 	}
 
 	@Override
@@ -148,6 +136,26 @@ public class LockedEnderChestBlockEntity extends BaseStorageBlockEntity {
 	@Override
 	protected Component getDefaultName() {
 		return Component.translatable(AssortedStorage.MODID + ".container.locked_ender_chest");
+	}
+
+	@Override
+	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction) {
+		return !this.isLocked();
+	}
+
+	@Override
+	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
+		return !this.isLocked();
+	}
+
+	@Override
+	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction, String code, boolean force) {
+		return force || (this.isLocked() ? this.getLockCode().equals(code) : true);
+	}
+
+	@Override
+	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction, String code, boolean force) {
+		return force || (this.isLocked() ? this.getLockCode().equals(code) : true);
 	}
 
 }

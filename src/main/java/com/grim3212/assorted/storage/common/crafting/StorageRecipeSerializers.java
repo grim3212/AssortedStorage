@@ -19,6 +19,7 @@ public class StorageRecipeSerializers {
 	public static final RegistryObject<SimpleRecipeSerializer<LockedShulkerBoxRecipe>> LOCKED_SHULKER_BOX = register("locked_shulker_box", () -> LockedShulkerBoxRecipe.SERIALIZER);
 	public static final RegistryObject<SimpleRecipeSerializer<LockedShulkerBoxColoring>> SHULKER_BOX_COLORING = register("shulker_box_coloring", () -> LockedShulkerBoxColoring.SERIALIZER);
 	public static final RegistryObject<SimpleRecipeSerializer<LockedBarrelRecipe>> LOCKED_BARREL = register("locked_barrel", () -> LockedBarrelRecipe.SERIALIZER);
+	public static final RegistryObject<SimpleRecipeSerializer<LockedHopperRecipe>> LOCKED_HOPPER = register("locked_hopper", () -> LockedHopperRecipe.SERIALIZER);
 	public static final RegistryObject<RecipeSerializer<LockedUpgradingRecipe>> LOCKED_UPGRADING = register("locked_upgrading", () -> new LockedUpgradingRecipe.Serializer());
 
 	private static <T extends RecipeSerializer<?>> RegistryObject<T> register(final String name, final Supplier<T> sup) {

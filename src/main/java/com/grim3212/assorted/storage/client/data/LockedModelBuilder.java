@@ -7,23 +7,23 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
-public class LockedBarrelModelBuilder extends ModelBuilder<LockedBarrelModelBuilder> {
+public class LockedModelBuilder extends ModelBuilder<LockedModelBuilder> {
 
 	private static final String BARREL_MODEL_LOADER = new ResourceLocation(AssortedStorage.MODID, "models/barrel").toString();
 
 	private ResourceLocation unlockedModel;
 	private ResourceLocation lockedModel;
 
-	protected LockedBarrelModelBuilder(ResourceLocation outputLocation, ExistingFileHelper existingFileHelper) {
+	protected LockedModelBuilder(ResourceLocation outputLocation, ExistingFileHelper existingFileHelper) {
 		super(outputLocation, existingFileHelper);
 	}
 
-	public LockedBarrelModelBuilder unlockedModel(ResourceLocation unlockedModel) {
+	public LockedModelBuilder unlockedModel(ResourceLocation unlockedModel) {
 		this.unlockedModel = unlockedModel;
 		return this;
 	}
 
-	public LockedBarrelModelBuilder lockedModel(ResourceLocation lockedModel) {
+	public LockedModelBuilder lockedModel(ResourceLocation lockedModel) {
 		this.lockedModel = lockedModel;
 		return this;
 	}

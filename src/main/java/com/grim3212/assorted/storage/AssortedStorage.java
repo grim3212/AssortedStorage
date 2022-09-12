@@ -3,7 +3,7 @@ package com.grim3212.assorted.storage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.grim3212.assorted.storage.client.data.LockedBarrelModelProvider;
+import com.grim3212.assorted.storage.client.data.LockedModelProvider;
 import com.grim3212.assorted.storage.client.data.StorageBlockstateProvider;
 import com.grim3212.assorted.storage.client.data.StorageItemModelProvider;
 import com.grim3212.assorted.storage.client.proxy.ClientProxy;
@@ -93,7 +93,7 @@ public class AssortedStorage {
 		datagenerator.addProvider(event.includeServer(), new StorageLootProvider(datagenerator));
 
 		// Client
-		LockedBarrelModelProvider barrelProvider = new LockedBarrelModelProvider(datagenerator, fileHelper);
+		LockedModelProvider barrelProvider = new LockedModelProvider(datagenerator, fileHelper);
 		datagenerator.addProvider(event.includeClient(), new StorageBlockstateProvider(datagenerator, fileHelper, barrelProvider));
 		datagenerator.addProvider(event.includeClient(), barrelProvider);
 		datagenerator.addProvider(event.includeClient(), new StorageItemModelProvider(datagenerator, fileHelper));

@@ -1,10 +1,10 @@
 {
   "values": [
-    "assortedstorage:barrel_silver",
-    "assortedstorage:barrel_diamond",
-    "assortedstorage:barrel_ruby",
-    "assortedstorage:barrel_steel",
+    "assortedstorage:barrel_invar",
     "assortedstorage:barrel_electrum",
-    "assortedstorage:barrel_invar"
+    "assortedstorage:barrel_diamond",
+    "assortedstorage:barrel_silver",
+    "assortedstorage:barrel_steel",
+    "assortedstorage:barrel_ruby"
   ]
 }

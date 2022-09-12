@@ -31,6 +31,13 @@ public class StorageTags {
 		public static final TagKey<Block> BARRELS_LEVEL_3 = storageTag("barrels/level_3");
 		public static final TagKey<Block> BARRELS_LEVEL_4 = storageTag("barrels/level_4");
 
+		public static final TagKey<Block> HOPPERS = forgeTag("hoppers");
+		public static final TagKey<Block> HOPPERS_LEVEL_0 = storageTag("hoppers/level_0");
+		public static final TagKey<Block> HOPPERS_LEVEL_1 = storageTag("hoppers/level_1");
+		public static final TagKey<Block> HOPPERS_LEVEL_2 = storageTag("hoppers/level_2");
+		public static final TagKey<Block> HOPPERS_LEVEL_3 = storageTag("hoppers/level_3");
+		public static final TagKey<Block> HOPPERS_LEVEL_4 = storageTag("hoppers/level_4");
+
 		public static TagKey<Block> forgeTag(String name) {
 			return BlockTags.create(new ResourceLocation("forge", name));
 		}
@@ -82,6 +89,13 @@ public class StorageTags {
 		public static final TagKey<Item> BARRELS_LEVEL_2 = storageTag("barrels/level_2");
 		public static final TagKey<Item> BARRELS_LEVEL_3 = storageTag("barrels/level_3");
 		public static final TagKey<Item> BARRELS_LEVEL_4 = storageTag("barrels/level_4");
+
+		public static final TagKey<Item> HOPPERS = forgeTag("hoppers");
+		public static final TagKey<Item> HOPPERS_LEVEL_0 = storageTag("hoppers/level_0");
+		public static final TagKey<Item> HOPPERS_LEVEL_1 = storageTag("hoppers/level_1");
+		public static final TagKey<Item> HOPPERS_LEVEL_2 = storageTag("hoppers/level_2");
+		public static final TagKey<Item> HOPPERS_LEVEL_3 = storageTag("hoppers/level_3");
+		public static final TagKey<Item> HOPPERS_LEVEL_4 = storageTag("hoppers/level_4");
 
 		public static final TagKey<Item> STORAGE_LEVEL_UPGRADES = forgeTag("storage/level_upgrades");
 		public static final TagKey<Item> STORAGE_LEVEL_0_UPGRADES = forgeTag("storage/level_0_upgrades");

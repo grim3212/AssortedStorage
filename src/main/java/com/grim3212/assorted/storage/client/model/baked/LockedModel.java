@@ -26,12 +26,12 @@ import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
 import net.minecraftforge.client.model.geometry.IGeometryLoader;
 import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
 
-public class LockedBarrelModel implements IUnbakedGeometry<LockedBarrelModel> {
+public class LockedModel implements IUnbakedGeometry<LockedModel> {
 
 	private final BlockModel unbakedUnlockedModel;
 	private final BlockModel unbakedLockedModel;
 
-	private LockedBarrelModel(BlockModel unbakedUnlockedModel, BlockModel unbakedLockedModel) {
+	private LockedModel(BlockModel unbakedUnlockedModel, BlockModel unbakedLockedModel) {
 		this.unbakedUnlockedModel = unbakedUnlockedModel;
 		this.unbakedLockedModel = unbakedLockedModel;
 	}
@@ -50,18 +50,18 @@ public class LockedBarrelModel implements IUnbakedGeometry<LockedBarrelModel> {
 	public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation name) {
 		BakedModel bakedUnlockedBarrel = unbakedUnlockedModel.bake(bakery, spriteGetter, transform, name);
 		BakedModel bakedLockedBarrel = unbakedLockedModel.bake(bakery, spriteGetter, transform, name);
-		return new LockedBarrelBakedModel(bakedUnlockedBarrel, bakedLockedBarrel, owner, spriteGetter.apply(owner.getMaterial("particle")), bakery, spriteGetter, transform, overrides, name);
+		return new LockedBakedModel(bakedUnlockedBarrel, bakedLockedBarrel, owner, spriteGetter.apply(owner.getMaterial("particle")), bakery, spriteGetter, transform, overrides, name);
 	}
 
-	public enum Loader implements IGeometryLoader<LockedBarrelModel> {
+	public enum Loader implements IGeometryLoader<LockedModel> {
 		INSTANCE;
 
 		@Nonnull
 		@Override
-		public LockedBarrelModel read(JsonObject jsonObject, JsonDeserializationContext deserializationContext) throws JsonParseException {
+		public LockedModel read(JsonObject jsonObject, JsonDeserializationContext deserializationContext) throws JsonParseException {
 			BlockModel unlockedModel = deserializationContext.deserialize(jsonObject.getAsJsonObject("unlocked"), BlockModel.class);
 			BlockModel lockedModel = deserializationContext.deserialize(jsonObject.getAsJsonObject("locked"), BlockModel.class);
-			return new LockedBarrelModel(unlockedModel, lockedModel);
+			return new LockedModel(unlockedModel, lockedModel);
 		}
 	}
 }

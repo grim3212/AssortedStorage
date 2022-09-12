@@ -1,5 +1,7 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
+import java.util.stream.IntStream;
+
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.inventory.LockedMaterialContainer;
@@ -8,6 +10,7 @@ import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -20,12 +23,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
 
 public class LockedBarrelBlockEntity extends BaseStorageBlockEntity {
 
 	private final StorageMaterial storageMaterial;
-	public static final ModelProperty<Boolean> IS_LOCKED = new ModelProperty<Boolean>();
+	protected final int[] slots;
 
 	public LockedBarrelBlockEntity(BlockPos pos, BlockState state) {
 		super(StorageBlockEntityTypes.LOCKED_BARREL.get(), pos, state);
@@ -38,6 +40,13 @@ public class LockedBarrelBlockEntity extends BaseStorageBlockEntity {
 			this.storageMaterial = null;
 			this.setStartingContents(27);
 		}
+
+		this.slots = IntStream.range(0, this.getContainerSize()).toArray();
+	}
+
+	@Override
+	public int[] getSlotsForFace(Direction side) {
+		return this.slots;
 	}
 
 	@Override
@@ -74,7 +83,7 @@ public class LockedBarrelBlockEntity extends BaseStorageBlockEntity {
 
 	@Override
 	public ModelData getModelData() {
-		return ModelData.builder().with(IS_LOCKED, this.isLocked()).build();
+		return ModelData.builder().with(ModelProperties.IS_LOCKED, this.isLocked()).build();
 	}
 
 	@Override

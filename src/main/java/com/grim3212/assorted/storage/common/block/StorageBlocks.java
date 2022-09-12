@@ -64,6 +64,7 @@ public class StorageBlocks {
 	public static final RegistryObject<LockedChestBlock> LOCKED_CHEST = registerChest("locked_chest", () -> new LockedChestBlock(null, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
 	public static final RegistryObject<LockedShulkerBoxBlock> LOCKED_SHULKER_BOX = registerShulker("locked_shulker_box", () -> new LockedShulkerBoxBlock(null, BlockBehaviour.Properties.of(Material.SHULKER_SHELL)));
 	public static final RegistryObject<LockedBarrelBlock> LOCKED_BARREL = register("locked_barrel", EnabledCondition.BARRELS_CONDITION, () -> new LockedBarrelBlock(null, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
+	public static final RegistryObject<LockedHopperBlock> LOCKED_HOPPER = register("locked_hopper", EnabledCondition.HOPPERS_CONDITION, () -> new LockedHopperBlock(null, BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).requiresCorrectToolForDrops().strength(3.0F, 4.8F).sound(SoundType.METAL).noOcclusion()));
 
 	public static final RegistryObject<LockedDoorBlock> LOCKED_OAK_DOOR = registerNoItem("locked_oak_door", () -> new LockedDoorBlock(Blocks.OAK_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.WOOD).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
 	public static final RegistryObject<LockedDoorBlock> LOCKED_SPRUCE_DOOR = registerNoItem("locked_spruce_door", () -> new LockedDoorBlock(Blocks.SPRUCE_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.PODZOL).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));

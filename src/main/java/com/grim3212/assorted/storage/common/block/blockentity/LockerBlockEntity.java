@@ -102,6 +102,26 @@ public class LockerBlockEntity extends BaseStorageBlockEntity {
 	}
 
 	@Override
+	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction, String lockCode, boolean force) {
+		BlockEntity lockerDown = level.getBlockEntity(worldPosition.below());
+		if (lockerDown != null && lockerDown instanceof LockerBlockEntity) {
+			return ((LockerBlockEntity) lockerDown).canPlaceItemThroughFace(index, itemStackIn, direction, lockCode, force);
+		}
+
+		return super.canPlaceItemThroughFace(index, itemStackIn, direction, lockCode, force);
+	}
+
+	@Override
+	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction, String lockCode, boolean force) {
+		BlockEntity lockerDown = level.getBlockEntity(worldPosition.below());
+		if (lockerDown != null && lockerDown instanceof LockerBlockEntity) {
+			return ((LockerBlockEntity) lockerDown).canTakeItemThroughFace(index, stack, direction, lockCode, force);
+		}
+
+		return super.canTakeItemThroughFace(index, stack, direction, lockCode, force);
+	}
+
+	@Override
 	public AABB getRenderBoundingBox() {
 		return hasUpperLocker() ? super.getRenderBoundingBox().expandTowards(0, 1, 0) : super.getRenderBoundingBox();
 	}

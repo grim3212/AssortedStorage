@@ -89,6 +89,10 @@ public enum StorageMaterial {
 		return this.xRows * this.yCols;
 	}
 
+	public int hopperSize() {
+		return Math.max(1, xRows / 3) + Math.max(1, yCols / 3) + 2;
+	}
+
 	public TagKey<Item> getMaterial() {
 		return material.get();
 	}

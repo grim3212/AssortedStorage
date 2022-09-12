@@ -10,17 +10,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.generators.ModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
-public class LockedBarrelModelProvider extends ModelProvider<LockedBarrelModelBuilder> {
+public class LockedModelProvider extends ModelProvider<LockedModelBuilder> {
 
-	final Map<ResourceLocation, LockedBarrelModelBuilder> previousModels = new HashMap<>();
+	final Map<ResourceLocation, LockedModelBuilder> previousModels = new HashMap<>();
 
-	public LockedBarrelModelProvider(DataGenerator gen, ExistingFileHelper exHelper) {
-		super(gen, AssortedStorage.MODID, "block", LockedBarrelModelBuilder::new, exHelper);
+	public LockedModelProvider(DataGenerator gen, ExistingFileHelper exHelper) {
+		super(gen, AssortedStorage.MODID, "block", LockedModelBuilder::new, exHelper);
 	}
 
 	@Override
 	public String getName() {
-		return "Storage barrel model provider";
+		return "Storage locked model provider";
 	}
 
 	@Override

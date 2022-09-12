@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
 
-import com.grim3212.assorted.storage.common.block.blockentity.LockedBarrelBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.ModelProperties;
 import com.grim3212.assorted.storage.common.util.StorageUtil;
 
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -31,7 +31,8 @@ import net.minecraftforge.client.model.BakedModelWrapper;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
 
-public class LockedBarrelBakedModel extends BakedModelWrapper<BakedModel> {
+public class LockedBakedModel extends BakedModelWrapper<BakedModel> {
+
 	protected final ModelBakery bakery;
 	protected final Function<Material, TextureAtlasSprite> spriteGetter;
 	protected final ModelState transform;
@@ -41,7 +42,7 @@ public class LockedBarrelBakedModel extends BakedModelWrapper<BakedModel> {
 	protected final TextureAtlasSprite baseSprite;
 	private final BakedModel lockedModel;
 
-	public LockedBarrelBakedModel(BakedModel unlockedModel, BakedModel lockedModel, IGeometryBakingContext owner, TextureAtlasSprite baseSprite, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation name) {
+	public LockedBakedModel(BakedModel unlockedModel, BakedModel lockedModel, IGeometryBakingContext owner, TextureAtlasSprite baseSprite, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation name) {
 		super(unlockedModel);
 		this.lockedModel = lockedModel;
 		this.bakery = bakery;
@@ -62,8 +63,8 @@ public class LockedBarrelBakedModel extends BakedModelWrapper<BakedModel> {
 	@Nonnull
 	@Override
 	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull RandomSource rand, @Nonnull ModelData extraData, @Nullable RenderType renderType) {
-		if (extraData.get(LockedBarrelBlockEntity.IS_LOCKED) != null) {
-			if (extraData.get(LockedBarrelBlockEntity.IS_LOCKED)) {
+		if (extraData.get(ModelProperties.IS_LOCKED) != null) {
+			if (extraData.get(ModelProperties.IS_LOCKED)) {
 				return this.lockedModel.getQuads(state, side, rand, extraData, RenderType.solid());
 			}
 		}
@@ -87,13 +88,13 @@ public class LockedBarrelBakedModel extends BakedModelWrapper<BakedModel> {
 
 		@Override
 		public BakedModel resolve(BakedModel originalModel, ItemStack stack, @Nullable ClientLevel world, @Nullable LivingEntity entity, int field) {
-			LockedBarrelBakedModel barrelModel = (LockedBarrelBakedModel) originalModel;
+			LockedBakedModel lockedModel = (LockedBakedModel) originalModel;
 
 			if (StorageUtil.hasCode(stack)) {
-				return barrelModel.lockedModel;
+				return lockedModel.lockedModel;
 			}
 
-			return barrelModel.originalModel;
+			return lockedModel.originalModel;
 		}
 	}
 }

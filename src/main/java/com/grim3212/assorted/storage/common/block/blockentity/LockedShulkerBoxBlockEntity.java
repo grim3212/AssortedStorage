@@ -23,7 +23,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.monster.Shulker;
@@ -34,6 +33,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity.AnimationStatus;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,9 +42,8 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
-public class LockedShulkerBoxBlockEntity extends RandomizableContainerBlockEntity implements WorldlyContainer, ILockable {
+public class LockedShulkerBoxBlockEntity extends RandomizableContainerBlockEntity implements LockedWorldlyContainer, ILockable {
 
 	private final StorageMaterial storageMaterial;
 	private int openCount;
@@ -271,16 +270,33 @@ public class LockedShulkerBoxBlockEntity extends RandomizableContainerBlockEntit
 		this.setChanged();
 	}
 
+	@Override
 	public int[] getSlotsForFace(Direction dir) {
 		return slots;
 	}
 
+	@Override
 	public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
-		return !this.isLocked() && !(Block.byItem(stack.getItem()) instanceof LockedShulkerBoxBlock) && stack.getItem().canFitInsideContainerItems();
+		return !this.isLocked() && !(Block.byItem(stack.getItem()) instanceof LockedShulkerBoxBlock || Block.byItem(stack.getItem()) instanceof ShulkerBoxBlock) && stack.getItem().canFitInsideContainerItems();
 	}
 
+	@Override
 	public boolean canTakeItemThroughFace(int p_59682_, ItemStack p_59683_, Direction p_59684_) {
 		return !this.isLocked();
+	}
+
+	@Override
+	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction, String code, boolean force) {
+		if (!(Block.byItem(itemStackIn.getItem()) instanceof LockedShulkerBoxBlock || Block.byItem(itemStackIn.getItem()) instanceof ShulkerBoxBlock) && itemStackIn.getItem().canFitInsideContainerItems()) {
+			return force || (this.isLocked() ? this.lockCode.getLockCode().equals(code) : true);
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction, String code, boolean force) {
+		return force || (this.isLocked() ? this.lockCode.getLockCode().equals(code) : true);
 	}
 
 	public float getProgress(float p_59658_) {
@@ -293,7 +309,7 @@ public class LockedShulkerBoxBlockEntity extends RandomizableContainerBlockEntit
 
 	@Override
 	protected IItemHandler createUnSidedHandler() {
-		return new SidedInvWrapper(this, Direction.UP);
+		return new LockedSidedInvWrapper(this, Direction.UP);
 	}
 
 	@Override

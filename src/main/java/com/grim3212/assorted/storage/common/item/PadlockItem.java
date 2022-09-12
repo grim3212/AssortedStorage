@@ -4,11 +4,13 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
+import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseLockedBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedBarrelBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedChestBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedEnderChestBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.LockedHopperBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedShulkerBoxBlockEntity;
 
 import net.minecraft.core.BlockPos;
@@ -25,11 +27,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.BarrelBlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.EnderChestBlockEntity;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
@@ -58,6 +62,7 @@ public class PadlockItem extends CombinationItem {
 		lockMappings.put(Blocks.ENDER_CHEST, StorageBlocks.LOCKED_ENDER_CHEST.get());
 		lockMappings.put(Blocks.CHEST, StorageBlocks.LOCKED_CHEST.get());
 		lockMappings.put(Blocks.BARREL, StorageBlocks.LOCKED_BARREL.get());
+		lockMappings.put(Blocks.HOPPER, StorageBlocks.LOCKED_HOPPER.get());
 
 		lockMappings.put(Blocks.SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
 		lockMappings.put(Blocks.WHITE_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
@@ -131,6 +136,10 @@ public class PadlockItem extends CombinationItem {
 			}
 		} else if (new ItemStack(world.getBlockState(pos).getBlock()).is(Tags.Items.BARRELS_WOODEN)) {
 			if (tryPlaceLockOnBarrel(world, pos, player, hand)) {
+				return InteractionResult.SUCCESS;
+			}
+		} else if (world.getBlockState(pos).getBlock() instanceof HopperBlock) {
+			if (tryPlaceLockOnHopper(world, pos, player, hand)) {
 				return InteractionResult.SUCCESS;
 			}
 		}
@@ -279,6 +288,46 @@ public class PadlockItem extends CombinationItem {
 					if (worldIn.getBlockEntity(pos)instanceof LockedBarrelBlockEntity barrelBE) {
 						barrelBE.setLockCode(code);
 						barrelBE.setItems(chestItems);
+					}
+
+					return true;
+				}
+			}
+
+		}
+
+		return false;
+	}
+
+	private boolean tryPlaceLockOnHopper(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
+		ItemStack itemstack = entityplayer.getItemInHand(hand);
+
+		if (itemstack.hasTag()) {
+			String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
+			if (!code.isEmpty()) {
+				BlockState currentBlockState = worldIn.getBlockState(pos);
+
+				Block newBlock = getMatchingBlock(currentBlockState.getBlock());
+				if (newBlock == Blocks.AIR) {
+					return false;
+				}
+
+				if (worldIn.getBlockEntity(pos)instanceof HopperBlockEntity previousHopperBE) {
+					NonNullList<ItemStack> chestItems = NonNullList.withSize(previousHopperBE.getContainerSize(), ItemStack.EMPTY);
+					for (int i = 0; i < previousHopperBE.getContainerSize(); i++) {
+						chestItems.set(i, previousHopperBE.getItem(i).copy());
+					}
+					// This way the block doesn't drop items and dupe
+					previousHopperBE.clearContent();
+
+					if (!entityplayer.isCreative())
+						itemstack.shrink(1);
+
+					worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(LockedHopperBlock.FACING, currentBlockState.getValue(LockedHopperBlock.FACING)), 3);
+					worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+					if (worldIn.getBlockEntity(pos)instanceof LockedHopperBlockEntity hopperBE) {
+						hopperBE.setLockCode(code);
+						hopperBE.setItems(chestItems);
 					}
 
 					return true;

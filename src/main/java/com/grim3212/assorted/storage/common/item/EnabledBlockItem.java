@@ -19,6 +19,8 @@ public class EnabledBlockItem extends BlockItem {
 	@Override
 	protected boolean allowedIn(CreativeModeTab tab) {
 		switch (this.enabledCondition) {
+			case EnabledCondition.HOPPERS_CONDITION:
+				return StorageConfig.COMMON.hoppersEnabled.get() ? super.allowedIn(tab) : false;
 			case EnabledCondition.BARRELS_CONDITION:
 				return StorageConfig.COMMON.barrelsEnabled.get() ? super.allowedIn(tab) : false;
 			default:

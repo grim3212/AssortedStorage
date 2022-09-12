@@ -70,6 +70,7 @@ public class StorageItemModelProvider extends ItemModelProvider {
 		generatedItem(StorageItems.LOCKSMITH_KEY.get());
 		generatedItem(StorageItems.LOCKSMITH_LOCK.get());
 		generatedItem(StorageItems.KEY_RING.get());
+		generatedItem(StorageBlocks.LOCKED_HOPPER.get().asItem());
 
 		generatedItem(StorageItems.BLANK_UPGRADE.get());
 		for (RegistryObject<LevelUpgradeItem> levelUpgrade : StorageItems.LEVEL_UPGRADES.values()) {

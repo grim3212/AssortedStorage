@@ -32,6 +32,7 @@ public class StorageBlockEntityTypes {
 	public static final RegistryObject<BlockEntityType<LockedChestBlockEntity>> LOCKED_CHEST = BLOCK_ENTITIES.register("locked_chest", () -> new BlockEntityType<>(LockedChestBlockEntity::new, getChests(), null));
 	public static final RegistryObject<BlockEntityType<LockedShulkerBoxBlockEntity>> LOCKED_SHULKER_BOX = BLOCK_ENTITIES.register("locked_shulker_box", () -> new BlockEntityType<>(LockedShulkerBoxBlockEntity::new, getShulkers(), null));
 	public static final RegistryObject<BlockEntityType<LockedBarrelBlockEntity>> LOCKED_BARREL = BLOCK_ENTITIES.register("locked_barrel", () -> new BlockEntityType<>(LockedBarrelBlockEntity::new, getBarrels(), null));
+	public static final RegistryObject<BlockEntityType<LockedHopperBlockEntity>> LOCKED_HOPPER = BLOCK_ENTITIES.register("locked_hopper", () -> new BlockEntityType<>(LockedHopperBlockEntity::new, getHoppers(), null));
 
 	private static Set<Block> getWarehouseCrates() {
 		return Sets.newHashSet(StorageBlocks.OAK_WAREHOUSE_CRATE.get(), StorageBlocks.BIRCH_WAREHOUSE_CRATE.get(), StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get(), StorageBlocks.ACACIA_WAREHOUSE_CRATE.get(), StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get(), StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get(), StorageBlocks.WARPED_WAREHOUSE_CRATE.get(), StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get(), StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get());
@@ -52,6 +53,12 @@ public class StorageBlockEntityTypes {
 	private static Set<Block> getBarrels() {
 		Set<Block> barrels = StorageBlocks.BARRELS.values().stream().map((b) -> b.get()).collect(Collectors.toSet());
 		barrels.add(StorageBlocks.LOCKED_BARREL.get());
+		return barrels;
+	}
+
+	private static Set<Block> getHoppers() {
+		Set<Block> barrels = Sets.newHashSet();
+		barrels.add(StorageBlocks.LOCKED_HOPPER.get());
 		return barrels;
 	}
 }

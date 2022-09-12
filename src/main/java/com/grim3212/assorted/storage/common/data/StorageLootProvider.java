@@ -86,6 +86,7 @@ public class StorageLootProvider implements DataProvider {
 
 		tables.put(StorageBlocks.LOCKED_CHEST.getId(), genRegular(Blocks.CHEST));
 		tables.put(StorageBlocks.LOCKED_BARREL.getId(), genRegular(Blocks.BARREL));
+		tables.put(StorageBlocks.LOCKED_HOPPER.getId(), genRegular(Blocks.HOPPER));
 		tables.put(StorageBlocks.LOCKED_ENDER_CHEST.getId(), genInventoryCode(StorageBlocks.LOCKED_ENDER_CHEST.get()));
 
 		tables.put(StorageBlocks.LOCKED_SHULKER_BOX.getId(), genShulker(StorageBlocks.LOCKED_SHULKER_BOX.get()));

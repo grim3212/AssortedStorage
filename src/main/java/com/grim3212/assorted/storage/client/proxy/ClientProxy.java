@@ -19,13 +19,14 @@ import com.grim3212.assorted.storage.client.model.SafeModel;
 import com.grim3212.assorted.storage.client.model.ShulkerBoxModel;
 import com.grim3212.assorted.storage.client.model.StorageModelLayers;
 import com.grim3212.assorted.storage.client.model.WarehouseCrateModel;
-import com.grim3212.assorted.storage.client.model.baked.LockedBarrelModel;
+import com.grim3212.assorted.storage.client.model.baked.LockedModel;
 import com.grim3212.assorted.storage.client.screen.DualLockerScreen;
 import com.grim3212.assorted.storage.client.screen.GenericStorageScreen;
 import com.grim3212.assorted.storage.client.screen.GoldSafeScreen;
 import com.grim3212.assorted.storage.client.screen.ItemTowerScreen;
 import com.grim3212.assorted.storage.client.screen.KeyRingScreen;
 import com.grim3212.assorted.storage.client.screen.LockedEnderChestScreen;
+import com.grim3212.assorted.storage.client.screen.LockedHopperScreen;
 import com.grim3212.assorted.storage.client.screen.LockedMaterialScreen;
 import com.grim3212.assorted.storage.client.screen.LockerScreen;
 import com.grim3212.assorted.storage.client.screen.LocksmithWorkbenchScreen;
@@ -58,7 +59,7 @@ public class ClientProxy implements IProxy {
 	}
 
 	private void registerLoaders(final ModelEvent.RegisterGeometryLoaders event) {
-		event.register("models/barrel", LockedBarrelModel.Loader.INSTANCE);
+		event.register("models/barrel", LockedModel.Loader.INSTANCE);
 	}
 
 	private void registerLayers(final EntityRenderersEvent.RegisterLayerDefinitions event) {
@@ -92,6 +93,10 @@ public class ClientProxy implements IProxy {
 
 		StorageContainerTypes.BARRELS.forEach((material, menu) -> {
 			MenuScreens.register(menu.get(), LockedMaterialScreen::new);
+		});
+
+		StorageContainerTypes.HOPPERS.forEach((material, menu) -> {
+			MenuScreens.register(menu.get(), LockedHopperScreen::new);
 		});
 
 		StorageContainerTypes.SHULKERS.forEach((material, menu) -> {

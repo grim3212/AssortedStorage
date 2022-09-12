@@ -1,5 +1,7 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
+import java.util.stream.IntStream;
+
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.LockedChestBlock;
 import com.grim3212.assorted.storage.common.inventory.LockedMaterialContainer;
@@ -7,6 +9,7 @@ import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -18,6 +21,7 @@ import net.minecraft.world.phys.AABB;
 public class LockedChestBlockEntity extends BaseStorageBlockEntity {
 
 	private final StorageMaterial storageMaterial;
+	protected final int[] slots;
 
 	public LockedChestBlockEntity(BlockPos pos, BlockState state) {
 		super(StorageBlockEntityTypes.LOCKED_CHEST.get(), pos, state);
@@ -30,6 +34,13 @@ public class LockedChestBlockEntity extends BaseStorageBlockEntity {
 			this.storageMaterial = null;
 			this.setStartingContents(27);
 		}
+
+		this.slots = IntStream.range(0, this.getContainerSize()).toArray();
+	}
+
+	@Override
+	public int[] getSlotsForFace(Direction side) {
+		return this.slots;
 	}
 
 	@Override

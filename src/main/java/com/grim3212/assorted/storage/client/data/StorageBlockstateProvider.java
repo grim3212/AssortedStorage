@@ -6,6 +6,7 @@ import java.util.Map;
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.block.LockedChestBlock;
+import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
@@ -25,11 +26,11 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class StorageBlockstateProvider extends BlockStateProvider {
 
-	private final LockedBarrelModelProvider loaderModels;
+	private final LockedModelProvider loaderModels;
 
 	private final Map<Block, ResourceLocation> blocks;
 
-	public StorageBlockstateProvider(DataGenerator generator, ExistingFileHelper exFileHelper, LockedBarrelModelProvider loader) {
+	public StorageBlockstateProvider(DataGenerator generator, ExistingFileHelper exFileHelper, LockedModelProvider loader) {
 		super(generator, AssortedStorage.MODID, exFileHelper);
 		this.loaderModels = loader;
 
@@ -97,7 +98,45 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 			createMaterialBarrel(b.get());
 		}
 
+		createNormalHopper(StorageBlocks.LOCKED_HOPPER.get());
+
 		this.loaderModels.previousModels();
+	}
+
+	private void createNormalHopper(LockedHopperBlock b) {
+//		ModelFile unlocked = models().getExistingFile(new ResourceLocation("block/hopper"));
+//		ModelFile locked = models().withExistingParent(name(b) + "_locked", new ResourceLocation("block/hopper")).texture("side", new ResourceLocation(prefix("block/hoppers/locked_hopper_outside")));
+//		ModelFile unlockedSide = models().getExistingFile(new ResourceLocation("block/hopper_side"));
+//		ModelFile lockedSide = models().withExistingParent(name(b) + "_locked_side", new ResourceLocation("block/hopper_side")).texture("side", new ResourceLocation(prefix("block/hoppers/locked_hopper_outside")));
+
+		ModelFile unlocked = models().getExistingFile(new ResourceLocation("block/hopper"));
+		ModelFile locked = models().withExistingParent(name(b) + "_locked", new ResourceLocation(prefix("block/template_hopper")));
+		ModelFile unlockedSide = models().getExistingFile(new ResourceLocation("block/hopper_side"));
+		ModelFile lockedSide = models().withExistingParent(name(b) + "_locked_side", new ResourceLocation(prefix("block/template_hopper_side")));
+
+		
+		LockedModelBuilder hopperModel = this.loaderModels.getBuilder(name(b)).unlockedModel(unlocked.getLocation()).lockedModel(locked.getLocation());
+		LockedModelBuilder hopperSideModel = this.loaderModels.getBuilder(name(b) + "_side").unlockedModel(unlockedSide.getLocation()).lockedModel(lockedSide.getLocation());
+
+		getVariantBuilder(StorageBlocks.LOCKED_HOPPER.get()).forAllStatesExcept(state -> {
+			Direction dir = state.getValue(LockedHopperBlock.FACING);
+			int rotation = 0;
+			switch (dir) {
+				case EAST:
+					rotation = 90;
+					break;
+				case WEST:
+					rotation = 270;
+					break;
+				case SOUTH:
+					rotation = 180;
+					break;
+				default:
+					rotation = 0;
+					break;
+			}
+			return ConfiguredModel.builder().modelFile(dir == Direction.DOWN ? hopperModel : hopperSideModel).rotationY(rotation).build();
+		}, LockedHopperBlock.ENABLED);
 	}
 
 	private void createNormalBarrel(LockedBarrelBlock b) {
@@ -105,7 +144,7 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 		ModelFile locked = models().cubeBottomTop(name(b) + "_locked", new ResourceLocation("block/barrel_side"), new ResourceLocation("block/barrel_bottom"), new ResourceLocation(prefix("block/barrels/locked_barrel_top")));
 		ModelFile open = models().cubeBottomTop(name(b) + "_open", new ResourceLocation("block/barrel_side"), new ResourceLocation("block/barrel_bottom"), new ResourceLocation("block/barrel_top_open"));
 
-		LockedBarrelModelBuilder barrelModel = this.loaderModels.getBuilder(name(b)).unlockedModel(unlocked.getLocation()).lockedModel(locked.getLocation());
+		LockedModelBuilder barrelModel = this.loaderModels.getBuilder(name(b)).unlockedModel(unlocked.getLocation()).lockedModel(locked.getLocation());
 
 		getVariantBuilder(StorageBlocks.LOCKED_BARREL.get()).forAllStates(state -> {
 			Direction dir = state.getValue(BlockStateProperties.FACING);
@@ -121,7 +160,7 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 		ModelFile locked = models().cubeBottomTop(name(b) + "_locked", new ResourceLocation(prefix("block/barrels/" + material.toString() + "/barrel_side")), new ResourceLocation(prefix("block/barrels/" + material.toString() + "/barrel_bottom")), new ResourceLocation(prefix("block/barrels/" + material.toString() + "/locked_barrel_top")));
 		ModelFile open = models().cubeBottomTop(name(b) + "_open", new ResourceLocation(prefix("block/barrels/" + material.toString() + "/barrel_side")), new ResourceLocation(prefix("block/barrels/" + material.toString() + "/barrel_bottom")), new ResourceLocation(prefix("block/barrels/" + material.toString() + "/barrel_top_open")));
 
-		LockedBarrelModelBuilder barrelModel = this.loaderModels.getBuilder(name(b)).unlockedModel(unlocked.getLocation()).lockedModel(locked.getLocation());
+		LockedModelBuilder barrelModel = this.loaderModels.getBuilder(name(b)).unlockedModel(unlocked.getLocation()).lockedModel(locked.getLocation());
 
 		getVariantBuilder(b).forAllStates(state -> {
 			Direction dir = state.getValue(BlockStateProperties.FACING);

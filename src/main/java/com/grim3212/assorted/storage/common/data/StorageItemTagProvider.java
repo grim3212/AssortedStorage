@@ -58,6 +58,19 @@ public class StorageItemTagProvider extends ItemTagsProvider {
 		this.copy(StorageTags.Blocks.BARRELS_LEVEL_2, StorageTags.Items.CAN_UPGRADE_LEVEL_3);
 		this.copy(StorageTags.Blocks.BARRELS_LEVEL_3, StorageTags.Items.CAN_UPGRADE_LEVEL_4);
 
+		this.copy(StorageTags.Blocks.HOPPERS, StorageTags.Items.HOPPERS);
+		this.copy(StorageTags.Blocks.HOPPERS_LEVEL_0, StorageTags.Items.HOPPERS_LEVEL_0);
+		this.copy(StorageTags.Blocks.HOPPERS_LEVEL_1, StorageTags.Items.HOPPERS_LEVEL_1);
+		this.copy(StorageTags.Blocks.HOPPERS_LEVEL_2, StorageTags.Items.HOPPERS_LEVEL_2);
+		this.copy(StorageTags.Blocks.HOPPERS_LEVEL_3, StorageTags.Items.HOPPERS_LEVEL_3);
+		this.copy(StorageTags.Blocks.HOPPERS_LEVEL_4, StorageTags.Items.HOPPERS_LEVEL_4);
+
+		this.tag(StorageTags.Items.CAN_UPGRADE_LEVEL_0).addTag(StorageTags.Items.HOPPERS);
+		this.copy(StorageTags.Blocks.HOPPERS_LEVEL_0, StorageTags.Items.CAN_UPGRADE_LEVEL_1);
+		this.copy(StorageTags.Blocks.HOPPERS_LEVEL_1, StorageTags.Items.CAN_UPGRADE_LEVEL_2);
+		this.copy(StorageTags.Blocks.HOPPERS_LEVEL_2, StorageTags.Items.CAN_UPGRADE_LEVEL_3);
+		this.copy(StorageTags.Blocks.HOPPERS_LEVEL_3, StorageTags.Items.CAN_UPGRADE_LEVEL_4);
+
 		this.copy(StorageTags.Blocks.SHULKERS_NORMAL, StorageTags.Items.SHULKERS_NORMAL);
 		this.copy(StorageTags.Blocks.SHULKERS_LEVEL_0, StorageTags.Items.SHULKERS_LEVEL_0);
 		this.copy(StorageTags.Blocks.SHULKERS_LEVEL_1, StorageTags.Items.SHULKERS_LEVEL_1);
