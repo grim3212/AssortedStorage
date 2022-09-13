@@ -1,0 +1,9 @@
+{
+  "loader": "assortedstorage:models/barrel",
+  "locked": {
+    "parent": "assortedstorage:block/hopper_amethyst_locked_side"
+  },
+  "unlocked": {
+    "parent": "assortedstorage:block/hopper_amethyst_unlocked_side"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "parent": "assortedstorage:block/template_hopper_side",
+  "textures": {
+    "inside": "assortedstorage:block/hoppers/sapphire/hopper_inside",
+    "particle": "assortedstorage:block/hoppers/sapphire/hopper_outside",
+    "side": "assortedstorage:block/hoppers/sapphire/hopper_outside",
+    "top": "assortedstorage:block/hoppers/sapphire/hopper_top",
+    "topsides": "assortedstorage:block/hoppers/sapphire/locked_hopper_outside"
+  }
+}

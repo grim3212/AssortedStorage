@@ -1,0 +1,9 @@
+{
+  "loader": "assortedstorage:models/barrel",
+  "locked": {
+    "parent": "assortedstorage:block/barrel_nickel_locked"
+  },
+  "unlocked": {
+    "parent": "assortedstorage:block/barrel_nickel_unlocked"
+  }
+}

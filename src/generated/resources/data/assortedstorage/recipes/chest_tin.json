@@ -1,0 +1,32 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "chests"
+        }
+      ],
+      "recipe": {
+        "type": "assortedstorage:locked_upgrading",
+        "key": {
+          "C": {
+            "tag": "assortedstorage:chests/level_0"
+          },
+          "M": {
+            "tag": "forge:ingots/tin"
+          }
+        },
+        "pattern": [
+          "MMM",
+          "MCM",
+          "MMM"
+        ],
+        "result": {
+          "item": "assortedstorage:chest_tin"
+        }
+      }
+    }
+  ]
+}

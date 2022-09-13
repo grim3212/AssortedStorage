@@ -1,0 +1,55 @@
+{
+  "advancements": [
+    {
+      "advancement": {
+        "parent": "minecraft:recipes/root",
+        "criteria": {
+          "has_material": {
+            "conditions": {
+              "items": [
+                {
+                  "tag": "forge:ingots/iron"
+                }
+              ]
+            },
+            "trigger": "minecraft:inventory_changed"
+          },
+          "has_shulker": {
+            "conditions": {
+              "items": [
+                {
+                  "tag": "assortedstorage:shulkers/level_0"
+                }
+              ]
+            },
+            "trigger": "minecraft:inventory_changed"
+          },
+          "has_the_recipe": {
+            "conditions": {
+              "recipe": "assortedstorage:shulker_box_iron"
+            },
+            "trigger": "minecraft:recipe_unlocked"
+          }
+        },
+        "requirements": [
+          [
+            "has_shulker",
+            "has_material",
+            "has_the_recipe"
+          ]
+        ],
+        "rewards": {
+          "recipes": [
+            "assortedstorage:shulker_box_iron"
+          ]
+        }
+      },
+      "conditions": [
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "shulkers"
+        }
+      ]
+    }
+  ]
+}

@@ -3,7 +3,7 @@ package com.grim3212.assorted.storage.common.block;
 import javax.annotation.Nullable;
 
 import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
-import com.grim3212.assorted.storage.common.block.blockentity.ILockeable;
+import com.grim3212.assorted.storage.common.block.blockentity.ILockable;
 import com.grim3212.assorted.storage.common.block.blockentity.INamed;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
@@ -26,6 +26,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
@@ -39,12 +40,17 @@ import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -52,14 +58,15 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.network.NetworkHooks;
 
-public abstract class BaseStorageBlock extends Block implements EntityBlock {
+public abstract class BaseStorageBlock extends Block implements EntityBlock, SimpleWaterloggedBlock {
 
+	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 	public static final VoxelShape FAKE_SIDES_AND_BOTTOM = Block.box(0.01D, 0.01D, 0.01D, 16.0D, 16.0D, 16.0D);
 
 	public BaseStorageBlock(Properties properties) {
 		super(properties);
-		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(WATERLOGGED, false));
 	}
 
 	@Override
@@ -84,23 +91,38 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock {
 	}
 
 	@Override
+	public BlockState updateShape(BlockState state, Direction dir, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+		if (state.getValue(WATERLOGGED)) {
+			level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+		}
+
+		return super.updateShape(state, dir, neighborState, level, pos, neighborPos);
+	}
+
+	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		Direction direction = context.getHorizontalDirection().getOpposite();
+		FluidState fluidstate = context.getLevel().getFluidState(context.getClickedPos());
 
-		return this.defaultBlockState().setValue(FACING, direction);
+		return this.defaultBlockState().setValue(FACING, direction).setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER);
+	}
+
+	@Override
+	public FluidState getFluidState(BlockState state) {
+		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
 	}
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(FACING);
+		builder.add(FACING, WATERLOGGED);
 	}
 
 	@Override
 	public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
 		BlockEntity te = worldIn.getBlockEntity(pos);
 
-		if (te instanceof ILockeable) {
-			ILockeable tileentity = (ILockeable) te;
+		if (te instanceof ILockable) {
+			ILockable tileentity = (ILockable) te;
 
 			if (tileentity.isLocked() && !StorageUtil.canAccess(worldIn, pos, player))
 				return -1.0F;
@@ -122,11 +144,11 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock {
 
 	@Override
 	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-		if (state.getBlock() != newState.getBlock()) {
+		if (!state.is(newState.getBlock())) {
 			BlockEntity tileentity = worldIn.getBlockEntity(pos);
 
-			if (tileentity instanceof ILockeable) {
-				ILockeable teStorage = (ILockeable) tileentity;
+			if (tileentity instanceof ILockable) {
+				ILockable teStorage = (ILockable) tileentity;
 
 				if (teStorage.isLocked()) {
 					ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
@@ -144,10 +166,6 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock {
 		}
 	}
 
-	protected boolean canBeLocked(Level worldIn, BlockPos pos) {
-		return !((ILockeable) worldIn.getBlockEntity(pos)).isLocked();
-	}
-
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		if (this.canBeLocked(worldIn, pos) && player.getItemInHand(handIn).getItem() == StorageItems.LOCKSMITH_LOCK.get()) {
@@ -157,8 +175,8 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock {
 
 		if (player.isShiftKeyDown() && StorageUtil.canAccess(worldIn, pos, player)) {
 			BlockEntity tileentity = worldIn.getBlockEntity(pos);
-			if (tileentity instanceof ILockeable) {
-				ILockeable teStorage = (ILockeable) tileentity;
+			if (tileentity instanceof ILockable) {
+				ILockable teStorage = (ILockable) tileentity;
 
 				if (teStorage.isLocked()) {
 					ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
@@ -186,6 +204,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock {
 				if (inamedcontainerprovider != null) {
 					NetworkHooks.openScreen((ServerPlayer) player, inamedcontainerprovider, pos);
 					player.awardStat(this.getOpenStat());
+					PiglinAi.angerNearbyPiglins(player, true);
 				}
 			}
 		}
@@ -245,16 +264,24 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock {
 		return false;
 	}
 
+	protected boolean canBeLocked(Level worldIn, BlockPos pos) {
+		return !((ILockable) worldIn.getBlockEntity(pos)).isLocked();
+	}
+
 	protected boolean removeLock(Level worldIn, BlockPos pos, Player entityplayer) {
-		ILockeable tileentity = (ILockeable) worldIn.getBlockEntity(pos);
+		return tryRemoveLock(worldIn, pos, entityplayer);
+	}
+
+	public static boolean tryRemoveLock(Level worldIn, BlockPos pos, Player entityplayer) {
+		ILockable tileentity = (ILockable) worldIn.getBlockEntity(pos);
 		tileentity.setLockCode("");
 		worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
 		return true;
 	}
 
-	private boolean tryPlaceLock(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
+	public static boolean tryPlaceLock(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
 		BlockEntity tileentity = worldIn.getBlockEntity(pos);
-		ILockeable lockeable = (ILockeable) tileentity;
+		ILockable lockeable = (ILockable) tileentity;
 		ItemStack itemstack = entityplayer.getItemInHand(hand);
 		String code = StorageUtil.getCode(itemstack);
 

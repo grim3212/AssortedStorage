@@ -1,0 +1,26 @@
+{
+  "values": [
+    "assortedstorage:barrel_diamond",
+    "assortedstorage:barrel_gold",
+    "assortedstorage:barrel_steel",
+    "assortedstorage:barrel_aluminum",
+    "assortedstorage:barrel_silver",
+    "assortedstorage:barrel_copper",
+    "assortedstorage:barrel_bronze",
+    "assortedstorage:barrel_ruby",
+    "assortedstorage:barrel_nickel",
+    "assortedstorage:barrel_peridot",
+    "assortedstorage:barrel_tin",
+    "assortedstorage:barrel_topaz",
+    "assortedstorage:barrel_sapphire",
+    "assortedstorage:barrel_iron",
+    "assortedstorage:barrel_emerald",
+    "assortedstorage:barrel_electrum",
+    "assortedstorage:barrel_lead",
+    "assortedstorage:barrel_invar",
+    "assortedstorage:barrel_platinum",
+    "assortedstorage:barrel_amethyst",
+    "assortedstorage:barrel_stone",
+    "assortedstorage:barrel_netherite"
+  ]
+}

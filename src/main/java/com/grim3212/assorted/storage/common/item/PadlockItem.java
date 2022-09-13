@@ -3,11 +3,18 @@ package com.grim3212.assorted.storage.common.item;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
+import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
+import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseLockedBlockEntity;
-import com.grim3212.assorted.storage.common.block.blockentity.ILockeable;
+import com.grim3212.assorted.storage.common.block.blockentity.LockedBarrelBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.LockedChestBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.LockedEnderChestBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.LockedHopperBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.LockedShulkerBoxBlockEntity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -20,9 +27,17 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
-import net.minecraft.world.level.block.EnderChestBlock;
+import net.minecraft.world.level.block.HopperBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.level.block.entity.BarrelBlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.EnderChestBlockEntity;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class PadlockItem extends CombinationItem {
@@ -45,6 +60,27 @@ public class PadlockItem extends CombinationItem {
 		lockMappings.put(Blocks.WARPED_DOOR, StorageBlocks.LOCKED_WARPED_DOOR.get());
 		lockMappings.put(Blocks.IRON_DOOR, StorageBlocks.LOCKED_IRON_DOOR.get());
 		lockMappings.put(Blocks.ENDER_CHEST, StorageBlocks.LOCKED_ENDER_CHEST.get());
+		lockMappings.put(Blocks.CHEST, StorageBlocks.LOCKED_CHEST.get());
+		lockMappings.put(Blocks.BARREL, StorageBlocks.LOCKED_BARREL.get());
+		lockMappings.put(Blocks.HOPPER, StorageBlocks.LOCKED_HOPPER.get());
+
+		lockMappings.put(Blocks.SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.WHITE_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.ORANGE_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.MAGENTA_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.LIGHT_BLUE_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.YELLOW_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.LIME_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.PINK_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.GRAY_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.LIGHT_GRAY_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.CYAN_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.PURPLE_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.BLUE_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.BROWN_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.GREEN_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.RED_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+		lockMappings.put(Blocks.BLACK_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
 
 		Block quartzDoor = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("assorteddecor:quartz_door"));
 		if (quartzDoor != Blocks.AIR) {
@@ -87,7 +123,23 @@ public class PadlockItem extends CombinationItem {
 				return InteractionResult.SUCCESS;
 			}
 		} else if (world.getBlockState(pos).getBlock() == Blocks.ENDER_CHEST) {
-			if (tryPlaceLockOnBlock(world, pos, player, hand)) {
+			if (tryPlaceLockOnEnderChest(world, pos, player, hand)) {
+				return InteractionResult.SUCCESS;
+			}
+		} else if (new ItemStack(world.getBlockState(pos).getBlock()).is(Tags.Items.CHESTS_WOODEN)) {
+			if (tryPlaceLockOnChest(world, pos, player, hand)) {
+				return InteractionResult.SUCCESS;
+			}
+		} else if (world.getBlockState(pos).getBlock() instanceof ShulkerBoxBlock) {
+			if (tryPlaceLockOnShulker(world, pos, player, hand)) {
+				return InteractionResult.SUCCESS;
+			}
+		} else if (new ItemStack(world.getBlockState(pos).getBlock()).is(Tags.Items.BARRELS_WOODEN)) {
+			if (tryPlaceLockOnBarrel(world, pos, player, hand)) {
+				return InteractionResult.SUCCESS;
+			}
+		} else if (world.getBlockState(pos).getBlock() instanceof HopperBlock) {
+			if (tryPlaceLockOnHopper(world, pos, player, hand)) {
 				return InteractionResult.SUCCESS;
 			}
 		}
@@ -95,7 +147,7 @@ public class PadlockItem extends CombinationItem {
 		return super.useOn(context);
 	}
 
-	private boolean tryPlaceLockOnBlock(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
+	private boolean tryPlaceLockOnEnderChest(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
 		ItemStack itemstack = entityplayer.getItemInHand(hand);
 
 		if (itemstack.hasTag()) {
@@ -108,15 +160,178 @@ public class PadlockItem extends CombinationItem {
 					return false;
 				}
 
-				if (!entityplayer.isCreative())
-					itemstack.shrink(1);
+				if (worldIn.getBlockEntity(pos)instanceof EnderChestBlockEntity previousChestEntity) {
 
-				worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(EnderChestBlock.FACING, currentBlockState.getValue(EnderChestBlock.FACING)), 3);
-				worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
-				ILockeable currentTE = (ILockeable) worldIn.getBlockEntity(pos);
-				currentTE.setLockCode(code);
+					if (!entityplayer.isCreative())
+						itemstack.shrink(1);
 
-				return true;
+					worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, currentBlockState.getValue(HorizontalDirectionalBlock.FACING)), 3);
+					worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+					if (worldIn.getBlockEntity(pos)instanceof LockedEnderChestBlockEntity chestBE) {
+						chestBE.setLockCode(code);
+					}
+
+					return true;
+				}
+			}
+
+		}
+
+		return false;
+	}
+
+	private boolean tryPlaceLockOnShulker(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
+		ItemStack itemstack = entityplayer.getItemInHand(hand);
+
+		if (itemstack.hasTag()) {
+			String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
+			if (!code.isEmpty()) {
+				BlockState currentBlockState = worldIn.getBlockState(pos);
+
+				Block newBlock = getMatchingBlock(currentBlockState.getBlock());
+				if (newBlock == Blocks.AIR) {
+					return false;
+				}
+
+				if (worldIn.getBlockEntity(pos)instanceof ShulkerBoxBlockEntity previousShulkerEntity) {
+					NonNullList<ItemStack> shulkerItems = NonNullList.withSize(previousShulkerEntity.getContainerSize(), ItemStack.EMPTY);
+					for (int i = 0; i < previousShulkerEntity.getContainerSize(); i++) {
+						shulkerItems.set(i, previousShulkerEntity.getItem(i).copy());
+					}
+
+					if (!entityplayer.isCreative())
+						itemstack.shrink(1);
+
+					worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(ShulkerBoxBlock.FACING, currentBlockState.getValue(ShulkerBoxBlock.FACING)), 3);
+					worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+					if (worldIn.getBlockEntity(pos)instanceof LockedShulkerBoxBlockEntity shulkerBE) {
+						shulkerBE.setItems(shulkerItems);
+						shulkerBE.setLockCode(code);
+						shulkerBE.setColor(ShulkerBoxBlock.getColorFromBlock(currentBlockState.getBlock()));
+					}
+
+					return true;
+				}
+			}
+
+		}
+
+		return false;
+	}
+
+	private boolean tryPlaceLockOnChest(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
+		ItemStack itemstack = entityplayer.getItemInHand(hand);
+
+		if (itemstack.hasTag()) {
+			String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
+			if (!code.isEmpty()) {
+				BlockState currentBlockState = worldIn.getBlockState(pos);
+
+				Block newBlock = getMatchingBlock(currentBlockState.getBlock());
+				if (newBlock == Blocks.AIR) {
+					return false;
+				}
+
+				if (worldIn.getBlockEntity(pos)instanceof ChestBlockEntity previousChestEntity) {
+					NonNullList<ItemStack> chestItems = NonNullList.withSize(previousChestEntity.getContainerSize(), ItemStack.EMPTY);
+					for (int i = 0; i < previousChestEntity.getContainerSize(); i++) {
+						chestItems.set(i, previousChestEntity.getItem(i).copy());
+					}
+					// This way the block doesn't drop items and dupe
+					previousChestEntity.clearContent();
+
+					if (!entityplayer.isCreative())
+						itemstack.shrink(1);
+
+					worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, currentBlockState.getValue(HorizontalDirectionalBlock.FACING)), 3);
+					worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+					if (worldIn.getBlockEntity(pos)instanceof LockedChestBlockEntity chestBE) {
+						chestBE.setLockCode(code);
+						chestBE.setItems(chestItems);
+					}
+
+					return true;
+				}
+			}
+
+		}
+
+		return false;
+	}
+
+	private boolean tryPlaceLockOnBarrel(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
+		ItemStack itemstack = entityplayer.getItemInHand(hand);
+
+		if (itemstack.hasTag()) {
+			String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
+			if (!code.isEmpty()) {
+				BlockState currentBlockState = worldIn.getBlockState(pos);
+
+				Block newBlock = getMatchingBlock(currentBlockState.getBlock());
+				if (newBlock == Blocks.AIR) {
+					return false;
+				}
+
+				if (worldIn.getBlockEntity(pos)instanceof BarrelBlockEntity previousBarrelEntity) {
+					NonNullList<ItemStack> chestItems = NonNullList.withSize(previousBarrelEntity.getContainerSize(), ItemStack.EMPTY);
+					for (int i = 0; i < previousBarrelEntity.getContainerSize(); i++) {
+						chestItems.set(i, previousBarrelEntity.getItem(i).copy());
+					}
+					// This way the block doesn't drop items and dupe
+					previousBarrelEntity.clearContent();
+
+					if (!entityplayer.isCreative())
+						itemstack.shrink(1);
+
+					worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(LockedBarrelBlock.FACING, currentBlockState.getValue(LockedBarrelBlock.FACING)), 3);
+					worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+					if (worldIn.getBlockEntity(pos)instanceof LockedBarrelBlockEntity barrelBE) {
+						barrelBE.setLockCode(code);
+						barrelBE.setItems(chestItems);
+					}
+
+					return true;
+				}
+			}
+
+		}
+
+		return false;
+	}
+
+	private boolean tryPlaceLockOnHopper(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
+		ItemStack itemstack = entityplayer.getItemInHand(hand);
+
+		if (itemstack.hasTag()) {
+			String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
+			if (!code.isEmpty()) {
+				BlockState currentBlockState = worldIn.getBlockState(pos);
+
+				Block newBlock = getMatchingBlock(currentBlockState.getBlock());
+				if (newBlock == Blocks.AIR) {
+					return false;
+				}
+
+				if (worldIn.getBlockEntity(pos)instanceof HopperBlockEntity previousHopperBE) {
+					NonNullList<ItemStack> chestItems = NonNullList.withSize(previousHopperBE.getContainerSize(), ItemStack.EMPTY);
+					for (int i = 0; i < previousHopperBE.getContainerSize(); i++) {
+						chestItems.set(i, previousHopperBE.getItem(i).copy());
+					}
+					// This way the block doesn't drop items and dupe
+					previousHopperBE.clearContent();
+
+					if (!entityplayer.isCreative())
+						itemstack.shrink(1);
+
+					worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(LockedHopperBlock.FACING, currentBlockState.getValue(LockedHopperBlock.FACING)), 3);
+					worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+					if (worldIn.getBlockEntity(pos)instanceof LockedHopperBlockEntity hopperBE) {
+						hopperBE.setLockCode(code);
+						hopperBE.setItems(chestItems);
+					}
+
+					return true;
+				}
 			}
 
 		}

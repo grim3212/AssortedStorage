@@ -1,0 +1,32 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "barrels"
+        }
+      ],
+      "recipe": {
+        "type": "assortedstorage:locked_upgrading",
+        "key": {
+          "C": {
+            "tag": "assortedstorage:barrels/level_4"
+          },
+          "M": {
+            "tag": "forge:ingots/netherite"
+          }
+        },
+        "pattern": [
+          "MMM",
+          "MCM",
+          "MMM"
+        ],
+        "result": {
+          "item": "assortedstorage:barrel_netherite"
+        }
+      }
+    }
+  ]
+}

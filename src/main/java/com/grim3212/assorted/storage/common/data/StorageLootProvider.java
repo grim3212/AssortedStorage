@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.grim3212.assorted.storage.common.block.GoldSafeBlock;
+import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
+import com.grim3212.assorted.storage.common.block.LockedChestBlock;
+import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
+import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 
@@ -36,6 +40,7 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePrope
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class StorageLootProvider implements DataProvider {
 
@@ -60,6 +65,18 @@ public class StorageLootProvider implements DataProvider {
 		blocks.add(StorageBlocks.WARPED_WAREHOUSE_CRATE.get());
 		blocks.add(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get());
 		blocks.add(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get());
+
+		for (RegistryObject<LockedChestBlock> b : StorageBlocks.CHESTS.values()) {
+			blocks.add(b.get());
+		}
+
+		for (RegistryObject<LockedBarrelBlock> b : StorageBlocks.BARRELS.values()) {
+			blocks.add(b.get());
+		}
+
+		for (RegistryObject<LockedHopperBlock> b : StorageBlocks.HOPPERS.values()) {
+			blocks.add(b.get());
+		}
 	}
 
 	@Override
@@ -72,7 +89,15 @@ public class StorageLootProvider implements DataProvider {
 
 		tables.put(StorageBlocks.GOLD_SAFE.getId(), genGoldSafe(StorageBlocks.GOLD_SAFE.get()));
 
+		tables.put(StorageBlocks.LOCKED_CHEST.getId(), genRegular(Blocks.CHEST));
+		tables.put(StorageBlocks.LOCKED_BARREL.getId(), genRegular(Blocks.BARREL));
+		tables.put(StorageBlocks.LOCKED_HOPPER.getId(), genRegular(Blocks.HOPPER));
 		tables.put(StorageBlocks.LOCKED_ENDER_CHEST.getId(), genInventoryCode(StorageBlocks.LOCKED_ENDER_CHEST.get()));
+
+		tables.put(StorageBlocks.LOCKED_SHULKER_BOX.getId(), genShulker(StorageBlocks.LOCKED_SHULKER_BOX.get()));
+		for (RegistryObject<LockedShulkerBoxBlock> b : StorageBlocks.SHULKERS.values()) {
+			tables.put(b.getId(), genShulker(b.get()));
+		}
 
 		for (Map.Entry<ResourceLocation, LootTable.Builder> e : tables.entrySet()) {
 			Path path = getPath(generator.getOutputFolder(), e.getKey());
@@ -115,6 +140,14 @@ public class StorageLootProvider implements DataProvider {
 
 	private static LootTable.Builder genGoldSafe(Block b) {
 		LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b).apply(CopyNameFunction.copyName(NameSource.BLOCK_ENTITY)).apply(SetContainerContents.setContents(StorageBlockEntityTypes.GOLD_SAFE.get()).withEntry(DynamicLoot.dynamicEntry(GoldSafeBlock.CONTENTS)));
+		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantValue.exactly(1)).add(entry).when(ExplosionCondition.survivesExplosion());
+		return LootTable.lootTable().withPool(pool);
+	}
+
+	private static LootTable.Builder genShulker(Block b) {
+		CopyNbtFunction.Builder colorFunc = CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Color", "Color");
+		CopyNbtFunction.Builder func = CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Storage_Lock", "Storage_Lock");
+		LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b).apply(func).apply(colorFunc).apply(CopyNameFunction.copyName(NameSource.BLOCK_ENTITY)).apply(SetContainerContents.setContents(StorageBlockEntityTypes.LOCKED_SHULKER_BOX.get()).withEntry(DynamicLoot.dynamicEntry(LockedShulkerBoxBlock.CONTENTS)));
 		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantValue.exactly(1)).add(entry).when(ExplosionCondition.survivesExplosion());
 		return LootTable.lootTable().withPool(pool);
 	}

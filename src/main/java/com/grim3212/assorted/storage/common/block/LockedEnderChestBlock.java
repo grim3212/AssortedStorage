@@ -3,7 +3,7 @@ package com.grim3212.assorted.storage.common.block;
 import java.util.List;
 
 import com.grim3212.assorted.storage.AssortedStorage;
-import com.grim3212.assorted.storage.common.block.blockentity.ILockeable;
+import com.grim3212.assorted.storage.common.block.blockentity.ILockable;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedEnderChestBlockEntity;
 import com.grim3212.assorted.storage.common.util.StorageUtil;
 
@@ -81,7 +81,7 @@ public class LockedEnderChestBlock extends BaseStorageBlock {
 	public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		super.setPlacedBy(worldIn, pos, state, placer, stack);
 
-		ILockeable lockeable = (ILockeable) worldIn.getBlockEntity(pos);
+		ILockable lockeable = (ILockable) worldIn.getBlockEntity(pos);
 		if (lockeable != null) {
 			lockeable.setLockCode(StorageUtil.getCode(stack));
 		}

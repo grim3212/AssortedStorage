@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "assortedstorage:block/locked_shulker_box"
+    }
+  }
+}

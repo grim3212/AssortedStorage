@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class BaseLockedBlockEntity extends BlockEntity implements ILockeable {
+public class BaseLockedBlockEntity extends BlockEntity implements ILockable {
 
 	private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
 

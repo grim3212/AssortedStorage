@@ -3,6 +3,7 @@ package com.grim3212.assorted.storage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.grim3212.assorted.storage.client.data.LockedModelProvider;
 import com.grim3212.assorted.storage.client.data.StorageBlockstateProvider;
 import com.grim3212.assorted.storage.client.data.StorageItemModelProvider;
 import com.grim3212.assorted.storage.client.proxy.ClientProxy;
@@ -13,6 +14,8 @@ import com.grim3212.assorted.storage.common.data.StorageBlockTagProvider;
 import com.grim3212.assorted.storage.common.data.StorageItemTagProvider;
 import com.grim3212.assorted.storage.common.data.StorageLootProvider;
 import com.grim3212.assorted.storage.common.data.StorageRecipes;
+import com.grim3212.assorted.storage.common.handler.EnabledCondition;
+import com.grim3212.assorted.storage.common.handler.StorageConfig;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.network.PacketHandler;
 import com.grim3212.assorted.storage.common.proxy.IProxy;
@@ -22,11 +25,14 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
@@ -61,10 +67,18 @@ public class AssortedStorage {
 		StorageBlockEntityTypes.BLOCK_ENTITIES.register(modBus);
 		StorageContainerTypes.CONTAINERS.register(modBus);
 		StorageRecipeSerializers.RECIPES.register(modBus);
+
+		ModLoadingContext.get().registerConfig(Type.COMMON, StorageConfig.COMMON_SPEC);
+
+		CraftingHelper.register(EnabledCondition.Serializer.INSTANCE);
 	}
 
 	private void setup(final FMLCommonSetupEvent event) {
 		PacketHandler.init();
+
+		event.enqueueWork(() -> {
+			StorageBlocks.initDispenserHandlers();
+		});
 	}
 
 	private void gatherData(GatherDataEvent event) {
@@ -79,7 +93,9 @@ public class AssortedStorage {
 		datagenerator.addProvider(event.includeServer(), new StorageLootProvider(datagenerator));
 
 		// Client
-		datagenerator.addProvider(event.includeClient(), new StorageBlockstateProvider(datagenerator, fileHelper));
+		LockedModelProvider barrelProvider = new LockedModelProvider(datagenerator, fileHelper);
+		datagenerator.addProvider(event.includeClient(), new StorageBlockstateProvider(datagenerator, fileHelper, barrelProvider));
+		datagenerator.addProvider(event.includeClient(), barrelProvider);
 		datagenerator.addProvider(event.includeClient(), new StorageItemModelProvider(datagenerator, fileHelper));
 	}
 }

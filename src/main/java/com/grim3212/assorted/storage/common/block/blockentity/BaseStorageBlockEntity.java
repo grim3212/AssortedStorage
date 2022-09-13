@@ -5,6 +5,8 @@ import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 
 import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
+import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
+import com.grim3212.assorted.storage.common.inventory.LockedSidedInvWrapper;
 import com.grim3212.assorted.storage.common.inventory.StorageContainer;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 
@@ -20,10 +22,10 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -35,10 +37,9 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
 @OnlyIn(value = Dist.CLIENT, _interface = IStorage.class)
-public abstract class BaseStorageBlockEntity extends BlockEntity implements WorldlyContainer, MenuProvider, INamed, IStorage, ILockeable {
+public abstract class BaseStorageBlockEntity extends BlockEntity implements LockedWorldlyContainer, MenuProvider, INamed, IStorage, ILockable {
 
 	private NonNullList<ItemStack> chestContents;
 	protected int numPlayersUsing;
@@ -56,7 +57,25 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 		super(typeIn, pos, state);
 
 		if (this.selfInventory())
-			this.chestContents = NonNullList.<ItemStack>withSize(inventorySize, ItemStack.EMPTY);
+			setStartingContents(inventorySize);
+	}
+
+	public void setStartingContents(int inventorySize) {
+		this.chestContents = NonNullList.<ItemStack>withSize(inventorySize, ItemStack.EMPTY);
+	}
+
+	public void setItems(NonNullList<ItemStack> itemsIn) {
+		if (itemsIn.size() == this.chestContents.size()) {
+			this.chestContents = itemsIn;
+		}
+
+		this.chestContents = NonNullList.<ItemStack>withSize(this.chestContents.size(), ItemStack.EMPTY);
+
+		for (int i = 0; i < itemsIn.size(); i++) {
+			this.chestContents.set(i, itemsIn.get(i));
+		}
+
+		this.setChanged();
 	}
 
 	@Override
@@ -151,6 +170,14 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 
 	protected abstract Component getDefaultName();
 
+	protected SoundEvent openSound() {
+		return SoundEvents.CHEST_OPEN;
+	}
+
+	protected SoundEvent closeSound() {
+		return SoundEvents.CHEST_CLOSE;
+	}
+
 	public void tick() {
 		int i = this.worldPosition.getX();
 		int j = this.worldPosition.getY();
@@ -159,7 +186,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 		this.numPlayersUsing = getNumberOfPlayersUsing(this.level, this, this.ticksSinceSync, i, j, k, this.numPlayersUsing);
 		this.prevRotation = this.rotation;
 		if (this.numPlayersUsing > 0 && this.rotation == 0.0F) {
-			this.playSound(SoundEvents.CHEST_OPEN);
+			this.playSound(openSound());
 		}
 
 		if (this.numPlayersUsing == 0 && this.rotation > 0.0F || this.numPlayersUsing > 0 && this.rotation < 1.0F) {
@@ -175,7 +202,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 			}
 
 			if (this.rotation < 0.5F && f1 >= 0.5F) {
-				this.playSound(SoundEvents.CHEST_CLOSE);
+				this.playSound(closeSound());
 			}
 
 			if (this.rotation < 0.0F) {
@@ -190,7 +217,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 		return Mth.lerp(partialTicks, this.prevRotation, this.rotation);
 	}
 
-	public static int getNumberOfPlayersUsing(Level worldIn, BaseStorageBlockEntity lockableTileEntity, int ticksSinceSync, int x, int y, int z, int numPlayersUsing) {
+	public int getNumberOfPlayersUsing(Level worldIn, BaseStorageBlockEntity lockableTileEntity, int ticksSinceSync, int x, int y, int z, int numPlayersUsing) {
 		if (!worldIn.isClientSide && numPlayersUsing != 0 && (ticksSinceSync + x + y + z) % 200 == 0) {
 			numPlayersUsing = getNumberOfPlayersUsing(worldIn, lockableTileEntity, x, y, z);
 		}
@@ -198,7 +225,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 		return numPlayersUsing;
 	}
 
-	public static int getNumberOfPlayersUsing(Level world, BaseStorageBlockEntity lockableTileEntity, int x, int y, int z) {
+	public int getNumberOfPlayersUsing(Level world, BaseStorageBlockEntity lockableTileEntity, int x, int y, int z) {
 		int i = 0;
 
 		for (Player playerentity : world.getEntitiesOfClass(Player.class, new AABB((double) ((float) x - 5.0F), (double) ((float) y - 5.0F), (double) ((float) z - 5.0F), (double) ((float) (x + 1) + 5.0F), (double) ((float) (y + 1) + 5.0F), (double) ((float) (z + 1) + 5.0F)))) {
@@ -208,6 +235,14 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 		}
 
 		return i;
+	}
+
+	public int getNumberOfPlayersUsing(Level world, BaseStorageBlockEntity lockableTileEntity) {
+		if (lockableTileEntity != null) {
+			return this.getNumberOfPlayersUsing(world, lockableTileEntity, lockableTileEntity.worldPosition.getX(), lockableTileEntity.worldPosition.getY(), lockableTileEntity.worldPosition.getZ());
+		}
+
+		return 0;
 	}
 
 	private void playSound(SoundEvent soundIn) {
@@ -254,6 +289,8 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 		if (block instanceof BaseStorageBlock) {
 			this.level.blockEvent(this.worldPosition, block, 1, this.numPlayersUsing);
 			this.level.updateNeighborsAt(this.worldPosition, block);
+		} else if (block instanceof LockedBarrelBlock) {
+			this.level.setBlock(this.getBlockPos(), getBlockState().setValue(BarrelBlock.OPEN, this.numPlayersUsing > 0), 3);
 		}
 	}
 
@@ -272,7 +309,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 	private LazyOptional<?> storageItemHandler = LazyOptional.of(() -> createSidedHandler());
 
 	protected IItemHandler createSidedHandler() {
-		return new SidedInvWrapper(this, null);
+		return new LockedSidedInvWrapper(this, null);
 	}
 
 	/**
@@ -364,5 +401,15 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Worl
 	@Override
 	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
 		return !this.isLocked();
+	}
+
+	@Override
+	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction, String code, boolean force) {
+		return force || (this.isLocked() ? this.lockCode.getLockCode().equals(code) : true);
+	}
+
+	@Override
+	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction, String code, boolean force) {
+		return force || (this.isLocked() ? this.lockCode.getLockCode().equals(code) : true);
 	}
 }

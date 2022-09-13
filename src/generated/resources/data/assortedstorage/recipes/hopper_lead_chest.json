@@ -1,0 +1,32 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "hoppers"
+        }
+      ],
+      "recipe": {
+        "type": "assortedstorage:locked_upgrading",
+        "key": {
+          "C": {
+            "item": "assortedstorage:chest_lead"
+          },
+          "M": {
+            "tag": "forge:ingots/iron"
+          }
+        },
+        "pattern": [
+          "M M",
+          "MCM",
+          " M "
+        ],
+        "result": {
+          "item": "assortedstorage:hopper_lead"
+        }
+      }
+    }
+  ]
+}

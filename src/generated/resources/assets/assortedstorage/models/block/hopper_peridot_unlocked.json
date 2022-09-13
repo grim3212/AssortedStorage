@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/hopper",
+  "textures": {
+    "inside": "assortedstorage:block/hoppers/peridot/hopper_inside",
+    "particle": "assortedstorage:block/hoppers/peridot/hopper_outside",
+    "side": "assortedstorage:block/hoppers/peridot/hopper_outside",
+    "top": "assortedstorage:block/hoppers/peridot/hopper_top"
+  }
+}

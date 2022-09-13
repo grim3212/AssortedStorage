@@ -12,7 +12,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 public class LockedEnderChestBlockEntityRenderer<T extends BlockEntity & IStorage> extends StorageBlockEntityRenderer<T> {
 
 	public LockedEnderChestBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-		super(context, new ChestModel(context.getModelSet().bakeLayer(StorageModelLayers.LOCKED_ENDER_CHEST)), new ResourceLocation(AssortedStorage.MODID, "textures/model/locked_ender_chest.png"));
+		super(context, new ChestModel(context.getModelSet().bakeLayer(StorageModelLayers.LOCKED_CHEST)), new ResourceLocation(AssortedStorage.MODID, "textures/model/locked_ender_chest.png"));
 	}
 
+	@Override
+	protected boolean alwaysLocked() {
+		return true;
+	}
 }
