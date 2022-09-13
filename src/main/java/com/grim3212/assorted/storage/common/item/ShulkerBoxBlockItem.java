@@ -43,6 +43,10 @@ public class ShulkerBoxBlockItem extends BlockItem {
 			return super.getDescriptionId(stack);
 		}
 
+		if(NBTHelper.getInt(stack, "Color") == -1) {
+			return super.getDescriptionId(stack);
+		}
+		
 		return super.getDescriptionId(stack) + "_" + DyeColor.byId(NBTHelper.getInt(stack, "Color")).getName();
 	}
 
