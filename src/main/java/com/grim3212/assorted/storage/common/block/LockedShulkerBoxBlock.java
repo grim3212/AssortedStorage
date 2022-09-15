@@ -8,6 +8,7 @@ import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.blockentity.ILockable;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedShulkerBoxBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
+import com.grim3212.assorted.storage.common.handler.StorageConfig;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.util.NBTHelper;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
@@ -70,6 +71,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorageMaterial {
 
@@ -322,11 +324,21 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
 
 	@Override
 	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
-		if (this.getStorageMaterial() == null) {
-			items.add(StorageUtil.setCodeOnStack("default", new ItemStack(StorageBlocks.LOCKED_SHULKER_BOX.get())));
-		} else {
-			items.add(new ItemStack(this));
+		if (!StorageConfig.COMMON.shulkersEnabled.get()) {
+			return;
 		}
+
+		if (this.getStorageMaterial() == null) {
+			ItemStack output = StorageUtil.setCodeOnStack("default", new ItemStack(StorageBlocks.LOCKED_SHULKER_BOX.get()));
+			items.add(output);
+			return;
+		}
+
+		if (StorageConfig.COMMON.hideUncraftableItems.get() && ForgeRegistries.ITEMS.tags().getTag(this.getStorageMaterial().getMaterial()).size() <= 0) {
+			return;
+		}
+
+		super.fillItemCategory(group, items);
 	}
 
 	@Override
@@ -337,7 +349,7 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
 		if (!code.isEmpty()) {
 			tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.combo", Component.literal(code).withStyle(ChatFormatting.AQUA)));
 		}
-		
+
 		tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.level_upgrade_level", Component.literal("" + (material == null ? 0 : material.getStorageLevel())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
 
 		CompoundTag compoundnbt = stack.getTagElement("BlockEntityTag");

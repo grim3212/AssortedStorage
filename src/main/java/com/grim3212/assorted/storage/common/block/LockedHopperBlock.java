@@ -9,6 +9,7 @@ import com.grim3212.assorted.storage.common.block.blockentity.ILockable;
 import com.grim3212.assorted.storage.common.block.blockentity.INamed;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedHopperBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
+import com.grim3212.assorted.storage.common.handler.StorageConfig;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
@@ -49,6 +50,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class LockedHopperBlock extends HopperBlock implements IStorageMaterial {
 
@@ -71,12 +73,21 @@ public class LockedHopperBlock extends HopperBlock implements IStorageMaterial {
 
 	@Override
 	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
+		if (!StorageConfig.COMMON.hoppersEnabled.get()) {
+			return;
+		}
+
 		if (this.getStorageMaterial() == null) {
 			ItemStack output = StorageUtil.setCodeOnStack("default", new ItemStack(StorageBlocks.LOCKED_HOPPER.get()));
 			items.add(output);
-		} else {
-			super.fillItemCategory(group, items);
+			return;
 		}
+
+		if (StorageConfig.COMMON.hideUncraftableItems.get() && ForgeRegistries.ITEMS.tags().getTag(this.getStorageMaterial().getMaterial()).size() <= 0) {
+			return;
+		}
+
+		super.fillItemCategory(group, items);
 	}
 
 	@Override

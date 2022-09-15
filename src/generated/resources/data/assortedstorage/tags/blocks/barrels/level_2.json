@@ -1,10 +1,10 @@
 {
   "values": [
     "assortedstorage:barrel_nickel",
-    "assortedstorage:barrel_peridot",
-    "assortedstorage:barrel_sapphire",
     "assortedstorage:barrel_emerald",
+    "assortedstorage:barrel_peridot",
     "assortedstorage:barrel_lead",
-    "assortedstorage:barrel_amethyst"
+    "assortedstorage:barrel_amethyst",
+    "assortedstorage:barrel_sapphire"
   ]
 }

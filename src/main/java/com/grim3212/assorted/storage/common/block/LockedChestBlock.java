@@ -5,6 +5,7 @@ import java.util.List;
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.blockentity.ILockable;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedChestBlockEntity;
+import com.grim3212.assorted.storage.common.handler.StorageConfig;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 import com.grim3212.assorted.storage.common.util.StorageUtil;
 
@@ -30,6 +31,7 @@ import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class LockedChestBlock extends BaseStorageBlock implements IStorageMaterial {
 
@@ -67,12 +69,21 @@ public class LockedChestBlock extends BaseStorageBlock implements IStorageMateri
 
 	@Override
 	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
+		if (!StorageConfig.COMMON.chestsEnabled.get()) {
+			return;
+		}
+
 		if (this.getStorageMaterial() == null) {
 			ItemStack output = StorageUtil.setCodeOnStack("default", new ItemStack(StorageBlocks.LOCKED_CHEST.get()));
 			items.add(output);
-		} else {
-			super.fillItemCategory(group, items);
+			return;
 		}
+
+		if (StorageConfig.COMMON.hideUncraftableItems.get() && ForgeRegistries.ITEMS.tags().getTag(this.getStorageMaterial().getMaterial()).size() <= 0) {
+			return;
+		}
+
+		super.fillItemCategory(group, items);
 	}
 
 	@Override

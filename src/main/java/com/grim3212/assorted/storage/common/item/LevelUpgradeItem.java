@@ -42,6 +42,7 @@ import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class LevelUpgradeItem extends Item {
 
@@ -63,7 +64,15 @@ public class LevelUpgradeItem extends Item {
 
 	@Override
 	protected boolean allowedIn(CreativeModeTab tab) {
-		return StorageConfig.COMMON.upgradesEnabled.get() ? super.allowedIn(tab) : false;
+		if (!StorageConfig.COMMON.upgradesEnabled.get()) {
+			return false;
+		}
+
+		if (StorageConfig.COMMON.hideUncraftableItems.get() && ForgeRegistries.ITEMS.tags().getTag(this.getStorageMaterial().getMaterial()).size() <= 0) {
+			return false;
+		}
+
+		return super.allowedIn(tab);
 	}
 
 	@Override

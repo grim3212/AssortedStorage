@@ -48,6 +48,13 @@
         {
           "type": "assortedstorage:part_enabled",
           "part": "shulkers"
+        },
+        {
+          "type": "forge:not",
+          "value": {
+            "type": "forge:tag_empty",
+            "tag": "forge:ingots/copper"
+          }
         }
       ]
     }

@@ -1,24 +1,24 @@
 {
   "values": [
-    "assortedstorage:chest_aluminum",
-    "assortedstorage:chest_copper",
     "assortedstorage:chest_tin",
-    "assortedstorage:chest_topaz",
     "assortedstorage:chest_iron",
-    "assortedstorage:barrel_aluminum",
-    "assortedstorage:barrel_copper",
+    "assortedstorage:chest_copper",
+    "assortedstorage:chest_aluminum",
+    "assortedstorage:chest_topaz",
     "assortedstorage:barrel_tin",
-    "assortedstorage:barrel_topaz",
     "assortedstorage:barrel_iron",
-    "assortedstorage:hopper_aluminum",
-    "assortedstorage:hopper_copper",
+    "assortedstorage:barrel_copper",
+    "assortedstorage:barrel_aluminum",
+    "assortedstorage:barrel_topaz",
     "assortedstorage:hopper_tin",
-    "assortedstorage:hopper_topaz",
     "assortedstorage:hopper_iron",
-    "assortedstorage:shulker_box_aluminum",
-    "assortedstorage:shulker_box_copper",
+    "assortedstorage:hopper_copper",
+    "assortedstorage:hopper_aluminum",
+    "assortedstorage:hopper_topaz",
     "assortedstorage:shulker_box_tin",
-    "assortedstorage:shulker_box_topaz",
-    "assortedstorage:shulker_box_iron"
+    "assortedstorage:shulker_box_iron",
+    "assortedstorage:shulker_box_copper",
+    "assortedstorage:shulker_box_aluminum",
+    "assortedstorage:shulker_box_topaz"
   ]
 }

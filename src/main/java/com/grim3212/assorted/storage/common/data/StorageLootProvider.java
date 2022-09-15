@@ -42,6 +42,8 @@ import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+// TODO: Use LootTableProvider
+// TODO: Fix extra door support requiring manual loot tables switch this out
 public class StorageLootProvider implements DataProvider {
 
 	private final DataGenerator generator;
