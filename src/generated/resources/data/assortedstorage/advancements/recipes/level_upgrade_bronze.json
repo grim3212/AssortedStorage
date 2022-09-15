@@ -50,6 +50,13 @@
         {
           "type": "assortedstorage:part_enabled",
           "part": "upgrades"
+        },
+        {
+          "type": "forge:not",
+          "value": {
+            "type": "forge:tag_empty",
+            "tag": "forge:ingots/bronze"
+          }
         }
       ]
     }

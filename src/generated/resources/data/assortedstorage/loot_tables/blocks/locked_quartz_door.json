@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "assortedstorage:mod_loaded",
+          "modId": "assorteddecor"
+        },
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "assortedstorage:optional_item",
+          "conditions": [
+            {
+              "block": "assortedstorage:locked_quartz_door",
+              "condition": "minecraft:block_state_property",
+              "properties": {
+                "half": "lower"
+              }
+            }
+          ],
+          "name": "assorteddecor:quartz_door"
+        }
+      ],
+      "name": "main",
+      "rolls": 1.0
+    }
+  ]
+}

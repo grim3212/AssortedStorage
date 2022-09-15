@@ -12,11 +12,13 @@ import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntity
 import com.grim3212.assorted.storage.common.crafting.StorageRecipeSerializers;
 import com.grim3212.assorted.storage.common.data.StorageBlockTagProvider;
 import com.grim3212.assorted.storage.common.data.StorageItemTagProvider;
-import com.grim3212.assorted.storage.common.data.StorageLootProvider;
 import com.grim3212.assorted.storage.common.data.StorageRecipes;
+import com.grim3212.assorted.storage.common.data.loot.StorageLootProvider;
 import com.grim3212.assorted.storage.common.handler.EnabledCondition;
 import com.grim3212.assorted.storage.common.handler.StorageConfig;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
+import com.grim3212.assorted.storage.common.loot.StorageLootConditions;
+import com.grim3212.assorted.storage.common.loot.StorageLootEntries;
 import com.grim3212.assorted.storage.common.network.PacketHandler;
 import com.grim3212.assorted.storage.common.proxy.IProxy;
 
@@ -67,6 +69,8 @@ public class AssortedStorage {
 		StorageBlockEntityTypes.BLOCK_ENTITIES.register(modBus);
 		StorageContainerTypes.CONTAINERS.register(modBus);
 		StorageRecipeSerializers.RECIPES.register(modBus);
+		StorageLootConditions.LOOT_ITEM_CONDITIONS.register(modBus);
+		StorageLootEntries.LOOT_POOL_ENTRY_TYPES.register(modBus);
 
 		ModLoadingContext.get().registerConfig(Type.COMMON, StorageConfig.COMMON_SPEC);
 
