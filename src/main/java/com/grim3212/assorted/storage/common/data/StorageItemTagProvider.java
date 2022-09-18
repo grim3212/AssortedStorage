@@ -4,6 +4,7 @@ import java.util.Map.Entry;
 
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
+import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.LevelUpgradeItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
@@ -119,6 +120,36 @@ public class StorageItemTagProvider extends ItemTagsProvider {
 			}
 		}
 		this.tag(StorageTags.Items.STORAGE_LEVEL_UPGRADES).addTags(StorageTags.Items.STORAGE_LEVEL_0_UPGRADES, StorageTags.Items.STORAGE_LEVEL_1_UPGRADES, StorageTags.Items.STORAGE_LEVEL_2_UPGRADES, StorageTags.Items.STORAGE_LEVEL_3_UPGRADES, StorageTags.Items.STORAGE_LEVEL_4_UPGRADES, StorageTags.Items.STORAGE_LEVEL_5_UPGRADES);
+
+		for (Entry<StorageMaterial, RegistryObject<BagItem>> bag : StorageItems.BAGS.entrySet()) {
+			BagItem item = bag.getValue().get();
+
+			switch (bag.getKey().getStorageLevel()) {
+				case 1:
+					this.tag(StorageTags.Items.BAGS_LEVEL_1).add(item);
+					break;
+				case 2:
+					this.tag(StorageTags.Items.BAGS_LEVEL_2).add(item);
+					break;
+				case 3:
+					this.tag(StorageTags.Items.BAGS_LEVEL_3).add(item);
+					break;
+				case 4:
+					this.tag(StorageTags.Items.BAGS_LEVEL_4).add(item);
+					break;
+				case 5:
+					this.tag(StorageTags.Items.BAGS_LEVEL_5).add(item);
+					break;
+				default:
+					this.tag(StorageTags.Items.BAGS_LEVEL_0).add(item);
+					break;
+			}
+		}
+
+		this.tag(StorageTags.Items.BAGS_LEVEL_0).add(StorageItems.BAG.get());
+		this.tag(StorageTags.Items.BAGS).add(StorageItems.ENDER_BAG.get());
+		this.tag(StorageTags.Items.BAGS).addTags(StorageTags.Items.BAGS_LEVEL_0, StorageTags.Items.BAGS_LEVEL_1, StorageTags.Items.BAGS_LEVEL_2, StorageTags.Items.BAGS_LEVEL_3, StorageTags.Items.BAGS_LEVEL_4, StorageTags.Items.BAGS_LEVEL_5);
+
 	}
 
 	@Override

@@ -22,6 +22,8 @@ public class StorageRecipeSerializers {
 	public static final RegistryObject<SimpleRecipeSerializer<LockedHopperRecipe>> LOCKED_HOPPER = register("locked_hopper", () -> LockedHopperRecipe.SERIALIZER);
 	public static final RegistryObject<RecipeSerializer<LockedUpgradingRecipe>> LOCKED_UPGRADING = register("locked_upgrading", () -> new LockedUpgradingRecipe.Serializer());
 
+	public static final RegistryObject<SimpleRecipeSerializer<BagColoringRecipe>> BAG_COLORING = register("bag_coloring", () -> BagColoringRecipe.SERIALIZER);
+
 	private static <T extends RecipeSerializer<?>> RegistryObject<T> register(final String name, final Supplier<T> sup) {
 		return RECIPES.register(name, sup);
 	}

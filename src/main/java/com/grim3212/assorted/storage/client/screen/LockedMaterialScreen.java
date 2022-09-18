@@ -65,12 +65,12 @@ public class LockedMaterialScreen extends AbstractContainerScreen<LockedMaterial
 				inventoryTexture = CHEST_GUI_TEXTURE_12_COLS;
 				break;
 			case (13):
-				this.textureXSize = 256;
+				this.textureXSize = 276;
 				this.textureYSize = 276;
 				inventoryTexture = CHEST_GUI_TEXTURE_13_COLS;
 				break;
 			case (14):
-				this.textureXSize = 276;
+				this.textureXSize = 296;
 				this.textureYSize = 276;
 				inventoryTexture = CHEST_GUI_TEXTURE_14_COLS;
 				break;

@@ -113,4 +113,42 @@ public class StorageUtil {
 		return true;
 	}
 
+	public static boolean canAccess(ItemStack stack, Player entityplayer) {
+		if (stack.hasTag() && stack.getTag().contains("Storage_Lock")) {
+			for (int slot = 0; slot < entityplayer.getInventory().getContainerSize(); slot++) {
+				ItemStack itemstack = entityplayer.getInventory().getItem(slot);
+
+				if (!itemstack.isEmpty()) {
+					if (itemstack.getItem() == StorageItems.LOCKSMITH_KEY.get()) {
+						if (hasCodeWithMatch(itemstack, stack.getTag().getString("Storage_Lock"))) {
+							return true;
+						}
+					} else if (itemstack.getItem() == StorageItems.KEY_RING.get()) {
+						IItemHandler itemHandler = itemstack.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+
+						if (itemHandler instanceof KeyRingItemHandler) {
+							KeyRingItemHandler handler = (KeyRingItemHandler) itemHandler;
+							handler.load();
+
+							for (int keyRingSlot = 0; keyRingSlot < handler.getSlots(); keyRingSlot++) {
+								ItemStack keyRingStack = handler.getStackInSlot(keyRingSlot);
+
+								if (!keyRingStack.isEmpty()) {
+									if (keyRingStack.getItem() == StorageItems.LOCKSMITH_KEY.get()) {
+										if (hasCodeWithMatch(keyRingStack, stack.getTag().getString("Storage_Lock"))) {
+											return true;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			return false;
+		}
+
+		return true;
+	}
 }

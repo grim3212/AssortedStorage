@@ -9,6 +9,7 @@ import com.grim3212.assorted.storage.common.block.LockedChestBlock;
 import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
+import com.grim3212.assorted.storage.common.crafting.BagColoringRecipe;
 import com.grim3212.assorted.storage.common.crafting.LockedBarrelRecipe;
 import com.grim3212.assorted.storage.common.crafting.LockedChestRecipe;
 import com.grim3212.assorted.storage.common.crafting.LockedEnderChestRecipe;
@@ -16,6 +17,7 @@ import com.grim3212.assorted.storage.common.crafting.LockedShulkerBoxColoring;
 import com.grim3212.assorted.storage.common.crafting.LockedShulkerBoxRecipe;
 import com.grim3212.assorted.storage.common.crafting.LockedUpgradingRecipeBuilder;
 import com.grim3212.assorted.storage.common.handler.EnabledCondition;
+import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.LevelUpgradeItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
@@ -69,12 +71,15 @@ public class StorageRecipes extends RecipeProvider implements IConditionBuilder 
 		ShapedRecipeBuilder.shaped(StorageBlocks.LOCKSMITH_WORKBENCH.get(), 1).define('L', StorageItems.LOCKSMITH_LOCK.get()).define('K', StorageItems.LOCKSMITH_KEY.get()).define('W', Blocks.CRAFTING_TABLE).pattern("K").pattern("L").pattern("W").unlockedBy("has_lock", has(StorageItems.LOCKSMITH_LOCK.get())).save(consumer, new ResourceLocation(AssortedStorage.MODID, "locksmith_workbench_alt"));
 
 		ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.UPGRADES_CONDITION)).addRecipe(ShapedRecipeBuilder.shaped(StorageItems.BLANK_UPGRADE.get(), 1).define('W', StorageTags.Items.PAPER).define('P', ItemTags.PLANKS).pattern("PPP").pattern("PWP").pattern("PPP").unlockedBy("has_paper", has(StorageTags.Items.PAPER))::save).generateAdvancement().build(consumer, StorageItems.BLANK_UPGRADE.getId());
+		ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.BAGS_CONDITION)).addRecipe(ShapedRecipeBuilder.shaped(StorageItems.ENDER_BAG.get(), 1).define('S', Tags.Items.STRING).define('C', Tags.Items.CHESTS_ENDER).define('L', Tags.Items.LEATHER).pattern("SLS").pattern("LCL").pattern("LLL").unlockedBy("has_leather", has(Tags.Items.LEATHER)).unlockedBy("has_chest", has(Tags.Items.CHESTS_ENDER))::save).generateAdvancement().build(consumer,
+				StorageItems.ENDER_BAG.getId());
 
 		SpecialRecipeBuilder.special(LockedEnderChestRecipe.SERIALIZER).save(consumer, new ResourceLocation(AssortedStorage.MODID, "locked_ender_chest").toString());
 		SpecialRecipeBuilder.special(LockedChestRecipe.SERIALIZER).save(consumer, new ResourceLocation(AssortedStorage.MODID, "locked_chest").toString());
 		SpecialRecipeBuilder.special(LockedBarrelRecipe.SERIALIZER).save(consumer, new ResourceLocation(AssortedStorage.MODID, "locked_barrel").toString());
 		SpecialRecipeBuilder.special(LockedShulkerBoxRecipe.SERIALIZER).save(consumer, new ResourceLocation(AssortedStorage.MODID, "locked_shulker_box").toString());
 		SpecialRecipeBuilder.special(LockedShulkerBoxColoring.SERIALIZER).save(consumer, new ResourceLocation(AssortedStorage.MODID, "shulker_box_coloring").toString());
+		SpecialRecipeBuilder.special(BagColoringRecipe.SERIALIZER).save(consumer, new ResourceLocation(AssortedStorage.MODID, "bag_coloring").toString());
 
 		for (Entry<StorageMaterial, RegistryObject<LockedChestBlock>> chest : StorageBlocks.CHESTS.entrySet()) {
 			TagKey<Item> mat = chest.getKey().getMaterial();
@@ -200,9 +205,40 @@ public class StorageRecipes extends RecipeProvider implements IConditionBuilder 
 			}
 		}
 
+		ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.BAGS_CONDITION)).addRecipe(LockedUpgradingRecipeBuilder.shaped(StorageItems.BAG.get(), 1).define('S', Tags.Items.STRING).define('C', Tags.Items.CHESTS_WOODEN).define('L', Tags.Items.LEATHER).pattern("SLS").pattern("LCL").pattern("LLL").unlockedBy("has_leather", has(Tags.Items.LEATHER)).unlockedBy("has_chest", has(Tags.Items.CHESTS_WOODEN))::save).generateAdvancement().build(consumer, StorageItems.BAG.getId());
+
+		for (Entry<StorageMaterial, RegistryObject<BagItem>> bag : StorageItems.BAGS.entrySet()) {
+			TagKey<Item> mat = bag.getKey().getMaterial();
+			Block matchChest = StorageBlocks.CHESTS.get(bag.getKey()).get();
+
+			ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.BAGS_CONDITION)).addRecipe(LockedUpgradingRecipeBuilder.shaped(bag.getValue().get(), 1).define('C', matchChest).define('S', Tags.Items.STRING).define('L', Tags.Items.LEATHER).pattern("SLS").pattern("LCL").pattern("LLL").unlockedBy("has_chest", has(matchChest)).unlockedBy("has_leather", has(Tags.Items.LEATHER))::save).generateAdvancement().build(consumer,
+					new ResourceLocation(bag.getValue().getId() + "_chest"));
+
+			switch (bag.getKey().getStorageLevel()) {
+				case 1:
+					ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.BAGS_CONDITION)).addCondition(not(tagEmpty(mat))).addRecipe(LockedUpgradingRecipeBuilder.shaped(bag.getValue().get(), 1).define('C', StorageTags.Items.BAGS_LEVEL_0).define('M', mat).pattern("MMM").pattern("MCM").pattern("MMM").unlockedBy("has_bag", has(StorageTags.Items.BAGS_LEVEL_0)).unlockedBy("has_material", has(mat))::save).generateAdvancement().build(consumer, bag.getValue().getId());
+					break;
+				case 2:
+					ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.BAGS_CONDITION)).addCondition(not(tagEmpty(mat))).addRecipe(LockedUpgradingRecipeBuilder.shaped(bag.getValue().get(), 1).define('C', StorageTags.Items.BAGS_LEVEL_1).define('M', mat).pattern("MMM").pattern("MCM").pattern("MMM").unlockedBy("has_bag", has(StorageTags.Items.BAGS_LEVEL_1)).unlockedBy("has_material", has(mat))::save).generateAdvancement().build(consumer, bag.getValue().getId());
+					break;
+				case 3:
+					ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.BAGS_CONDITION)).addCondition(not(tagEmpty(mat))).addRecipe(LockedUpgradingRecipeBuilder.shaped(bag.getValue().get(), 1).define('C', StorageTags.Items.BAGS_LEVEL_2).define('M', mat).pattern("MMM").pattern("MCM").pattern("MMM").unlockedBy("has_bag", has(StorageTags.Items.BAGS_LEVEL_2)).unlockedBy("has_material", has(mat))::save).generateAdvancement().build(consumer, bag.getValue().getId());
+					break;
+				case 4:
+					ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.BAGS_CONDITION)).addCondition(not(tagEmpty(mat))).addRecipe(LockedUpgradingRecipeBuilder.shaped(bag.getValue().get(), 1).define('C', StorageTags.Items.BAGS_LEVEL_3).define('M', mat).pattern("MMM").pattern("MCM").pattern("MMM").unlockedBy("has_bag", has(StorageTags.Items.BAGS_LEVEL_3)).unlockedBy("has_material", has(mat))::save).generateAdvancement().build(consumer, bag.getValue().getId());
+					break;
+				case 5:
+					ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.BAGS_CONDITION)).addCondition(not(tagEmpty(mat))).addRecipe(LockedUpgradingRecipeBuilder.shaped(bag.getValue().get(), 1).define('C', StorageTags.Items.BAGS_LEVEL_4).define('M', mat).pattern("MMM").pattern("MCM").pattern("MMM").unlockedBy("has_bag", has(StorageTags.Items.BAGS_LEVEL_4)).unlockedBy("has_material", has(mat))::save).generateAdvancement().build(consumer, bag.getValue().getId());
+					break;
+				default:
+					ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.BAGS_CONDITION)).addCondition(not(tagEmpty(mat))).addRecipe(LockedUpgradingRecipeBuilder.shaped(bag.getValue().get(), 1).define('C', StorageItems.BAG.get()).define('M', mat).pattern("MMM").pattern("MCM").pattern("MMM").unlockedBy("has_bag", has(StorageItems.BAG.get())).unlockedBy("has_material", has(mat))::save).generateAdvancement().build(consumer, bag.getValue().getId());
+					break;
+			}
+		}
+
 		for (Entry<StorageMaterial, RegistryObject<LevelUpgradeItem>> levelUpgrade : StorageItems.LEVEL_UPGRADES.entrySet()) {
-			ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.UPGRADES_CONDITION)).addCondition(not(tagEmpty(levelUpgrade.getKey().getMaterial()))).addRecipe(ShapedRecipeBuilder.shaped(levelUpgrade.getValue().get(), 1).define('M', levelUpgrade.getKey().getMaterial()).define('B', StorageItems.BLANK_UPGRADE.get()).pattern("MMM").pattern("MBM").pattern("MMM").unlockedBy("has_upgrade", has(StorageItems.BLANK_UPGRADE.get())).unlockedBy("has_material", has(levelUpgrade.getKey().getMaterial()))::save).generateAdvancement()
-					.build(consumer, levelUpgrade.getValue().getId());
+			ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.UPGRADES_CONDITION)).addCondition(not(tagEmpty(levelUpgrade.getKey().getMaterial())))
+					.addRecipe(ShapedRecipeBuilder.shaped(levelUpgrade.getValue().get(), 1).define('M', levelUpgrade.getKey().getMaterial()).define('B', StorageItems.BLANK_UPGRADE.get()).pattern("MMM").pattern("MBM").pattern("MMM").unlockedBy("has_upgrade", has(StorageItems.BLANK_UPGRADE.get())).unlockedBy("has_material", has(levelUpgrade.getKey().getMaterial()))::save).generateAdvancement().build(consumer, levelUpgrade.getValue().getId());
 		}
 	}
 

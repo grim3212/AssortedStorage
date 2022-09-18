@@ -15,6 +15,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
@@ -29,6 +30,8 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 	private final LockedModelProvider loaderModels;
 
 	private final Map<Block, ResourceLocation> blocks;
+
+	private static final ResourceLocation CUTOUT_RENDER_TYPE = new ResourceLocation("minecraft:cutout");
 
 	public StorageBlockstateProvider(DataGenerator generator, ExistingFileHelper exFileHelper, LockedModelProvider loader) {
 		super(generator, AssortedStorage.MODID, exFileHelper);
@@ -78,20 +81,20 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 
 		genericBlock(StorageBlocks.LOCKSMITH_WORKBENCH.get());
 
-		doorBlock(StorageBlocks.LOCKED_QUARTZ_DOOR.get(), resource("block/locked_quartz_door_bottom"), resource("block/locked_quartz_door_top"));
-		doorBlock(StorageBlocks.LOCKED_GLASS_DOOR.get(), resource("block/locked_glass_door_bottom"), resource("block/locked_glass_door_top"));
-		doorBlock(StorageBlocks.LOCKED_STEEL_DOOR.get(), resource("block/locked_steel_door_bottom"), resource("block/locked_steel_door_top"));
-		doorBlock(StorageBlocks.LOCKED_CHAIN_LINK_DOOR.get(), resource("block/locked_chain_link_door_bottom"), resource("block/locked_chain_link_door_top"));
-		doorBlock(StorageBlocks.LOCKED_OAK_DOOR.get(), resource("block/locked_oak_door_bottom"), resource("block/locked_oak_door_top"));
-		doorBlock(StorageBlocks.LOCKED_SPRUCE_DOOR.get(), resource("block/locked_spruce_door_bottom"), resource("block/locked_spruce_door_top"));
-		doorBlock(StorageBlocks.LOCKED_BIRCH_DOOR.get(), resource("block/locked_birch_door_bottom"), resource("block/locked_birch_door_top"));
-		doorBlock(StorageBlocks.LOCKED_ACACIA_DOOR.get(), resource("block/locked_acacia_door_bottom"), resource("block/locked_acacia_door_top"));
-		doorBlock(StorageBlocks.LOCKED_JUNGLE_DOOR.get(), resource("block/locked_jungle_door_bottom"), resource("block/locked_jungle_door_top"));
-		doorBlock(StorageBlocks.LOCKED_DARK_OAK_DOOR.get(), resource("block/locked_dark_oak_door_bottom"), resource("block/locked_dark_oak_door_top"));
-		doorBlock(StorageBlocks.LOCKED_CRIMSON_DOOR.get(), resource("block/locked_crimson_door_bottom"), resource("block/locked_crimson_door_top"));
-		doorBlock(StorageBlocks.LOCKED_MANGROVE_DOOR.get(), resource("block/locked_mangrove_door_bottom"), resource("block/locked_mangrove_door_top"));
-		doorBlock(StorageBlocks.LOCKED_WARPED_DOOR.get(), resource("block/locked_warped_door_bottom"), resource("block/locked_warped_door_top"));
-		doorBlock(StorageBlocks.LOCKED_IRON_DOOR.get(), resource("block/locked_iron_door_bottom"), resource("block/locked_iron_door_top"));
+		door(StorageBlocks.LOCKED_QUARTZ_DOOR.get(), resource("block/locked_quartz_door_bottom"), resource("block/locked_quartz_door_top"));
+		door(StorageBlocks.LOCKED_GLASS_DOOR.get(), resource("block/locked_glass_door_bottom"), resource("block/locked_glass_door_top"));
+		door(StorageBlocks.LOCKED_STEEL_DOOR.get(), resource("block/locked_steel_door_bottom"), resource("block/locked_steel_door_top"));
+		door(StorageBlocks.LOCKED_CHAIN_LINK_DOOR.get(), resource("block/locked_chain_link_door_bottom"), resource("block/locked_chain_link_door_top"));
+		door(StorageBlocks.LOCKED_OAK_DOOR.get(), resource("block/locked_oak_door_bottom"), resource("block/locked_oak_door_top"));
+		door(StorageBlocks.LOCKED_SPRUCE_DOOR.get(), resource("block/locked_spruce_door_bottom"), resource("block/locked_spruce_door_top"));
+		door(StorageBlocks.LOCKED_BIRCH_DOOR.get(), resource("block/locked_birch_door_bottom"), resource("block/locked_birch_door_top"));
+		door(StorageBlocks.LOCKED_ACACIA_DOOR.get(), resource("block/locked_acacia_door_bottom"), resource("block/locked_acacia_door_top"));
+		door(StorageBlocks.LOCKED_JUNGLE_DOOR.get(), resource("block/locked_jungle_door_bottom"), resource("block/locked_jungle_door_top"));
+		door(StorageBlocks.LOCKED_DARK_OAK_DOOR.get(), resource("block/locked_dark_oak_door_bottom"), resource("block/locked_dark_oak_door_top"));
+		door(StorageBlocks.LOCKED_CRIMSON_DOOR.get(), resource("block/locked_crimson_door_bottom"), resource("block/locked_crimson_door_top"));
+		door(StorageBlocks.LOCKED_MANGROVE_DOOR.get(), resource("block/locked_mangrove_door_bottom"), resource("block/locked_mangrove_door_top"));
+		door(StorageBlocks.LOCKED_WARPED_DOOR.get(), resource("block/locked_warped_door_bottom"), resource("block/locked_warped_door_top"));
+		door(StorageBlocks.LOCKED_IRON_DOOR.get(), resource("block/locked_iron_door_bottom"), resource("block/locked_iron_door_top"));
 
 		createNormalBarrel(StorageBlocks.LOCKED_BARREL.get());
 		for (RegistryObject<LockedBarrelBlock> b : StorageBlocks.BARRELS.values()) {
@@ -104,6 +107,22 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 		}
 
 		this.loaderModels.previousModels();
+	}
+
+	private void door(DoorBlock block, ResourceLocation bottom, ResourceLocation top) {
+		doorBlockCutoutInternal(block, ForgeRegistries.BLOCKS.getKey(block).toString(), bottom, top);
+	}
+
+	private void doorBlockCutoutInternal(DoorBlock block, String baseName, ResourceLocation bottom, ResourceLocation top) {
+		ModelFile bottomLeft = models().doorBottomLeft(baseName + "_bottom_left", bottom, top).renderType(CUTOUT_RENDER_TYPE);
+		ModelFile bottomLeftOpen = models().doorBottomLeftOpen(baseName + "_bottom_left_open", bottom, top).renderType(CUTOUT_RENDER_TYPE);
+		ModelFile bottomRight = models().doorBottomRight(baseName + "_bottom_right", bottom, top).renderType(CUTOUT_RENDER_TYPE);
+		ModelFile bottomRightOpen = models().doorBottomRightOpen(baseName + "_bottom_right_open", bottom, top).renderType(CUTOUT_RENDER_TYPE);
+		ModelFile topLeft = models().doorTopLeft(baseName + "_top_left", bottom, top).renderType(CUTOUT_RENDER_TYPE);
+		ModelFile topLeftOpen = models().doorTopLeftOpen(baseName + "_top_left_open", bottom, top).renderType(CUTOUT_RENDER_TYPE);
+		ModelFile topRight = models().doorTopRight(baseName + "_top_right", bottom, top).renderType(CUTOUT_RENDER_TYPE);
+		ModelFile topRightOpen = models().doorTopRightOpen(baseName + "_top_right_open", bottom, top).renderType(CUTOUT_RENDER_TYPE);
+		doorBlock(block, bottomLeft, bottomLeftOpen, bottomRight, bottomRightOpen, topLeft, topLeftOpen, topRight, topRightOpen);
 	}
 
 	private void createNormalHopper(LockedHopperBlock b) {

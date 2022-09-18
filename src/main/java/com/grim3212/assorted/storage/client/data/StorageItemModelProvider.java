@@ -8,8 +8,10 @@ import com.grim3212.assorted.storage.common.block.LockedChestBlock;
 import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
+import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.LevelUpgradeItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
+import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
 import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.data.DataGenerator;
@@ -72,7 +74,13 @@ public class StorageItemModelProvider extends ItemModelProvider {
 		generatedItem(StorageItems.LOCKSMITH_LOCK.get());
 		generatedItem(StorageItems.KEY_RING.get());
 		generatedItem(StorageBlocks.LOCKED_HOPPER.get().asItem());
-		
+		generateBag(StorageItems.BAG.get());
+		generateEnderBag(StorageItems.ENDER_BAG.get());
+
+		for (RegistryObject<BagItem> bag : StorageItems.BAGS.values()) {
+			generateMaterialBag(bag.get());
+		}
+
 		for (RegistryObject<LockedHopperBlock> b : StorageBlocks.HOPPERS.values()) {
 			generatedItem(b.get().asItem());
 		}
@@ -81,6 +89,38 @@ public class StorageItemModelProvider extends ItemModelProvider {
 		for (RegistryObject<LevelUpgradeItem> levelUpgrade : StorageItems.LEVEL_UPGRADES.values()) {
 			generatedItem(levelUpgrade.get());
 		}
+	}
+
+	private static final ResourceLocation COLOR_OVERRIDE = new ResourceLocation(AssortedStorage.MODID, "color");
+	private static final ResourceLocation LOCK_OVERRIDE = new ResourceLocation(AssortedStorage.MODID, "locked");
+
+	private ItemModelBuilder generateBag(String name) {
+		ModelFile coloredBag = withExistingParent(name + "_colored", "item/generated").texture("layer0", resource("item/" + name + "_colored")).texture("layer1", resource("item/" + "bag_strap"));
+		ModelFile lockedBag = withExistingParent(name + "_locked", "item/generated").texture("layer0", resource("item/" + name + "_lock_cutout")).texture("layer1", resource("item/" + "bag_strap_lock_cutout")).texture("layer2", resource("item/" + "bag_lock"));
+		ModelFile lockedColoredBag = withExistingParent(name + "_locked_colored", "item/generated").texture("layer0", resource("item/" + name + "_colored_lock_cutout")).texture("layer1", resource("item/" + "bag_strap_lock_cutout")).texture("layer2", resource("item/" + "bag_lock"));
+		return withExistingParent(name, "item/generated").texture("layer0", resource("item/" + name)).texture("layer1", resource("item/" + "bag_strap")).override().predicate(COLOR_OVERRIDE, 1.0F).predicate(LOCK_OVERRIDE, 0.0F).model(coloredBag).end().override().predicate(COLOR_OVERRIDE, 0.0F).predicate(LOCK_OVERRIDE, 1.0F).model(lockedBag).end().override().predicate(COLOR_OVERRIDE, 1.0F).predicate(LOCK_OVERRIDE, 1.0F).model(lockedColoredBag).end();
+	}
+
+	private ItemModelBuilder generateEnderBag(Item i) {
+		String name = name(i);
+		ModelFile lockedBag = withExistingParent(name + "_locked", "item/generated").texture("layer0", resource("item/" + name + "_locked"));
+		return withExistingParent(name, "item/generated").texture("layer0", resource("item/" + name)).override().predicate(LOCK_OVERRIDE, 1.0F).model(lockedBag).end();
+	}
+
+	private ItemModelBuilder generateMaterialBag(String name, StorageMaterial type) {
+		ModelFile coloredBag = withExistingParent(name + "_material_colored", "item/generated").texture("layer0", resource("item/bag_material_colored")).texture("layer1", resource("item/" + "bag_strap")).texture("layer2", resource("item/" + name));
+		ModelFile lockedBag = withExistingParent(name + "_material_locked", "item/generated").texture("layer0", resource("item/bag_material_lock_cutout")).texture("layer1", resource("item/" + "bag_strap_lock_cutout")).texture("layer2", resource("item/" + name)).texture("layer3", resource("item/" + "bag_lock"));
+		ModelFile lockedColoredBag = withExistingParent(name + "_material_locked_colored", "item/generated").texture("layer0", resource("item/bag_material_colored_lock_cutout")).texture("layer1", resource("item/" + "bag_strap_lock_cutout")).texture("layer2", resource("item/" + name)).texture("layer3", resource("item/" + "bag_lock"));
+		return withExistingParent(name, "item/generated").texture("layer0", resource("item/bag_material")).texture("layer1", resource("item/" + "bag_strap")).texture("layer2", resource("item/" + name)).override().predicate(COLOR_OVERRIDE, 1.0F).predicate(LOCK_OVERRIDE, 0.0F).model(coloredBag).end().override().predicate(COLOR_OVERRIDE, 0.0F).predicate(LOCK_OVERRIDE, 1.0F).model(lockedBag).end().override().predicate(COLOR_OVERRIDE, 1.0F).predicate(LOCK_OVERRIDE, 1.0F).model(lockedColoredBag)
+				.end();
+	}
+
+	private ItemModelBuilder generateBag(Item i) {
+		return generateBag(name(i));
+	}
+
+	private ItemModelBuilder generateMaterialBag(BagItem i) {
+		return generateMaterialBag(name(i), i.getStorageMaterial());
 	}
 
 	private ItemModelBuilder generatedItem(String name) {

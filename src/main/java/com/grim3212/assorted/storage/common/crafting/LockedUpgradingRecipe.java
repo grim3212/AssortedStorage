@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.grim3212.assorted.storage.common.block.LockedChestBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
+import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.util.NBTHelper;
 
 import net.minecraft.core.NonNullList;
@@ -140,7 +141,7 @@ public class LockedUpgradingRecipe implements CraftingRecipe, IShapedRecipe<Craf
 			ItemStack stack = container.getItem(i);
 
 			if (!stack.isEmpty()) {
-				if (Block.byItem(stack.getItem()) instanceof LockedShulkerBoxBlock || Block.byItem(stack.getItem()) instanceof LockedChestBlock) {
+				if (Block.byItem(stack.getItem()) instanceof LockedShulkerBoxBlock || Block.byItem(stack.getItem()) instanceof LockedChestBlock || stack.getItem() instanceof BagItem) {
 					itemstack = stack;
 				} else if (Block.byItem(stack.getItem()) instanceof ShulkerBoxBlock) {
 					DyeColor dyeColor = ShulkerBoxBlock.getColorFromItem(stack.getItem());

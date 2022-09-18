@@ -5,6 +5,8 @@ import java.util.stream.Stream;
 
 import com.google.common.collect.Maps;
 import com.grim3212.assorted.storage.AssortedStorage;
+import com.grim3212.assorted.storage.common.inventory.bag.BagContainer;
+import com.grim3212.assorted.storage.common.inventory.enderbag.EnderBagContainer;
 import com.grim3212.assorted.storage.common.inventory.keyring.KeyRingContainer;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
@@ -28,7 +30,9 @@ public class StorageContainerTypes {
 	public static final RegistryObject<MenuType<LocksmithWorkbenchContainer>> LOCKSMITH_WORKBENCH = CONTAINERS.register("locksmith_workbench", () -> new MenuType<>(LocksmithWorkbenchContainer::createContainer));
 	public static final RegistryObject<MenuType<KeyRingContainer>> KEY_RING = CONTAINERS.register("key_ring", () -> IForgeMenuType.create(KeyRingContainer::new));
 	public static final RegistryObject<MenuType<StorageContainer>> LOCKED_ENDER_CHEST = CONTAINERS.register("locked_ender_chest", () -> new MenuType<>(StorageContainer::createEnderChestContainer));
-
+	public static final RegistryObject<MenuType<BagContainer>> BAG = CONTAINERS.register("bag", () -> IForgeMenuType.create(BagContainer::new));
+	public static final RegistryObject<MenuType<EnderBagContainer>> ENDER_BAG = CONTAINERS.register("ender_bag", () -> IForgeMenuType.create(EnderBagContainer::new));
+	
 	public static final Map<StorageMaterial, RegistryObject<MenuType<LockedMaterialContainer>>> CHESTS = Maps.newHashMap();
 	public static final Map<StorageMaterial, RegistryObject<MenuType<LockedMaterialContainer>>> SHULKERS = Maps.newHashMap();
 	public static final Map<StorageMaterial, RegistryObject<MenuType<LockedMaterialContainer>>> BARRELS = Maps.newHashMap();

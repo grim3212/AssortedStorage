@@ -12,8 +12,8 @@ import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntity
 import com.grim3212.assorted.storage.common.crafting.StorageRecipeSerializers;
 import com.grim3212.assorted.storage.common.data.StorageBlockTagProvider;
 import com.grim3212.assorted.storage.common.data.StorageItemTagProvider;
+import com.grim3212.assorted.storage.common.data.StorageLootProvider;
 import com.grim3212.assorted.storage.common.data.StorageRecipes;
-import com.grim3212.assorted.storage.common.data.loot.StorageLootProvider;
 import com.grim3212.assorted.storage.common.handler.EnabledCondition;
 import com.grim3212.assorted.storage.common.handler.StorageConfig;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;

@@ -113,6 +113,14 @@ public class StorageTags {
 		public static final TagKey<Item> STORAGE_LEVEL_3_UPGRADES = forgeTag("storage/level_3_upgrades");
 		public static final TagKey<Item> STORAGE_LEVEL_4_UPGRADES = forgeTag("storage/level_4_upgrades");
 		public static final TagKey<Item> STORAGE_LEVEL_5_UPGRADES = forgeTag("storage/level_5_upgrades");
+		
+		public static final TagKey<Item> BAGS = storageTag("bags");
+		public static final TagKey<Item> BAGS_LEVEL_0 = storageTag("bags/level_0");
+		public static final TagKey<Item> BAGS_LEVEL_1 = storageTag("bags/level_1");
+		public static final TagKey<Item> BAGS_LEVEL_2 = storageTag("bags/level_2");
+		public static final TagKey<Item> BAGS_LEVEL_3 = storageTag("bags/level_3");
+		public static final TagKey<Item> BAGS_LEVEL_4 = storageTag("bags/level_4");
+		public static final TagKey<Item> BAGS_LEVEL_5 = storageTag("bags/level_5");
 
 		public static TagKey<Item> forgeTag(String name) {
 			return ItemTags.create(new ResourceLocation("forge", name));

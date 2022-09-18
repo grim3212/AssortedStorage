@@ -1,5 +1,8 @@
 package com.grim3212.assorted.storage.client.proxy;
 
+import java.util.Map.Entry;
+
+import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.client.blockentity.GlassCabinetBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.GoldSafeBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.ItemTowerBlockEntityRenderer;
@@ -20,7 +23,9 @@ import com.grim3212.assorted.storage.client.model.ShulkerBoxModel;
 import com.grim3212.assorted.storage.client.model.StorageModelLayers;
 import com.grim3212.assorted.storage.client.model.WarehouseCrateModel;
 import com.grim3212.assorted.storage.client.model.baked.LockedModel;
+import com.grim3212.assorted.storage.client.screen.BagScreen;
 import com.grim3212.assorted.storage.client.screen.DualLockerScreen;
+import com.grim3212.assorted.storage.client.screen.EnderBagScreen;
 import com.grim3212.assorted.storage.client.screen.GenericStorageScreen;
 import com.grim3212.assorted.storage.client.screen.GoldSafeScreen;
 import com.grim3212.assorted.storage.client.screen.ItemTowerScreen;
@@ -30,23 +35,30 @@ import com.grim3212.assorted.storage.client.screen.LockedHopperScreen;
 import com.grim3212.assorted.storage.client.screen.LockedMaterialScreen;
 import com.grim3212.assorted.storage.client.screen.LockerScreen;
 import com.grim3212.assorted.storage.client.screen.LocksmithWorkbenchScreen;
-import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
+import com.grim3212.assorted.storage.common.item.BagItem;
+import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.proxy.IProxy;
+import com.grim3212.assorted.storage.common.util.StorageMaterial;
+import com.grim3212.assorted.storage.common.util.StorageUtil;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ClientProxy implements IProxy {
 
@@ -56,6 +68,7 @@ public class ClientProxy implements IProxy {
 		modBus.addListener(this::setupClient);
 		modBus.addListener(this::registerLayers);
 		modBus.addListener(this::registerLoaders);
+		modBus.addListener(this::registerItemColors);
 	}
 
 	private void registerLoaders(final ModelEvent.RegisterGeometryLoaders event) {
@@ -85,6 +98,8 @@ public class ClientProxy implements IProxy {
 		MenuScreens.register(StorageContainerTypes.ITEM_TOWER.get(), ItemTowerScreen::new);
 		MenuScreens.register(StorageContainerTypes.LOCKSMITH_WORKBENCH.get(), LocksmithWorkbenchScreen::new);
 		MenuScreens.register(StorageContainerTypes.KEY_RING.get(), KeyRingScreen::new);
+		MenuScreens.register(StorageContainerTypes.BAG.get(), BagScreen::new);
+		MenuScreens.register(StorageContainerTypes.ENDER_BAG.get(), EnderBagScreen::new);
 		MenuScreens.register(StorageContainerTypes.LOCKED_ENDER_CHEST.get(), LockedEnderChestScreen::new);
 
 		StorageContainerTypes.CHESTS.forEach((material, menu) -> {
@@ -114,13 +129,47 @@ public class ClientProxy implements IProxy {
 		BlockEntityRenderers.register(StorageBlockEntityTypes.LOCKED_CHEST.get(), LockedChestBlockEntityRenderer::new);
 		BlockEntityRenderers.register(StorageBlockEntityTypes.LOCKED_SHULKER_BOX.get(), LockedShulkerBoxBlockEntityRenderer::new);
 
-		for (Block b : StorageBlocks.lockedDoors()) {
-			ItemBlockRenderTypes.setRenderLayer(b, RenderType.cutout());
-		}
+		event.enqueueWork(() -> {
+			ClampedItemPropertyFunction colorOverride = (stack, world, entity, seed) -> stack.hasTag() && stack.getTag().contains(BagItem.TAG_PRIMARY_COLOR) && stack.getTag().getInt(BagItem.TAG_PRIMARY_COLOR) >= 0 ? 1.0F : 0.0F;
+			ClampedItemPropertyFunction lockOverride = (stack, world, entity, seed) -> StorageUtil.getCode(stack).isEmpty() ? 0.0F : 1.0F;
+
+			ItemProperties.register(StorageItems.BAG.get(), new ResourceLocation(AssortedStorage.MODID, "color"), colorOverride);
+			ItemProperties.register(StorageItems.BAG.get(), new ResourceLocation(AssortedStorage.MODID, "locked"), lockOverride);
+			ItemProperties.register(StorageItems.ENDER_BAG.get(), new ResourceLocation(AssortedStorage.MODID, "locked"), lockOverride);
+
+			for (Entry<StorageMaterial, RegistryObject<BagItem>> bag : StorageItems.BAGS.entrySet()) {
+				BagItem item = bag.getValue().get();
+
+				ItemProperties.register(item, new ResourceLocation(AssortedStorage.MODID, "color"), colorOverride);
+				ItemProperties.register(item, new ResourceLocation(AssortedStorage.MODID, "locked"), lockOverride);
+			}
+		});
 	}
 
-	@Override
-	public Player getClientPlayer() {
-		return Minecraft.getInstance().player;
+	public void registerItemColors(final RegisterColorHandlersEvent.Item event) {
+		ItemColor bagColor = new ItemColor() {
+
+			@Override
+			public int getColor(ItemStack stack, int layer) {
+				if (stack.getItem()instanceof BagItem bag && stack.hasTag()) {
+
+					if (layer == 0 && stack.getTag().contains(BagItem.TAG_PRIMARY_COLOR)) {
+						int dyeColor = stack.getTag().getInt(BagItem.TAG_PRIMARY_COLOR);
+						return dyeColor == -1 ? 16777215 : DyeColor.byId(dyeColor).getFireworkColor();
+					}
+
+					if (layer == 1 && stack.getTag().contains(BagItem.TAG_SECONDARY_COLOR)) {
+						int dyeColor = stack.getTag().getInt(BagItem.TAG_SECONDARY_COLOR);
+						return dyeColor == -1 ? 16777215 : DyeColor.byId(dyeColor).getFireworkColor();
+					}
+
+				}
+				return 16777215;
+			}
+
+		};
+
+		event.register(bagColor, StorageItems.BAG.get());
+		event.register(bagColor, StorageItems.BAGS.values().stream().map((b) -> b.get()).toArray(ItemLike[]::new));
 	}
 }

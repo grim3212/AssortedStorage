@@ -1,0 +1,39 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "bags"
+        },
+        {
+          "type": "forge:not",
+          "value": {
+            "type": "forge:tag_empty",
+            "tag": "forge:ingots/lead"
+          }
+        }
+      ],
+      "recipe": {
+        "type": "assortedstorage:locked_upgrading",
+        "key": {
+          "C": {
+            "tag": "assortedstorage:bags/level_1"
+          },
+          "M": {
+            "tag": "forge:ingots/lead"
+          }
+        },
+        "pattern": [
+          "MMM",
+          "MCM",
+          "MMM"
+        ],
+        "result": {
+          "item": "assortedstorage:bag_lead"
+        }
+      }
+    }
+  ]
+}

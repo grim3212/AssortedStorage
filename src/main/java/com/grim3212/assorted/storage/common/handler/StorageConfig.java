@@ -21,6 +21,7 @@ public final class StorageConfig {
 		public final ForgeConfigSpec.BooleanValue shulkersEnabled;
 		public final ForgeConfigSpec.BooleanValue hoppersEnabled;
 		public final ForgeConfigSpec.BooleanValue upgradesEnabled;
+		public final ForgeConfigSpec.BooleanValue bagsEnabled;
 
 		public final ForgeConfigSpec.BooleanValue hideUncraftableItems;
 
@@ -31,6 +32,7 @@ public final class StorageConfig {
 			shulkersEnabled = builder.comment("Set this to true if you would like extra shulker boxes to be craftable and found in the creative tab.").define("shulkersEnabled", true);
 			hoppersEnabled = builder.comment("Set this to true if you would like extra hoppers to be craftable and found in the creative tab.").define("hoppersEnabled", true);
 			upgradesEnabled = builder.comment("Set this to true if you would like to be able to use and craft storage upgrades.").define("upgradesEnabled", true);
+			bagsEnabled = builder.comment("Set this to true if you would like to be able to use and craft bags.").define("bagsEnabled", true);
 			builder.pop();
 
 			builder.push("General");
