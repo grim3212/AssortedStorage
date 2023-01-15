@@ -104,7 +104,7 @@ public class ItemTowerScreen extends AbstractContainerScreen<ItemTowerContainer>
 			if (prevRowID != this.rowId) {
 				this.menu.setDisplayRow(this.rowId);
 				if (playSound)
-					this.minecraft.player.playSound(SoundEvents.UI_BUTTON_CLICK, 1.0F, 1.0F);
+					this.minecraft.player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 1.0F, 1.0F);
 			}
 		}
 	}

@@ -12,7 +12,7 @@ import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
 import net.minecraft.core.Direction;
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
@@ -33,8 +33,8 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 
 	private static final ResourceLocation CUTOUT_RENDER_TYPE = new ResourceLocation("minecraft:cutout");
 
-	public StorageBlockstateProvider(DataGenerator generator, ExistingFileHelper exFileHelper, LockedModelProvider loader) {
-		super(generator, AssortedStorage.MODID, exFileHelper);
+	public StorageBlockstateProvider(PackOutput output, ExistingFileHelper exFileHelper, LockedModelProvider loader) {
+		super(output, AssortedStorage.MODID, exFileHelper);
 		this.loaderModels = loader;
 
 		this.blocks = new HashMap<>();

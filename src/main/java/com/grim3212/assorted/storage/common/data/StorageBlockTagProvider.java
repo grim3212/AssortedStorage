@@ -1,6 +1,7 @@
 package com.grim3212.assorted.storage.common.data;
 
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
 
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
@@ -11,24 +12,26 @@ import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 import com.grim3212.assorted.storage.common.util.StorageTags;
 
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.tags.BlockTagsProvider;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderLookup.Provider;
+import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.RegistryObject;
 
 public class StorageBlockTagProvider extends BlockTagsProvider {
 
-	public StorageBlockTagProvider(DataGenerator generatorIn, ExistingFileHelper existingFileHelper) {
-		super(generatorIn, AssortedStorage.MODID, existingFileHelper);
+	public StorageBlockTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper) {
+		super(output, lookupProvider, AssortedStorage.MODID, existingFileHelper);
 	}
 
 	@Override
-	protected void addTags() {
-		TagAppender<Block> piglinBuilder = this.tag(BlockTags.GUARDED_BY_PIGLINS);
+	protected void addTags(Provider provider) {
+		IntrinsicTagAppender<Block> piglinBuilder = this.tag(BlockTags.GUARDED_BY_PIGLINS);
 		piglinBuilder.add(StorageBlocks.ACACIA_WAREHOUSE_CRATE.get());
 		piglinBuilder.add(StorageBlocks.BIRCH_WAREHOUSE_CRATE.get());
 		piglinBuilder.add(StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get());
@@ -103,7 +106,7 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 					break;
 			}
 		}
-		
+
 		for (Entry<StorageMaterial, RegistryObject<LockedHopperBlock>> barrel : StorageBlocks.HOPPERS.entrySet()) {
 			Block block = barrel.getValue().get();
 			piglinBuilder.add(block);
@@ -175,7 +178,7 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 		this.tag(StorageTags.Blocks.SHULKERS_NORMAL).add(Blocks.SHULKER_BOX, Blocks.BLACK_SHULKER_BOX, Blocks.BLUE_SHULKER_BOX, Blocks.BROWN_SHULKER_BOX, Blocks.CYAN_SHULKER_BOX, Blocks.GRAY_SHULKER_BOX, Blocks.GREEN_SHULKER_BOX, Blocks.LIGHT_BLUE_SHULKER_BOX, Blocks.LIGHT_GRAY_SHULKER_BOX, Blocks.LIME_SHULKER_BOX, Blocks.MAGENTA_SHULKER_BOX, Blocks.ORANGE_SHULKER_BOX, Blocks.PINK_SHULKER_BOX, Blocks.PURPLE_SHULKER_BOX, Blocks.RED_SHULKER_BOX, Blocks.WHITE_SHULKER_BOX,
 				Blocks.YELLOW_SHULKER_BOX);
 
-		TagAppender<Block> doorBuilder = this.tag(BlockTags.DOORS);
+		IntrinsicTagAppender<Block> doorBuilder = this.tag(BlockTags.DOORS);
 		for (Block b : StorageBlocks.lockedDoors()) {
 			doorBuilder.add(b);
 		}

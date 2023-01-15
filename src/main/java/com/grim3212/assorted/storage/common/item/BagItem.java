@@ -5,7 +5,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.grim3212.assorted.storage.AssortedStorage;
-import com.grim3212.assorted.storage.common.handler.StorageConfig;
 import com.grim3212.assorted.storage.common.inventory.bag.BagCapabilityProvider;
 import com.grim3212.assorted.storage.common.inventory.bag.BagContainer;
 import com.grim3212.assorted.storage.common.inventory.keyring.KeyRingItemHandler;
@@ -14,7 +13,6 @@ import com.grim3212.assorted.storage.common.util.StorageMaterial;
 import com.grim3212.assorted.storage.common.util.StorageUtil;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -23,7 +21,6 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -32,7 +29,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class BagItem extends Item {
 
@@ -51,33 +47,6 @@ public class BagItem extends Item {
 	}
 
 	@Override
-	public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> items) {
-		if (this.allowedIn(tab)) {
-
-			items.add(new ItemStack(this));
-
-			if (material == null) {
-				for (DyeColor color : DyeColor.values()) {
-					items.add(NBTHelper.putIntItemStack(new ItemStack(this), TAG_PRIMARY_COLOR, color.getId()));
-				}
-			}
-		}
-	}
-
-	@Override
-	protected boolean allowedIn(CreativeModeTab tab) {
-		if (!StorageConfig.COMMON.bagsEnabled.get()) {
-			return false;
-		}
-
-		if (this.material != null && StorageConfig.COMMON.hideUncraftableItems.get() && ForgeRegistries.ITEMS.tags().getTag(this.getStorageMaterial().getMaterial()).size() <= 0) {
-			return false;
-		}
-
-		return super.allowedIn(tab);
-	}
-
-	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
 		return false;
 	}
@@ -93,7 +62,7 @@ public class BagItem extends Item {
 		if (!lockCode.isEmpty()) {
 			tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.locked").withStyle(ChatFormatting.AQUA));
 		}
-		
+
 		tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.level_upgrade_level", Component.literal("" + (material == null ? 0 : material.getStorageLevel())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
 	}
 

@@ -3,12 +3,10 @@ package com.grim3212.assorted.storage.common.data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.ImmutableList;
 import com.grim3212.assorted.storage.common.block.GoldSafeBlock;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.block.LockedChestBlock;
@@ -18,12 +16,11 @@ import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import com.grim3212.assorted.storage.common.loot.ModLoadedLootCondition;
 import com.grim3212.assorted.storage.common.loot.OptionalLootItem;
-import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.loot.BlockLoot;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.data.loot.packs.VanillaBlockLoot;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -31,7 +28,6 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.LootTable.Builder;
 import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.entries.DynamicLoot;
@@ -41,8 +37,6 @@ import net.minecraft.world.level.storage.loot.functions.CopyNameFunction;
 import net.minecraft.world.level.storage.loot.functions.CopyNameFunction.NameSource;
 import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
 import net.minecraft.world.level.storage.loot.functions.SetContainerContents;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
@@ -51,13 +45,8 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class StorageLootProvider extends LootTableProvider {
 
-	public StorageLootProvider(DataGenerator generator) {
-		super(generator);
-	}
-
-	@Override
-	protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, Builder>>>, LootContextParamSet>> getTables() {
-		return ImmutableList.of(Pair.of(BlockTables::new, LootContextParamSets.BLOCK));
+	public StorageLootProvider(PackOutput output, Set<ResourceLocation> requiredTables, List<LootTableProvider.SubProviderEntry> subProviders) {
+		super(output, requiredTables, subProviders);
 	}
 
 	@Override
@@ -67,12 +56,7 @@ public class StorageLootProvider extends LootTableProvider {
 		});
 	}
 
-	@Override
-	public String getName() {
-		return "Assorted Storage loot tables";
-	}
-
-	private class BlockTables extends BlockLoot {
+	public static class BlockTables extends VanillaBlockLoot {
 
 		private final List<Block> blocks = new ArrayList<>();
 
@@ -107,7 +91,7 @@ public class StorageLootProvider extends LootTableProvider {
 		}
 
 		@Override
-		protected void addTables() {
+		protected void generate() {
 			for (Block b : blocks) {
 				this.dropSelf(b);
 			}
@@ -115,12 +99,12 @@ public class StorageLootProvider extends LootTableProvider {
 			this.dropOther(StorageBlocks.LOCKED_BARREL.get(), Blocks.BARREL);
 			this.dropOther(StorageBlocks.LOCKED_HOPPER.get(), Blocks.HOPPER);
 
-			this.add(StorageBlocks.GOLD_SAFE.get(), BlockTables::createGoldSafeTable);
-			this.add(StorageBlocks.LOCKED_ENDER_CHEST.get(), BlockTables::createInventoryCodeTable);
+			this.add(StorageBlocks.GOLD_SAFE.get(), createGoldSafeTable(StorageBlocks.GOLD_SAFE.get()));
+			this.add(StorageBlocks.LOCKED_ENDER_CHEST.get(), createInventoryCodeTable(StorageBlocks.LOCKED_ENDER_CHEST.get()));
 
-			this.add(StorageBlocks.LOCKED_SHULKER_BOX.get(), BlockTables::createLockedShulkerTable);
+			this.add(StorageBlocks.LOCKED_SHULKER_BOX.get(), createLockedShulkerTable(StorageBlocks.LOCKED_SHULKER_BOX.get()));
 			for (RegistryObject<LockedShulkerBoxBlock> b : StorageBlocks.SHULKERS.values()) {
-				this.add(b.get(), BlockTables::createLockedShulkerTable);
+				this.add(b.get(), createLockedShulkerTable(b.get()));
 			}
 
 			this.add(StorageBlocks.LOCKED_IRON_DOOR.get(), createLockedDoorTable(StorageBlocks.LOCKED_IRON_DOOR.get(), Blocks.IRON_DOOR));
@@ -140,21 +124,21 @@ public class StorageLootProvider extends LootTableProvider {
 			this.add(StorageBlocks.LOCKED_GLASS_DOOR.get(), createDecorTable(StorageBlocks.LOCKED_GLASS_DOOR.get(), new ResourceLocation("assorteddecor:glass_door")));
 		}
 
-		private static LootTable.Builder createLockedDoorTable(Block b, Block out) {
+		private LootTable.Builder createLockedDoorTable(Block b, Block out) {
 			return LootTable.lootTable().withPool(applyExplosionCondition(b, LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F)).add(LootItem.lootTableItem(out).when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(b).setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(DoorBlock.HALF, DoubleBlockHalf.LOWER))))));
 		}
 
-		private static LootTable.Builder createDecorTable(Block b, ResourceLocation decorBlockLoc) {
+		private LootTable.Builder createDecorTable(Block b, ResourceLocation decorBlockLoc) {
 			return LootTable.lootTable().withPool(applyExplosionCondition(b, LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F)).when(ModLoadedLootCondition.isModLoaded("assorteddecor")).add(OptionalLootItem.optionalLootTableItem(decorBlockLoc).when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(b).setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(DoorBlock.HALF, DoubleBlockHalf.LOWER))))));
 		}
 
-		private static LootTable.Builder createGoldSafeTable(Block b) {
+		private LootTable.Builder createGoldSafeTable(Block b) {
 			LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b).apply(CopyNameFunction.copyName(NameSource.BLOCK_ENTITY)).apply(SetContainerContents.setContents(StorageBlockEntityTypes.GOLD_SAFE.get()).withEntry(DynamicLoot.dynamicEntry(GoldSafeBlock.CONTENTS)));
 			LootPool.Builder pool = LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(entry).when(ExplosionCondition.survivesExplosion());
 			return LootTable.lootTable().withPool(pool);
 		}
 
-		private static LootTable.Builder createLockedShulkerTable(Block b) {
+		private LootTable.Builder createLockedShulkerTable(Block b) {
 			CopyNbtFunction.Builder colorFunc = CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Color", "Color");
 			CopyNbtFunction.Builder func = CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Storage_Lock", "Storage_Lock");
 			LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b).apply(func).apply(colorFunc).apply(CopyNameFunction.copyName(NameSource.BLOCK_ENTITY)).apply(SetContainerContents.setContents(StorageBlockEntityTypes.LOCKED_SHULKER_BOX.get()).withEntry(DynamicLoot.dynamicEntry(LockedShulkerBoxBlock.CONTENTS)));
@@ -162,7 +146,7 @@ public class StorageLootProvider extends LootTableProvider {
 			return LootTable.lootTable().withPool(pool);
 		}
 
-		private static LootTable.Builder createInventoryCodeTable(Block b) {
+		private LootTable.Builder createInventoryCodeTable(Block b) {
 			LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b);
 			CopyNbtFunction.Builder func = CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Storage_Lock", "Storage_Lock");
 			LootPool.Builder pool = LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(entry).when(ExplosionCondition.survivesExplosion()).apply(func);

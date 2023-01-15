@@ -1,5 +1,7 @@
 package com.grim3212.assorted.storage.common.block;
 
+import javax.annotation.Nullable;
+
 import com.grim3212.assorted.storage.common.block.blockentity.BaseLockedBlockEntity;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
@@ -9,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
@@ -28,7 +31,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -37,14 +39,14 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock {
 
 	private final Block parent;
 
-	public LockedDoorBlock(Block parent, Properties builder) {
-		super(builder);
+	public LockedDoorBlock(DoorBlock parent, Properties builder) {
+		super(builder, parent.closeSound, parent.openSound);
 		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(OPEN, false).setValue(HINGE, DoorHingeSide.LEFT).setValue(POWERED, false).setValue(HALF, DoubleBlockHalf.LOWER));
 		this.parent = parent;
 	}
 
-	public LockedDoorBlock(ResourceLocation parent, Properties builder) {
-		super(builder);
+	public LockedDoorBlock(ResourceLocation parent, SoundEvent closeSound, SoundEvent openSound, Properties builder) {
+		super(builder, closeSound, openSound);
 		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(OPEN, false).setValue(HINGE, DoorHingeSide.LEFT).setValue(POWERED, false).setValue(HALF, DoubleBlockHalf.LOWER));
 		this.parent = ForgeRegistries.BLOCKS.getValue(parent);
 	}
@@ -95,11 +97,15 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock {
 		if (StorageUtil.canAccess(worldIn, pos, player)) {
 			state = state.cycle(OPEN);
 			worldIn.setBlock(pos, state, 10);
-			worldIn.levelEvent(player, state.getValue(OPEN) ? this.getOpenSound() : this.getCloseSound(), pos, 0);
+			this.playSound(player, worldIn, pos, state.getValue(OPEN));
 			return InteractionResult.SUCCESS;
 		} else {
 			return InteractionResult.PASS;
 		}
+	}
+
+	private void playSound(@Nullable Entity entity, Level level, BlockPos pos, boolean isOpen) {
+		level.playSound(entity, pos, isOpen ? this.openSound : this.closeSound, SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.1F + 0.9F);
 	}
 
 	@Override
@@ -135,14 +141,6 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock {
 
 			super.onRemove(state, worldIn, pos, newState, isMoving);
 		}
-	}
-
-	private int getCloseSound() {
-		return this.material == Material.METAL ? 1011 : 1012;
-	}
-
-	private int getOpenSound() {
-		return this.material == Material.METAL ? 1005 : 1006;
 	}
 
 	@Override

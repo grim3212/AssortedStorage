@@ -3,7 +3,6 @@ package com.grim3212.assorted.storage.common.item;
 import java.util.List;
 
 import com.grim3212.assorted.storage.AssortedStorage;
-import com.grim3212.assorted.storage.common.handler.StorageConfig;
 import com.grim3212.assorted.storage.common.inventory.enderbag.EnderBagCapabilityProvider;
 import com.grim3212.assorted.storage.common.inventory.enderbag.EnderBagContainer;
 import com.grim3212.assorted.storage.common.inventory.keyring.KeyRingItemHandler;
@@ -18,7 +17,6 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -31,11 +29,6 @@ public class EnderBagItem extends Item {
 
 	public EnderBagItem(Properties props) {
 		super(props.stacksTo(1));
-	}
-
-	@Override
-	protected boolean allowedIn(CreativeModeTab tab) {
-		return StorageConfig.COMMON.bagsEnabled.get() && super.allowedIn(tab);
 	}
 
 	@Override

@@ -9,18 +9,19 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.AirItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.Tags;
 
 public class LockedBarrelRecipe extends CustomRecipe {
 
-	public static final SimpleRecipeSerializer<LockedBarrelRecipe> SERIALIZER = new SimpleRecipeSerializer<>(LockedBarrelRecipe::new);
+	public static final SimpleCraftingRecipeSerializer<LockedBarrelRecipe> SERIALIZER = new SimpleCraftingRecipeSerializer<>(LockedBarrelRecipe::new);
 
-	public LockedBarrelRecipe(ResourceLocation id) {
-		super(id);
+	public LockedBarrelRecipe(ResourceLocation id, CraftingBookCategory category) {
+		super(id, category);
 	}
 
 	@Override

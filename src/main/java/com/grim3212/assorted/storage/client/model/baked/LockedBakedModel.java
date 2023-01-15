@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -33,7 +33,7 @@ import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
 
 public class LockedBakedModel extends BakedModelWrapper<BakedModel> {
 
-	protected final ModelBakery bakery;
+	protected final ModelBaker bakery;
 	protected final Function<Material, TextureAtlasSprite> spriteGetter;
 	protected final ModelState transform;
 	protected final ResourceLocation name;
@@ -42,7 +42,7 @@ public class LockedBakedModel extends BakedModelWrapper<BakedModel> {
 	protected final TextureAtlasSprite baseSprite;
 	private final BakedModel lockedModel;
 
-	public LockedBakedModel(BakedModel unlockedModel, BakedModel lockedModel, IGeometryBakingContext owner, TextureAtlasSprite baseSprite, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation name) {
+	public LockedBakedModel(BakedModel unlockedModel, BakedModel lockedModel, IGeometryBakingContext owner, TextureAtlasSprite baseSprite, ModelBaker bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation name) {
 		super(unlockedModel);
 		this.lockedModel = lockedModel;
 		this.bakery = bakery;

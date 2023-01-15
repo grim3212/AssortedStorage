@@ -14,7 +14,7 @@ import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
 import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
@@ -28,8 +28,8 @@ public class StorageItemModelProvider extends ItemModelProvider {
 
 	private final List<Item> items;
 
-	public StorageItemModelProvider(DataGenerator generator, ExistingFileHelper existingFileHelper) {
-		super(generator, AssortedStorage.MODID, existingFileHelper);
+	public StorageItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
+		super(output, AssortedStorage.MODID, existingFileHelper);
 
 		this.items = new ArrayList<>();
 

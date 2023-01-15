@@ -10,17 +10,18 @@ import net.minecraft.world.item.AirItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.Level;
 
 public class LockedHopperRecipe extends CustomRecipe {
 
-	public static final SimpleRecipeSerializer<LockedHopperRecipe> SERIALIZER = new SimpleRecipeSerializer<>(LockedHopperRecipe::new);
+	public static final SimpleCraftingRecipeSerializer<LockedHopperRecipe> SERIALIZER = new SimpleCraftingRecipeSerializer<>(LockedHopperRecipe::new);
 
-	public LockedHopperRecipe(ResourceLocation id) {
-		super(id);
+	public LockedHopperRecipe(ResourceLocation id, CraftingBookCategory category) {
+		super(id, category);
 	}
 
 	@Override

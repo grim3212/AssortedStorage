@@ -9,7 +9,7 @@ import com.grim3212.assorted.storage.common.block.blockentity.IStorage;
 import com.grim3212.assorted.storage.common.block.blockentity.WarehouseCrateBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -55,7 +55,7 @@ public class WarehouseCrateBlockEntityRenderer<T extends BlockEntity & IStorage>
 			matrixStackIn.pushPose();
 			float f = blockstate.getValue(BaseStorageBlock.FACING).toYRot();
 			matrixStackIn.translate(0.5D, 0.5D, 0.5D);
-			matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(-f));
+			matrixStackIn.mulPose(Axis.YP.rotationDegrees(-f));
 			matrixStackIn.translate(-0.5D, -0.5D, -0.5D);
 
 			float angle = tileEntity.getRotation(partialTicks);

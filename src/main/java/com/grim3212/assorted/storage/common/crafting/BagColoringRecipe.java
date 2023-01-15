@@ -8,18 +8,19 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.Tags;
 
 public class BagColoringRecipe extends CustomRecipe {
 
-	public static final SimpleRecipeSerializer<BagColoringRecipe> SERIALIZER = new SimpleRecipeSerializer<>(BagColoringRecipe::new);
+	public static final SimpleCraftingRecipeSerializer<BagColoringRecipe> SERIALIZER = new SimpleCraftingRecipeSerializer<>(BagColoringRecipe::new);
 
-	public BagColoringRecipe(ResourceLocation location) {
-		super(location);
+	public BagColoringRecipe(ResourceLocation location, CraftingBookCategory category) {
+		super(location, category);
 	}
 
 	@Override

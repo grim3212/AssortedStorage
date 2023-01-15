@@ -8,7 +8,6 @@ import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.blockentity.ILockable;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedShulkerBoxBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
-import com.grim3212.assorted.storage.common.handler.StorageConfig;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.util.NBTHelper;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
@@ -38,7 +37,6 @@ import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -71,7 +69,6 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorageMaterial {
 
@@ -320,25 +317,6 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
 		}
 
 		return super.getDrops(state, builder);
-	}
-
-	@Override
-	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
-		if (!StorageConfig.COMMON.shulkersEnabled.get()) {
-			return;
-		}
-
-		if (this.getStorageMaterial() == null) {
-			ItemStack output = StorageUtil.setCodeOnStack("default", new ItemStack(StorageBlocks.LOCKED_SHULKER_BOX.get()));
-			items.add(output);
-			return;
-		}
-
-		if (StorageConfig.COMMON.hideUncraftableItems.get() && ForgeRegistries.ITEMS.tags().getTag(this.getStorageMaterial().getMaterial()).size() <= 0) {
-			return;
-		}
-
-		super.fillItemCategory(group, items);
 	}
 
 	@Override

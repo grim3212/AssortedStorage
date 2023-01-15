@@ -26,7 +26,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -42,7 +41,6 @@ import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class LevelUpgradeItem extends Item {
 
@@ -60,19 +58,6 @@ public class LevelUpgradeItem extends Item {
 	@Override
 	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.level_upgrade_level", Component.literal("" + storageMaterial.getStorageLevel()).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
-	}
-
-	@Override
-	protected boolean allowedIn(CreativeModeTab tab) {
-		if (!StorageConfig.COMMON.upgradesEnabled.get()) {
-			return false;
-		}
-
-		if (StorageConfig.COMMON.hideUncraftableItems.get() && ForgeRegistries.ITEMS.tags().getTag(this.getStorageMaterial().getMaterial()).size() <= 0) {
-			return false;
-		}
-
-		return super.allowedIn(tab);
 	}
 
 	@Override

@@ -12,18 +12,19 @@ import net.minecraft.world.item.AirItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 
 public class LockedShulkerBoxRecipe extends CustomRecipe {
 
-	public static final SimpleRecipeSerializer<LockedShulkerBoxRecipe> SERIALIZER = new SimpleRecipeSerializer<>(LockedShulkerBoxRecipe::new);
+	public static final SimpleCraftingRecipeSerializer<LockedShulkerBoxRecipe> SERIALIZER = new SimpleCraftingRecipeSerializer<>(LockedShulkerBoxRecipe::new);
 
-	public LockedShulkerBoxRecipe(ResourceLocation id) {
-		super(id);
+	public LockedShulkerBoxRecipe(ResourceLocation id, CraftingBookCategory category) {
+		super(id, category);
 	}
 
 	@Override

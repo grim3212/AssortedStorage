@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.grim3212.assorted.storage.AssortedStorage;
 
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.generators.ModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -14,8 +14,8 @@ public class LockedModelProvider extends ModelProvider<LockedModelBuilder> {
 
 	final Map<ResourceLocation, LockedModelBuilder> previousModels = new HashMap<>();
 
-	public LockedModelProvider(DataGenerator gen, ExistingFileHelper exHelper) {
-		super(gen, AssortedStorage.MODID, "block", LockedModelBuilder::new, exHelper);
+	public LockedModelProvider(PackOutput output, ExistingFileHelper exHelper) {
+		super(output, AssortedStorage.MODID, "block", LockedModelBuilder::new, exHelper);
 	}
 
 	@Override

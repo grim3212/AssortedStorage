@@ -17,6 +17,7 @@
       ],
       "recipe": {
         "type": "minecraft:crafting_shaped",
+        "category": "misc",
         "key": {
           "B": {
             "item": "assortedstorage:blank_upgrade"

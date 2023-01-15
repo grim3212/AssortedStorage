@@ -37,7 +37,6 @@ public class LocksmithWorkbenchScreen extends AbstractContainerScreen<LocksmithW
 	protected void init() {
 		super.init();
 
-		this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 		this.lockField = new EditBox(this.font, this.leftPos + 67, this.topPos + 39, 42, 12, Component.translatable(AssortedStorage.MODID + ".container.keycode"));
 		this.lockField.setCanLoseFocus(false);
 		this.lockField.setTextColor(-1);
@@ -93,7 +92,6 @@ public class LocksmithWorkbenchScreen extends AbstractContainerScreen<LocksmithW
 	@Override
 	public void removed() {
 		super.removed();
-		this.minecraft.keyboardHandler.setSendRepeatsToGui(false);
 	}
 
 	@Override

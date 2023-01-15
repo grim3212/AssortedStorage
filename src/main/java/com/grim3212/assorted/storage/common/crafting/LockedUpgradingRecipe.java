@@ -16,7 +16,7 @@ import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.util.NBTHelper;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -25,6 +25,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -312,7 +313,7 @@ public class LockedUpgradingRecipe implements CraftingRecipe, IShapedRecipe<Craf
 
 	public static Item itemFromJson(JsonObject p_151279_) {
 		String s = GsonHelper.getAsString(p_151279_, "item");
-		Item item = Registry.ITEM.getOptional(new ResourceLocation(s)).orElseThrow(() -> {
+		Item item = BuiltInRegistries.ITEM.getOptional(new ResourceLocation(s)).orElseThrow(() -> {
 			return new JsonSyntaxException("Unknown item '" + s + "'");
 		});
 		if (item == Items.AIR) {
@@ -359,6 +360,11 @@ public class LockedUpgradingRecipe implements CraftingRecipe, IShapedRecipe<Craf
 
 			p_44227_.writeItem(p_44228_.result);
 		}
+	}
+
+	@Override
+	public CraftingBookCategory category() {
+		return CraftingBookCategory.MISC;
 	}
 
 }
