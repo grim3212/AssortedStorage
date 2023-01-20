@@ -40,7 +40,7 @@ public class StorageCreativeTab {
 
 			if (StorageConfig.COMMON.bagsEnabled.get()) {
 				StorageItems.BAGS.forEach((mat, bag) -> {
-					if (canCraft(mat)) {
+					if (canNotCraft(mat)) {
 						return;
 					}
 
@@ -50,7 +50,7 @@ public class StorageCreativeTab {
 
 			if (StorageConfig.COMMON.upgradesEnabled.get()) {
 				StorageItems.LEVEL_UPGRADES.forEach((mat, upgrade) -> {
-					if (canCraft(mat)) {
+					if (canNotCraft(mat)) {
 						return;
 					}
 
@@ -97,7 +97,7 @@ public class StorageCreativeTab {
 			if (StorageConfig.COMMON.chestsEnabled.get()) {
 				StorageBlocks.CHESTS.forEach((mat, chest) -> {
 
-					if (canCraft(mat)) {
+					if (canNotCraft(mat)) {
 						return;
 					}
 
@@ -108,7 +108,7 @@ public class StorageCreativeTab {
 			if (StorageConfig.COMMON.shulkersEnabled.get()) {
 				StorageBlocks.SHULKERS.forEach((mat, shulker) -> {
 
-					if (canCraft(mat)) {
+					if (canNotCraft(mat)) {
 						return;
 					}
 
@@ -119,7 +119,7 @@ public class StorageCreativeTab {
 			if (StorageConfig.COMMON.barrelsEnabled.get()) {
 				StorageBlocks.BARRELS.forEach((mat, barrel) -> {
 
-					if (canCraft(mat)) {
+					if (canNotCraft(mat)) {
 						return;
 					}
 
@@ -130,7 +130,7 @@ public class StorageCreativeTab {
 			if (StorageConfig.COMMON.hoppersEnabled.get()) {
 				StorageBlocks.HOPPERS.forEach((mat, hopper) -> {
 
-					if (canCraft(mat)) {
+					if (canNotCraft(mat)) {
 						return;
 					}
 
@@ -144,7 +144,7 @@ public class StorageCreativeTab {
 		return StorageUtil.setCodeOnStack("default", new ItemStack(item));
 	}
 
-	private static boolean canCraft(StorageMaterial mat) {
+	private static boolean canNotCraft(StorageMaterial mat) {
 		return StorageConfig.COMMON.hideUncraftableItems.get() && ForgeRegistries.ITEMS.tags().getTag(mat.getMaterial()).size() <= 0;
 	}
 }
