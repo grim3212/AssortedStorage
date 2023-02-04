@@ -4,14 +4,12 @@ import com.grim3212.assorted.storage.AssortedStorage;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class PacketHandler {
@@ -21,17 +19,18 @@ public final class PacketHandler {
 	public static void init() {
 		int id = 0;
 		HANDLER.registerMessage(id++, SetLockPacket.class, SetLockPacket::encode, SetLockPacket::decode, SetLockPacket::handle);
+		HANDLER.registerMessage(id++, SyncStorageCrate.class, SyncStorageCrate::encode, SyncStorageCrate::decode, SyncStorageCrate::handle);
+		HANDLER.registerMessage(id++, SetSlotLockPacket.class, SetSlotLockPacket::encode, SetSlotLockPacket::decode, SetSlotLockPacket::handle);
+		HANDLER.registerMessage(id++, SetAllSlotLockPacket.class, SetAllSlotLockPacket::encode, SetAllSlotLockPacket::decode, SetAllSlotLockPacket::handle);
 	}
 
 	/**
 	 * Send message to all within 64 blocks that have this chunk loaded
 	 */
 	public static void sendToNearby(Level world, BlockPos pos, Object toSend) {
-		if (world instanceof ServerLevel) {
-			ServerLevel ws = (ServerLevel) world;
-
-			ws.getChunkSource().chunkMap.getPlayers(new ChunkPos(pos), false).stream().filter(p -> p.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) < 64 * 64).forEach(p -> HANDLER.send(PacketDistributor.PLAYER.with(() -> p), toSend));
-		}
+		world.getEntitiesOfClass(ServerPlayer.class, new AABB(pos).inflate(64)).forEach(playerEntity -> {
+			HANDLER.sendTo(toSend, playerEntity.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+		});
 	}
 
 	public static void sendToNearby(Level world, Entity e, Object toSend) {

@@ -18,8 +18,8 @@ import com.grim3212.assorted.storage.common.crafting.LockedShulkerBoxRecipe;
 import com.grim3212.assorted.storage.common.crafting.LockedUpgradingRecipeBuilder;
 import com.grim3212.assorted.storage.common.handler.EnabledCondition;
 import com.grim3212.assorted.storage.common.item.BagItem;
-import com.grim3212.assorted.storage.common.item.LevelUpgradeItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
+import com.grim3212.assorted.storage.common.item.upgrades.LevelUpgradeItem;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 import com.grim3212.assorted.storage.common.util.StorageTags;
 

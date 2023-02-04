@@ -22,6 +22,7 @@ public final class StorageConfig {
 		public final ForgeConfigSpec.BooleanValue hoppersEnabled;
 		public final ForgeConfigSpec.BooleanValue upgradesEnabled;
 		public final ForgeConfigSpec.BooleanValue bagsEnabled;
+		public final ForgeConfigSpec.BooleanValue storageCratesEnabled;
 
 		public final ForgeConfigSpec.BooleanValue hideUncraftableItems;
 
@@ -33,11 +34,32 @@ public final class StorageConfig {
 			hoppersEnabled = builder.comment("Set this to true if you would like extra hoppers to be craftable and found in the creative tab.").define("hoppersEnabled", true);
 			upgradesEnabled = builder.comment("Set this to true if you would like to be able to use and craft storage upgrades.").define("upgradesEnabled", true);
 			bagsEnabled = builder.comment("Set this to true if you would like to be able to use and craft bags.").define("bagsEnabled", true);
+			storageCratesEnabled = builder.comment("Set this to true if you would like to be able to use and craft storage crates.").define("storageCratesEnabled", true);
 			builder.pop();
 
 			builder.push("General");
 			hideUncraftableItems = builder.comment("For any item that is unobtainable (like missing materials from other mods) hide it from the creative menu / JEI.").define("hideUncraftableItems", false);
 			builder.pop();
 		}
+	}
+
+	public static final Client CLIENT;
+	public static final ForgeConfigSpec CLIENT_SPEC;
+	static {
+		final Pair<Client, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(Client::new);
+		CLIENT_SPEC = specPair.getRight();
+		CLIENT = specPair.getLeft();
+	}
+
+	public static class Client {
+
+		public final ForgeConfigSpec.IntValue storageCrateMaxRenderDistance;
+
+		public Client(ForgeConfigSpec.Builder builder) {
+			builder.push("Storage Crates");
+			storageCrateMaxRenderDistance = builder.comment("Set this to the maximum distance you would like to still render Storage Crate items.").defineInRange("storageCrateMaxRenderDistance", 16, 1, 256);
+			builder.pop();
+		}
+
 	}
 }

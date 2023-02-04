@@ -1,0 +1,26 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "assortedstorage:block/storage_crate_tin_vertical",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "assortedstorage:block/storage_crate_tin",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "assortedstorage:block/storage_crate_tin"
+    },
+    "facing=south": {
+      "model": "assortedstorage:block/storage_crate_tin",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "assortedstorage:block/storage_crate_tin_vertical"
+    },
+    "facing=west": {
+      "model": "assortedstorage:block/storage_crate_tin",
+      "y": 270
+    }
+  }
+}

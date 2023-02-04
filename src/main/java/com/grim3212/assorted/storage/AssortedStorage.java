@@ -73,6 +73,7 @@ public class AssortedStorage {
 		StorageLootConditions.LOOT_ITEM_CONDITIONS.register(modBus);
 		StorageLootEntries.LOOT_POOL_ENTRY_TYPES.register(modBus);
 
+		ModLoadingContext.get().registerConfig(Type.CLIENT, StorageConfig.CLIENT_SPEC);
 		ModLoadingContext.get().registerConfig(Type.COMMON, StorageConfig.COMMON_SPEC);
 
 		CraftingHelper.register(EnabledCondition.Serializer.INSTANCE);

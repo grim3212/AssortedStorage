@@ -1,4 +1,4 @@
-package com.grim3212.assorted.storage.common.item;
+package com.grim3212.assorted.storage.common.item.upgrades;
 
 import java.util.List;
 

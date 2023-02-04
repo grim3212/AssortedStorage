@@ -3,17 +3,31 @@ package com.grim3212.assorted.storage.common.item;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
+import com.grim3212.assorted.storage.AssortedStorage;
+import com.grim3212.assorted.storage.api.crates.ICrateUpgradeRenderer;
+import com.grim3212.assorted.storage.client.render.RenderHelper;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
+import com.grim3212.assorted.storage.common.block.StorageCrateBlock;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseLockedBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedBarrelBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedChestBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedEnderChestBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedHopperBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedShulkerBoxBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.StorageCrateBlockEntity;
+import com.grim3212.assorted.storage.common.util.CrateLayout;
+import com.grim3212.assorted.storage.common.util.StorageUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -31,16 +45,20 @@ import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.BarrelBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.EnderChestBlockEntity;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class PadlockItem extends CombinationItem {
+@OnlyIn(value = Dist.CLIENT, _interface = ICrateUpgradeRenderer.class)
+public class PadlockItem extends CombinationItem implements ICrateUpgradeRenderer {
 
 	private final Map<Block, Block> lockMappings;
 
@@ -142,9 +160,30 @@ public class PadlockItem extends CombinationItem {
 			if (tryPlaceLockOnHopper(world, pos, player, hand)) {
 				return InteractionResult.SUCCESS;
 			}
+		} else if (world.getBlockState(pos).getBlock() instanceof StorageCrateBlock) {
+			if (tryPlaceLockOnHopper(world, pos, player, hand)) {
+				return InteractionResult.SUCCESS;
+			}
 		}
 
 		return super.useOn(context);
+	}
+
+	@Override
+	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+		Level level = context.getLevel();
+		BlockPos pos = context.getClickedPos();
+
+		BlockEntity entity = level.getBlockEntity(pos);
+		if (entity instanceof StorageCrateBlockEntity crate) {
+			if (!crate.isLocked() && StorageUtil.hasCode(stack)) {
+				crate.getEnhancements().set(0, stack.copyWithCount(1));
+				stack.shrink(1);
+				return InteractionResult.SUCCESS;
+			}
+		}
+
+		return super.onItemUseFirst(stack, context);
 	}
 
 	private boolean tryPlaceLockOnEnderChest(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
@@ -378,5 +417,37 @@ public class PadlockItem extends CombinationItem {
 		}
 
 		return false;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	private static ResourceLocation ICONS_LOCATIONS = new ResourceLocation(AssortedStorage.MODID, "textures/block/storage_crates/icons.png");
+	@OnlyIn(Dist.CLIENT)
+	private static final RenderType ICONS = RenderType.text(ICONS_LOCATIONS);
+
+	@Override
+	@OnlyIn(Dist.CLIENT)
+	public void render(StorageCrateBlockEntity tileEntityIn, ItemStack selfStack, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
+		Direction facing = tileEntityIn.getBlockState().getValue(StorageCrateBlock.FACING);
+
+		matrixStack.pushPose();
+		float rot = facing.toYRot();
+		matrixStack.translate(0.5F, 0.5F, 0.5F);
+		if (facing.getAxis().isHorizontal()) {
+			matrixStack.mulPose(Axis.YP.rotationDegrees(-rot));
+		} else {
+			float f = facing == Direction.DOWN ? 90F : 270F;
+			matrixStack.mulPose(Axis.XP.rotationDegrees(f));
+		}
+
+		matrixStack.translate(-0.5D, 0.5D, 0.455D);
+		float scale = 0.052F * 0.6666667F;
+		matrixStack.scale(scale, -scale, scale);
+		matrixStack.translate(0D, -0.5D, -0.455D);
+		int yLoc = tileEntityIn.getLayout() != CrateLayout.SINGLE ? 13 : 1;
+		RenderSystem.enableBlend();
+		VertexConsumer vertexConsumer = bufferIn.getBuffer(ICONS);
+		RenderHelper.lightedBlit(vertexConsumer, matrixStack, 13, yLoc, 2, 0, 4, 3, 6, 16, 16, combinedLightIn);
+		RenderSystem.disableDepthTest();
+		matrixStack.popPose();
 	}
 }

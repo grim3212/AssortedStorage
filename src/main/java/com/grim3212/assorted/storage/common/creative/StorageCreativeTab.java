@@ -24,9 +24,23 @@ public class StorageCreativeTab {
 			populator.accept(StorageItems.LOCKSMITH_KEY.get());
 			populator.accept(StorageItems.LOCKSMITH_LOCK.get());
 			populator.accept(StorageItems.KEY_RING.get());
+			populator.accept(StorageItems.ROTATOR_MAJIG.get());
+
+			if (StorageConfig.COMMON.storageCratesEnabled.get()) {
+				populator.accept(StorageBlocks.STORAGE_CRATE.get());
+				populator.accept(StorageBlocks.STORAGE_CRATE_DOUBLE.get());
+				populator.accept(StorageBlocks.STORAGE_CRATE_TRIPLE.get());
+				populator.accept(StorageBlocks.STORAGE_CRATE_QUADRUPLE.get());
+
+				populator.accept(StorageBlocks.STORAGE_CRATE_COMPACTING.get());
+			}
 
 			if (StorageConfig.COMMON.upgradesEnabled.get()) {
 				populator.accept(StorageItems.BLANK_UPGRADE.get());
+				populator.accept(StorageItems.VOID_UPGRADE.get());
+				populator.accept(StorageItems.REDSTONE_UPGRADE.get());
+				populator.accept(StorageItems.AMOUNT_UPGRADE.get());
+				populator.accept(StorageItems.GLOW_UPGRADE.get());
 			}
 
 			if (StorageConfig.COMMON.bagsEnabled.get()) {

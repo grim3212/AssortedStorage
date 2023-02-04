@@ -6,8 +6,8 @@ import java.util.concurrent.CompletableFuture;
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.BagItem;
-import com.grim3212.assorted.storage.common.item.LevelUpgradeItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
+import com.grim3212.assorted.storage.common.item.upgrades.LevelUpgradeItem;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 import com.grim3212.assorted.storage.common.util.StorageTags;
 
@@ -98,6 +98,7 @@ public class StorageItemTagProvider extends ItemTagsProvider {
 		this.copy(StorageTags.Blocks.SHULKERS_LEVEL_4, StorageTags.Items.CAN_UPGRADE_LEVEL_5);
 
 		this.tag(StorageTags.Items.PAPER).add(Items.PAPER);
+		this.tag(StorageTags.Items.IGNORE_CRAFTING_CHECK).add(Items.MELON, Items.MELON_SLICE).add(Items.CLAY, Items.CLAY_BALL);
 
 		for (Entry<StorageMaterial, RegistryObject<LevelUpgradeItem>> levelUpgrade : StorageItems.LEVEL_UPGRADES.entrySet()) {
 			LevelUpgradeItem item = levelUpgrade.getValue().get();
