@@ -1,0 +1,9 @@
+{
+  "loader": "assortedstorage:models/barrel",
+  "locked": {
+    "parent": "assortedstorage:block/crate_controller_locked"
+  },
+  "unlocked": {
+    "parent": "assortedstorage:block/crate_controller_unlocked"
+  }
+}

@@ -34,8 +34,9 @@ public class StorageBlockEntityTypes {
 	public static final RegistryObject<BlockEntityType<LockedBarrelBlockEntity>> LOCKED_BARREL = BLOCK_ENTITIES.register("locked_barrel", () -> new BlockEntityType<>(LockedBarrelBlockEntity::new, getBarrels(), null));
 	public static final RegistryObject<BlockEntityType<LockedHopperBlockEntity>> LOCKED_HOPPER = BLOCK_ENTITIES.register("locked_hopper", () -> new BlockEntityType<>(LockedHopperBlockEntity::new, getHoppers(), null));
 
-	public static final RegistryObject<BlockEntityType<StorageCrateBlockEntity>> STORAGE_CRATE = BLOCK_ENTITIES.register("storage_crate", () -> new BlockEntityType<>(StorageCrateBlockEntity::new, getStorageCrates(), null));
-	public static final RegistryObject<BlockEntityType<StorageCrateCompactingBlockEntity>> STORAGE_CRATE_COMPACTING = BLOCK_ENTITIES.register("storage_crate_compacting", () -> new BlockEntityType<>(StorageCrateCompactingBlockEntity::new, getCompactingStorageCrates(), null));
+	public static final RegistryObject<BlockEntityType<CrateBlockEntity>> CRATE = BLOCK_ENTITIES.register("crate", () -> new BlockEntityType<>(CrateBlockEntity::new, getCrates(), null));
+	public static final RegistryObject<BlockEntityType<CrateCompactingBlockEntity>> CRATE_COMPACTING = BLOCK_ENTITIES.register("crate_compacting", () -> new BlockEntityType<>(CrateCompactingBlockEntity::new, getCompactingCrates(), null));
+	public static final RegistryObject<BlockEntityType<CrateControllerBlockEntity>> CRATE_CONTROLLER = BLOCK_ENTITIES.register("crate_controller", () -> new BlockEntityType<>(CrateControllerBlockEntity::new, Sets.newHashSet(StorageBlocks.CRATE_CONTROLLER.get()), null));
 
 	private static Set<Block> getWarehouseCrates() {
 		return Sets.newHashSet(StorageBlocks.OAK_WAREHOUSE_CRATE.get(), StorageBlocks.BIRCH_WAREHOUSE_CRATE.get(), StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get(), StorageBlocks.ACACIA_WAREHOUSE_CRATE.get(), StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get(), StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get(), StorageBlocks.WARPED_WAREHOUSE_CRATE.get(), StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get(), StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get());
@@ -65,18 +66,18 @@ public class StorageBlockEntityTypes {
 		return hoppers;
 	}
 
-	private static Set<Block> getStorageCrates() {
-		Set<Block> crates = StorageBlocks.STORAGE_CRATES.values().stream().map((b) -> b.get()).collect(Collectors.toSet());
-		crates.add(StorageBlocks.STORAGE_CRATE.get());
-		crates.add(StorageBlocks.STORAGE_CRATE_DOUBLE.get());
-		crates.add(StorageBlocks.STORAGE_CRATE_TRIPLE.get());
-		crates.add(StorageBlocks.STORAGE_CRATE_QUADRUPLE.get());
+	private static Set<Block> getCrates() {
+		Set<Block> crates = StorageBlocks.CRATES.values().stream().map((b) -> b.get()).collect(Collectors.toSet());
+		crates.add(StorageBlocks.CRATE.get());
+		crates.add(StorageBlocks.CRATE_DOUBLE.get());
+		crates.add(StorageBlocks.CRATE_TRIPLE.get());
+		crates.add(StorageBlocks.CRATE_QUADRUPLE.get());
 		return crates;
 	}
-	
-	private static Set<Block> getCompactingStorageCrates() {
+
+	private static Set<Block> getCompactingCrates() {
 		Set<Block> crates = Sets.newHashSet();
-		crates.add(StorageBlocks.STORAGE_CRATE_COMPACTING.get());
+		crates.add(StorageBlocks.CRATE_COMPACTING.get());
 		return crates;
 	}
 }

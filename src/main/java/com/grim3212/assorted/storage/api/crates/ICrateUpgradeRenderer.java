@@ -1,6 +1,6 @@
 package com.grim3212.assorted.storage.api.crates;
 
-import com.grim3212.assorted.storage.common.block.blockentity.StorageCrateBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -11,5 +11,5 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public interface ICrateUpgradeRenderer {
 
-	public void render(StorageCrateBlockEntity tileEntityIn, ItemStack selfStack, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn);
+	public void render(CrateBlockEntity tileEntityIn, ItemStack selfStack, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn);
 }

@@ -11,7 +11,7 @@ import com.grim3212.assorted.storage.client.blockentity.LockedEnderChestBlockEnt
 import com.grim3212.assorted.storage.client.blockentity.LockedShulkerBoxBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.LockerBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.ObsidianSafeBlockEntityRenderer;
-import com.grim3212.assorted.storage.client.blockentity.StorageCrateBlockEntityRenderer;
+import com.grim3212.assorted.storage.client.blockentity.CrateBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.WarehouseCrateBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.WoodCabinetBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.model.CabinetModel;
@@ -36,8 +36,8 @@ import com.grim3212.assorted.storage.client.screen.LockedHopperScreen;
 import com.grim3212.assorted.storage.client.screen.LockedMaterialScreen;
 import com.grim3212.assorted.storage.client.screen.LockerScreen;
 import com.grim3212.assorted.storage.client.screen.LocksmithWorkbenchScreen;
-import com.grim3212.assorted.storage.client.screen.StorageCrateCompactingScreen;
-import com.grim3212.assorted.storage.client.screen.StorageCrateScreen;
+import com.grim3212.assorted.storage.client.screen.CrateCompactingScreen;
+import com.grim3212.assorted.storage.client.screen.CrateScreen;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.item.BagItem;
@@ -121,12 +121,12 @@ public class ClientProxy implements IProxy {
 			MenuScreens.register(menu.get(), LockedMaterialScreen::new);
 		});
 
-		StorageContainerTypes.STORAGE_CRATES.forEach((material, menu) -> {
-			MenuScreens.register(menu.get(), StorageCrateScreen::new);
+		StorageContainerTypes.CRATES.forEach((material, menu) -> {
+			MenuScreens.register(menu.get(), CrateScreen::new);
 		});
 
-		StorageContainerTypes.STORAGE_CRATES_COMPACTING.forEach((material, menu) -> {
-			MenuScreens.register(menu.get(), StorageCrateCompactingScreen::new);
+		StorageContainerTypes.CRATES_COMPACTING.forEach((material, menu) -> {
+			MenuScreens.register(menu.get(), CrateCompactingScreen::new);
 		});
 
 		BlockEntityRenderers.register(StorageBlockEntityTypes.WOOD_CABINET.get(), WoodCabinetBlockEntityRenderer::new);
@@ -139,8 +139,8 @@ public class ClientProxy implements IProxy {
 		BlockEntityRenderers.register(StorageBlockEntityTypes.LOCKED_ENDER_CHEST.get(), LockedEnderChestBlockEntityRenderer::new);
 		BlockEntityRenderers.register(StorageBlockEntityTypes.LOCKED_CHEST.get(), LockedChestBlockEntityRenderer::new);
 		BlockEntityRenderers.register(StorageBlockEntityTypes.LOCKED_SHULKER_BOX.get(), LockedShulkerBoxBlockEntityRenderer::new);
-		BlockEntityRenderers.register(StorageBlockEntityTypes.STORAGE_CRATE.get(), StorageCrateBlockEntityRenderer::new);
-		BlockEntityRenderers.register(StorageBlockEntityTypes.STORAGE_CRATE_COMPACTING.get(), StorageCrateBlockEntityRenderer::new);
+		BlockEntityRenderers.register(StorageBlockEntityTypes.CRATE.get(), CrateBlockEntityRenderer::new);
+		BlockEntityRenderers.register(StorageBlockEntityTypes.CRATE_COMPACTING.get(), CrateBlockEntityRenderer::new);
 
 		event.enqueueWork(() -> {
 			ClampedItemPropertyFunction colorOverride = (stack, world, entity, seed) -> stack.hasTag() && stack.getTag().contains(BagItem.TAG_PRIMARY_COLOR) && stack.getTag().getInt(BagItem.TAG_PRIMARY_COLOR) >= 0 ? 1.0F : 0.0F;

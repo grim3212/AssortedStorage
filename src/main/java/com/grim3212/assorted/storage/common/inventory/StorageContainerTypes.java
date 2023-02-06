@@ -6,8 +6,8 @@ import java.util.stream.Stream;
 import com.google.common.collect.Maps;
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.inventory.bag.BagContainer;
-import com.grim3212.assorted.storage.common.inventory.crates.StorageCrateCompactingContainer;
-import com.grim3212.assorted.storage.common.inventory.crates.StorageCrateContainer;
+import com.grim3212.assorted.storage.common.inventory.crates.CrateCompactingContainer;
+import com.grim3212.assorted.storage.common.inventory.crates.CrateContainer;
 import com.grim3212.assorted.storage.common.inventory.enderbag.EnderBagContainer;
 import com.grim3212.assorted.storage.common.inventory.keyring.KeyRingContainer;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
@@ -39,16 +39,16 @@ public class StorageContainerTypes {
 	public static final Map<StorageMaterial, RegistryObject<MenuType<LockedMaterialContainer>>> SHULKERS = Maps.newHashMap();
 	public static final Map<StorageMaterial, RegistryObject<MenuType<LockedMaterialContainer>>> BARRELS = Maps.newHashMap();
 	public static final Map<StorageMaterial, RegistryObject<MenuType<LockedHopperContainer>>> HOPPERS = Maps.newHashMap();
-	public static final Map<StorageMaterial, RegistryObject<MenuType<StorageCrateContainer>>> STORAGE_CRATES = Maps.newHashMap();
-	public static final Map<StorageMaterial, RegistryObject<MenuType<StorageCrateCompactingContainer>>> STORAGE_CRATES_COMPACTING = Maps.newHashMap();
+	public static final Map<StorageMaterial, RegistryObject<MenuType<CrateContainer>>> CRATES = Maps.newHashMap();
+	public static final Map<StorageMaterial, RegistryObject<MenuType<CrateCompactingContainer>>> CRATES_COMPACTING = Maps.newHashMap();
 
 	static {
 		CHESTS.put(null, CONTAINERS.register("locked_chest", () -> IForgeMenuType.create((syncId, inv, c) -> LockedMaterialContainer.createChestContainer(syncId, inv, null))));
 		SHULKERS.put(null, CONTAINERS.register("locked_shulker_box", () -> IForgeMenuType.create((syncId, inv, c) -> LockedMaterialContainer.createShulkerContainer(syncId, inv, null))));
 		BARRELS.put(null, CONTAINERS.register("locked_barrel", () -> IForgeMenuType.create((syncId, inv, c) -> LockedMaterialContainer.createBarrelContainer(syncId, inv, null))));
 		HOPPERS.put(null, CONTAINERS.register("locked_hopper", () -> IForgeMenuType.create((syncId, inv, c) -> LockedHopperContainer.createHopperContainer(syncId, inv, null))));
-		STORAGE_CRATES.put(null, CONTAINERS.register("storage_crate", () -> IForgeMenuType.create((syncId, inv, c) -> StorageCrateContainer.createCrateContainer(syncId, inv, c))));
-		STORAGE_CRATES_COMPACTING.put(null, CONTAINERS.register("storage_crate_compacting", () -> IForgeMenuType.create((syncId, inv, c) -> StorageCrateCompactingContainer.createCrateContainer(syncId, inv, c))));
+		CRATES.put(null, CONTAINERS.register("crate", () -> IForgeMenuType.create((syncId, inv, c) -> CrateContainer.createCrateContainer(syncId, inv, c))));
+		CRATES_COMPACTING.put(null, CONTAINERS.register("crate_compacting", () -> IForgeMenuType.create((syncId, inv, c) -> CrateCompactingContainer.createCrateContainer(syncId, inv, c))));
 
 		Stream.of(StorageMaterial.values()).forEach((type) -> {
 			CHESTS.put(type, CONTAINERS.register(type.toString() + "_locked_chest", () -> IForgeMenuType.create((syncId, inv, c) -> LockedMaterialContainer.createChestContainer(syncId, inv, type))));

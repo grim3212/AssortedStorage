@@ -2,8 +2,8 @@ package com.grim3212.assorted.storage.common.item.upgrades;
 
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.api.crates.ICrateUpgradeRenderer;
-import com.grim3212.assorted.storage.common.block.StorageCrateBlock;
-import com.grim3212.assorted.storage.common.block.blockentity.StorageCrateBlockEntity;
+import com.grim3212.assorted.storage.common.block.CrateBlock;
+import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import com.grim3212.assorted.storage.common.util.NBTHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -44,7 +44,7 @@ public class AmountUpgradeItem extends ModeCrateUpgradeItem implements ICrateUpg
 		return 0;
 	}
 
-	private String getSlotAmount(StorageCrateBlockEntity tileEntityIn, int slotId, boolean showFull) {
+	private String getSlotAmount(CrateBlockEntity tileEntityIn, int slotId, boolean showFull) {
 		int amount = tileEntityIn.getLargeItemStack(slotId).getAmount();
 		if (showFull) {
 			int max = tileEntityIn.getMaxStackSizeForSlot(slotId);
@@ -63,8 +63,8 @@ public class AmountUpgradeItem extends ModeCrateUpgradeItem implements ICrateUpg
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void render(StorageCrateBlockEntity tileEntityIn, ItemStack selfStack, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
-		Direction facing = tileEntityIn.getBlockState().getValue(StorageCrateBlock.FACING);
+	public void render(CrateBlockEntity tileEntityIn, ItemStack selfStack, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
+		Direction facing = tileEntityIn.getBlockState().getValue(CrateBlock.FACING);
 		Font font = Minecraft.getInstance().font;
 
 		boolean showFull = NBTHelper.getInt(selfStack, "Mode") > 0;

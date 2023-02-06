@@ -1,7 +1,7 @@
 package com.grim3212.assorted.storage.common.item.upgrades;
 
 import com.grim3212.assorted.storage.api.crates.ICrateUpgrade;
-import com.grim3212.assorted.storage.common.block.blockentity.StorageCrateBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
@@ -23,7 +23,7 @@ public class BasicCrateUpgradeItem extends Item implements ICrateUpgrade {
 		BlockPos pos = context.getClickedPos();
 
 		BlockEntity entity = level.getBlockEntity(pos);
-		if (entity instanceof StorageCrateBlockEntity crate) {
+		if (entity instanceof CrateBlockEntity crate) {
 			int firstEmptySlot = (crate.getEnhancements().subList(1, crate.getEnhancements().size()).indexOf(ItemStack.EMPTY) + 1);
 			// The 0 slot is for Padlocks only
 			if (firstEmptySlot > 0) {

@@ -19,7 +19,7 @@ public final class PacketHandler {
 	public static void init() {
 		int id = 0;
 		HANDLER.registerMessage(id++, SetLockPacket.class, SetLockPacket::encode, SetLockPacket::decode, SetLockPacket::handle);
-		HANDLER.registerMessage(id++, SyncStorageCrate.class, SyncStorageCrate::encode, SyncStorageCrate::decode, SyncStorageCrate::handle);
+		HANDLER.registerMessage(id++, SyncCrate.class, SyncCrate::encode, SyncCrate::decode, SyncCrate::handle);
 		HANDLER.registerMessage(id++, SetSlotLockPacket.class, SetSlotLockPacket::encode, SetSlotLockPacket::decode, SetSlotLockPacket::handle);
 		HANDLER.registerMessage(id++, SetAllSlotLockPacket.class, SetAllSlotLockPacket::encode, SetAllSlotLockPacket::decode, SetAllSlotLockPacket::handle);
 	}

@@ -2,7 +2,7 @@ package com.grim3212.assorted.storage.common.network;
 
 import java.util.function.Supplier;
 
-import com.grim3212.assorted.storage.common.inventory.crates.StorageCrateContainer;
+import com.grim3212.assorted.storage.common.inventory.crates.CrateContainer;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.LogicalSide;
@@ -27,7 +27,7 @@ public class SetAllSlotLockPacket {
 	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		if (ctx.get().getDirection().getReceptionSide() == LogicalSide.SERVER) {
 			ctx.get().enqueueWork(() -> {
-				if (ctx.get().getSender().containerMenu instanceof StorageCrateContainer crate) {
+				if (ctx.get().getSender().containerMenu instanceof CrateContainer crate) {
 					crate.getInventory().setAllSlotsLocked(this.locked);
 				}
 			});

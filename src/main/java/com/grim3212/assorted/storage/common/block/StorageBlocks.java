@@ -83,25 +83,29 @@ public class StorageBlocks {
 	public static final RegistryObject<LockedDoorBlock> LOCKED_STEEL_DOOR = registerNoItem("locked_steel_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:steel_door"), SoundEvents.IRON_DOOR_CLOSE, SoundEvents.IRON_DOOR_OPEN, Block.Properties.of(Material.METAL).strength(1.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
 	public static final RegistryObject<LockedDoorBlock> LOCKED_CHAIN_LINK_DOOR = registerNoItem("locked_chain_link_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:chain_link_door"), SoundEvents.IRON_DOOR_CLOSE, SoundEvents.IRON_DOOR_OPEN, Block.Properties.of(Material.DECORATION).strength(0.5F, 5.0F).sound(SoundType.METAL).noOcclusion()));
 
-	public static final RegistryObject<StorageCrateBlock> STORAGE_CRATE = registerStorageItem("storage_crate", () -> new StorageCrateBlock(null, CrateLayout.SINGLE, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
-	public static final RegistryObject<StorageCrateBlock> STORAGE_CRATE_DOUBLE = registerStorageItem("storage_crate_double", () -> new StorageCrateBlock(null, CrateLayout.DOUBLE, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
-	public static final RegistryObject<StorageCrateBlock> STORAGE_CRATE_TRIPLE = registerStorageItem("storage_crate_triple", () -> new StorageCrateBlock(null, CrateLayout.TRIPLE, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
-	public static final RegistryObject<StorageCrateBlock> STORAGE_CRATE_QUADRUPLE = registerStorageItem("storage_crate_quadruple", () -> new StorageCrateBlock(null, CrateLayout.QUADRUPLE, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
+	// TODO: Decide if Crates use upgrades for storage or use separate blocks like the other storage options
+	// Having them use upgrades would make it easier for upgrading compacting storage crates and save a ton on texture!
+	public static final RegistryObject<CrateBlock> CRATE = register("crate", () -> new CrateBlock(null, CrateLayout.SINGLE, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
+	public static final RegistryObject<CrateBlock> CRATE_DOUBLE = register("crate_double", () -> new CrateBlock(null, CrateLayout.DOUBLE, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
+	public static final RegistryObject<CrateBlock> CRATE_TRIPLE = register("crate_triple", () -> new CrateBlock(null, CrateLayout.TRIPLE, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
+	public static final RegistryObject<CrateBlock> CRATE_QUADRUPLE = register("crate_quadruple", () -> new CrateBlock(null, CrateLayout.QUADRUPLE, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
 
-	public static final RegistryObject<StorageCrateCompactingBlock> STORAGE_CRATE_COMPACTING = registerStorageItem("storage_crate_compacting", () -> new StorageCrateCompactingBlock(null, CrateLayout.TRIPLE, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
+	public static final RegistryObject<CrateCompactingBlock> CRATE_COMPACTING = register("crate_compacting", () -> new CrateCompactingBlock(null, CrateLayout.TRIPLE, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
+	public static final RegistryObject<CrateControllerBlock> CRATE_CONTROLLER = register("crate_controller", () -> new CrateControllerBlock(BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
+	public static final RegistryObject<CrateBridgeBlock> CRATE_BRIDGE = register("crate_bridge", () -> new CrateBridgeBlock(BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
 
 	public static final Map<StorageMaterial, RegistryObject<LockedChestBlock>> CHESTS = Maps.newHashMap();
 	public static final Map<StorageMaterial, RegistryObject<LockedBarrelBlock>> BARRELS = Maps.newHashMap();
 	public static final Map<StorageMaterial, RegistryObject<LockedHopperBlock>> HOPPERS = Maps.newHashMap();
 	public static final Map<StorageMaterial, RegistryObject<LockedShulkerBoxBlock>> SHULKERS = Maps.newHashMap();
-	public static final Map<StorageMaterial, RegistryObject<StorageCrateBlock>> STORAGE_CRATES = Maps.newHashMap();
+	public static final Map<StorageMaterial, RegistryObject<CrateBlock>> CRATES = Maps.newHashMap();
 	static {
 		Stream.of(StorageMaterial.values()).forEach((type) -> {
 			CHESTS.put(type, registerChest("chest_" + type.toString(), () -> new LockedChestBlock(type)));
 			BARRELS.put(type, register("barrel_" + type.toString(), () -> new LockedBarrelBlock(type)));
 			HOPPERS.put(type, register("hopper_" + type.toString(), () -> new LockedHopperBlock(type)));
 			SHULKERS.put(type, registerShulker("shulker_box_" + type.toString(), () -> new LockedShulkerBoxBlock(type)));
-			STORAGE_CRATES.put(type, register("storage_crate_" + type.toString(), () -> new StorageCrateBlock(type, CrateLayout.SINGLE)));
+			CRATES.put(type, register("crate_" + type.toString(), () -> new CrateBlock(type, CrateLayout.SINGLE)));
 		});
 	}
 

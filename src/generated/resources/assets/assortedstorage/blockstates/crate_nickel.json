@@ -1,0 +1,26 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "assortedstorage:block/crate_nickel_vertical",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "assortedstorage:block/crate_nickel",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "assortedstorage:block/crate_nickel"
+    },
+    "facing=south": {
+      "model": "assortedstorage:block/crate_nickel",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "assortedstorage:block/crate_nickel_vertical"
+    },
+    "facing=west": {
+      "model": "assortedstorage:block/crate_nickel",
+      "y": 270
+    }
+  }
+}

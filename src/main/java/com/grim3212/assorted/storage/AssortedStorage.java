@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import com.grim3212.assorted.storage.client.data.LockedModelProvider;
 import com.grim3212.assorted.storage.client.data.StorageBlockstateProvider;
 import com.grim3212.assorted.storage.client.data.StorageItemModelProvider;
+import com.grim3212.assorted.storage.client.data.StorageLanguageProvider;
 import com.grim3212.assorted.storage.client.data.StorageSpriteSourceProvider;
 import com.grim3212.assorted.storage.client.proxy.ClientProxy;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
@@ -106,5 +107,6 @@ public class AssortedStorage {
 		datagenerator.addProvider(event.includeClient(), barrelProvider);
 		datagenerator.addProvider(event.includeClient(), new StorageItemModelProvider(packOutput, fileHelper));
 		datagenerator.addProvider(event.includeClient(), new StorageSpriteSourceProvider(packOutput, fileHelper));
+		datagenerator.addProvider(event.includeClient(), new StorageLanguageProvider(packOutput));
 	}
 }

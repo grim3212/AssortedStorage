@@ -3,20 +3,20 @@ package com.grim3212.assorted.storage.common.item;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
-import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.api.crates.ICrateUpgradeRenderer;
 import com.grim3212.assorted.storage.client.render.RenderHelper;
+import com.grim3212.assorted.storage.client.util.ClientResources;
+import com.grim3212.assorted.storage.common.block.CrateBlock;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
-import com.grim3212.assorted.storage.common.block.StorageCrateBlock;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseLockedBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedBarrelBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedChestBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedEnderChestBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedHopperBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedShulkerBoxBlockEntity;
-import com.grim3212.assorted.storage.common.block.blockentity.StorageCrateBlockEntity;
 import com.grim3212.assorted.storage.common.util.CrateLayout;
 import com.grim3212.assorted.storage.common.util.StorageUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -160,7 +160,7 @@ public class PadlockItem extends CombinationItem implements ICrateUpgradeRendere
 			if (tryPlaceLockOnHopper(world, pos, player, hand)) {
 				return InteractionResult.SUCCESS;
 			}
-		} else if (world.getBlockState(pos).getBlock() instanceof StorageCrateBlock) {
+		} else if (world.getBlockState(pos).getBlock() instanceof CrateBlock) {
 			if (tryPlaceLockOnHopper(world, pos, player, hand)) {
 				return InteractionResult.SUCCESS;
 			}
@@ -175,7 +175,7 @@ public class PadlockItem extends CombinationItem implements ICrateUpgradeRendere
 		BlockPos pos = context.getClickedPos();
 
 		BlockEntity entity = level.getBlockEntity(pos);
-		if (entity instanceof StorageCrateBlockEntity crate) {
+		if (entity instanceof CrateBlockEntity crate) {
 			if (!crate.isLocked() && StorageUtil.hasCode(stack)) {
 				crate.getEnhancements().set(0, stack.copyWithCount(1));
 				stack.shrink(1);
@@ -420,14 +420,12 @@ public class PadlockItem extends CombinationItem implements ICrateUpgradeRendere
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	private static ResourceLocation ICONS_LOCATIONS = new ResourceLocation(AssortedStorage.MODID, "textures/block/storage_crates/icons.png");
-	@OnlyIn(Dist.CLIENT)
-	private static final RenderType ICONS = RenderType.text(ICONS_LOCATIONS);
+	private static final RenderType ICONS = RenderType.text(ClientResources.CRATE_ICONS_LOCATION);
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void render(StorageCrateBlockEntity tileEntityIn, ItemStack selfStack, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
-		Direction facing = tileEntityIn.getBlockState().getValue(StorageCrateBlock.FACING);
+	public void render(CrateBlockEntity tileEntityIn, ItemStack selfStack, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
+		Direction facing = tileEntityIn.getBlockState().getValue(CrateBlock.FACING);
 
 		matrixStack.pushPose();
 		float rot = facing.toYRot();

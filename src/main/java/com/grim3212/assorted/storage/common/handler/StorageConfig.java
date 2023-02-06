@@ -22,9 +22,11 @@ public final class StorageConfig {
 		public final ForgeConfigSpec.BooleanValue hoppersEnabled;
 		public final ForgeConfigSpec.BooleanValue upgradesEnabled;
 		public final ForgeConfigSpec.BooleanValue bagsEnabled;
-		public final ForgeConfigSpec.BooleanValue storageCratesEnabled;
+		public final ForgeConfigSpec.BooleanValue cratesEnabled;
 
 		public final ForgeConfigSpec.BooleanValue hideUncraftableItems;
+
+		public final ForgeConfigSpec.IntValue maxControllerSearchRange;
 
 		public Common(ForgeConfigSpec.Builder builder) {
 			builder.push("Parts");
@@ -34,11 +36,15 @@ public final class StorageConfig {
 			hoppersEnabled = builder.comment("Set this to true if you would like extra hoppers to be craftable and found in the creative tab.").define("hoppersEnabled", true);
 			upgradesEnabled = builder.comment("Set this to true if you would like to be able to use and craft storage upgrades.").define("upgradesEnabled", true);
 			bagsEnabled = builder.comment("Set this to true if you would like to be able to use and craft bags.").define("bagsEnabled", true);
-			storageCratesEnabled = builder.comment("Set this to true if you would like to be able to use and craft storage crates.").define("storageCratesEnabled", true);
+			cratesEnabled = builder.comment("Set this to true if you would like to be able to use and craft storage crates.").define("cratesEnabled", true);
 			builder.pop();
 
 			builder.push("General");
 			hideUncraftableItems = builder.comment("For any item that is unobtainable (like missing materials from other mods) hide it from the creative menu / JEI.").define("hideUncraftableItems", false);
+			builder.pop();
+
+			builder.push("Crates");
+			maxControllerSearchRange = builder.comment("What is the maximum distance that Storage Crate Controllers will search for Storage Crates.").defineInRange("maxControllerSearchRange", 64, 1, 500);
 			builder.pop();
 		}
 	}
@@ -53,11 +59,11 @@ public final class StorageConfig {
 
 	public static class Client {
 
-		public final ForgeConfigSpec.IntValue storageCrateMaxRenderDistance;
+		public final ForgeConfigSpec.IntValue crateMaxRenderDistance;
 
 		public Client(ForgeConfigSpec.Builder builder) {
-			builder.push("Storage Crates");
-			storageCrateMaxRenderDistance = builder.comment("Set this to the maximum distance you would like to still render Storage Crate items.").defineInRange("storageCrateMaxRenderDistance", 16, 1, 256);
+			builder.push("Crates");
+			crateMaxRenderDistance = builder.comment("Set this to the maximum distance you would like to still render Storage Crate items.").defineInRange("crateMaxRenderDistance", 16, 1, 256);
 			builder.pop();
 		}
 

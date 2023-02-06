@@ -1,0 +1,26 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "assortedstorage:block/crate_aluminum_vertical",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "assortedstorage:block/crate_aluminum",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "assortedstorage:block/crate_aluminum"
+    },
+    "facing=south": {
+      "model": "assortedstorage:block/crate_aluminum",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "assortedstorage:block/crate_aluminum_vertical"
+    },
+    "facing=west": {
+      "model": "assortedstorage:block/crate_aluminum",
+      "y": 270
+    }
+  }
+}

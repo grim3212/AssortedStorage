@@ -26,13 +26,15 @@ public class StorageCreativeTab {
 			populator.accept(StorageItems.KEY_RING.get());
 			populator.accept(StorageItems.ROTATOR_MAJIG.get());
 
-			if (StorageConfig.COMMON.storageCratesEnabled.get()) {
-				populator.accept(StorageBlocks.STORAGE_CRATE.get());
-				populator.accept(StorageBlocks.STORAGE_CRATE_DOUBLE.get());
-				populator.accept(StorageBlocks.STORAGE_CRATE_TRIPLE.get());
-				populator.accept(StorageBlocks.STORAGE_CRATE_QUADRUPLE.get());
+			if (StorageConfig.COMMON.cratesEnabled.get()) {
+				populator.accept(StorageBlocks.CRATE.get());
+				populator.accept(StorageBlocks.CRATE_DOUBLE.get());
+				populator.accept(StorageBlocks.CRATE_TRIPLE.get());
+				populator.accept(StorageBlocks.CRATE_QUADRUPLE.get());
 
-				populator.accept(StorageBlocks.STORAGE_CRATE_COMPACTING.get());
+				populator.accept(StorageBlocks.CRATE_COMPACTING.get());
+				populator.accept(StorageBlocks.CRATE_CONTROLLER.get());
+				populator.accept(StorageBlocks.CRATE_BRIDGE.get());
 			}
 
 			if (StorageConfig.COMMON.upgradesEnabled.get()) {

@@ -1,0 +1,11 @@
+{
+  "parent": "assortedstorage:block/base_crate_double_vertical",
+  "textures": {
+    "columns": "assortedstorage:block/crates/columns",
+    "facing_columns": "assortedstorage:block/crates/facing_columns",
+    "inner_facing": "assortedstorage:block/crates/inner_facing",
+    "inner_sides": "assortedstorage:block/crates/inner_sides",
+    "top_bottom": "assortedstorage:block/crates/top_bottom",
+    "top_bottom_edges": "assortedstorage:block/crates/top_bottom_edges"
+  }
+}
