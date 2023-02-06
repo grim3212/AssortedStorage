@@ -10,7 +10,6 @@ import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.ILockable;
 import com.grim3212.assorted.storage.common.block.blockentity.INamed;
 import com.grim3212.assorted.storage.common.util.CrateLayout;
-import com.grim3212.assorted.storage.common.util.StorageMaterial;
 import com.grim3212.assorted.storage.common.util.StorageUtil;
 
 import net.minecraft.ChatFormatting;
@@ -53,12 +52,11 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.NetworkHooks;
 
-public class CrateBlock extends Block implements EntityBlock, IStorageMaterial, ICrateSystem {
+public class CrateBlock extends Block implements EntityBlock, ICrateSystem {
 
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
-	private final StorageMaterial material;
 	private final CrateLayout layout;
 
 	private static final VoxelShape TOP_SHAPE = Block.box(0.0D, 14.0D, 0.0D, 16.0D, 16.0D, 16.0D);
@@ -79,14 +77,9 @@ public class CrateBlock extends Block implements EntityBlock, IStorageMaterial, 
 	private static final VoxelShape SIDE_VERTICAL_4 = Block.box(14.0D, 14.0D, 2.0D, 16.0D, 16.0D, 14.0D);
 	public static final VoxelShape FINAL_VERTICAL_SHAPE = Shapes.or(TOP_VERTICAL_SHAPE, INSIDE_VERTICAL_SHAPE, BOTTOM_VERTICAL_SHAPE, SIDE_VERTICAL_1, SIDE_VERTICAL_2, SIDE_VERTICAL_3, SIDE_VERTICAL_4);
 
-	public CrateBlock(StorageMaterial material, CrateLayout layout) {
-		this(material, layout, material.getProps());
-	}
-
-	public CrateBlock(StorageMaterial material, CrateLayout layout, Block.Properties props) {
+	public CrateBlock(CrateLayout layout, Block.Properties props) {
 		super(props);
 
-		this.material = material;
 		this.layout = layout;
 		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(WATERLOGGED, false));
 	}
@@ -104,11 +97,6 @@ public class CrateBlock extends Block implements EntityBlock, IStorageMaterial, 
 	public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
 		// TODO: Determine if this looks better with textures than at 0
 		return 1;
-	}
-
-	@Override
-	public StorageMaterial getStorageMaterial() {
-		return material;
 	}
 
 	@Override
@@ -321,8 +309,6 @@ public class CrateBlock extends Block implements EntityBlock, IStorageMaterial, 
 		if (!code.isEmpty()) {
 			tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.combo", Component.literal(code).withStyle(ChatFormatting.AQUA)));
 		}
-
-		tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.level_upgrade_level", Component.literal("" + (material == null ? 0 : material.getStorageLevel())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
 	}
 
 	@Override

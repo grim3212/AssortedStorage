@@ -2,7 +2,6 @@ package com.grim3212.assorted.storage.common.block;
 
 import com.grim3212.assorted.storage.common.block.blockentity.CrateCompactingBlockEntity;
 import com.grim3212.assorted.storage.common.util.CrateLayout;
-import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
@@ -13,18 +12,16 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class CrateCompactingBlock extends CrateBlock {
 
-	public CrateCompactingBlock(StorageMaterial material, CrateLayout layout) {
-		super(material, layout);
-	}
-
-	public CrateCompactingBlock(StorageMaterial material, CrateLayout layout, Block.Properties props) {
-		super(material, layout, props);
+	public CrateCompactingBlock(CrateLayout layout, Block.Properties props) {
+		super(layout, props);
 	}
 
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new CrateCompactingBlockEntity(pos, state);
 	}
+	
+	//TODO: Fix block breaking duplicating items
 
 	@Override
 	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {

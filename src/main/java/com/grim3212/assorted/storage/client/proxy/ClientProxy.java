@@ -3,6 +3,7 @@ package com.grim3212.assorted.storage.client.proxy;
 import java.util.Map.Entry;
 
 import com.grim3212.assorted.storage.AssortedStorage;
+import com.grim3212.assorted.storage.client.blockentity.CrateBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.GlassCabinetBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.GoldSafeBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.ItemTowerBlockEntityRenderer;
@@ -11,7 +12,6 @@ import com.grim3212.assorted.storage.client.blockentity.LockedEnderChestBlockEnt
 import com.grim3212.assorted.storage.client.blockentity.LockedShulkerBoxBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.LockerBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.ObsidianSafeBlockEntityRenderer;
-import com.grim3212.assorted.storage.client.blockentity.CrateBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.WarehouseCrateBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.WoodCabinetBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.model.CabinetModel;
@@ -25,6 +25,8 @@ import com.grim3212.assorted.storage.client.model.StorageModelLayers;
 import com.grim3212.assorted.storage.client.model.WarehouseCrateModel;
 import com.grim3212.assorted.storage.client.model.baked.LockedModel;
 import com.grim3212.assorted.storage.client.screen.BagScreen;
+import com.grim3212.assorted.storage.client.screen.CrateCompactingScreen;
+import com.grim3212.assorted.storage.client.screen.CrateScreen;
 import com.grim3212.assorted.storage.client.screen.DualLockerScreen;
 import com.grim3212.assorted.storage.client.screen.EnderBagScreen;
 import com.grim3212.assorted.storage.client.screen.GenericStorageScreen;
@@ -36,8 +38,6 @@ import com.grim3212.assorted.storage.client.screen.LockedHopperScreen;
 import com.grim3212.assorted.storage.client.screen.LockedMaterialScreen;
 import com.grim3212.assorted.storage.client.screen.LockerScreen;
 import com.grim3212.assorted.storage.client.screen.LocksmithWorkbenchScreen;
-import com.grim3212.assorted.storage.client.screen.CrateCompactingScreen;
-import com.grim3212.assorted.storage.client.screen.CrateScreen;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.item.BagItem;
@@ -104,6 +104,8 @@ public class ClientProxy implements IProxy {
 		MenuScreens.register(StorageContainerTypes.BAG.get(), BagScreen::new);
 		MenuScreens.register(StorageContainerTypes.ENDER_BAG.get(), EnderBagScreen::new);
 		MenuScreens.register(StorageContainerTypes.LOCKED_ENDER_CHEST.get(), LockedEnderChestScreen::new);
+		MenuScreens.register(StorageContainerTypes.CRATE.get(), CrateScreen::new);
+		MenuScreens.register(StorageContainerTypes.CRATE_COMPACTING.get(), CrateCompactingScreen::new);
 
 		StorageContainerTypes.CHESTS.forEach((material, menu) -> {
 			MenuScreens.register(menu.get(), LockedMaterialScreen::new);
@@ -119,14 +121,6 @@ public class ClientProxy implements IProxy {
 
 		StorageContainerTypes.SHULKERS.forEach((material, menu) -> {
 			MenuScreens.register(menu.get(), LockedMaterialScreen::new);
-		});
-
-		StorageContainerTypes.CRATES.forEach((material, menu) -> {
-			MenuScreens.register(menu.get(), CrateScreen::new);
-		});
-
-		StorageContainerTypes.CRATES_COMPACTING.forEach((material, menu) -> {
-			MenuScreens.register(menu.get(), CrateCompactingScreen::new);
 		});
 
 		BlockEntityRenderers.register(StorageBlockEntityTypes.WOOD_CABINET.get(), WoodCabinetBlockEntityRenderer::new);

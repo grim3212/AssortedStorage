@@ -97,7 +97,7 @@ public class CompactingHelper {
 			matchingStacks = findMatchingStacks(new ComparisonCraftingContainer(2, stack));
 		}
 
-		if (stack.is(StorageTags.Items.IGNORE_CRAFTING_CHECK)) {
+		if (stack.is(StorageTags.Items.CRAFTING_OVERRIDE)) {
 			outputs = matchingStacks;
 		} else if (matchingStacks.size() > 0) {
 			ComparisonCraftingContainer craftingContainer = new ComparisonCraftingContainer(1);
@@ -148,7 +148,7 @@ public class CompactingHelper {
 			ItemStack match = tryMatch(stack, craftingRecipe.getIngredients());
 			if (!match.isEmpty()) {
 				int recipeSize = craftingRecipe.getIngredients().size();
-				if (stack.is(StorageTags.Items.IGNORE_CRAFTING_CHECK)) {
+				if (stack.is(StorageTags.Items.CRAFTING_OVERRIDE)) {
 					itemOptions.put(match, recipeSize);
 				}
 

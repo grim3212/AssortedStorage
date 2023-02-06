@@ -3,6 +3,7 @@ package com.grim3212.assorted.storage.common.item.upgrades;
 import java.util.List;
 
 import com.grim3212.assorted.storage.AssortedStorage;
+import com.grim3212.assorted.storage.api.crates.ICrateUpgrade;
 import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.block.LockedChestBlock;
@@ -42,7 +43,7 @@ import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class LevelUpgradeItem extends Item {
+public class LevelUpgradeItem extends Item implements ICrateUpgrade {
 
 	private final StorageMaterial storageMaterial;
 
@@ -326,5 +327,10 @@ public class LevelUpgradeItem extends Item {
 			world.playSound(player, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
 		}
 		return InteractionResult.SUCCESS;
+	}
+
+	@Override
+	public int getStorageModifier() {
+		return (this.storageMaterial.getStorageLevel() + 1) * 5;
 	}
 }

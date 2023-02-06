@@ -115,10 +115,6 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 		createBaseStorageCrateModels();
 
 		createStorageCrate(StorageBlocks.CRATE.get());
-		for (RegistryObject<CrateBlock> b : StorageBlocks.CRATES.values()) {
-			createStorageCrate(b.get());
-		}
-
 		createStorageCrate(StorageBlocks.CRATE_DOUBLE.get());
 		createStorageCrate(StorageBlocks.CRATE_TRIPLE.get());
 		createStorageCrate(StorageBlocks.CRATE_QUADRUPLE.get());

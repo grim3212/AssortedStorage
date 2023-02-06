@@ -25,6 +25,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 public class CrateCompactingBlockEntity extends CrateBlockEntity {
 
+	//TODO: Add missing compact recipes to the tags
 	private List<Match> matches = NonNullList.<Match>withSize(3, new Match(ItemStack.EMPTY, 1));
 
 	public CrateCompactingBlockEntity(BlockPos pos, BlockState state) {
@@ -60,7 +61,7 @@ public class CrateCompactingBlockEntity extends CrateBlockEntity {
 
 		return tag;
 	}
-	
+
 	@Override
 	protected Component getDefaultName() {
 		return Component.translatable(AssortedStorage.MODID + ".container.compacting_storage_crate");
@@ -371,7 +372,7 @@ public class CrateCompactingBlockEntity extends CrateBlockEntity {
 
 	@Override
 	public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
-		return new CrateCompactingContainer(StorageContainerTypes.CRATES_COMPACTING.get(this.getStorageMaterial()).get(), windowId, player, this);
+		return new CrateCompactingContainer(StorageContainerTypes.CRATE_COMPACTING.get(), windowId, player, this);
 	}
 
 	public NonNullList<ItemStack> asItemStacks() {

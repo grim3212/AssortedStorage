@@ -13,7 +13,6 @@ import com.grim3212.assorted.storage.common.block.LockedChestBlock;
 import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
-import com.grim3212.assorted.storage.common.block.CrateBlock;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import com.grim3212.assorted.storage.common.loot.ModLoadedLootCondition;
 import com.grim3212.assorted.storage.common.loot.OptionalLootItem;
@@ -85,7 +84,7 @@ public class StorageLootProvider extends LootTableProvider {
 			blocks.add(StorageBlocks.CRATE_COMPACTING.get());
 			blocks.add(StorageBlocks.CRATE_CONTROLLER.get());
 			blocks.add(StorageBlocks.CRATE_BRIDGE.get());
-			
+
 			for (RegistryObject<LockedChestBlock> b : StorageBlocks.CHESTS.values()) {
 				blocks.add(b.get());
 			}
@@ -95,10 +94,6 @@ public class StorageLootProvider extends LootTableProvider {
 			}
 
 			for (RegistryObject<LockedHopperBlock> b : StorageBlocks.HOPPERS.values()) {
-				blocks.add(b.get());
-			}
-
-			for (RegistryObject<CrateBlock> b : StorageBlocks.CRATES.values()) {
 				blocks.add(b.get());
 			}
 		}

@@ -22,6 +22,7 @@ public class StorageLanguageProvider extends LanguageProvider {
 		this.add("assortedstorage.info.level_upgrade_level", "Storage Level %s");
 		this.add("assortedstorage.info.level_upgrade", "Can be used on:");
 		this.add("assortedstorage.info.level_upgrade_shift", "§lHold Shift§r to See §bSupported Blocks");
+		this.add("assortedstorage.info.amount", "Amount %s");
 		this.add("assortedstorage.info.upgrade.mode", "Mode: %s");
 		this.add("assortedstorage.info.upgrade_amount.mode.simple", "Simple");
 		this.add("assortedstorage.info.upgrade_amount.mode.full", "Full");
@@ -29,6 +30,7 @@ public class StorageLanguageProvider extends LanguageProvider {
 		this.add("assortedstorage.info.upgrade_redstone.mode.most", "Most Full Slot");
 		this.add("assortedstorage.info.upgrade_redstone.mode.least", "Least Full Slot");
 		this.add("assortedstorage.info.upgrade_redstone.mode.slot", "Slot %s");
+		this.add("assortedstorage.info.storage_multiplier", "Storage Multiplier %s");
 		this.add("assortedstorage.info.item_lock", "Toggle item lock for slot %s");
 		this.add("assortedstorage.info.compact_item_lock", "Toggle item lock for Compacting Crate");
 
@@ -49,6 +51,7 @@ public class StorageLanguageProvider extends LanguageProvider {
 		this.add("assortedstorage.container.locksmith_workbench", "Locksmith Workbench");
 		this.add("assortedstorage.container.locked_ender_chest", "Ender Chest");
 		this.add("assortedstorage.container.key_ring", "Key Ring");
+		this.add("assortedstorage.container.storage_crate.upgrades", "Upgrades");
 		this.add("assortedstorage.container.storage_crate", "Storage Crate");
 		this.add("assortedstorage.container.compacting_storage_crate", "Compacting Storage Crate");
 
@@ -70,9 +73,6 @@ public class StorageLanguageProvider extends LanguageProvider {
 
 			this.add("assortedstorage.container.shulker_" + materialName, capitalizedMaterialName + " Shulker Box");
 			this.add("block.assortedstorage.shulker_box_" + materialName, capitalizedMaterialName + " Shulker Box");
-
-			this.add("assortedstorage.container.storage_crate_" + materialName, capitalizedMaterialName + " Storage Crate");
-			this.add("block.assortedstorage.crate_" + materialName, capitalizedMaterialName + " Crate");
 			
 			this.add("item.assortedstorage.level_upgrade_" + materialName, capitalizedMaterialName + " Level Upgrade");
 		}
@@ -83,9 +83,9 @@ public class StorageLanguageProvider extends LanguageProvider {
 		this.add("block.assortedstorage.locked_shulker_box", "Locked Shulker Box");
 		this.add("block.assortedstorage.locked_ender_chest", "Locked Ender Chest");
 		
-		this.add("block.assortedstorage.crate", "Crate");
-		this.add("block.assortedstorage.crate_controller", "Crate Controller");
-		this.add("block.assortedstorage.crate_bridge", "Crate Bridge");
+		this.add("block.assortedstorage.crate", "Storage Crate");
+		this.add("block.assortedstorage.crate_controller", "Storage Crate Controller");
+		this.add("block.assortedstorage.crate_bridge", "Storage Crate Bridge");
 
 		this.add("block.assortedstorage.wood_cabinet", "Wood Cabinet");
 		this.add("block.assortedstorage.glass_cabinet", "Glass Cabinet");

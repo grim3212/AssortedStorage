@@ -18,8 +18,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -95,7 +97,18 @@ public class CrateControllerBlock extends Block implements EntityBlock, ICrateSy
 		if (!state.is(newState.getBlock())) {
 			BlockEntity tileentity = worldIn.getBlockEntity(pos);
 
-			if (tileentity instanceof CrateControllerBlockEntity crate) {
+			if (tileentity instanceof ILockable) {
+				ILockable teStorage = (ILockable) tileentity;
+
+				if (teStorage.isLocked()) {
+					ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
+					CompoundTag tag = new CompoundTag();
+					new StorageLockCode(teStorage.getLockCode()).write(tag);
+					lockStack.setTag(tag);
+					Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
+				}
+
+				Containers.dropContents(worldIn, pos, (WorldlyContainer) tileentity);
 				worldIn.updateNeighbourForOutputSignal(pos, this);
 			}
 

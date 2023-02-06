@@ -35,7 +35,7 @@ public class StorageBlockEntityTypes {
 	public static final RegistryObject<BlockEntityType<LockedHopperBlockEntity>> LOCKED_HOPPER = BLOCK_ENTITIES.register("locked_hopper", () -> new BlockEntityType<>(LockedHopperBlockEntity::new, getHoppers(), null));
 
 	public static final RegistryObject<BlockEntityType<CrateBlockEntity>> CRATE = BLOCK_ENTITIES.register("crate", () -> new BlockEntityType<>(CrateBlockEntity::new, getCrates(), null));
-	public static final RegistryObject<BlockEntityType<CrateCompactingBlockEntity>> CRATE_COMPACTING = BLOCK_ENTITIES.register("crate_compacting", () -> new BlockEntityType<>(CrateCompactingBlockEntity::new, getCompactingCrates(), null));
+	public static final RegistryObject<BlockEntityType<CrateCompactingBlockEntity>> CRATE_COMPACTING = BLOCK_ENTITIES.register("crate_compacting", () -> new BlockEntityType<>(CrateCompactingBlockEntity::new, Sets.newHashSet(StorageBlocks.CRATE_COMPACTING.get()), null));
 	public static final RegistryObject<BlockEntityType<CrateControllerBlockEntity>> CRATE_CONTROLLER = BLOCK_ENTITIES.register("crate_controller", () -> new BlockEntityType<>(CrateControllerBlockEntity::new, Sets.newHashSet(StorageBlocks.CRATE_CONTROLLER.get()), null));
 
 	private static Set<Block> getWarehouseCrates() {
@@ -67,17 +67,11 @@ public class StorageBlockEntityTypes {
 	}
 
 	private static Set<Block> getCrates() {
-		Set<Block> crates = StorageBlocks.CRATES.values().stream().map((b) -> b.get()).collect(Collectors.toSet());
+		Set<Block> crates = Sets.newHashSet();
 		crates.add(StorageBlocks.CRATE.get());
 		crates.add(StorageBlocks.CRATE_DOUBLE.get());
 		crates.add(StorageBlocks.CRATE_TRIPLE.get());
 		crates.add(StorageBlocks.CRATE_QUADRUPLE.get());
-		return crates;
-	}
-
-	private static Set<Block> getCompactingCrates() {
-		Set<Block> crates = Sets.newHashSet();
-		crates.add(StorageBlocks.CRATE_COMPACTING.get());
 		return crates;
 	}
 }

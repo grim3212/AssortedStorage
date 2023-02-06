@@ -4,9 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import com.grim3212.assorted.storage.AssortedStorage;
+import com.grim3212.assorted.storage.api.crates.ICrateUpgrade;
 import com.grim3212.assorted.storage.client.screen.buttons.ImageToggleButton;
-import com.grim3212.assorted.storage.common.inventory.crates.LargeItemStackSlot;
 import com.grim3212.assorted.storage.common.inventory.crates.CrateContainer;
+import com.grim3212.assorted.storage.common.inventory.crates.LargeItemStackSlot;
 import com.grim3212.assorted.storage.common.network.PacketHandler;
 import com.grim3212.assorted.storage.common.network.SetSlotLockPacket;
 import com.grim3212.assorted.storage.common.util.CrateLayout;
@@ -45,7 +46,7 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
 		super(container, playerInventory, title);
 
 		this.imageHeight = 188;
-		this.imageWidth = 202;
+		this.imageWidth = 176;
 
 		this.passEvents = true;
 		this.renderStack = new ItemStack(container.getInventory().getBlockState().getBlock());
@@ -64,7 +65,20 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
 			List<Component> tooltip = this.getTooltipFromItem(this.hoveredSlot.getItem());
 			Optional<TooltipComponent> tooltipComponents = this.hoveredSlot.getItem().getTooltipImage();
 			if (this.hoveredSlot instanceof LargeItemStackSlot slot) {
-				tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.upgrade_redstone.mode.slot", Component.literal(String.valueOf(slot.getContainerSlot())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
+				int curSlot = slot.getContainerSlot();
+				LargeItemStack stackInSlot = this.getStack(curSlot);
+				int maxStackSize = this.menu.getInventory().getMaxStackSizeForSlot(curSlot);
+				tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.amount", Component.literal(String.valueOf(stackInSlot.getAmount() + "/" + maxStackSize)).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
+				tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.upgrade_redstone.mode.slot", Component.literal(String.valueOf(curSlot)).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
+				this.renderTooltip(stack, tooltip, tooltipComponents, mouseX, mouseY);
+				return;
+			} else if (this.hoveredSlot.getItem().getItem()instanceof ICrateUpgrade upgrade) {
+				if (upgrade.getStorageModifier() <= 0) {
+					this.renderTooltip(stack, tooltip, tooltipComponents, mouseX, mouseY);
+					return;
+				}
+
+				tooltip.add(Component.translatable(AssortedStorage.MODID + ".info.storage_multiplier", Component.literal(String.valueOf(upgrade.getStorageModifier())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
 				this.renderTooltip(stack, tooltip, tooltipComponents, mouseX, mouseY);
 				return;
 			} else {
@@ -72,7 +86,7 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
 			}
 		}
 	}
-	
+
 	protected LargeItemStack getStack(int slot) {
 		return this.menu.getInventory().getLargeItemStack(slot);
 	}
@@ -142,8 +156,15 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
 
 	@Override
 	protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
-		this.font.draw(matrixStack, this.title, 8.0F, 6.0F, 4210752);
-		this.font.draw(matrixStack, this.playerInventoryTitle, 8.0F, (float) (this.imageHeight - 93), 4210752);
+		this.font.draw(matrixStack, this.title, (this.imageWidth - this.font.width(this.title)) / 2, 6.0F, 4210752);
+		this.font.draw(matrixStack, this.playerInventoryTitle, 8.0F, this.imageHeight - 93, 4210752);
+		this.font.draw(matrixStack, Component.translatable("assortedstorage.container.storage_crate.upgrades"), 8.0F, this.imageHeight - 124, 4210752);
+
+		int mod = this.menu.getInventory().getStorageModifier();
+		if (mod > 0) {
+			String s = "X " + mod;
+			this.font.draw(matrixStack, s, 160F - this.font.width(s), this.imageHeight - 93, DyeColor.GRAY.getTextColor());
+		}
 
 		matrixStack.pushPose();
 		matrixStack.translate(0F, 0F, 300F);
@@ -180,7 +201,7 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
 		RenderSystem.setShaderTexture(0, TEXTURE);
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
-		this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
+		this.blit(matrixStack, i, j, 0, 0, this.imageWidth + 26, this.imageHeight);
 		this.itemRenderer.blitOffset = 100.0F;
 
 		matrixStack.pushPose();

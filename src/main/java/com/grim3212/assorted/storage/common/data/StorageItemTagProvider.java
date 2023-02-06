@@ -98,7 +98,23 @@ public class StorageItemTagProvider extends ItemTagsProvider {
 		this.copy(StorageTags.Blocks.SHULKERS_LEVEL_4, StorageTags.Items.CAN_UPGRADE_LEVEL_5);
 
 		this.tag(StorageTags.Items.PAPER).add(Items.PAPER);
-		this.tag(StorageTags.Items.IGNORE_CRAFTING_CHECK).add(Items.MELON, Items.MELON_SLICE).add(Items.CLAY, Items.CLAY_BALL);
+		
+		// Logic from FunctionalStorage
+		//@formatter:off
+		this.tag(StorageTags.Items.CRAFTING_OVERRIDE)
+			.add(Items.MELON, Items.MELON_SLICE)
+			.add(Items.CLAY, Items.CLAY_BALL)
+			.add(Items.GLOWSTONE, Items.GLOWSTONE_DUST)
+			.add(Items.QUARTZ, Items.QUARTZ_BLOCK)
+			.add(Items.ICE, Items.BLUE_ICE, Items.PACKED_ICE)
+			.add(Items.AMETHYST_BLOCK, Items.AMETHYST_SHARD)
+			.add(Items.SNOWBALL, Items.SNOW_BLOCK)
+			.add(Items.BRICKS, Items.BRICK)
+			.add(Items.NETHER_BRICK, Items.NETHER_BRICKS)
+			.add(Items.NETHER_WART_BLOCK, Items.NETHER_WART)
+			.add(Items.SANDSTONE, Items.SAND)
+			.add(Items.RED_SANDSTONE, Items.RED_SAND);
+		//@formatter:on
 
 		for (Entry<StorageMaterial, RegistryObject<LevelUpgradeItem>> levelUpgrade : StorageItems.LEVEL_UPGRADES.entrySet()) {
 			LevelUpgradeItem item = levelUpgrade.getValue().get();

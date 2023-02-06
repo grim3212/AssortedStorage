@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.compress.utils.Lists;
 
 import com.grim3212.assorted.storage.AssortedStorage;
+import com.grim3212.assorted.storage.api.crates.ICrateUpgrade;
 import com.grim3212.assorted.storage.common.block.CrateBlock;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.inventory.crates.CrateContainer;
@@ -21,7 +22,6 @@ import com.grim3212.assorted.storage.common.util.CrateLayout;
 import com.grim3212.assorted.storage.common.util.LargeItemStack;
 import com.grim3212.assorted.storage.common.util.NBTHelper;
 import com.grim3212.assorted.storage.common.util.StorageLockCode;
-import com.grim3212.assorted.storage.common.util.StorageMaterial;
 import com.grim3212.assorted.storage.common.util.StorageUtil;
 
 import net.minecraft.Util;
@@ -55,7 +55,6 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 public class CrateBlockEntity extends BlockEntity implements LockedWorldlyContainer, MenuProvider, INamed, ILockable {
 
-	private final StorageMaterial storageMaterial;
 	private final CrateLayout layout;
 	private Component customName;
 	// One for each slots on the face of a Storage Crate
@@ -75,25 +74,18 @@ public class CrateBlockEntity extends BlockEntity implements LockedWorldlyContai
 		super(type, pos, state);
 
 		if (state.getBlock()instanceof CrateBlock storageCrate) {
-			this.storageMaterial = storageCrate.getStorageMaterial();
 			layout = storageCrate.getLayout();
 		} else {
-			// Default to regular chest
-			this.storageMaterial = null;
 			this.layout = CrateLayout.SINGLE;
 		}
 
 		this.slotContents = NonNullList.<LargeItemStack>withSize(this.layout.getNumStacks(), LargeItemStack.empty());
-		// 4 upgrades and 1 lock slot
-		this.enhancements = NonNullList.<ItemStack>withSize(5, ItemStack.EMPTY);
+		// 8 upgrades and 1 lock slot
+		this.enhancements = NonNullList.<ItemStack>withSize(9, ItemStack.EMPTY);
 	}
 
 	public CrateLayout getLayout() {
 		return layout;
-	}
-
-	public StorageMaterial getStorageMaterial() {
-		return storageMaterial;
 	}
 
 	public ItemStack getLockStack() {
@@ -301,11 +293,7 @@ public class CrateBlockEntity extends BlockEntity implements LockedWorldlyContai
 	}
 
 	protected Component getDefaultName() {
-		if (this.storageMaterial == null) {
-			return Component.translatable(AssortedStorage.MODID + ".container.storage_crate");
-		}
-
-		return Component.translatable(AssortedStorage.MODID + ".container.storage_crate_" + this.storageMaterial.toString());
+		return Component.translatable(AssortedStorage.MODID + ".container.storage_crate");
 	}
 
 	@Override
@@ -649,11 +637,31 @@ public class CrateBlockEntity extends BlockEntity implements LockedWorldlyContai
 		if (slot < 0 && slot >= this.getItems().size()) {
 			return 0;
 		}
-
+		
+		int baseStackSize = this.getBaseStackSize(slot);
+		return baseStackSize + this.getExtraStorage(baseStackSize);
+	}
+	
+	public int getBaseStackSize(int slot) {
 		int slotBase = this.layout.getSlotsBaseStacks()[slot];
 		int stackSizeMultiplier = this.getItem(slot).getMaxStackSize();
+		return stackSizeMultiplier * slotBase;
+	}
 
-		return stackSizeMultiplier * (this.storageMaterial == null ? slotBase : slotBase * (this.storageMaterial.getStorageLevel() + 1));
+	public int getExtraStorage(int baseStackSize) {
+		int extra = 0;
+		for (ItemStack stack : this.enhancements) {
+			if (stack.getItem()instanceof ICrateUpgrade upgrade) {
+				extra += upgrade.getStorageModifier() * baseStackSize;
+			}
+		}
+		return extra;
+	}
+	
+	public int getStorageModifier() {
+		int base = 2;
+		int total = base + this.getExtraStorage(base);
+		return total / base;
 	}
 
 	@Override
@@ -717,6 +725,6 @@ public class CrateBlockEntity extends BlockEntity implements LockedWorldlyContai
 
 	@Override
 	public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
-		return new CrateContainer(StorageContainerTypes.CRATES.get(this.storageMaterial).get(), windowId, player, this);
+		return new CrateContainer(StorageContainerTypes.CRATE.get(), windowId, player, this);
 	}
 }

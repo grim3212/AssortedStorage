@@ -52,7 +52,7 @@ public class StorageTags {
 	}
 
 	public static class Items {
-		public static final TagKey<Item> IGNORE_CRAFTING_CHECK = storageTag("ignore_craft_check");
+		public static final TagKey<Item> CRAFTING_OVERRIDE = storageTag("crafting_override");
 		
 		public static final TagKey<Item> INGOTS_TIN = forgeTag("ingots/tin");
 		public static final TagKey<Item> INGOTS_SILVER = forgeTag("ingots/silver");

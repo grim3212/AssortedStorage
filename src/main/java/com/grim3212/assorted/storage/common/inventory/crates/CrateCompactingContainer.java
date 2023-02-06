@@ -15,7 +15,7 @@ public class CrateCompactingContainer extends CrateContainer {
 
 	public static CrateCompactingContainer createCrateContainer(int windowId, Inventory playerInventory, FriendlyByteBuf data) {
 		CrateCompactingBlockEntity crate = getCrateBlockEntity(playerInventory, data.readBlockPos());
-		return new CrateCompactingContainer(StorageContainerTypes.CRATES_COMPACTING.get(crate.getStorageMaterial()).get(), windowId, playerInventory, crate);
+		return new CrateCompactingContainer(StorageContainerTypes.CRATE_COMPACTING.get(), windowId, playerInventory, crate);
 	}
 
 	protected static CrateCompactingBlockEntity getCrateBlockEntity(Inventory playerInv, BlockPos pos) {

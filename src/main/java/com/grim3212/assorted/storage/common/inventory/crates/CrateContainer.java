@@ -2,7 +2,6 @@ package com.grim3212.assorted.storage.common.inventory.crates;
 
 import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
-import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -21,7 +20,7 @@ public class CrateContainer extends AbstractContainerMenu {
 
 	public static CrateContainer createCrateContainer(int windowId, Inventory playerInventory, FriendlyByteBuf data) {
 		CrateBlockEntity crate = getCrateBlockEntity(playerInventory, data.readBlockPos());
-		return new CrateContainer(StorageContainerTypes.CRATES.get(crate.getStorageMaterial()).get(), windowId, playerInventory, crate);
+		return new CrateContainer(StorageContainerTypes.CRATE.get(), windowId, playerInventory, crate);
 	}
 
 	protected static CrateBlockEntity getCrateBlockEntity(Inventory playerInv, BlockPos pos) {
@@ -42,11 +41,11 @@ public class CrateContainer extends AbstractContainerMenu {
 		// Lock slot
 		this.addSlot(new LockSlot(inventory, 0, 180, 18));
 
-		for (int enhancement = 1; enhancement < 5; enhancement++) {
-			this.addSlot(new EnhancementSlot(inventory, enhancement, 35 + 18 * enhancement, 74));
+		for (int enhancement = 1; enhancement < 9; enhancement++) {
+			this.addSlot(new EnhancementSlot(inventory, enhancement, (18 * enhancement) - 1, 74));
 		}
-		
-		switch(inventory.getLayout()) {
+
+		switch (inventory.getLayout()) {
 			case SINGLE:
 				this.addSlot(new LargeItemStackSlot(inventory, 0, 80, 34));
 				break;
@@ -81,13 +80,9 @@ public class CrateContainer extends AbstractContainerMenu {
 			this.addSlot(new Slot(playerInventory, hotbarSlot, leftOffset + hotbarSlot * 18, heighOffset - 24));
 		}
 	}
-	
+
 	public CrateBlockEntity getInventory() {
 		return inventory;
-	}
-
-	public StorageMaterial getStorageMaterial() {
-		return this.inventory.getStorageMaterial();
 	}
 
 	@Override

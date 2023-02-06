@@ -105,7 +105,7 @@ public enum StorageMaterial {
 	public int hopperSize() {
 		return this.hopperXRows * this.hopperYCols;
 	}
-	
+
 	public int hopperCooldown() {
 		return 8 - storageLevel;
 	}
