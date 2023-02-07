@@ -377,9 +377,10 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
 			}
 
 			ICrateSystem crateSystem = (ICrateSystem) block;
-			if (crateSystem.hasItems()) {
+			int numSlots = crateSystem.numSlots(level, checking);
+			if (numSlots > 0) {
 				knownConnections.add(checking);
-				connectedStorageCrates.add(new CrateConnection(checking, dist, crateSystem.getItems(getLevel(), checking)));
+				connectedStorageCrates.add(new CrateConnection(checking, dist, numSlots));
 			}
 
 			BlockPos[] neighbors = new BlockPos[] { checking.west(), checking.east(), checking.south(), checking.north(), checking.above(), checking.below() };
@@ -398,14 +399,14 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
 		// Sort by depth so when we query it later we don't need to sort each time
 		connectedStorageCrates = connectedStorageCrates.stream().sorted((a, b) -> Integer.compare(a.getDepth(), b.getDepth())).collect(Collectors.toList());
 
-		int maxSlots = connectedStorageCrates.stream().max((a, b) -> Integer.compare(a.getSupportedItems().size(), b.getSupportedItems().size())).map(x -> x.getSupportedItems().size()).get();
+		int maxSlots = connectedStorageCrates.stream().max((a, b) -> Integer.compare(a.getNumSlots(), b.getNumSlots())).map(x -> x.getNumSlots()).get();
 
 		for (int i = 0; i < maxSlots; i++) {
 			List<Integer> storageConnectionsForSlotIndex = Lists.newArrayList();
 			for (int j = 0; j < connectedStorageCrates.size(); j++) {
 				CrateConnection connection = this.connectedStorageCrates.get(j);
 
-				if (connection.getSupportedItems().size() > i) {
+				if (connection.getNumSlots() > i) {
 					storageConnectionsForSlotIndex.add(j);
 				}
 			}

@@ -10,6 +10,7 @@ import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.ILockable;
 import com.grim3212.assorted.storage.common.block.blockentity.INamed;
 import com.grim3212.assorted.storage.common.util.CrateLayout;
+import com.grim3212.assorted.storage.common.util.Wood;
 import com.grim3212.assorted.storage.common.util.StorageUtil;
 
 import net.minecraft.ChatFormatting;
@@ -58,6 +59,7 @@ public class CrateBlock extends Block implements EntityBlock, ICrateSystem {
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
 	private final CrateLayout layout;
+	private final Wood type;
 
 	private static final VoxelShape TOP_SHAPE = Block.box(0.0D, 14.0D, 0.0D, 16.0D, 16.0D, 16.0D);
 	private static final VoxelShape INSIDE_SHAPE = Block.box(1.0D, 2.0D, 1.0D, 14.0D, 14.0D, 14.0D);
@@ -77,15 +79,20 @@ public class CrateBlock extends Block implements EntityBlock, ICrateSystem {
 	private static final VoxelShape SIDE_VERTICAL_4 = Block.box(14.0D, 14.0D, 2.0D, 16.0D, 16.0D, 14.0D);
 	public static final VoxelShape FINAL_VERTICAL_SHAPE = Shapes.or(TOP_VERTICAL_SHAPE, INSIDE_VERTICAL_SHAPE, BOTTOM_VERTICAL_SHAPE, SIDE_VERTICAL_1, SIDE_VERTICAL_2, SIDE_VERTICAL_3, SIDE_VERTICAL_4);
 
-	public CrateBlock(CrateLayout layout, Block.Properties props) {
+	public CrateBlock(Wood type, CrateLayout layout, Block.Properties props) {
 		super(props);
 
+		this.type = type;
 		this.layout = layout;
 		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(WATERLOGGED, false));
 	}
 
 	public CrateLayout getLayout() {
 		return layout;
+	}
+
+	public Wood getWoodType() {
+		return type;
 	}
 
 	@Override
@@ -95,7 +102,9 @@ public class CrateBlock extends Block implements EntityBlock, ICrateSystem {
 
 	@Override
 	public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
-		// TODO: Determine if this looks better with textures than at 0
+		// Because of MineCrafts lighting or model rendering it
+		// can make these type of models pretty dark and ugly
+		// This makes it look a bit better
 		return 1;
 	}
 
@@ -317,16 +326,11 @@ public class CrateBlock extends Block implements EntityBlock, ICrateSystem {
 	}
 
 	@Override
-	public boolean hasItems() {
-		return true;
-	}
-
-	@Override
-	public List<ItemStack> getItems(Level level, BlockPos pos) {
+	public int numSlots(Level level, BlockPos pos) {
 		if (level.getBlockEntity(pos)instanceof CrateBlockEntity crate) {
-			return crate.getItemStacks();
+			return crate.getContainerSize();
 		}
 
-		return ICrateSystem.super.getItems(level, pos);
+		return ICrateSystem.super.numSlots(level, pos);
 	}
 }

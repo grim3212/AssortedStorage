@@ -1,6 +1,8 @@
 package com.grim3212.assorted.storage.client.data;
 
 import com.grim3212.assorted.storage.AssortedStorage;
+import com.grim3212.assorted.storage.common.block.StorageBlocks;
+import com.grim3212.assorted.storage.common.block.StorageBlocks.CrateGroup;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
 import net.minecraft.data.PackOutput;
@@ -84,6 +86,17 @@ public class StorageLanguageProvider extends LanguageProvider {
 		this.add("block.assortedstorage.locked_ender_chest", "Locked Ender Chest");
 		
 		this.add("block.assortedstorage.crate", "Storage Crate");
+		for (CrateGroup group : StorageBlocks.CRATES) {
+			String woodName = group.getType().toString();
+			String capitalizedWoodName = woodName == "dark_oak" ? "Dark Oak" : woodName.substring(0, 1).toUpperCase() + woodName.substring(1);
+			
+			this.add("block.assortedstorage." + woodName + "_crate", capitalizedWoodName + " Storage Crate");
+			this.add("block.assortedstorage." + woodName + "_crate_double", capitalizedWoodName + " Double Storage Crate");
+			this.add("block.assortedstorage." + woodName + "_crate_triple", capitalizedWoodName + " Triple Storage Crate");
+			this.add("block.assortedstorage." + woodName + "_crate_quadruple", capitalizedWoodName + " Quadruple Storage Crate");
+		}
+		
+		this.add("block.assortedstorage.crate_compacting", "Compacting Storage Crate");
 		this.add("block.assortedstorage.crate_controller", "Storage Crate Controller");
 		this.add("block.assortedstorage.crate_bridge", "Storage Crate Bridge");
 
@@ -124,6 +137,10 @@ public class StorageLanguageProvider extends LanguageProvider {
 		this.add("item.assortedstorage.ender_bag", "Ender Bag");
 		this.add("item.assortedstorage.bag", "Bag");
 		this.add("item.assortedstorage.blank_upgrade", "Blank Upgrade");
+		this.add("item.assortedstorage.void_upgrade", "Void Upgrade");
+		this.add("item.assortedstorage.amount_upgrade", "Amount Upgrade");
+		this.add("item.assortedstorage.redstone_upgrade", "Redstone Upgrade");
+		this.add("item.assortedstorage.glow_upgrade", "Glow Upgrade");
 		this.add("item.assortedstorage.rotator_majig", "Rotator Majig");
 
 

@@ -1,0 +1,7 @@
+{
+  "parent": "assortedstorage:block/base_crate_single",
+  "textures": {
+    "facing": "assortedstorage:block/crates/dark_oak_facing",
+    "sides": "minecraft:block/dark_oak_log"
+  }
+}

@@ -13,6 +13,7 @@ import com.grim3212.assorted.storage.common.block.LockedChestBlock;
 import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
+import com.grim3212.assorted.storage.common.block.StorageBlocks.CrateGroup;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import com.grim3212.assorted.storage.common.loot.ModLoadedLootCondition;
 import com.grim3212.assorted.storage.common.loot.OptionalLootItem;
@@ -77,10 +78,6 @@ public class StorageLootProvider extends LootTableProvider {
 			blocks.add(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get());
 			blocks.add(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get());
 
-			blocks.add(StorageBlocks.CRATE.get());
-			blocks.add(StorageBlocks.CRATE_DOUBLE.get());
-			blocks.add(StorageBlocks.CRATE_TRIPLE.get());
-			blocks.add(StorageBlocks.CRATE_QUADRUPLE.get());
 			blocks.add(StorageBlocks.CRATE_COMPACTING.get());
 			blocks.add(StorageBlocks.CRATE_CONTROLLER.get());
 			blocks.add(StorageBlocks.CRATE_BRIDGE.get());
@@ -95,6 +92,13 @@ public class StorageLootProvider extends LootTableProvider {
 
 			for (RegistryObject<LockedHopperBlock> b : StorageBlocks.HOPPERS.values()) {
 				blocks.add(b.get());
+			}
+			
+			for (CrateGroup group : StorageBlocks.CRATES) {
+				blocks.add(group.SINGLE.get());
+				blocks.add(group.DOUBLE.get());
+				blocks.add(group.TRIPLE.get());
+				blocks.add(group.QUADRUPLE.get());
 			}
 		}
 

@@ -25,7 +25,6 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 public class CrateCompactingBlockEntity extends CrateBlockEntity {
 
-	//TODO: Add missing compact recipes to the tags
 	private List<Match> matches = NonNullList.<Match>withSize(3, new Match(ItemStack.EMPTY, 1));
 
 	public CrateCompactingBlockEntity(BlockPos pos, BlockState state) {
@@ -379,6 +378,7 @@ public class CrateCompactingBlockEntity extends CrateBlockEntity {
 		NonNullList<ItemStack> stacks = NonNullList.create();
 
 		LargeItemStack topTier = this.getLargeItemStack(0);
+		int topConversion = matches.get(0).getNumRequired();
 		// Add top most tier itemstacks
 		stacks.addAll(topTier.asItemStacks());
 
@@ -389,8 +389,13 @@ public class CrateCompactingBlockEntity extends CrateBlockEntity {
 			LargeItemStack middleTier = this.getLargeItemStack(1);
 			int middleAmount = middleTier.getAmount();
 			int middleConversion = matches.get(1).getNumRequired();
+
+			// Use a different conversion rate if this compactor has 3 recipes vs 2
+			int middleMultiplier = matches.get(2).getItem().isEmpty() ? topConversion : middleConversion;
+
 			// Converted one tier down
-			int middleRemaining = middleAmount - topAmount * middleConversion;
+			int middleRemaining = middleAmount - topAmount * middleMultiplier;
+
 			stacks.addAll(new LargeItemStack(middleTier.getStack().copyWithCount(1), middleRemaining).asItemStacks());
 
 			// Finally check if we have a lower tier

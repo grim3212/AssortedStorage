@@ -57,8 +57,6 @@ public class CrateBlockEntityRenderer implements BlockEntityRenderer<CrateBlockE
 		BlockState state = tileEntityIn.getBlockState();
 		Direction facing = state.getValue(CrateBlock.FACING);
 
-		int newCombinedLight = LevelRenderer.getLightColor(tileEntityIn.getLevel(), tileEntityIn.getBlockPos().relative(facing));
-
 		matrixStackIn.pushPose();
 		if (facing.getAxis().isHorizontal()) {
 			float f = facing.toYRot();
@@ -75,7 +73,7 @@ public class CrateBlockEntityRenderer implements BlockEntityRenderer<CrateBlockE
 		matrixStackIn.scale(0.5f, 0.5f, 0.5f);
 		matrixStackIn.mulPoseMatrix(new Matrix4f().scale(1, 1, 0.001f));
 
-		int itemLight = tileEntityIn.hasGlowUpgrade() ? LightTexture.FULL_BRIGHT : newCombinedLight;
+		int itemLight = tileEntityIn.hasGlowUpgrade() ? LightTexture.FULL_BRIGHT : combinedLightIn;
 
 		switch (tileEntityIn.getLayout()) {
 			case SINGLE:
@@ -106,7 +104,7 @@ public class CrateBlockEntityRenderer implements BlockEntityRenderer<CrateBlockE
 		// Unique upgrades only
 		tileEntityIn.getEnhancements().stream().filter(StreamHelper.distinctByKey(p -> p.getItem())).forEach(stack -> {
 			if (stack.getItem()instanceof ICrateUpgradeRenderer upgrade) {
-				upgrade.render(tileEntityIn, stack, partialTicks, matrixStackIn, bufferIn, newCombinedLight, combinedOverlayIn);
+				upgrade.render(tileEntityIn, stack, partialTicks, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
 			}
 		});
 		matrixStackIn.popPose();

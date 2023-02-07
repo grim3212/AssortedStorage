@@ -1,5 +1,6 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -67,11 +68,13 @@ public class StorageBlockEntityTypes {
 	}
 
 	private static Set<Block> getCrates() {
-		Set<Block> crates = Sets.newHashSet();
-		crates.add(StorageBlocks.CRATE.get());
-		crates.add(StorageBlocks.CRATE_DOUBLE.get());
-		crates.add(StorageBlocks.CRATE_TRIPLE.get());
-		crates.add(StorageBlocks.CRATE_QUADRUPLE.get());
+		Set<Block> crates = new HashSet<>();
+		StorageBlocks.CRATES.forEach(x -> {
+			crates.add(x.SINGLE.get());
+			crates.add(x.DOUBLE.get());
+			crates.add(x.TRIPLE.get());
+			crates.add(x.QUADRUPLE.get());
+		});
 		return crates;
 	}
 }

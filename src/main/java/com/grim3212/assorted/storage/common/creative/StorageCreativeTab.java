@@ -2,6 +2,7 @@ package com.grim3212.assorted.storage.common.creative;
 
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
+import com.grim3212.assorted.storage.common.block.StorageBlocks.CrateGroup;
 import com.grim3212.assorted.storage.common.handler.StorageConfig;
 import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
@@ -27,22 +28,23 @@ public class StorageCreativeTab {
 			populator.accept(StorageItems.ROTATOR_MAJIG.get());
 
 			if (StorageConfig.COMMON.cratesEnabled.get()) {
-				populator.accept(StorageBlocks.CRATE.get());
-				populator.accept(StorageBlocks.CRATE_DOUBLE.get());
-				populator.accept(StorageBlocks.CRATE_TRIPLE.get());
-				populator.accept(StorageBlocks.CRATE_QUADRUPLE.get());
-
 				populator.accept(StorageBlocks.CRATE_COMPACTING.get());
 				populator.accept(StorageBlocks.CRATE_CONTROLLER.get());
 				populator.accept(StorageBlocks.CRATE_BRIDGE.get());
-			}
 
-			if (StorageConfig.COMMON.upgradesEnabled.get()) {
-				populator.accept(StorageItems.BLANK_UPGRADE.get());
-				populator.accept(StorageItems.VOID_UPGRADE.get());
-				populator.accept(StorageItems.REDSTONE_UPGRADE.get());
-				populator.accept(StorageItems.AMOUNT_UPGRADE.get());
-				populator.accept(StorageItems.GLOW_UPGRADE.get());
+				for (CrateGroup group : StorageBlocks.CRATES) {
+					populator.accept(group.SINGLE.get());
+					populator.accept(group.DOUBLE.get());
+					populator.accept(group.TRIPLE.get());
+					populator.accept(group.QUADRUPLE.get());
+				}
+
+				if (StorageConfig.COMMON.upgradesEnabled.get()) {
+					populator.accept(StorageItems.VOID_UPGRADE.get());
+					populator.accept(StorageItems.REDSTONE_UPGRADE.get());
+					populator.accept(StorageItems.AMOUNT_UPGRADE.get());
+					populator.accept(StorageItems.GLOW_UPGRADE.get());
+				}
 			}
 
 			if (StorageConfig.COMMON.bagsEnabled.get()) {
@@ -65,6 +67,7 @@ public class StorageCreativeTab {
 			}
 
 			if (StorageConfig.COMMON.upgradesEnabled.get()) {
+				populator.accept(StorageItems.BLANK_UPGRADE.get());
 				StorageItems.LEVEL_UPGRADES.forEach((mat, upgrade) -> {
 					if (canNotCraft(mat)) {
 						return;

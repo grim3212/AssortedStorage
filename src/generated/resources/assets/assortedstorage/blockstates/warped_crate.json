@@ -1,0 +1,26 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "assortedstorage:block/warped_crate_vertical",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "assortedstorage:block/warped_crate",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "assortedstorage:block/warped_crate"
+    },
+    "facing=south": {
+      "model": "assortedstorage:block/warped_crate",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "assortedstorage:block/warped_crate_vertical"
+    },
+    "facing=west": {
+      "model": "assortedstorage:block/warped_crate",
+      "y": 270
+    }
+  }
+}

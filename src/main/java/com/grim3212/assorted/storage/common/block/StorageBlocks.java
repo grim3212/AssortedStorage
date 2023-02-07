@@ -1,5 +1,7 @@
 package com.grim3212.assorted.storage.common.block;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -17,6 +19,7 @@ import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.item.WarehouseCrateBlockItem;
 import com.grim3212.assorted.storage.common.util.CrateLayout;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
+import com.grim3212.assorted.storage.common.util.Wood;
 
 import net.minecraft.core.dispenser.ShulkerBoxDispenseBehavior;
 import net.minecraft.resources.ResourceLocation;
@@ -29,6 +32,7 @@ import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
@@ -83,28 +87,27 @@ public class StorageBlocks {
 	public static final RegistryObject<LockedDoorBlock> LOCKED_STEEL_DOOR = registerNoItem("locked_steel_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:steel_door"), SoundEvents.IRON_DOOR_CLOSE, SoundEvents.IRON_DOOR_OPEN, Block.Properties.of(Material.METAL).strength(1.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
 	public static final RegistryObject<LockedDoorBlock> LOCKED_CHAIN_LINK_DOOR = registerNoItem("locked_chain_link_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:chain_link_door"), SoundEvents.IRON_DOOR_CLOSE, SoundEvents.IRON_DOOR_OPEN, Block.Properties.of(Material.DECORATION).strength(0.5F, 5.0F).sound(SoundType.METAL).noOcclusion()));
 
-	// TODO: Cleanup Block.Props
 	// TODO: Create recipes
-	// TODO: Add to block/item tags
 	// TODO: Any other datagen related
-	public static final RegistryObject<CrateBlock> CRATE = register("crate", () -> new CrateBlock(CrateLayout.SINGLE, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
-	public static final RegistryObject<CrateBlock> CRATE_DOUBLE = register("crate_double", () -> new CrateBlock(CrateLayout.DOUBLE, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
-	public static final RegistryObject<CrateBlock> CRATE_TRIPLE = register("crate_triple", () -> new CrateBlock(CrateLayout.TRIPLE, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
-	public static final RegistryObject<CrateBlock> CRATE_QUADRUPLE = register("crate_quadruple", () -> new CrateBlock(CrateLayout.QUADRUPLE, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
-	public static final RegistryObject<CrateCompactingBlock> CRATE_COMPACTING = register("crate_compacting", () -> new CrateCompactingBlock(CrateLayout.TRIPLE, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
-	public static final RegistryObject<CrateControllerBlock> CRATE_CONTROLLER = register("crate_controller", () -> new CrateControllerBlock(BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
-	public static final RegistryObject<CrateBridgeBlock> CRATE_BRIDGE = register("crate_bridge", () -> new CrateBridgeBlock(BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
+	public static final RegistryObject<CrateCompactingBlock> CRATE_COMPACTING = register("crate_compacting", () -> new CrateCompactingBlock(CrateLayout.TRIPLE, BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY).strength(1.5F, 6.0F).sound(SoundType.STONE)));
+	public static final RegistryObject<CrateControllerBlock> CRATE_CONTROLLER = register("crate_controller", () -> new CrateControllerBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY).strength(1.5F, 6.0F).sound(SoundType.STONE)));
+	public static final RegistryObject<CrateBridgeBlock> CRATE_BRIDGE = register("crate_bridge", () -> new CrateBridgeBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY).strength(1.5F, 6.0F).sound(SoundType.STONE)));
 
 	public static final Map<StorageMaterial, RegistryObject<LockedChestBlock>> CHESTS = Maps.newHashMap();
 	public static final Map<StorageMaterial, RegistryObject<LockedBarrelBlock>> BARRELS = Maps.newHashMap();
 	public static final Map<StorageMaterial, RegistryObject<LockedHopperBlock>> HOPPERS = Maps.newHashMap();
 	public static final Map<StorageMaterial, RegistryObject<LockedShulkerBoxBlock>> SHULKERS = Maps.newHashMap();
+	public static final List<CrateGroup> CRATES = new ArrayList<>();
 	static {
 		Stream.of(StorageMaterial.values()).forEach((type) -> {
 			CHESTS.put(type, registerChest("chest_" + type.toString(), () -> new LockedChestBlock(type)));
 			BARRELS.put(type, register("barrel_" + type.toString(), () -> new LockedBarrelBlock(type)));
 			HOPPERS.put(type, register("hopper_" + type.toString(), () -> new LockedHopperBlock(type)));
 			SHULKERS.put(type, registerShulker("shulker_box_" + type.toString(), () -> new LockedShulkerBoxBlock(type)));
+		});
+
+		Stream.of(Wood.values()).forEach((type) -> {
+			CRATES.add(new CrateGroup(type));
 		});
 	}
 
@@ -175,5 +178,30 @@ public class StorageBlocks {
 
 	private static Supplier<BlockItem> lockerItem() {
 		return () -> new LockerItem(new Item.Properties());
+	}
+
+	public static final class CrateGroup {
+		public final RegistryObject<CrateBlock> SINGLE;
+		public final RegistryObject<CrateBlock> DOUBLE;
+		public final RegistryObject<CrateBlock> TRIPLE;
+		public final RegistryObject<CrateBlock> QUADRUPLE;
+		private final Wood type;
+
+		public CrateGroup(Wood type) {
+			this.type = type;
+			BlockState woodState = type.getLog().defaultBlockState();
+			Material material = woodState.getMaterial();
+			MaterialColor color = woodState.getBlock().defaultMaterialColor();
+			SoundType sound = woodState.getSoundType();
+
+			this.SINGLE = register(type.toString() + "_crate", () -> new CrateBlock(type, CrateLayout.SINGLE, BlockBehaviour.Properties.of(material, color).strength(2.5F).sound(sound)));
+			this.DOUBLE = register(type.toString() + "_crate_double", () -> new CrateBlock(type, CrateLayout.DOUBLE, BlockBehaviour.Properties.of(material, color).strength(2.5F).sound(sound)));
+			this.TRIPLE = register(type.toString() + "_crate_triple", () -> new CrateBlock(type, CrateLayout.TRIPLE, BlockBehaviour.Properties.of(material, color).strength(2.5F).sound(sound)));
+			this.QUADRUPLE = register(type.toString() + "_crate_quadruple", () -> new CrateBlock(type, CrateLayout.QUADRUPLE, BlockBehaviour.Properties.of(material, color).strength(2.5F).sound(sound)));
+		}
+
+		public Wood getType() {
+			return type;
+		}
 	}
 }

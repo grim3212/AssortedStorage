@@ -13,15 +13,13 @@ import net.minecraft.world.level.block.state.BlockState;
 public class CrateCompactingBlock extends CrateBlock {
 
 	public CrateCompactingBlock(CrateLayout layout, Block.Properties props) {
-		super(layout, props);
+		super(null, layout, props);
 	}
 
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new CrateCompactingBlockEntity(pos, state);
 	}
-	
-	//TODO: Fix block breaking duplicating items
 
 	@Override
 	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {

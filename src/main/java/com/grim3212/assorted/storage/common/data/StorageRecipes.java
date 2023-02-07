@@ -9,6 +9,7 @@ import com.grim3212.assorted.storage.common.block.LockedChestBlock;
 import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
+import com.grim3212.assorted.storage.common.block.StorageBlocks.CrateGroup;
 import com.grim3212.assorted.storage.common.crafting.BagColoringRecipe;
 import com.grim3212.assorted.storage.common.crafting.LockedBarrelRecipe;
 import com.grim3212.assorted.storage.common.crafting.LockedChestRecipe;
@@ -240,6 +241,13 @@ public class StorageRecipes extends RecipeProvider implements IConditionBuilder 
 		for (Entry<StorageMaterial, RegistryObject<LevelUpgradeItem>> levelUpgrade : StorageItems.LEVEL_UPGRADES.entrySet()) {
 			ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.UPGRADES_CONDITION)).addCondition(not(tagEmpty(levelUpgrade.getKey().getMaterial())))
 					.addRecipe(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, levelUpgrade.getValue().get(), 1).define('M', levelUpgrade.getKey().getMaterial()).define('B', StorageItems.BLANK_UPGRADE.get()).pattern("MMM").pattern("MBM").pattern("MMM").unlockedBy("has_upgrade", has(StorageItems.BLANK_UPGRADE.get())).unlockedBy("has_material", has(levelUpgrade.getKey().getMaterial()))::save).generateAdvancement().build(consumer, levelUpgrade.getValue().getId());
+		}
+		
+		for (CrateGroup group : StorageBlocks.CRATES) {
+			ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.CRATES_CONDITION)).addRecipe(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, group.SINGLE.get(), 1).define('L', group.getType().getLogTag()).define('C', Tags.Items.CHESTS_WOODEN).define('D', StorageTags.Items.DEEPSLATE).pattern(" D ").pattern("LCL").pattern(" D ").unlockedBy("has_chest", has(Tags.Items.CHESTS_WOODEN)).unlockedBy("has_deepslate", has(StorageTags.Items.DEEPSLATE))::save).generateAdvancement().build(consumer, group.SINGLE.getId());
+			ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.CRATES_CONDITION)).addRecipe(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, group.DOUBLE.get(), 1).define('L', group.getType().getLogTag()).define('C', Tags.Items.CHESTS_WOODEN).define('D', StorageTags.Items.DEEPSLATE).pattern("DCD").pattern("L L").pattern("DCD").unlockedBy("has_chest", has(Tags.Items.CHESTS_WOODEN)).unlockedBy("has_deepslate", has(StorageTags.Items.DEEPSLATE))::save).generateAdvancement().build(consumer, group.DOUBLE.getId());
+			ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.CRATES_CONDITION)).addRecipe(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, group.TRIPLE.get(), 1).define('L', group.getType().getLogTag()).define('C', Tags.Items.CHESTS_WOODEN).define('D', StorageTags.Items.DEEPSLATE).pattern(" D ").pattern("LCL").pattern("CDC").unlockedBy("has_chest", has(Tags.Items.CHESTS_WOODEN)).unlockedBy("has_deepslate", has(StorageTags.Items.DEEPSLATE))::save).generateAdvancement().build(consumer, group.TRIPLE.getId());
+			ConditionalRecipe.builder().addCondition(new EnabledCondition(EnabledCondition.CRATES_CONDITION)).addRecipe(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, group.QUADRUPLE.get(), 1).define('L', group.getType().getLogTag()).define('C', Tags.Items.CHESTS_WOODEN).define('D', StorageTags.Items.DEEPSLATE).pattern("CDC").pattern("L L").pattern("CDC").unlockedBy("has_chest", has(Tags.Items.CHESTS_WOODEN)).unlockedBy("has_deepslate", has(StorageTags.Items.DEEPSLATE))::save).generateAdvancement().build(consumer, group.QUADRUPLE.getId());
 		}
 	}
 }

@@ -2,7 +2,6 @@ package com.grim3212.assorted.storage.common.block.blockentity;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.annotation.Nullable;
@@ -242,10 +241,6 @@ public class CrateBlockEntity extends BlockEntity implements LockedWorldlyContai
 		}
 
 		return true;
-	}
-
-	public List<ItemStack> getItemStacks() {
-		return this.slotContents.stream().map(i -> i.getStack().copyWithCount(1)).collect(Collectors.toList());
 	}
 
 	public NonNullList<LargeItemStack> getItems() {
@@ -637,11 +632,11 @@ public class CrateBlockEntity extends BlockEntity implements LockedWorldlyContai
 		if (slot < 0 && slot >= this.getItems().size()) {
 			return 0;
 		}
-		
+
 		int baseStackSize = this.getBaseStackSize(slot);
 		return baseStackSize + this.getExtraStorage(baseStackSize);
 	}
-	
+
 	public int getBaseStackSize(int slot) {
 		int slotBase = this.layout.getSlotsBaseStacks()[slot];
 		int stackSizeMultiplier = this.getItem(slot).getMaxStackSize();
@@ -657,7 +652,7 @@ public class CrateBlockEntity extends BlockEntity implements LockedWorldlyContai
 		}
 		return extra;
 	}
-	
+
 	public int getStorageModifier() {
 		int base = 2;
 		int total = base + this.getExtraStorage(base);

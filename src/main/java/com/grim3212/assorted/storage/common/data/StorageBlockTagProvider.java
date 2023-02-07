@@ -9,6 +9,7 @@ import com.grim3212.assorted.storage.common.block.LockedChestBlock;
 import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
+import com.grim3212.assorted.storage.common.block.StorageBlocks.CrateGroup;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 import com.grim3212.assorted.storage.common.util.StorageTags;
 
@@ -163,6 +164,30 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 			}
 		}
 
+		this.tag(StorageTags.Blocks.CRATES).add(StorageBlocks.CRATE_COMPACTING.get());
+		this.tag(BlockTags.MINEABLE_WITH_PICKAXE).add(StorageBlocks.CRATE_COMPACTING.get(), StorageBlocks.CRATE_CONTROLLER.get(), StorageBlocks.CRATE_BRIDGE.get());
+		for (CrateGroup crateGroup : StorageBlocks.CRATES) {
+			piglinBuilder.add(crateGroup.SINGLE.get());
+			this.tag(BlockTags.MINEABLE_WITH_AXE).add(crateGroup.SINGLE.get());
+			this.tag(StorageTags.Blocks.CRATES).add(crateGroup.SINGLE.get());
+			this.tag(StorageTags.Blocks.CRATES_SINGLE).add(crateGroup.SINGLE.get());
+
+			piglinBuilder.add(crateGroup.DOUBLE.get());
+			this.tag(BlockTags.MINEABLE_WITH_AXE).add(crateGroup.DOUBLE.get());
+			this.tag(StorageTags.Blocks.CRATES).add(crateGroup.DOUBLE.get());
+			this.tag(StorageTags.Blocks.CRATES_DOUBLE).add(crateGroup.DOUBLE.get());
+
+			piglinBuilder.add(crateGroup.TRIPLE.get());
+			this.tag(BlockTags.MINEABLE_WITH_AXE).add(crateGroup.TRIPLE.get());
+			this.tag(StorageTags.Blocks.CRATES).add(crateGroup.TRIPLE.get());
+			this.tag(StorageTags.Blocks.CRATES_TRIPLE).add(crateGroup.TRIPLE.get());
+
+			piglinBuilder.add(crateGroup.QUADRUPLE.get());
+			this.tag(BlockTags.MINEABLE_WITH_AXE).add(crateGroup.QUADRUPLE.get());
+			this.tag(StorageTags.Blocks.CRATES).add(crateGroup.QUADRUPLE.get());
+			this.tag(StorageTags.Blocks.CRATES_QUADRUPLE).add(crateGroup.QUADRUPLE.get());
+		}
+
 		this.tag(Tags.Blocks.CHESTS_WOODEN).add(StorageBlocks.LOCKED_CHEST.get());
 		this.tag(StorageTags.Blocks.CHESTS_LEVEL_0).addTag(Tags.Blocks.CHESTS_WOODEN);
 
@@ -186,6 +211,8 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 		this.tag(BlockTags.MINEABLE_WITH_PICKAXE).add(StorageBlocks.ITEM_TOWER.get(), StorageBlocks.LOCKER.get(), StorageBlocks.GOLD_SAFE.get(), StorageBlocks.OBSIDIAN_SAFE.get(), StorageBlocks.LOCKED_IRON_DOOR.get(), StorageBlocks.LOCKED_QUARTZ_DOOR.get(), StorageBlocks.LOCKED_STEEL_DOOR.get(), StorageBlocks.LOCKED_ENDER_CHEST.get(), StorageBlocks.LOCKED_HOPPER.get());
 		this.tag(Tags.Blocks.CHESTS_ENDER).add(StorageBlocks.LOCKED_ENDER_CHEST.get());
 		this.tag(BlockTags.MINEABLE_WITH_AXE).add(StorageBlocks.LOCKED_CHEST.get(), StorageBlocks.LOCKED_BARREL.get());
+		
+		this.tag(StorageTags.Blocks.DEEPSLATE).add(Blocks.DEEPSLATE, Blocks.COBBLED_DEEPSLATE, Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_BRICKS, Blocks.CRACKED_DEEPSLATE_BRICKS, Blocks.DEEPSLATE_TILES, Blocks.CRACKED_DEEPSLATE_TILES, Blocks.CHISELED_DEEPSLATE, Blocks.REINFORCED_DEEPSLATE);
 	}
 
 	@Override
