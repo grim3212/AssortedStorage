@@ -49,6 +49,7 @@ public class StorageTags {
 		public static final TagKey<Block> CRATES_QUADRUPLE = storageTag("crates/quadruple");
 
 		public static final TagKey<Block> DEEPSLATE = forgeTag("deepslate");
+		public static final TagKey<Block> PISTONS = forgeTag("pistons");
 		
 		public static TagKey<Block> forgeTag(String name) {
 			return BlockTags.create(new ResourceLocation("forge", name));
@@ -139,6 +140,7 @@ public class StorageTags {
 		public static final TagKey<Item> CRAFTING_OVERRIDE = storageTag("crafting_override");
 		
 		public static final TagKey<Item> DEEPSLATE = forgeTag("deepslate");
+		public static final TagKey<Item> PISTONS = forgeTag("pistons");
 
 		public static TagKey<Item> forgeTag(String name) {
 			return ItemTags.create(new ResourceLocation("forge", name));

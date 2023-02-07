@@ -213,6 +213,7 @@ public class StorageBlockTagProvider extends BlockTagsProvider {
 		this.tag(BlockTags.MINEABLE_WITH_AXE).add(StorageBlocks.LOCKED_CHEST.get(), StorageBlocks.LOCKED_BARREL.get());
 		
 		this.tag(StorageTags.Blocks.DEEPSLATE).add(Blocks.DEEPSLATE, Blocks.COBBLED_DEEPSLATE, Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_BRICKS, Blocks.CRACKED_DEEPSLATE_BRICKS, Blocks.DEEPSLATE_TILES, Blocks.CRACKED_DEEPSLATE_TILES, Blocks.CHISELED_DEEPSLATE, Blocks.REINFORCED_DEEPSLATE);
+		this.tag(StorageTags.Blocks.PISTONS).add(Blocks.PISTON, Blocks.STICKY_PISTON);
 	}
 
 	@Override

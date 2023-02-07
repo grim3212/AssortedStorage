@@ -1,0 +1,55 @@
+{
+  "advancements": [
+    {
+      "advancement": {
+        "parent": "minecraft:recipes/root",
+        "criteria": {
+          "has_pistons": {
+            "conditions": {
+              "items": [
+                {
+                  "tag": "forge:pistons"
+                }
+              ]
+            },
+            "trigger": "minecraft:inventory_changed"
+          },
+          "has_the_recipe": {
+            "conditions": {
+              "recipe": "assortedstorage:crate_compacting"
+            },
+            "trigger": "minecraft:recipe_unlocked"
+          },
+          "has_triple_crate": {
+            "conditions": {
+              "items": [
+                {
+                  "tag": "assortedstorage:crates/triple"
+                }
+              ]
+            },
+            "trigger": "minecraft:inventory_changed"
+          }
+        },
+        "requirements": [
+          [
+            "has_triple_crate",
+            "has_pistons",
+            "has_the_recipe"
+          ]
+        ],
+        "rewards": {
+          "recipes": [
+            "assortedstorage:crate_compacting"
+          ]
+        }
+      },
+      "conditions": [
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "crates"
+        }
+      ]
+    }
+  ]
+}

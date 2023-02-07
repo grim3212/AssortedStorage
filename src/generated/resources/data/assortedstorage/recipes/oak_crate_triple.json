@@ -1,0 +1,36 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "crates"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "category": "misc",
+        "key": {
+          "C": {
+            "tag": "forge:chests/wooden"
+          },
+          "D": {
+            "tag": "forge:deepslate"
+          },
+          "L": {
+            "tag": "minecraft:oak_logs"
+          }
+        },
+        "pattern": [
+          " D ",
+          "LCL",
+          "CDC"
+        ],
+        "result": {
+          "item": "assortedstorage:oak_crate_triple"
+        }
+      }
+    }
+  ]
+}

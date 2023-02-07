@@ -4,8 +4,8 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 import com.grim3212.assorted.storage.api.crates.ICrateUpgradeRenderer;
+import com.grim3212.assorted.storage.client.blockentity.CrateBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.render.RenderHelper;
-import com.grim3212.assorted.storage.client.util.ClientResources;
 import com.grim3212.assorted.storage.common.block.CrateBlock;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
@@ -25,7 +25,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -419,9 +418,6 @@ public class PadlockItem extends CombinationItem implements ICrateUpgradeRendere
 		return false;
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	private static final RenderType ICONS = RenderType.text(ClientResources.CRATE_ICONS_LOCATION);
-
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void render(CrateBlockEntity tileEntityIn, ItemStack selfStack, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
@@ -443,7 +439,7 @@ public class PadlockItem extends CombinationItem implements ICrateUpgradeRendere
 		matrixStack.translate(0D, -0.5D, -0.455D);
 		int yLoc = tileEntityIn.getLayout() != CrateLayout.SINGLE ? 13 : 1;
 		RenderSystem.enableBlend();
-		VertexConsumer vertexConsumer = bufferIn.getBuffer(ICONS);
+		VertexConsumer vertexConsumer = bufferIn.getBuffer(CrateBlockEntityRenderer.ICONS);
 		RenderHelper.lightedBlit(vertexConsumer, matrixStack, 13, yLoc, 2, 0, 4, 3, 6, 16, 16, combinedLightIn);
 		RenderSystem.disableDepthTest();
 		matrixStack.popPose();

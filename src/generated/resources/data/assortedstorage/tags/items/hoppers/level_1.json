@@ -1,9 +1,9 @@
 {
   "values": [
+    "assortedstorage:hopper_iron",
     "assortedstorage:hopper_copper",
-    "assortedstorage:hopper_topaz",
-    "assortedstorage:hopper_aluminum",
     "assortedstorage:hopper_tin",
-    "assortedstorage:hopper_iron"
+    "assortedstorage:hopper_topaz",
+    "assortedstorage:hopper_aluminum"
   ]
 }

@@ -1,0 +1,39 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "crates"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "category": "misc",
+        "key": {
+          "C": {
+            "tag": "assortedstorage:crates"
+          },
+          "D": {
+            "tag": "forge:deepslate"
+          },
+          "E": {
+            "tag": "forge:ender_pearls"
+          },
+          "R": {
+            "item": "minecraft:comparator"
+          }
+        },
+        "pattern": [
+          "DDD",
+          "CRC",
+          "DED"
+        ],
+        "result": {
+          "item": "assortedstorage:crate_controller"
+        }
+      }
+    }
+  ]
+}

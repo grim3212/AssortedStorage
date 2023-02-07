@@ -15,7 +15,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -31,7 +30,7 @@ public class CrateBlockEntityRenderer implements BlockEntityRenderer<CrateBlockE
 	private final ItemRenderer itemRenderer;
 	private final int viewDistance;
 
-	private static final RenderType ICONS = RenderType.text(ClientResources.CRATE_ICONS_LOCATION);
+	public static final RenderType ICONS = RenderType.text(ClientResources.CRATE_ICONS_LOCATION);
 
 	public CrateBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
 		this.itemRenderer = context.getItemRenderer();

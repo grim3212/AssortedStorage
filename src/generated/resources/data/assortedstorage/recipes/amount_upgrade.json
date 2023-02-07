@@ -1,0 +1,32 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "crates"
+        },
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "upgrades"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shapeless",
+        "category": "misc",
+        "ingredients": [
+          {
+            "item": "assortedstorage:blank_upgrade"
+          },
+          {
+            "tag": "minecraft:signs"
+          }
+        ],
+        "result": {
+          "item": "assortedstorage:amount_upgrade"
+        }
+      }
+    }
+  ]
+}
