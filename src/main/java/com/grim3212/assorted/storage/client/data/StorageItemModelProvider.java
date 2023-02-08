@@ -9,8 +9,8 @@ import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.BagItem;
-import com.grim3212.assorted.storage.common.item.LevelUpgradeItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
+import com.grim3212.assorted.storage.common.item.upgrades.LevelUpgradeItem;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
 import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
@@ -70,6 +70,7 @@ public class StorageItemModelProvider extends ItemModelProvider {
 	protected void registerModels() {
 		items.forEach((item) -> builtinEntity(item));
 
+		handheldItem(StorageItems.ROTATOR_MAJIG.get());
 		generatedItem(StorageItems.LOCKSMITH_KEY.get());
 		generatedItem(StorageItems.LOCKSMITH_LOCK.get());
 		generatedItem(StorageItems.KEY_RING.get());
@@ -86,6 +87,10 @@ public class StorageItemModelProvider extends ItemModelProvider {
 		}
 
 		generatedItem(StorageItems.BLANK_UPGRADE.get());
+		generatedItem(StorageItems.VOID_UPGRADE.get());
+		generatedItem(StorageItems.REDSTONE_UPGRADE.get());
+		generatedItem(StorageItems.AMOUNT_UPGRADE.get());
+		generatedItem(StorageItems.GLOW_UPGRADE.get());
 		for (RegistryObject<LevelUpgradeItem> levelUpgrade : StorageItems.LEVEL_UPGRADES.values()) {
 			generatedItem(levelUpgrade.get());
 		}
@@ -129,6 +134,14 @@ public class StorageItemModelProvider extends ItemModelProvider {
 
 	private ItemModelBuilder generatedItem(Item i) {
 		return generatedItem(name(i));
+	}
+
+	private ItemModelBuilder handheldItem(String name) {
+		return withExistingParent(name, "item/handheld").texture("layer0", resource("item/" + name));
+	}
+
+	private ItemModelBuilder handheldItem(Item i) {
+		return handheldItem(name(i));
 	}
 
 	private static String name(Item i) {

@@ -1,0 +1,46 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:not",
+          "value": {
+            "type": "forge:tag_empty",
+            "tag": "forge:ingots/bronze"
+          }
+        },
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "crates"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "category": "misc",
+        "key": {
+          "C": {
+            "tag": "assortedstorage:crates"
+          },
+          "D": {
+            "tag": "forge:deepslate"
+          },
+          "I": {
+            "tag": "forge:ingots/bronze"
+          },
+          "R": {
+            "item": "minecraft:repeater"
+          }
+        },
+        "pattern": [
+          "DDD",
+          "RCR",
+          "DID"
+        ],
+        "result": {
+          "item": "assortedstorage:crate_bridge"
+        }
+      }
+    }
+  ]
+}

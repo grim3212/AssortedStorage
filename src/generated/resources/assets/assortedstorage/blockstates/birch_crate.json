@@ -1,0 +1,26 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "assortedstorage:block/birch_crate_vertical",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "assortedstorage:block/birch_crate",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "assortedstorage:block/birch_crate"
+    },
+    "facing=south": {
+      "model": "assortedstorage:block/birch_crate",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "assortedstorage:block/birch_crate_vertical"
+    },
+    "facing=west": {
+      "model": "assortedstorage:block/birch_crate",
+      "y": 270
+    }
+  }
+}

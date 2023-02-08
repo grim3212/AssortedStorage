@@ -1,0 +1,39 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:not",
+          "value": {
+            "type": "forge:tag_empty",
+            "tag": "forge:ingots/steel"
+          }
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "category": "equipment",
+        "key": {
+          "B": {
+            "tag": "forge:rods/blaze"
+          },
+          "I": {
+            "tag": "forge:ingots/steel"
+          },
+          "S": {
+            "tag": "forge:rods/wooden"
+          }
+        },
+        "pattern": [
+          "I I",
+          " S ",
+          " B "
+        ],
+        "result": {
+          "item": "assortedstorage:rotator_majig"
+        }
+      }
+    }
+  ]
+}

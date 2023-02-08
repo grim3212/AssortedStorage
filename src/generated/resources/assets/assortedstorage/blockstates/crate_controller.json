@@ -1,0 +1,29 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "assortedstorage:block/crate_controller",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east": {
+      "model": "assortedstorage:block/crate_controller",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "assortedstorage:block/crate_controller"
+    },
+    "facing=south": {
+      "model": "assortedstorage:block/crate_controller",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "assortedstorage:block/crate_controller",
+      "x": 270,
+      "y": 180
+    },
+    "facing=west": {
+      "model": "assortedstorage:block/crate_controller",
+      "y": 270
+    }
+  }
+}

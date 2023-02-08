@@ -43,6 +43,7 @@ import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.Hopper;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.BooleanOp;
@@ -73,6 +74,10 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
 		}
 
 		this.slots = IntStream.range(0, this.getContainerSize()).toArray();
+	}
+	
+	public static int getHopperCooldown(StorageMaterial storageMaterial) {
+		return storageMaterial == null ? HopperBlockEntity.MOVE_ITEM_SPEED : storageMaterial.hopperCooldown();
 	}
 
 	@Override
@@ -185,7 +190,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
 				}
 
 				if (flag) {
-					hopperBE.setCooldown(hopperBE.storageMaterial.hopperCooldown());
+					hopperBE.setCooldown(getHopperCooldown(hopperBE.storageMaterial));
 					setChanged(level, pos, state);
 					return true;
 				}
@@ -267,7 +272,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
 									k = 1;
 								}
 							}
-							hopperBE.setCooldown(hopperBE.storageMaterial.hopperCooldown() - k);
+							hopperBE.setCooldown(getHopperCooldown(hopperBE.storageMaterial) - k);
 						}
 					}
 				}
@@ -297,7 +302,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
 										k = 1;
 									}
 								}
-								hopperBE.setCooldown(hopperBE.storageMaterial.hopperCooldown() - k);
+								hopperBE.setCooldown(getHopperCooldown(hopperBE.storageMaterial) - k);
 							}
 						}
 					}
@@ -557,7 +562,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
 								}
 							}
 
-							hopperblockentity1.setCooldown(hopperblockentity1.storageMaterial.hopperCooldown() - k);
+							hopperblockentity1.setCooldown(getHopperCooldown(hopperblockentity1.storageMaterial) - k);
 						}
 					}
 				}
@@ -652,7 +657,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
 	}
 
 	public boolean isOnCustomCooldown() {
-		return this.cooldownTime > storageMaterial.hopperCooldown();
+		return this.cooldownTime > getHopperCooldown(storageMaterial);
 	}
 
 	public static void entityInside(Level level, BlockPos pos, BlockState state, Entity entity, LockedHopperBlockEntity hopperBE) {
@@ -688,7 +693,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
 
 				if (wasEmpty && originalStackSize > stack.getCount()) {
 					if (!hopper.isOnCustomCooldown()) {
-						hopper.setCooldown(hopper.storageMaterial.hopperCooldown());
+						hopper.setCooldown(getHopperCooldown(hopper.storageMaterial));
 					}
 				}
 

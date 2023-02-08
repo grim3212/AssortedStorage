@@ -1,0 +1,8 @@
+{
+  "parent": "assortedstorage:block/base_crate_triple_vertical",
+  "textures": {
+    "facing": "assortedstorage:block/crates/crate_compacting_facing",
+    "facing_columns": "assortedstorage:block/crates/crate_compacting_columns",
+    "sides": "assortedstorage:block/crates/crate_bridge"
+  }
+}

@@ -1,5 +1,6 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,10 @@ public class StorageBlockEntityTypes {
 	public static final RegistryObject<BlockEntityType<LockedBarrelBlockEntity>> LOCKED_BARREL = BLOCK_ENTITIES.register("locked_barrel", () -> new BlockEntityType<>(LockedBarrelBlockEntity::new, getBarrels(), null));
 	public static final RegistryObject<BlockEntityType<LockedHopperBlockEntity>> LOCKED_HOPPER = BLOCK_ENTITIES.register("locked_hopper", () -> new BlockEntityType<>(LockedHopperBlockEntity::new, getHoppers(), null));
 
+	public static final RegistryObject<BlockEntityType<CrateBlockEntity>> CRATE = BLOCK_ENTITIES.register("crate", () -> new BlockEntityType<>(CrateBlockEntity::new, getCrates(), null));
+	public static final RegistryObject<BlockEntityType<CrateCompactingBlockEntity>> CRATE_COMPACTING = BLOCK_ENTITIES.register("crate_compacting", () -> new BlockEntityType<>(CrateCompactingBlockEntity::new, Sets.newHashSet(StorageBlocks.CRATE_COMPACTING.get()), null));
+	public static final RegistryObject<BlockEntityType<CrateControllerBlockEntity>> CRATE_CONTROLLER = BLOCK_ENTITIES.register("crate_controller", () -> new BlockEntityType<>(CrateControllerBlockEntity::new, Sets.newHashSet(StorageBlocks.CRATE_CONTROLLER.get()), null));
+
 	private static Set<Block> getWarehouseCrates() {
 		return Sets.newHashSet(StorageBlocks.OAK_WAREHOUSE_CRATE.get(), StorageBlocks.BIRCH_WAREHOUSE_CRATE.get(), StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get(), StorageBlocks.ACACIA_WAREHOUSE_CRATE.get(), StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get(), StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get(), StorageBlocks.WARPED_WAREHOUSE_CRATE.get(), StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get(), StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get());
 	}
@@ -57,8 +62,19 @@ public class StorageBlockEntityTypes {
 	}
 
 	private static Set<Block> getHoppers() {
-		Set<Block> barrels = StorageBlocks.HOPPERS.values().stream().map((b) -> b.get()).collect(Collectors.toSet());
-		barrels.add(StorageBlocks.LOCKED_HOPPER.get());
-		return barrels;
+		Set<Block> hoppers = StorageBlocks.HOPPERS.values().stream().map((b) -> b.get()).collect(Collectors.toSet());
+		hoppers.add(StorageBlocks.LOCKED_HOPPER.get());
+		return hoppers;
+	}
+
+	private static Set<Block> getCrates() {
+		Set<Block> crates = new HashSet<>();
+		StorageBlocks.CRATES.forEach(x -> {
+			crates.add(x.SINGLE.get());
+			crates.add(x.DOUBLE.get());
+			crates.add(x.TRIPLE.get());
+			crates.add(x.QUADRUPLE.get());
+		});
+		return crates;
 	}
 }

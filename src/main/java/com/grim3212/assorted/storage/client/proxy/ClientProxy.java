@@ -3,6 +3,7 @@ package com.grim3212.assorted.storage.client.proxy;
 import java.util.Map.Entry;
 
 import com.grim3212.assorted.storage.AssortedStorage;
+import com.grim3212.assorted.storage.client.blockentity.CrateBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.GlassCabinetBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.GoldSafeBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.ItemTowerBlockEntityRenderer;
@@ -24,6 +25,8 @@ import com.grim3212.assorted.storage.client.model.StorageModelLayers;
 import com.grim3212.assorted.storage.client.model.WarehouseCrateModel;
 import com.grim3212.assorted.storage.client.model.baked.LockedModel;
 import com.grim3212.assorted.storage.client.screen.BagScreen;
+import com.grim3212.assorted.storage.client.screen.CrateCompactingScreen;
+import com.grim3212.assorted.storage.client.screen.CrateScreen;
 import com.grim3212.assorted.storage.client.screen.DualLockerScreen;
 import com.grim3212.assorted.storage.client.screen.EnderBagScreen;
 import com.grim3212.assorted.storage.client.screen.GenericStorageScreen;
@@ -101,6 +104,8 @@ public class ClientProxy implements IProxy {
 		MenuScreens.register(StorageContainerTypes.BAG.get(), BagScreen::new);
 		MenuScreens.register(StorageContainerTypes.ENDER_BAG.get(), EnderBagScreen::new);
 		MenuScreens.register(StorageContainerTypes.LOCKED_ENDER_CHEST.get(), LockedEnderChestScreen::new);
+		MenuScreens.register(StorageContainerTypes.CRATE.get(), CrateScreen::new);
+		MenuScreens.register(StorageContainerTypes.CRATE_COMPACTING.get(), CrateCompactingScreen::new);
 
 		StorageContainerTypes.CHESTS.forEach((material, menu) -> {
 			MenuScreens.register(menu.get(), LockedMaterialScreen::new);
@@ -128,6 +133,8 @@ public class ClientProxy implements IProxy {
 		BlockEntityRenderers.register(StorageBlockEntityTypes.LOCKED_ENDER_CHEST.get(), LockedEnderChestBlockEntityRenderer::new);
 		BlockEntityRenderers.register(StorageBlockEntityTypes.LOCKED_CHEST.get(), LockedChestBlockEntityRenderer::new);
 		BlockEntityRenderers.register(StorageBlockEntityTypes.LOCKED_SHULKER_BOX.get(), LockedShulkerBoxBlockEntityRenderer::new);
+		BlockEntityRenderers.register(StorageBlockEntityTypes.CRATE.get(), CrateBlockEntityRenderer::new);
+		BlockEntityRenderers.register(StorageBlockEntityTypes.CRATE_COMPACTING.get(), CrateBlockEntityRenderer::new);
 
 		event.enqueueWork(() -> {
 			ClampedItemPropertyFunction colorOverride = (stack, world, entity, seed) -> stack.hasTag() && stack.getTag().contains(BagItem.TAG_PRIMARY_COLOR) && stack.getTag().getInt(BagItem.TAG_PRIMARY_COLOR) >= 0 ? 1.0F : 0.0F;

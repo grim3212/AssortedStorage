@@ -1,0 +1,55 @@
+{
+  "advancements": [
+    {
+      "advancement": {
+        "parent": "minecraft:recipes/root",
+        "criteria": {
+          "has_crates": {
+            "conditions": {
+              "items": [
+                {
+                  "tag": "assortedstorage:crates"
+                }
+              ]
+            },
+            "trigger": "minecraft:inventory_changed"
+          },
+          "has_gold": {
+            "conditions": {
+              "items": [
+                {
+                  "tag": "forge:ingots/gold"
+                }
+              ]
+            },
+            "trigger": "minecraft:inventory_changed"
+          },
+          "has_the_recipe": {
+            "conditions": {
+              "recipe": "assortedstorage:crate_bridge"
+            },
+            "trigger": "minecraft:recipe_unlocked"
+          }
+        },
+        "requirements": [
+          [
+            "has_crates",
+            "has_gold",
+            "has_the_recipe"
+          ]
+        ],
+        "rewards": {
+          "recipes": [
+            "assortedstorage:crate_bridge"
+          ]
+        }
+      },
+      "conditions": [
+        {
+          "type": "assortedstorage:part_enabled",
+          "part": "crates"
+        }
+      ]
+    }
+  ]
+}

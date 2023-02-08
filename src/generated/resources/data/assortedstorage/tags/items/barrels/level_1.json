@@ -2,8 +2,8 @@
   "values": [
     "assortedstorage:barrel_iron",
     "assortedstorage:barrel_aluminum",
+    "assortedstorage:barrel_copper",
     "assortedstorage:barrel_tin",
-    "assortedstorage:barrel_topaz",
-    "assortedstorage:barrel_copper"
+    "assortedstorage:barrel_topaz"
   ]
 }

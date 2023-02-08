@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import com.grim3212.assorted.storage.client.data.LockedModelProvider;
 import com.grim3212.assorted.storage.client.data.StorageBlockstateProvider;
 import com.grim3212.assorted.storage.client.data.StorageItemModelProvider;
+import com.grim3212.assorted.storage.client.data.StorageLanguageProvider;
 import com.grim3212.assorted.storage.client.data.StorageSpriteSourceProvider;
 import com.grim3212.assorted.storage.client.proxy.ClientProxy;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
@@ -73,6 +74,7 @@ public class AssortedStorage {
 		StorageLootConditions.LOOT_ITEM_CONDITIONS.register(modBus);
 		StorageLootEntries.LOOT_POOL_ENTRY_TYPES.register(modBus);
 
+		ModLoadingContext.get().registerConfig(Type.CLIENT, StorageConfig.CLIENT_SPEC);
 		ModLoadingContext.get().registerConfig(Type.COMMON, StorageConfig.COMMON_SPEC);
 
 		CraftingHelper.register(EnabledCondition.Serializer.INSTANCE);
@@ -105,5 +107,6 @@ public class AssortedStorage {
 		datagenerator.addProvider(event.includeClient(), barrelProvider);
 		datagenerator.addProvider(event.includeClient(), new StorageItemModelProvider(packOutput, fileHelper));
 		datagenerator.addProvider(event.includeClient(), new StorageSpriteSourceProvider(packOutput, fileHelper));
+		datagenerator.addProvider(event.includeClient(), new StorageLanguageProvider(packOutput));
 	}
 }

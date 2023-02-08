@@ -1,0 +1,7 @@
+{
+  "parent": "assortedstorage:block/base_crate_single_vertical",
+  "textures": {
+    "facing": "assortedstorage:block/crates/jungle_facing",
+    "sides": "minecraft:block/jungle_log"
+  }
+}

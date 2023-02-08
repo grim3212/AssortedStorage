@@ -41,7 +41,16 @@ public class StorageTags {
 		public static final TagKey<Block> HOPPERS_LEVEL_3 = storageTag("hoppers/level_3");
 		public static final TagKey<Block> HOPPERS_LEVEL_4 = storageTag("hoppers/level_4");
 		public static final TagKey<Block> HOPPERS_LEVEL_5 = storageTag("hoppers/level_5");
+		
+		public static final TagKey<Block> CRATES = storageTag("crates");
+		public static final TagKey<Block> CRATES_SINGLE = storageTag("crates/single");
+		public static final TagKey<Block> CRATES_DOUBLE = storageTag("crates/double");
+		public static final TagKey<Block> CRATES_TRIPLE = storageTag("crates/triple");
+		public static final TagKey<Block> CRATES_QUADRUPLE = storageTag("crates/quadruple");
 
+		public static final TagKey<Block> DEEPSLATE = forgeTag("deepslate");
+		public static final TagKey<Block> PISTONS = forgeTag("pistons");
+		
 		public static TagKey<Block> forgeTag(String name) {
 			return BlockTags.create(new ResourceLocation("forge", name));
 		}
@@ -121,6 +130,17 @@ public class StorageTags {
 		public static final TagKey<Item> BAGS_LEVEL_3 = storageTag("bags/level_3");
 		public static final TagKey<Item> BAGS_LEVEL_4 = storageTag("bags/level_4");
 		public static final TagKey<Item> BAGS_LEVEL_5 = storageTag("bags/level_5");
+		
+		public static final TagKey<Item> CRATES = storageTag("crates");
+		public static final TagKey<Item> CRATES_SINGLE = storageTag("crates/single");
+		public static final TagKey<Item> CRATES_DOUBLE = storageTag("crates/double");
+		public static final TagKey<Item> CRATES_TRIPLE = storageTag("crates/triple");
+		public static final TagKey<Item> CRATES_QUADRUPLE = storageTag("crates/quadruple");
+		public static final TagKey<Item> UPGRADES = storageTag("upgrades");
+		public static final TagKey<Item> CRAFTING_OVERRIDE = storageTag("crafting_override");
+		
+		public static final TagKey<Item> DEEPSLATE = forgeTag("deepslate");
+		public static final TagKey<Item> PISTONS = forgeTag("pistons");
 
 		public static TagKey<Item> forgeTag(String name) {
 			return ItemTags.create(new ResourceLocation("forge", name));

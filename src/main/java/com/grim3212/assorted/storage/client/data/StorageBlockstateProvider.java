@@ -2,13 +2,18 @@ package com.grim3212.assorted.storage.client.data;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import com.grim3212.assorted.storage.AssortedStorage;
+import com.grim3212.assorted.storage.common.block.CrateBlock;
+import com.grim3212.assorted.storage.common.block.CrateCompactingBlock;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.block.LockedChestBlock;
 import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
+import com.grim3212.assorted.storage.common.block.StorageBlocks.CrateGroup;
+import com.grim3212.assorted.storage.common.util.CrateLayout;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 
 import net.minecraft.core.Direction;
@@ -16,11 +21,15 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
+import net.minecraftforge.client.model.generators.ModelBuilder.FaceRotation;
 import net.minecraftforge.client.model.generators.ModelFile;
+import net.minecraftforge.client.model.generators.ModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -78,7 +87,6 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 
 		ModelFile model = models().cube(prefix("locksmith_workbench"), new ResourceLocation("block/oak_planks"), new ResourceLocation(prefix("block/locksmith_top")), new ResourceLocation(prefix("block/locksmith_front")), new ResourceLocation(prefix("block/locksmith_side")), new ResourceLocation(prefix("block/locksmith_side")), new ResourceLocation(prefix("block/locksmith_front"))).texture("particle", prefix("block/locksmith_front"));
 		simpleBlock(StorageBlocks.LOCKSMITH_WORKBENCH.get(), model);
-
 		genericBlock(StorageBlocks.LOCKSMITH_WORKBENCH.get());
 
 		door(StorageBlocks.LOCKED_QUARTZ_DOOR.get(), resource("block/locked_quartz_door_bottom"), resource("block/locked_quartz_door_top"));
@@ -106,6 +114,22 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 			createMaterialHopper(b.get());
 		}
 
+		createBaseStorageCrateModels();
+
+		for (CrateGroup group : StorageBlocks.CRATES) {
+			createStorageCrate(group.SINGLE.get());
+			createStorageCrate(group.DOUBLE.get());
+			createStorageCrate(group.TRIPLE.get());
+			createStorageCrate(group.QUADRUPLE.get());
+		}
+
+		createCompactingStorageCrate(StorageBlocks.CRATE_COMPACTING.get());
+
+		this.createCrateController();
+
+		simpleBlock(StorageBlocks.CRATE_BRIDGE.get(), models().cubeAll(name(StorageBlocks.CRATE_BRIDGE.get()), resource("block/crates/crate_bridge")));
+		genericBlock(StorageBlocks.CRATE_BRIDGE.get());
+
 		this.loaderModels.previousModels();
 	}
 
@@ -123,6 +147,502 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 		ModelFile topRight = models().doorTopRight(baseName + "_top_right", bottom, top).renderType(CUTOUT_RENDER_TYPE);
 		ModelFile topRightOpen = models().doorTopRightOpen(baseName + "_top_right_open", bottom, top).renderType(CUTOUT_RENDER_TYPE);
 		doorBlock(block, bottomLeft, bottomLeftOpen, bottomRight, bottomRightOpen, topLeft, topLeftOpen, topRight, topRightOpen);
+	}
+
+	private void createCrateController() {
+		Block b = StorageBlocks.CRATE_CONTROLLER.get();
+		String controllerName = name(b);
+		ResourceLocation controllerTop = resource("block/crates/crate_top");
+		ResourceLocation controllerSide = resource("block/crates/crate_controller_side");
+		ResourceLocation controllerFront = resource("block/crates/crate_controller_front");
+		ResourceLocation controllerFrontLocked = resource("block/crates/crate_controller_front_locked");
+		ModelFile controllerUnlockedModel = models().orientable(controllerName + "_unlocked", controllerSide, controllerFront, controllerTop);
+		ModelFile controllerLockedModel = models().orientable(controllerName + "_locked", controllerSide, controllerFrontLocked, controllerTop);
+
+		LockedModelBuilder controllerModelBuilder = this.loaderModels.getBuilder(controllerName).unlockedModel(controllerUnlockedModel.getLocation()).lockedModel(controllerLockedModel.getLocation());
+
+		getVariantBuilder(b).forAllStates(state -> {
+			Direction dir = state.getValue(BlockStateProperties.FACING);
+			return ConfiguredModel.builder().modelFile(controllerModelBuilder).rotationX(dir == Direction.UP ? 270 : dir.getAxis().isHorizontal() ? 0 : 90).rotationY(dir.getAxis().isVertical() ? 180 : (((int) dir.toYRot()) + 180) % 360).build();
+		});
+		itemModels().getBuilder(controllerName).parent(controllerUnlockedModel);
+	}
+
+	private void createCompactingStorageCrate(CrateCompactingBlock b) {
+		CrateLayout layout = b.getLayout();
+		String name = name(b);
+
+		//@formatter:off
+		BlockModelBuilder storageCrateModel = models().withExistingParent(name(b), prefix("block/base_crate_" + layout.getName()))
+				.texture("facing", prefix("block/crates/" + name + "_facing"))
+				.texture("sides", resource("block/crates/crate_bridge"))
+				.texture("facing_columns", resource("block/crates/crate_compacting_columns"));
+		
+		BlockModelBuilder storageCrateVericalModel = models().withExistingParent(name(b) + "_vertical", prefix("block/base_crate_" + layout.getName() + "_vertical"))
+				.texture("facing", prefix("block/crates/" + name + "_facing"))
+				.texture("sides", resource("block/crates/crate_bridge"))
+				.texture("facing_columns", resource("block/crates/crate_compacting_columns"));
+		//@formatter:on
+
+		Function<BlockState, ModelFile> modelFunc = (state) -> {
+			return state.getValue(CrateBlock.FACING).getAxis().isVertical() ? storageCrateVericalModel : storageCrateModel;
+		};
+
+		getVariantBuilder(b).forAllStatesExcept(state -> {
+			Direction dir = state.getValue(CrateBlock.FACING);
+			return ConfiguredModel.builder().modelFile(modelFunc.apply(state)).rotationX(dir == Direction.DOWN ? 180 : 0).rotationY(dir.getAxis().isVertical() ? 0 : (((int) dir.toYRot()) + 180) % 360).build();
+		}, CrateBlock.WATERLOGGED);
+
+		itemModels().getBuilder(name(b)).parent(storageCrateModel);
+	}
+
+	private void createStorageCrate(CrateBlock b) {
+		CrateLayout layout = b.getLayout();
+		String name = b.getWoodType() != null ? b.getWoodType().toString() : name(b);
+		ResourceLocation sideTexture = b.getWoodType() != null ? new ResourceLocation("block/" + b.getWoodType().getLogTextureName()) : resource("block/crates/" + name + "_sides");
+
+		//@formatter:off
+		BlockModelBuilder storageCrateModel = models().withExistingParent(name(b), prefix("block/base_crate_" + layout.getName()))
+				.texture("facing", prefix("block/crates/" + name + "_facing"))
+				.texture("sides", sideTexture);
+		
+		BlockModelBuilder storageCrateVericalModel = models().withExistingParent(name(b) + "_vertical", prefix("block/base_crate_" + layout.getName() + "_vertical"))
+				.texture("facing", prefix("block/crates/" + name + "_facing"))
+				.texture("sides", sideTexture);
+		//@formatter:on
+
+		Function<BlockState, ModelFile> modelFunc = (state) -> {
+			return state.getValue(CrateBlock.FACING).getAxis().isVertical() ? storageCrateVericalModel : storageCrateModel;
+		};
+
+		getVariantBuilder(b).forAllStatesExcept(state -> {
+			Direction dir = state.getValue(CrateBlock.FACING);
+			return ConfiguredModel.builder().modelFile(modelFunc.apply(state)).rotationX(dir == Direction.DOWN ? 180 : 0).rotationY(dir.getAxis().isVertical() ? 0 : (((int) dir.toYRot()) + 180) % 360).build();
+		}, CrateBlock.WATERLOGGED);
+
+		itemModels().getBuilder(name(b)).parent(storageCrateModel);
+	}
+
+	private void createBaseStorageCrateModels() {
+		//@formatter:off
+		models().getBuilder(prefix("block/base_crate_single"))
+				.parent(this.models().getExistingFile(mcLoc(ModelProvider.BLOCK_FOLDER + "/block")))
+				.texture("particle", "#top")
+				.texture("top", prefix("block/crates/crate_top"))
+				.texture("edges", prefix("block/crates/crate_edges"))
+				.element().from(1, 1, 1).to(15, 15, 15)
+				.face(Direction.NORTH).uvs(1, 1, 15, 15).texture("#facing").end()
+				.face(Direction.EAST).uvs(1, 1, 15, 15).texture("#sides").end()
+				.face(Direction.SOUTH).uvs(1, 1, 15, 15).texture("#sides").end()
+				.face(Direction.WEST).uvs(1, 1, 15, 15).texture("#sides").end().end()
+				.element().from(0, 0, 0).to(16, 2, 16)
+				.face(Direction.NORTH).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(0, 0, 16, 2).texture("#top").end()
+				.face(Direction.DOWN).uvs(0, 0, 16, 2).texture("#top").cullface(Direction.DOWN).end().end()
+				.element().from(0, 14, 0).to(16, 16, 16)
+				.face(Direction.NORTH).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(16, 16, 0, 0).texture("#top").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(16, 16, 0, 0).texture("#top").end().end()
+				.element().from(0, 2, 14).to(2, 14, 16)
+				.face(Direction.NORTH).uvs(10, 2, 8, 14).texture("#sides").end()
+				.face(Direction.EAST).uvs(12, 2, 10, 14).texture("#sides").end()
+				.face(Direction.SOUTH).uvs(14, 2, 12, 14).texture("#sides").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(8, 2, 6, 14).texture("#sides").cullface(Direction.WEST).end().end()
+				.element().from(0, 2, 0).to(2, 14, 2)
+				.face(Direction.NORTH).uvs(4, 2, 6, 14).texture("#sides").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(2, 2, 4, 14).texture("#sides").end()
+				.face(Direction.SOUTH).uvs(8, 2, 10, 14).texture("#sides").end()
+				.face(Direction.WEST).uvs(6, 2, 8, 14).texture("#sides").cullface(Direction.WEST).end().end()
+				.element().from(14, 2, 14).to(16, 14, 16)
+				.face(Direction.NORTH).uvs(8, 2, 10, 14).texture("#sides").end()
+				.face(Direction.EAST).uvs(6, 2, 8, 14).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(12, 2, 14, 14).texture("#sides").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(10, 2, 12, 14).texture("#sides").end().end()
+				.element().from(14, 2, 0).to(16, 14, 2)
+				.face(Direction.NORTH).uvs(6, 2, 4, 14).texture("#sides").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(8, 2, 6, 14).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(10, 2, 8, 14).texture("#sides").end()
+				.face(Direction.WEST).uvs(4, 2, 2, 14).texture("#sides").end().end();
+		
+		
+		models().getBuilder(prefix("block/base_crate_single_vertical"))
+				.parent(this.models().getExistingFile(mcLoc(ModelProvider.BLOCK_FOLDER + "/block")))
+				.texture("particle", "#top")
+				.texture("top", prefix("block/crates/crate_top"))
+				.texture("edges", prefix("block/crates/crate_edges"))
+				.element().from(1, 1, 1).to(15, 15, 15)
+				.face(Direction.EAST).uvs(1, 1, 15, 15).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").end()
+				.face(Direction.WEST).uvs(1, 1, 15, 15).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").end()
+				.face(Direction.UP).uvs(1, 1, 15, 15).rotation(FaceRotation.UPSIDE_DOWN).texture("#facing").end()
+				.face(Direction.DOWN).uvs(1, 1, 15, 15).texture("#sides").end().end()
+				.element().from(0, 0, 0).to(16, 16, 2)
+				.face(Direction.NORTH).uvs(16, 0, 0, 16).rotation(FaceRotation.UPSIDE_DOWN).texture("#top").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(0, 0, 16, 2).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(16, 16, 0, 0).texture("#top").end()
+				.face(Direction.WEST).uvs(0, 0, 16, 2).rotation(FaceRotation.CLOCKWISE_90).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(0, 0, 16, 2).rotation(FaceRotation.UPSIDE_DOWN).texture("#edges").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.DOWN).end().end()
+				.element().from(0, 0, 14).to(16, 16, 16)
+				.face(Direction.NORTH).uvs(16, 16, 0, 0).rotation(FaceRotation.UPSIDE_DOWN).texture("#top").end()
+				.face(Direction.EAST).uvs(0, 2, 16, 0).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(16, 16, 0, 0).texture("#top").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(0, 2, 16, 0).rotation(FaceRotation.CLOCKWISE_90).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(0, 2, 16, 0).rotation(FaceRotation.UPSIDE_DOWN).texture("#edges").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.DOWN).end().end()
+				.element().from(0, 0, 2).to(2, 2, 14)
+				.face(Direction.EAST).uvs(12, 2, 10, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").end()
+				.face(Direction.WEST).uvs(8, 2, 6, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(10, 2, 8, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").end()
+				.face(Direction.DOWN).uvs(14, 2, 12, 14).texture("#sides").cullface(Direction.DOWN).end().end()
+				.element().from(0, 14, 2).to(2, 16, 14)
+				.face(Direction.EAST).uvs(2, 2, 4, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").end()
+				.face(Direction.WEST).uvs(6, 2, 8, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(4, 2, 6, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(8, 2, 10, 14).texture("#sides").end().end()
+				.element().from(14, 0, 2).to(16, 2, 14)
+				.face(Direction.EAST).uvs(6, 2, 8, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.WEST).uvs(10, 2, 12, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").end()
+				.face(Direction.UP).uvs(8, 2, 10, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").end()
+				.face(Direction.DOWN).uvs(12, 2, 14, 14).texture("#sides").cullface(Direction.DOWN).end().end()
+				.element().from(14, 14, 2).to(16, 16, 14)
+				.face(Direction.EAST).uvs(8, 2, 6, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.WEST).uvs(4, 2, 2, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").end()
+				.face(Direction.UP).uvs(6, 2, 4, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(10, 2, 8, 14).texture("#sides").end().end();
+		
+		models().getBuilder(prefix("block/base_crate_double"))
+				.parent(this.models().getExistingFile(mcLoc(ModelProvider.BLOCK_FOLDER + "/block")))
+				.texture("particle", "#top")
+				.texture("top", prefix("block/crates/crate_top"))
+				.texture("edges", prefix("block/crates/crate_edges"))
+				.texture("facing_columns", "#sides")
+				.element().from(1, 1, 1).to(15, 15, 15)
+				.face(Direction.NORTH).uvs(1, 1, 15, 15).texture("#facing").end()
+				.face(Direction.EAST).uvs(1, 1, 15, 15).texture("#sides").end()
+				.face(Direction.SOUTH).uvs(1, 1, 15, 15).texture("#sides").end()
+				.face(Direction.WEST).uvs(1, 1, 15, 15).texture("#sides").end().end()
+				.element().from(0, 0, 0).to(16, 2, 16)
+				.face(Direction.NORTH).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(0, 0, 16, 2).texture("#top").end()
+				.face(Direction.DOWN).uvs(0, 0, 16, 2).texture("#top").cullface(Direction.DOWN).end().end()
+				.element().from(0, 14, 0).to(16, 16, 16)
+				.face(Direction.NORTH).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(16, 16, 0, 0).texture("#top").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(16, 16, 0, 0).texture("#top").end().end()
+				.element().from(0, 2, 14).to(2, 14, 16)
+				.face(Direction.NORTH).uvs(10, 2, 8, 14).texture("#sides").end()
+				.face(Direction.EAST).uvs(12, 2, 10, 14).texture("#sides").end()
+				.face(Direction.SOUTH).uvs(14, 2, 12, 14).texture("#sides").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(8, 2, 6, 14).texture("#sides").cullface(Direction.WEST).end().end()
+				.element().from(0, 2, 0).to(2, 14, 2)
+				.face(Direction.NORTH).uvs(4, 2, 6, 14).texture("#sides").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(2, 2, 4, 14).texture("#sides").end()
+				.face(Direction.SOUTH).uvs(8, 2, 10, 14).texture("#sides").end()
+				.face(Direction.WEST).uvs(6, 2, 8, 14).texture("#sides").cullface(Direction.WEST).end().end()
+				.element().from(14, 2, 14).to(16, 14, 16)
+				.face(Direction.NORTH).uvs(8, 2, 10, 14).texture("#sides").end()
+				.face(Direction.EAST).uvs(6, 2, 8, 14).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(12, 2, 14, 14).texture("#sides").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(10, 2, 12, 14).texture("#sides").end().end()
+				.element().from(14, 2, 0).to(16, 14, 2)
+				.face(Direction.NORTH).uvs(6, 2, 4, 14).texture("#sides").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(8, 2, 6, 14).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(10, 2, 8, 14).texture("#sides").end()
+				.face(Direction.WEST).uvs(4, 2, 2, 14).texture("#sides").end().end()
+				.element().from(2, 7, 0).to(14, 9, 1)
+				.face(Direction.NORTH).uvs(0, 0, 12, 2).texture("#facing_columns").cullface(Direction.NORTH).end()
+				.face(Direction.UP).uvs(0, 0, 12, 1).texture("#facing_columns").end()
+				.face(Direction.DOWN).uvs(0, 0, 12, 1).texture("#facing_columns").end().end();
+	
+	
+		models().getBuilder(prefix("block/base_crate_double_vertical"))
+				.parent(this.models().getExistingFile(mcLoc(ModelProvider.BLOCK_FOLDER + "/block")))
+				.texture("particle", "#top")
+				.texture("top", prefix("block/crates/crate_top"))
+				.texture("edges", prefix("block/crates/crate_edges"))
+				.texture("facing_columns", "#sides")
+				.element().from(1, 1, 1).to(15, 15, 15)
+				.face(Direction.EAST).uvs(1, 1, 15, 15).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").end()
+				.face(Direction.WEST).uvs(1, 1, 15, 15).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").end()
+				.face(Direction.UP).uvs(1, 1, 15, 15).rotation(FaceRotation.UPSIDE_DOWN).texture("#facing").end()
+				.face(Direction.DOWN).uvs(1, 1, 15, 15).texture("#sides").end().end()
+				.element().from(0, 0, 0).to(16, 16, 2)
+				.face(Direction.NORTH).uvs(16, 0, 0, 16).rotation(FaceRotation.UPSIDE_DOWN).texture("#top").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(0, 0, 16, 2).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(16, 16, 0, 0).texture("#top").end()
+				.face(Direction.WEST).uvs(0, 0, 16, 2).rotation(FaceRotation.CLOCKWISE_90).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(0, 0, 16, 2).rotation(FaceRotation.UPSIDE_DOWN).texture("#edges").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.DOWN).end().end()
+				.element().from(0, 0, 14).to(16, 16, 16)
+				.face(Direction.NORTH).uvs(16, 16, 0, 0).rotation(FaceRotation.UPSIDE_DOWN).texture("#top").end()
+				.face(Direction.EAST).uvs(0, 2, 16, 0).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(16, 16, 0, 0).texture("#top").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(0, 2, 16, 0).rotation(FaceRotation.CLOCKWISE_90).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(0, 2, 16, 0).rotation(FaceRotation.UPSIDE_DOWN).texture("#edges").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.DOWN).end().end()
+				.element().from(0, 0, 2).to(2, 2, 14)
+				.face(Direction.EAST).uvs(12, 2, 10, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").end()
+				.face(Direction.WEST).uvs(8, 2, 6, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(10, 2, 8, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").end()
+				.face(Direction.DOWN).uvs(14, 2, 12, 14).texture("#sides").cullface(Direction.DOWN).end().end()
+				.element().from(0, 14, 2).to(2, 16, 14)
+				.face(Direction.EAST).uvs(2, 2, 4, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").end()
+				.face(Direction.WEST).uvs(6, 2, 8, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(4, 2, 6, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(8, 2, 10, 14).texture("#sides").end().end()
+				.element().from(14, 0, 2).to(16, 2, 14)
+				.face(Direction.EAST).uvs(6, 2, 8, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.WEST).uvs(10, 2, 12, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").end()
+				.face(Direction.UP).uvs(8, 2, 10, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").end()
+				.face(Direction.DOWN).uvs(12, 2, 14, 14).texture("#sides").cullface(Direction.DOWN).end().end()
+				.element().from(14, 14, 2).to(16, 16, 14)
+				.face(Direction.EAST).uvs(8, 2, 6, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.WEST).uvs(4, 2, 2, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").end()
+				.face(Direction.UP).uvs(6, 2, 4, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(10, 2, 8, 14).texture("#sides").end().end()
+				.element().from(2, 15, 7).to(14, 16, 9)
+				.face(Direction.NORTH).uvs(0, 0, 12, 1).texture("#facing_columns").end()
+				.face(Direction.SOUTH).uvs(0, 0, 12, 1).texture("#facing_columns").end()
+				.face(Direction.UP).uvs(0, 0, 12, 2).texture("#facing_columns").cullface(Direction.UP).end().end();
+		
+		models().getBuilder(prefix("block/base_crate_triple"))
+				.parent(this.models().getExistingFile(mcLoc(ModelProvider.BLOCK_FOLDER + "/block")))
+				.texture("particle", "#top")
+				.texture("top", prefix("block/crates/crate_top"))
+				.texture("edges", prefix("block/crates/crate_edges"))
+				.texture("facing_columns", "#sides")
+				.element().from(1, 1, 1).to(15, 15, 15)
+				.face(Direction.NORTH).uvs(1, 1, 15, 15).texture("#facing").end()
+				.face(Direction.EAST).uvs(1, 1, 15, 15).texture("#sides").end()
+				.face(Direction.SOUTH).uvs(1, 1, 15, 15).texture("#sides").end()
+				.face(Direction.WEST).uvs(1, 1, 15, 15).texture("#sides").end().end()
+				.element().from(0, 0, 0).to(16, 2, 16)
+				.face(Direction.NORTH).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(0, 0, 16, 2).texture("#top").end()
+				.face(Direction.DOWN).uvs(0, 0, 16, 2).texture("#top").cullface(Direction.DOWN).end().end()
+				.element().from(0, 14, 0).to(16, 16, 16)
+				.face(Direction.NORTH).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(16, 16, 0, 0).texture("#top").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(16, 16, 0, 0).texture("#top").end().end()
+				.element().from(0, 2, 14).to(2, 14, 16)
+				.face(Direction.NORTH).uvs(10, 2, 8, 14).texture("#sides").end()
+				.face(Direction.EAST).uvs(12, 2, 10, 14).texture("#sides").end()
+				.face(Direction.SOUTH).uvs(14, 2, 12, 14).texture("#sides").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(8, 2, 6, 14).texture("#sides").cullface(Direction.WEST).end().end()
+				.element().from(0, 2, 0).to(2, 14, 2)
+				.face(Direction.NORTH).uvs(4, 2, 6, 14).texture("#sides").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(2, 2, 4, 14).texture("#sides").end()
+				.face(Direction.SOUTH).uvs(8, 2, 10, 14).texture("#sides").end()
+				.face(Direction.WEST).uvs(6, 2, 8, 14).texture("#sides").cullface(Direction.WEST).end().end()
+				.element().from(14, 2, 14).to(16, 14, 16)
+				.face(Direction.NORTH).uvs(8, 2, 10, 14).texture("#sides").end()
+				.face(Direction.EAST).uvs(6, 2, 8, 14).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(12, 2, 14, 14).texture("#sides").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(10, 2, 12, 14).texture("#sides").end().end()
+				.element().from(14, 2, 0).to(16, 14, 2)
+				.face(Direction.NORTH).uvs(6, 2, 4, 14).texture("#sides").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(8, 2, 6, 14).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(10, 2, 8, 14).texture("#sides").end()
+				.face(Direction.WEST).uvs(4, 2, 2, 14).texture("#sides").end().end()
+				.element().from(2, 7, 0).to(14, 9, 1)
+				.face(Direction.NORTH).uvs(0, 0, 12, 2).texture("#facing_columns").cullface(Direction.NORTH).end()
+				.face(Direction.UP).uvs(0, 0, 12, 1).texture("#facing_columns").end()
+				.face(Direction.DOWN).uvs(0, 0, 12, 1).texture("#facing_columns").end().end()
+				.element().from(7, 2, 0).to(9, 7, 1)
+				.face(Direction.NORTH).uvs(4, 0, 2, 5).texture("#facing_columns").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(4, 0, 1, 5).texture("#facing_columns").end()
+				.face(Direction.WEST).uvs(4, 0, 1, 5).texture("#facing_columns").end().end();
+		
+		
+		models().getBuilder(prefix("block/base_crate_triple_vertical"))
+				.parent(this.models().getExistingFile(mcLoc(ModelProvider.BLOCK_FOLDER + "/block")))
+				.texture("particle", "#top")
+				.texture("top", prefix("block/crates/crate_top"))
+				.texture("edges", prefix("block/crates/crate_edges"))
+				.texture("facing_columns", "#sides")
+				.element().from(1, 1, 1).to(15, 15, 15)
+				.face(Direction.EAST).uvs(1, 1, 15, 15).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").end()
+				.face(Direction.WEST).uvs(1, 1, 15, 15).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").end()
+				.face(Direction.UP).uvs(1, 1, 15, 15).rotation(FaceRotation.UPSIDE_DOWN).texture("#facing").end()
+				.face(Direction.DOWN).uvs(1, 1, 15, 15).texture("#sides").end().end()
+				.element().from(0, 0, 0).to(16, 16, 2)
+				.face(Direction.NORTH).uvs(16, 0, 0, 16).rotation(FaceRotation.UPSIDE_DOWN).texture("#top").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(0, 0, 16, 2).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(16, 16, 0, 0).texture("#top").end()
+				.face(Direction.WEST).uvs(0, 0, 16, 2).rotation(FaceRotation.CLOCKWISE_90).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(0, 0, 16, 2).rotation(FaceRotation.UPSIDE_DOWN).texture("#edges").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.DOWN).end().end()
+				.element().from(0, 0, 14).to(16, 16, 16)
+				.face(Direction.NORTH).uvs(16, 16, 0, 0).rotation(FaceRotation.UPSIDE_DOWN).texture("#top").end()
+				.face(Direction.EAST).uvs(0, 2, 16, 0).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(16, 16, 0, 0).texture("#top").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(0, 2, 16, 0).rotation(FaceRotation.CLOCKWISE_90).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(0, 2, 16, 0).rotation(FaceRotation.UPSIDE_DOWN).texture("#edges").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.DOWN).end().end()
+				.element().from(0, 0, 2).to(2, 2, 14)
+				.face(Direction.EAST).uvs(12, 2, 10, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").end()
+				.face(Direction.WEST).uvs(8, 2, 6, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(10, 2, 8, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").end()
+				.face(Direction.DOWN).uvs(14, 2, 12, 14).texture("#sides").cullface(Direction.DOWN).end().end()
+				.element().from(0, 14, 2).to(2, 16, 14)
+				.face(Direction.EAST).uvs(2, 2, 4, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").end()
+				.face(Direction.WEST).uvs(6, 2, 8, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(4, 2, 6, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(8, 2, 10, 14).texture("#sides").end().end()
+				.element().from(14, 0, 2).to(16, 2, 14)
+				.face(Direction.EAST).uvs(6, 2, 8, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.WEST).uvs(10, 2, 12, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").end()
+				.face(Direction.UP).uvs(8, 2, 10, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").end()
+				.face(Direction.DOWN).uvs(12, 2, 14, 14).texture("#sides").cullface(Direction.DOWN).end().end()
+				.element().from(14, 14, 2).to(16, 16, 14)
+				.face(Direction.EAST).uvs(8, 2, 6, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.WEST).uvs(4, 2, 2, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").end()
+				.face(Direction.UP).uvs(6, 2, 4, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(10, 2, 8, 14).texture("#sides").end().end()
+				.element().from(2, 15, 7).to(14, 16, 9)
+				.face(Direction.NORTH).uvs(0, 0, 12, 1).texture("#facing_columns").end()
+				.face(Direction.SOUTH).uvs(0, 0, 12, 1).texture("#facing_columns").end()
+				.face(Direction.UP).uvs(0, 0, 12, 2).texture("#facing_columns").cullface(Direction.UP).end().end()
+				.element().from(7, 15, 9).to(9, 16, 14)
+				.face(Direction.EAST).uvs(4, 0, 5, 1).texture("#facing_columns").end()
+				.face(Direction.WEST).uvs(4, 0, 5, 1).texture("#facing_columns").end()
+				.face(Direction.UP).uvs(4, 0, 2, 5).texture("#facing_columns").cullface(Direction.UP).end().end();
+		
+		models().getBuilder(prefix("block/base_crate_quadruple"))
+				.parent(this.models().getExistingFile(mcLoc(ModelProvider.BLOCK_FOLDER + "/block")))
+				.texture("particle", "#top")
+				.texture("top", prefix("block/crates/crate_top"))
+				.texture("edges", prefix("block/crates/crate_edges"))
+				.texture("facing_columns", "#sides")
+				.element().from(1, 1, 1).to(15, 15, 15)
+				.face(Direction.NORTH).uvs(1, 1, 15, 15).texture("#facing").end()
+				.face(Direction.EAST).uvs(1, 1, 15, 15).texture("#sides").end()
+				.face(Direction.SOUTH).uvs(1, 1, 15, 15).texture("#sides").end()
+				.face(Direction.WEST).uvs(1, 1, 15, 15).texture("#sides").end().end()
+				.element().from(0, 0, 0).to(16, 2, 16)
+				.face(Direction.NORTH).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(0, 0, 16, 2).texture("#top").end()
+				.face(Direction.DOWN).uvs(0, 0, 16, 2).texture("#top").cullface(Direction.DOWN).end().end()
+				.element().from(0, 14, 0).to(16, 16, 16)
+				.face(Direction.NORTH).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(16, 16, 0, 0).texture("#top").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(16, 16, 0, 0).texture("#top").end().end()
+				.element().from(0, 2, 14).to(2, 14, 16)
+				.face(Direction.NORTH).uvs(10, 2, 8, 14).texture("#sides").end()
+				.face(Direction.EAST).uvs(12, 2, 10, 14).texture("#sides").end()
+				.face(Direction.SOUTH).uvs(14, 2, 12, 14).texture("#sides").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(8, 2, 6, 14).texture("#sides").cullface(Direction.WEST).end().end()
+				.element().from(0, 2, 0).to(2, 14, 2)
+				.face(Direction.NORTH).uvs(4, 2, 6, 14).texture("#sides").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(2, 2, 4, 14).texture("#sides").end()
+				.face(Direction.SOUTH).uvs(8, 2, 10, 14).texture("#sides").end()
+				.face(Direction.WEST).uvs(6, 2, 8, 14).texture("#sides").cullface(Direction.WEST).end().end()
+				.element().from(14, 2, 14).to(16, 14, 16)
+				.face(Direction.NORTH).uvs(8, 2, 10, 14).texture("#sides").end()
+				.face(Direction.EAST).uvs(6, 2, 8, 14).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(12, 2, 14, 14).texture("#sides").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(10, 2, 12, 14).texture("#sides").end().end()
+				.element().from(14, 2, 0).to(16, 14, 2)
+				.face(Direction.NORTH).uvs(6, 2, 4, 14).texture("#sides").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(8, 2, 6, 14).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(10, 2, 8, 14).texture("#sides").end()
+				.face(Direction.WEST).uvs(4, 2, 2, 14).texture("#sides").end().end()
+				.element().from(2, 7, 0).to(14, 9, 1)
+				.face(Direction.NORTH).uvs(0, 0, 12, 2).texture("#facing_columns").cullface(Direction.NORTH).end()
+				.face(Direction.UP).uvs(0, 0, 12, 1).texture("#facing_columns").end()
+				.face(Direction.DOWN).uvs(0, 0, 12, 1).texture("#facing_columns").end().end()
+				.element().from(7, 2, 0).to(9, 7, 1)
+				.face(Direction.NORTH).uvs(4, 0, 2, 5).texture("#facing_columns").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(4, 0, 1, 5).texture("#facing_columns").end()
+				.face(Direction.WEST).uvs(4, 0, 1, 5).texture("#facing_columns").end().end()
+				.element().from(7, 9, 0).to(9, 14, 1)
+				.face(Direction.NORTH).uvs(4, 0, 2, 5).texture("#facing_columns").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(4, 0, 1, 5).texture("#facing_columns").end()
+				.face(Direction.WEST).uvs(4, 0, 1, 5).texture("#facing_columns").end().end();
+		
+		
+		models().getBuilder(prefix("block/base_crate_quadruple_vertical"))
+				.parent(this.models().getExistingFile(mcLoc(ModelProvider.BLOCK_FOLDER + "/block")))
+				.texture("particle", "#top")
+				.texture("top", prefix("block/crates/crate_top"))
+				.texture("edges", prefix("block/crates/crate_edges"))
+				.texture("facing_columns", "#sides")
+				.element().from(1, 1, 1).to(15, 15, 15)
+				.face(Direction.EAST).uvs(1, 1, 15, 15).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").end()
+				.face(Direction.WEST).uvs(1, 1, 15, 15).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").end()
+				.face(Direction.UP).uvs(1, 1, 15, 15).rotation(FaceRotation.UPSIDE_DOWN).texture("#facing").end()
+				.face(Direction.DOWN).uvs(1, 1, 15, 15).texture("#sides").end().end()
+				.element().from(0, 0, 0).to(16, 16, 2)
+				.face(Direction.NORTH).uvs(16, 0, 0, 16).rotation(FaceRotation.UPSIDE_DOWN).texture("#top").cullface(Direction.NORTH).end()
+				.face(Direction.EAST).uvs(0, 0, 16, 2).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(16, 16, 0, 0).texture("#top").end()
+				.face(Direction.WEST).uvs(0, 0, 16, 2).rotation(FaceRotation.CLOCKWISE_90).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(0, 0, 16, 2).rotation(FaceRotation.UPSIDE_DOWN).texture("#edges").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(0, 0, 16, 2).texture("#edges").cullface(Direction.DOWN).end().end()
+				.element().from(0, 0, 14).to(16, 16, 16)
+				.face(Direction.NORTH).uvs(16, 16, 0, 0).rotation(FaceRotation.UPSIDE_DOWN).texture("#top").end()
+				.face(Direction.EAST).uvs(0, 2, 16, 0).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#edges").cullface(Direction.EAST).end()
+				.face(Direction.SOUTH).uvs(16, 16, 0, 0).texture("#top").cullface(Direction.SOUTH).end()
+				.face(Direction.WEST).uvs(0, 2, 16, 0).rotation(FaceRotation.CLOCKWISE_90).texture("#edges").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(0, 2, 16, 0).rotation(FaceRotation.UPSIDE_DOWN).texture("#edges").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(0, 2, 16, 0).texture("#edges").cullface(Direction.DOWN).end().end()
+				.element().from(0, 0, 2).to(2, 2, 14)
+				.face(Direction.EAST).uvs(12, 2, 10, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").end()
+				.face(Direction.WEST).uvs(8, 2, 6, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(10, 2, 8, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").end()
+				.face(Direction.DOWN).uvs(14, 2, 12, 14).texture("#sides").cullface(Direction.DOWN).end().end()
+				.element().from(0, 14, 2).to(2, 16, 14)
+				.face(Direction.EAST).uvs(2, 2, 4, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").end()
+				.face(Direction.WEST).uvs(6, 2, 8, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").cullface(Direction.WEST).end()
+				.face(Direction.UP).uvs(4, 2, 6, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(8, 2, 10, 14).texture("#sides").end().end()
+				.element().from(14, 0, 2).to(16, 2, 14)
+				.face(Direction.EAST).uvs(6, 2, 8, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.WEST).uvs(10, 2, 12, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").end()
+				.face(Direction.UP).uvs(8, 2, 10, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").end()
+				.face(Direction.DOWN).uvs(12, 2, 14, 14).texture("#sides").cullface(Direction.DOWN).end().end()
+				.element().from(14, 14, 2).to(16, 16, 14)
+				.face(Direction.EAST).uvs(8, 2, 6, 14).rotation(FaceRotation.COUNTERCLOCKWISE_90).texture("#sides").cullface(Direction.EAST).end()
+				.face(Direction.WEST).uvs(4, 2, 2, 14).rotation(FaceRotation.CLOCKWISE_90).texture("#sides").end()
+				.face(Direction.UP).uvs(6, 2, 4, 14).rotation(FaceRotation.UPSIDE_DOWN).texture("#sides").cullface(Direction.UP).end()
+				.face(Direction.DOWN).uvs(10, 2, 8, 14).texture("#sides").end().end()
+				.element().from(2, 15, 7).to(14, 16, 9)
+				.face(Direction.NORTH).uvs(0, 0, 12, 1).texture("#facing_columns").end()
+				.face(Direction.SOUTH).uvs(0, 0, 12, 1).texture("#facing_columns").end()
+				.face(Direction.UP).uvs(0, 0, 12, 2).texture("#facing_columns").cullface(Direction.UP).end().end()
+				.element().from(7, 15, 9).to(9, 16, 14)
+				.face(Direction.EAST).uvs(4, 0, 5, 1).texture("#facing_columns").end()
+				.face(Direction.WEST).uvs(4, 0, 5, 1).texture("#facing_columns").end()
+				.face(Direction.UP).uvs(4, 0, 2, 5).texture("#facing_columns").cullface(Direction.UP).end().end()
+				.element().from(7, 15, 2).to(9, 16, 7)
+				.face(Direction.EAST).uvs(4, 0, 5, 1).texture("#facing_columns").end()
+				.face(Direction.WEST).uvs(4, 0, 5, 1).texture("#facing_columns").end()
+				.face(Direction.UP).uvs(4, 0, 2, 5).texture("#facing_columns").cullface(Direction.UP).end().end();
+		//@formatter:on
 	}
 
 	private void createNormalHopper(LockedHopperBlock b) {

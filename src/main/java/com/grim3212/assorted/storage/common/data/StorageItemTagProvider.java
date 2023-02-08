@@ -6,8 +6,8 @@ import java.util.concurrent.CompletableFuture;
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.BagItem;
-import com.grim3212.assorted.storage.common.item.LevelUpgradeItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
+import com.grim3212.assorted.storage.common.item.upgrades.LevelUpgradeItem;
 import com.grim3212.assorted.storage.common.util.StorageMaterial;
 import com.grim3212.assorted.storage.common.util.StorageTags;
 
@@ -33,6 +33,9 @@ public class StorageItemTagProvider extends ItemTagsProvider {
 	protected void addTags(Provider provider) {
 		this.tag(ItemTags.PIGLIN_LOVED).add(StorageBlocks.GOLD_SAFE.get().asItem(), StorageBlocks.CHESTS.get(StorageMaterial.GOLD).get().asItem(), StorageBlocks.BARRELS.get(StorageMaterial.GOLD).get().asItem(), StorageBlocks.HOPPERS.get(StorageMaterial.GOLD).get().asItem(), StorageBlocks.SHULKERS.get(StorageMaterial.GOLD).get().asItem(), StorageItems.LEVEL_UPGRADES.get(StorageMaterial.GOLD).get().asItem());
 
+		this.copy(StorageTags.Blocks.DEEPSLATE, StorageTags.Items.DEEPSLATE);
+		this.copy(StorageTags.Blocks.PISTONS, StorageTags.Items.PISTONS);
+		
 		this.tag(Tags.Items.CHESTS_ENDER).add(StorageBlocks.LOCKED_ENDER_CHEST.get().asItem());
 		this.tag(Tags.Items.CHESTS_WOODEN).add(StorageBlocks.LOCKED_CHEST.get().asItem());
 		this.tag(Tags.Items.BARRELS_WOODEN).add(StorageBlocks.LOCKED_BARREL.get().asItem());
@@ -98,6 +101,30 @@ public class StorageItemTagProvider extends ItemTagsProvider {
 		this.copy(StorageTags.Blocks.SHULKERS_LEVEL_4, StorageTags.Items.CAN_UPGRADE_LEVEL_5);
 
 		this.tag(StorageTags.Items.PAPER).add(Items.PAPER);
+
+		// Logic from FunctionalStorage
+		//@formatter:off
+		this.tag(StorageTags.Items.CRAFTING_OVERRIDE)
+			.add(Items.MELON, Items.MELON_SLICE)
+			.add(Items.CLAY, Items.CLAY_BALL)
+			.add(Items.GLOWSTONE, Items.GLOWSTONE_DUST)
+			.add(Items.QUARTZ, Items.QUARTZ_BLOCK)
+			.add(Items.ICE, Items.BLUE_ICE, Items.PACKED_ICE)
+			.add(Items.AMETHYST_BLOCK, Items.AMETHYST_SHARD)
+			.add(Items.SNOWBALL, Items.SNOW_BLOCK)
+			.add(Items.BRICKS, Items.BRICK)
+			.add(Items.NETHER_BRICK, Items.NETHER_BRICKS)
+			.add(Items.NETHER_WART_BLOCK, Items.NETHER_WART)
+			.add(Items.SANDSTONE, Items.SAND)
+			.add(Items.RED_SANDSTONE, Items.RED_SAND);
+		//@formatter:on
+
+		this.copy(StorageTags.Blocks.CRATES, StorageTags.Items.CRATES);
+		this.copy(StorageTags.Blocks.CRATES_SINGLE, StorageTags.Items.CRATES_SINGLE);
+		this.copy(StorageTags.Blocks.CRATES_DOUBLE, StorageTags.Items.CRATES_DOUBLE);
+		this.copy(StorageTags.Blocks.CRATES_TRIPLE, StorageTags.Items.CRATES_TRIPLE);
+		this.copy(StorageTags.Blocks.CRATES_QUADRUPLE, StorageTags.Items.CRATES_QUADRUPLE);
+		this.tag(StorageTags.Items.UPGRADES).add(StorageItems.AMOUNT_UPGRADE.get(), StorageItems.GLOW_UPGRADE.get(), StorageItems.REDSTONE_UPGRADE.get(), StorageItems.VOID_UPGRADE.get());
 
 		for (Entry<StorageMaterial, RegistryObject<LevelUpgradeItem>> levelUpgrade : StorageItems.LEVEL_UPGRADES.entrySet()) {
 			LevelUpgradeItem item = levelUpgrade.getValue().get();
