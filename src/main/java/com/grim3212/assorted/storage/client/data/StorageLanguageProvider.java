@@ -23,7 +23,7 @@ public class StorageLanguageProvider extends LanguageProvider {
 		this.add("assortedstorage.info.locked", "Locked");
 		this.add("assortedstorage.info.level_upgrade_level", "Storage Level %s");
 		this.add("assortedstorage.info.level_upgrade", "Can be used on:");
-		this.add("assortedstorage.info.level_upgrade_shift", "§lHold Shift§r to See §bSupported Blocks");
+		this.add("assortedstorage.info.level_upgrade_shift", "\u00A7lHold Shift\u00A7r to See \u00A7bSupported Blocks");
 		this.add("assortedstorage.info.amount", "Amount %s");
 		this.add("assortedstorage.info.upgrade.mode", "Mode: %s");
 		this.add("assortedstorage.info.upgrade_amount.mode.simple", "Simple");
@@ -111,8 +111,8 @@ public class StorageLanguageProvider extends LanguageProvider {
 		this.add("block.assortedstorage.warped_warehouse_crate", "Warped Warehouse Crate");
 		this.add("block.assortedstorage.crimson_warehouse_crate", "Crimson Warehouse Crate");
 		this.add("block.assortedstorage.mangrove_warehouse_crate", "Mangrove Warehouse Crate");
-		this.add("block.assortedstorage.gold_safe", "§6Gold Safe");
-		this.add("block.assortedstorage.obsidian_safe", "§5Obsidian Safe");
+		this.add("block.assortedstorage.gold_safe", "\u00A76Gold Safe");
+		this.add("block.assortedstorage.obsidian_safe", "\u00A75Obsidian Safe");
 		this.add("block.assortedstorage.locker", "Locker");
 		this.add("block.assortedstorage.item_tower", "Item Tower");
 		this.add("block.assortedstorage.locksmith_workbench", "Locksmith Workbench");

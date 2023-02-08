@@ -10,7 +10,27 @@
     },
     {
       "type": "minecraft:single",
+      "resource": "assortedstorage:model/shulkers/invar"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/shulkers/stone"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/shulkers/gold"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/shulkers/aluminum"
+    },
+    {
+      "type": "minecraft:single",
       "resource": "assortedstorage:model/shulkers/sapphire"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/shulkers/emerald"
     },
     {
       "type": "minecraft:single",
@@ -26,23 +46,7 @@
     },
     {
       "type": "minecraft:single",
-      "resource": "assortedstorage:model/shulkers/topaz"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/shulkers/invar"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/shulkers/stone"
-    },
-    {
-      "type": "minecraft:single",
       "resource": "assortedstorage:model/shulkers/ruby"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/shulkers/lead"
     },
     {
       "type": "minecraft:single",
@@ -50,19 +54,7 @@
     },
     {
       "type": "minecraft:single",
-      "resource": "assortedstorage:model/shulkers/gold"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/shulkers/nickel"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/shulkers/aluminum"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/shulkers/silver"
+      "resource": "assortedstorage:model/shulkers/diamond"
     },
     {
       "type": "minecraft:single",
@@ -70,27 +62,35 @@
     },
     {
       "type": "minecraft:single",
-      "resource": "assortedstorage:model/shulkers/peridot"
-    },
-    {
-      "type": "minecraft:single",
       "resource": "assortedstorage:model/shulkers/steel"
     },
     {
       "type": "minecraft:single",
-      "resource": "assortedstorage:model/shulkers/emerald"
+      "resource": "assortedstorage:model/shulkers/lead"
     },
     {
       "type": "minecraft:single",
-      "resource": "assortedstorage:model/shulkers/diamond"
+      "resource": "assortedstorage:model/shulkers/silver"
     },
     {
       "type": "minecraft:single",
-      "resource": "assortedstorage:model/shulkers/bronze"
+      "resource": "assortedstorage:model/shulkers/nickel"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/shulkers/peridot"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/shulkers/topaz"
     },
     {
       "type": "minecraft:single",
       "resource": "assortedstorage:model/shulkers/amethyst"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/shulkers/bronze"
     }
   ]
 }

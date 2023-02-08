@@ -10,6 +10,7 @@ import com.grim3212.assorted.storage.common.block.LockedChestBlock;
 import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
+import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedBarrelBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedChestBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedHopperBlockEntity;
@@ -327,6 +328,25 @@ public class LevelUpgradeItem extends Item implements ICrateUpgrade {
 			world.playSound(player, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
 		}
 		return InteractionResult.SUCCESS;
+	}
+
+	@Override
+	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+		Level level = context.getLevel();
+		BlockPos pos = context.getClickedPos();
+
+		BlockEntity entity = level.getBlockEntity(pos);
+		if (entity instanceof CrateBlockEntity crate) {
+			int firstEmptySlot = (crate.getEnhancements().subList(1, crate.getEnhancements().size()).indexOf(ItemStack.EMPTY) + 1);
+			// The 0 slot is for Padlocks only
+			if (firstEmptySlot > 0) {
+				crate.getEnhancements().set(firstEmptySlot, stack.copyWithCount(1));
+				stack.shrink(1);
+				return InteractionResult.SUCCESS;
+			}
+		}
+
+		return super.onItemUseFirst(stack, context);
 	}
 
 	@Override
