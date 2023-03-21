@@ -68,7 +68,7 @@ public class LockedShulkerBoxColoring extends CustomRecipe {
 			}
 		}
 
-		ItemStack copy = itemstack.copy();
+		ItemStack copy = itemstack.copyWithCount(1);
 		NBTHelper.putInt(copy, "Color", dyecolor.getId());
 		return copy;
 	}
