@@ -1,6 +1,7 @@
 package com.grim3212.assorted.storage.client.proxy;
 
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.client.blockentity.CrateBlockEntityRenderer;
@@ -38,6 +39,8 @@ import com.grim3212.assorted.storage.client.screen.LockedHopperScreen;
 import com.grim3212.assorted.storage.client.screen.LockedMaterialScreen;
 import com.grim3212.assorted.storage.client.screen.LockerScreen;
 import com.grim3212.assorted.storage.client.screen.LocksmithWorkbenchScreen;
+import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
+import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.item.BagItem;
@@ -51,6 +54,8 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.client.renderer.item.ItemPropertyFunction;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -140,6 +145,10 @@ public class ClientProxy implements IProxy {
 			ClampedItemPropertyFunction colorOverride = (stack, world, entity, seed) -> stack.hasTag() && stack.getTag().contains(BagItem.TAG_PRIMARY_COLOR) && stack.getTag().getInt(BagItem.TAG_PRIMARY_COLOR) >= 0 ? 1.0F : 0.0F;
 			ClampedItemPropertyFunction lockOverride = (stack, world, entity, seed) -> StorageUtil.getCode(stack).isEmpty() ? 0.0F : 1.0F;
 
+			ItemPropertyFunction shulkerColorOverride = (stack, world, entity, seed) -> Optional.ofNullable(stack.getTag())
+						.map(tag -> tag.contains("Color", Tag.TAG_INT) ? tag.getInt("Color") : null)
+						.orElse(-1);
+
 			ItemProperties.register(StorageItems.BAG.get(), new ResourceLocation(AssortedStorage.MODID, "color"), colorOverride);
 			ItemProperties.register(StorageItems.BAG.get(), new ResourceLocation(AssortedStorage.MODID, "locked"), lockOverride);
 			ItemProperties.register(StorageItems.ENDER_BAG.get(), new ResourceLocation(AssortedStorage.MODID, "locked"), lockOverride);
@@ -149,6 +158,11 @@ public class ClientProxy implements IProxy {
 
 				ItemProperties.register(item, new ResourceLocation(AssortedStorage.MODID, "color"), colorOverride);
 				ItemProperties.register(item, new ResourceLocation(AssortedStorage.MODID, "locked"), lockOverride);
+			}
+
+			ItemProperties.register(StorageBlocks.LOCKED_SHULKER_BOX.get().asItem(), new ResourceLocation(AssortedStorage.MODID, "color"), shulkerColorOverride);
+			for (Entry<StorageMaterial, RegistryObject<LockedShulkerBoxBlock>> entry : StorageBlocks.SHULKERS.entrySet()) {
+				ItemProperties.register(entry.getValue().get().asItem(), new ResourceLocation(AssortedStorage.MODID, "color"), shulkerColorOverride);
 			}
 		});
 	}
