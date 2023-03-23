@@ -1,12 +1,11 @@
 package com.grim3212.assorted.storage.common.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-
-import org.apache.commons.compress.utils.Lists;
 
 import com.google.common.collect.Maps;
 
@@ -36,7 +35,7 @@ public class CompactingHelper {
 	}
 
 	public List<Match> findMatches(ItemStack stack, int numTiers) {
-		List<Match> matches = Lists.newArrayList();
+		List<Match> matches = new ArrayList<>();
 		// Add initial match for the stack itself
 		matches.add(new Match(stack, 1));
 		// Try to find an upperTier
@@ -88,7 +87,7 @@ public class CompactingHelper {
 	}
 
 	private Match findUpperTier(ItemStack stack) {
-		List<ItemStack> outputs = Lists.newArrayList();
+		List<ItemStack> outputs = new ArrayList<>();
 		// Try to check for 3x3 recipes first
 		List<ItemStack> matchingStacks = findMatchingStacks(new ComparisonCraftingContainer(3, stack));
 		int sizeCheck = matchingStacks.size() == 0 ? 4 : 9;
