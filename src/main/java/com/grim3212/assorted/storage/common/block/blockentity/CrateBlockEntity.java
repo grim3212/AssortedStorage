@@ -1,12 +1,11 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
 import javax.annotation.Nullable;
-
-import org.apache.commons.compress.utils.Lists;
 
 import com.grim3212.assorted.storage.AssortedStorage;
 import com.grim3212.assorted.storage.api.crates.ICrateUpgrade;
@@ -605,7 +604,7 @@ public class CrateBlockEntity extends BlockEntity implements LockedWorldlyContai
 	}
 
 	public static List<Integer> findMatchingStacks(Player player, ItemStack stack) {
-		List<Integer> slots = Lists.newArrayList();
+		List<Integer> slots = new ArrayList<>();
 
 		for (int slot = 0; slot < player.getInventory().getContainerSize(); ++slot) {
 			ItemStack itemstack = player.getInventory().getItem(slot);

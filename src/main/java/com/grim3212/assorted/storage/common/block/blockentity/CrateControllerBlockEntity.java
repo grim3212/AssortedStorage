@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
 
 import com.google.common.collect.Queues;
@@ -402,7 +401,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
 		int maxSlots = connectedStorageCrates.stream().max((a, b) -> Integer.compare(a.getNumSlots(), b.getNumSlots())).map(x -> x.getNumSlots()).get();
 
 		for (int i = 0; i < maxSlots; i++) {
-			List<Integer> storageConnectionsForSlotIndex = Lists.newArrayList();
+			List<Integer> storageConnectionsForSlotIndex = new ArrayList<>();
 			for (int j = 0; j < connectedStorageCrates.size(); j++) {
 				CrateConnection connection = this.connectedStorageCrates.get(j);
 
