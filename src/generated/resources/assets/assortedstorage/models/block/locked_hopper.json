@@ -1,9 +1,0 @@
-{
-  "loader": "assortedstorage:models/barrel",
-  "locked": {
-    "parent": "assortedstorage:block/locked_hopper_locked"
-  },
-  "unlocked": {
-    "parent": "minecraft:block/hopper"
-  }
-}

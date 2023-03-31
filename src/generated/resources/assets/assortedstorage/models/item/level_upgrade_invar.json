@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "assortedstorage:item/level_upgrade_invar"
-  }
-}

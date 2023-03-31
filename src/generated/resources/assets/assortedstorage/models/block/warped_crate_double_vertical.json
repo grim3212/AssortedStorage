@@ -1,7 +1,0 @@
-{
-  "parent": "assortedstorage:block/base_crate_double_vertical",
-  "textures": {
-    "facing": "assortedstorage:block/crates/warped_facing",
-    "sides": "minecraft:block/warped_stem"
-  }
-}

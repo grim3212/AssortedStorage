@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "${mod_author}"
+  ],
+  "contact": {
+    "issues": "${issue_tracker}"
+  },
+  "license": "${license}",
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.grim3212.assorted.storage.AssortedStorageFabric"
+    ],
+    "client": [
+      "com.grim3212.assorted.storage.client.AssortedStorageFabricClient"
+    ],
+    "fabric-datagen": [
+      "com.grim3212.assorted.storage.common.data.AssortedStorageFabricDatagen"
+    ]
+  },
+  "mixins": [
+    "${mod_id}.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14",
+    "fabric-api": "*",
+    "minecraft": "${fabric_mc_version_range}",
+    "java": ">=17",
+    "assortedlib": ">=1.0.1-25"
+  }
+}

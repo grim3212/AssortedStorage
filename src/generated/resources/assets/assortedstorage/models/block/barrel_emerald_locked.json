@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/cube_bottom_top",
-  "textures": {
-    "bottom": "assortedstorage:block/barrels/emerald/barrel_bottom",
-    "side": "assortedstorage:block/barrels/emerald/barrel_side",
-    "top": "assortedstorage:block/barrels/emerald/locked_barrel_top"
-  }
-}
