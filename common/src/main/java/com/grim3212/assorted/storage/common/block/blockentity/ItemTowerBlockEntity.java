@@ -1,6 +1,6 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
-import com.grim3212.assorted.lib.core.inventory.IInventoryStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.impl.SidedStorageHandler;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
@@ -30,7 +30,7 @@ public class ItemTowerBlockEntity extends BaseStorageBlockEntity {
     }
 
     @Override
-    public IInventoryStorageHandler createStorageHandler() {
+    public IPlatformInventoryStorageHandler createStorageHandler() {
         return Services.INVENTORY.createStorageInventoryHandler(new SidedStorageHandler(new ItemTowerInventory(getItemTowers(), this.worldPosition), null));
     }
 

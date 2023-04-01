@@ -79,8 +79,8 @@ public class StorageLanguageProvider extends LanguageProvider {
         }
 
         this.add("block.assortedstorage.locked_hopper", "Locked Hopper");
-        this.add("block.assortedstorage.locked_barrel", "Locked Hopper");
-        this.add("block.assortedstorage.locked_chest", "Locked Hopper");
+        this.add("block.assortedstorage.locked_barrel", "Locked Barrel");
+        this.add("block.assortedstorage.locked_chest", "Locked Chest");
         this.add("block.assortedstorage.locked_shulker_box", "Locked Shulker Box");
         this.add("block.assortedstorage.locked_ender_chest", "Locked Ender Chest");
 

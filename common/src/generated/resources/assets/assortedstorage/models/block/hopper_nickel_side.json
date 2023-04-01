@@ -1,5 +1,5 @@
 {
-  "loader": "assortedstorage:models/barrel",
+  "loader": "assortedstorage:locked",
   "locked": {
     "parent": "assortedstorage:block/hopper_nickel_locked_side"
   },

@@ -3,12 +3,12 @@ package com.grim3212.assorted.storage.common.block.blockentity;
 import com.grim3212.assorted.lib.client.model.data.IBlockModelData;
 import com.grim3212.assorted.lib.client.model.data.IModelDataBuilder;
 import com.grim3212.assorted.lib.core.block.IBlockEntityWithModelData;
-import com.grim3212.assorted.lib.core.inventory.IInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
-import com.grim3212.assorted.lib.core.inventory.LockedItemHandler;
-import com.grim3212.assorted.lib.core.inventory.LockedWorldlyContainer;
+import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.impl.LockedSidedStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
+import com.grim3212.assorted.lib.core.inventory.locking.LockedItemHandler;
+import com.grim3212.assorted.lib.core.inventory.locking.LockedWorldlyContainer;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.StorageMaterial;
@@ -80,7 +80,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
     }
 
     @Override
-    public IInventoryStorageHandler createStorageHandler() {
+    public IPlatformInventoryStorageHandler createStorageHandler() {
         return Services.INVENTORY.createStorageInventoryHandler(new ItemHandler(this));
     }
 

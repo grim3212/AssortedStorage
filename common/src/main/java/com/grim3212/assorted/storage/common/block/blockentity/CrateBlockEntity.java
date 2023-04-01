@@ -1,10 +1,10 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
 import com.grim3212.assorted.lib.core.inventory.IInventoryBlockEntity;
-import com.grim3212.assorted.lib.core.inventory.IInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.INamed;
-import com.grim3212.assorted.lib.core.inventory.LockedWorldlyContainer;
+import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
+import com.grim3212.assorted.lib.core.inventory.locking.LockedWorldlyContainer;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
@@ -56,7 +56,7 @@ public class CrateBlockEntity extends BlockEntity implements LockedWorldlyContai
     private UUID playerTimerUUID;
     private long playerTimerMillis;
     private ItemStack playerTimerStack = ItemStack.EMPTY;
-    private final IInventoryStorageHandler handler;
+    private IPlatformInventoryStorageHandler handler;
 
     public CrateBlockEntity(BlockPos pos, BlockState state) {
         this(StorageBlockEntityTypes.CRATE.get(), pos, state);
@@ -74,16 +74,19 @@ public class CrateBlockEntity extends BlockEntity implements LockedWorldlyContai
         this.slotContents = NonNullList.<LargeItemStack>withSize(this.layout.getNumStacks(), LargeItemStack.empty());
         // 8 upgrades and 1 lock slot
         this.enhancements = NonNullList.<ItemStack>withSize(9, ItemStack.EMPTY);
-        this.handler = this.createStorageHandler();
-    }
-
-    private IInventoryStorageHandler createStorageHandler() {
-        return Services.INVENTORY.createStorageInventoryHandler(new CrateSidedInv(this, null));
     }
 
     @Override
-    public IInventoryStorageHandler getStorageHandler() {
+    public IPlatformInventoryStorageHandler getStorageHandler() {
+        if (this.handler == null) {
+            this.handler = this.createStorageHandler();
+        }
+
         return this.handler;
+    }
+
+    private IPlatformInventoryStorageHandler createStorageHandler() {
+        return Services.INVENTORY.createStorageInventoryHandler(new CrateSidedInv(this, null));
     }
 
     public CrateLayout getLayout() {
@@ -693,7 +696,9 @@ public class CrateBlockEntity extends BlockEntity implements LockedWorldlyContai
     @Override
     public void setRemoved() {
         super.setRemoved();
-        this.handler.invalidate();
+        if (this.handler != null) {
+            this.handler.invalidate();
+        }
     }
 
     @Override

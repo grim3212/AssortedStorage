@@ -1,7 +1,7 @@
 package com.grim3212.assorted.storage.common.inventory.crates;
 
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
-import com.grim3212.assorted.lib.core.inventory.LockedItemHandler;
+import com.grim3212.assorted.lib.core.inventory.locking.LockedItemHandler;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.LargeItemStack;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;

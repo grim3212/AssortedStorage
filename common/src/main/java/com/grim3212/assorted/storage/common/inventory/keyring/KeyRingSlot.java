@@ -20,10 +20,4 @@ public class KeyRingSlot extends SlotStorageHandler {
         return 1;
     }
 
-    @Override
-    public void setChanged() {
-        super.setChanged();
-        if (getItemHandler() instanceof KeyRingItemHandler)
-            ((KeyRingItemHandler) getItemHandler()).setDirty();
-    }
 }

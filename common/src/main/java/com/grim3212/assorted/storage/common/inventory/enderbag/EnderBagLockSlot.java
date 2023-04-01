@@ -22,10 +22,4 @@ public class EnderBagLockSlot extends SlotStorageHandler {
         return 1;
     }
 
-    @Override
-    public void setChanged() {
-        super.setChanged();
-        if (getItemHandler() instanceof EnderBagItemHandler)
-            ((EnderBagItemHandler) getItemHandler()).setDirty();
-    }
 }

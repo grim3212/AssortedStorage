@@ -48,36 +48,36 @@ public class StorageClient {
         ClientServices.CLIENT.registerEntityLayer(StorageModelLayers.LOCKED_CHEST, ChestModel::createBaseMeshDefinition);
         ClientServices.CLIENT.registerEntityLayer(StorageModelLayers.LOCKED_SHULKER_BOX, ShulkerBoxModel::createBaseMeshDefinition);
 
-        ClientServices.CLIENT.registerScreen(StorageContainerTypes.WOOD_CABINET.get(), GenericStorageScreen::new);
-        ClientServices.CLIENT.registerScreen(StorageContainerTypes.GLASS_CABINET.get(), GenericStorageScreen::new);
-        ClientServices.CLIENT.registerScreen(StorageContainerTypes.WAREHOUSE_CRATE.get(), GenericStorageScreen::new);
-        ClientServices.CLIENT.registerScreen(StorageContainerTypes.GOLD_SAFE.get(), GoldSafeScreen::new);
-        ClientServices.CLIENT.registerScreen(StorageContainerTypes.OBSIDIAN_SAFE.get(), GenericStorageScreen::new);
-        ClientServices.CLIENT.registerScreen(StorageContainerTypes.LOCKER.get(), LockerScreen::new);
-        ClientServices.CLIENT.registerScreen(StorageContainerTypes.DUAL_LOCKER.get(), DualLockerScreen::new);
-        ClientServices.CLIENT.registerScreen(StorageContainerTypes.ITEM_TOWER.get(), ItemTowerScreen::new);
-        ClientServices.CLIENT.registerScreen(StorageContainerTypes.LOCKSMITH_WORKBENCH.get(), LocksmithWorkbenchScreen::new);
-        ClientServices.CLIENT.registerScreen(StorageContainerTypes.KEY_RING.get(), KeyRingScreen::new);
-        ClientServices.CLIENT.registerScreen(StorageContainerTypes.BAG.get(), BagScreen::new);
-        ClientServices.CLIENT.registerScreen(StorageContainerTypes.ENDER_BAG.get(), EnderBagScreen::new);
-        ClientServices.CLIENT.registerScreen(StorageContainerTypes.LOCKED_ENDER_CHEST.get(), LockedEnderChestScreen::new);
-        ClientServices.CLIENT.registerScreen(StorageContainerTypes.CRATE.get(), CrateScreen::new);
-        ClientServices.CLIENT.registerScreen(StorageContainerTypes.CRATE_COMPACTING.get(), CrateCompactingScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.WOOD_CABINET::get, GenericStorageScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.GLASS_CABINET::get, GenericStorageScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.WAREHOUSE_CRATE::get, GenericStorageScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.GOLD_SAFE::get, GoldSafeScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.OBSIDIAN_SAFE::get, GenericStorageScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.LOCKER::get, LockerScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.DUAL_LOCKER::get, DualLockerScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.ITEM_TOWER::get, ItemTowerScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.LOCKSMITH_WORKBENCH::get, LocksmithWorkbenchScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.KEY_RING::get, KeyRingScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.BAG::get, BagScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.ENDER_BAG::get, EnderBagScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.LOCKED_ENDER_CHEST::get, LockedEnderChestScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.CRATE::get, CrateScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.CRATE_COMPACTING::get, CrateCompactingScreen::new);
 
         StorageContainerTypes.CHESTS.forEach((material, menu) -> {
-            ClientServices.CLIENT.registerScreen(menu.get(), LockedMaterialScreen::new);
+            ClientServices.CLIENT.registerScreen(menu::get, LockedMaterialScreen::new);
         });
 
         StorageContainerTypes.BARRELS.forEach((material, menu) -> {
-            ClientServices.CLIENT.registerScreen(menu.get(), LockedMaterialScreen::new);
+            ClientServices.CLIENT.registerScreen(menu::get, LockedMaterialScreen::new);
         });
 
         StorageContainerTypes.HOPPERS.forEach((material, menu) -> {
-            ClientServices.CLIENT.registerScreen(menu.get(), LockedHopperScreen::new);
+            ClientServices.CLIENT.registerScreen(menu::get, LockedHopperScreen::new);
         });
 
         StorageContainerTypes.SHULKERS.forEach((material, menu) -> {
-            ClientServices.CLIENT.registerScreen(menu.get(), LockedMaterialScreen::new);
+            ClientServices.CLIENT.registerScreen(menu::get, LockedMaterialScreen::new);
         });
 
         ClientServices.CLIENT.registerBlockEntityRenderer(StorageBlockEntityTypes.WOOD_CABINET, WoodCabinetBlockEntityRenderer::new);

@@ -2,7 +2,7 @@ package com.grim3212.assorted.storage.common.inventory;
 
 import com.google.common.collect.Lists;
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
-import com.grim3212.assorted.lib.core.inventory.LockedItemHandler;
+import com.grim3212.assorted.lib.core.inventory.locking.LockedItemHandler;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.lib.util.ITagSerializable;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedEnderChestBlockEntity;

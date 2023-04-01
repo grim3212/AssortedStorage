@@ -4,8 +4,12 @@ import com.google.common.collect.Queues;
 import com.grim3212.assorted.lib.client.model.data.IBlockModelData;
 import com.grim3212.assorted.lib.client.model.data.IModelDataBuilder;
 import com.grim3212.assorted.lib.core.block.IBlockEntityWithModelData;
-import com.grim3212.assorted.lib.core.inventory.*;
+import com.grim3212.assorted.lib.core.inventory.IInventoryBlockEntity;
+import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.INamed;
+import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
+import com.grim3212.assorted.lib.core.inventory.locking.LockedWorldlyContainer;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
@@ -48,7 +52,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
     private UUID playerTimerUUID;
     private long playerTimerMillis;
     private ItemStack playerTimerStack = ItemStack.EMPTY;
-    private IInventoryStorageHandler handler;
+    private IPlatformInventoryStorageHandler handler;
 
     public CrateControllerBlockEntity(BlockPos pos, BlockState state) {
         this(StorageBlockEntityTypes.CRATE_CONTROLLER.get(), pos, state);
@@ -58,7 +62,19 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
         super(type, pos, state);
 
         this.maxRange = StorageCommonMod.COMMON_CONFIG.maxControllerSearchRange.get();
-        this.handler = Services.INVENTORY.createStorageInventoryHandler(new CrateControllerInvWrapper(this, null));
+    }
+
+    @Override
+    public IPlatformInventoryStorageHandler getStorageHandler() {
+        if (this.handler == null) {
+            this.handler = this.createStorageHandler();
+        }
+
+        return this.handler;
+    }
+
+    private IPlatformInventoryStorageHandler createStorageHandler() {
+        return Services.INVENTORY.createStorageInventoryHandler(new CrateControllerInvWrapper(this, null));
     }
 
     @Override
@@ -244,7 +260,9 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
     @Override
     public void setRemoved() {
         super.setRemoved();
-        this.handler.invalidate();
+        if (this.handler != null) {
+            this.handler.invalidate();
+        }
     }
 
     @Override
@@ -525,10 +543,5 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
         }
 
         return InteractionResult.SUCCESS;
-    }
-
-    @Override
-    public IInventoryStorageHandler getStorageHandler() {
-        return null;
     }
 }

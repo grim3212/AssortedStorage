@@ -1,5 +1,5 @@
 {
-  "loader": "assortedstorage:models/barrel",
+  "loader": "assortedstorage:locked",
   "locked": {
     "parent": "assortedstorage:block/barrel_diamond_locked"
   },

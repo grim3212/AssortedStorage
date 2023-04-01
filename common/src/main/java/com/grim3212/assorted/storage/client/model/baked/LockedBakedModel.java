@@ -34,45 +34,45 @@ import java.util.function.Function;
 public class LockedBakedModel implements IDataAwareBakedModel {
 
     protected final ModelBaker bakery;
-    protected final Function<Material, TextureAtlasSprite> spriteGetter;
     protected final ModelState transform;
     protected final ResourceLocation name;
     protected final IModelBakingContext context;
     private final BakedModel unlockedModel;
     private final BakedModel lockedModel;
-    private final LockedBarrelItemOverrideList itemOverrideList;
+    private final LockedItemOverrideList itemOverrideList;
     private final TextureAtlasSprite particle;
 
     public LockedBakedModel(IModelBakingContext context, BakedModel unlockedModel, BakedModel lockedModel, ModelBaker bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ResourceLocation name) {
         this.unlockedModel = unlockedModel;
         this.lockedModel = lockedModel;
         this.bakery = bakery;
-        this.spriteGetter = spriteGetter;
         this.transform = transform;
         this.name = name;
         this.context = context;
-        this.itemOverrideList = new LockedBarrelItemOverrideList(context);
-        this.particle = spriteGetter.apply(context.getMaterial("particle").orElse(null));
+        this.itemOverrideList = new LockedItemOverrideList(context, this);
+
+        Material particle = context.getMaterial("particle").orElse(null);
+        this.particle = particle != null ? spriteGetter.apply(particle) : null;
     }
 
     @Override
     public boolean useAmbientOcclusion() {
-        return this.unlockedModel.useAmbientOcclusion();
+        return this.context.useAmbientOcclusion();
     }
 
     @Override
     public boolean isGui3d() {
-        return this.unlockedModel.isGui3d();
+        return this.context.isGui3d();
     }
 
     @Override
     public boolean usesBlockLight() {
-        return this.unlockedModel.usesBlockLight();
+        return this.context.useBlockLight();
     }
 
     @Override
     public boolean isCustomRenderer() {
-        return this.unlockedModel.isCustomRenderer();
+        return false;
     }
 
     @Override
@@ -82,7 +82,7 @@ public class LockedBakedModel implements IDataAwareBakedModel {
 
     @Override
     public ItemTransforms getTransforms() {
-        return this.unlockedModel.getTransforms();
+        return this.context.getTransforms();
     }
 
 
@@ -123,21 +123,22 @@ public class LockedBakedModel implements IDataAwareBakedModel {
         return ImmutableList.of(RenderType.solid());
     }
 
-    public static final class LockedBarrelItemOverrideList extends ItemOverridesExtension {
+    public static final class LockedItemOverrideList extends ItemOverridesExtension {
 
-        protected LockedBarrelItemOverrideList(IModelBakingContext context) {
+        private final LockedBakedModel self;
+
+        protected LockedItemOverrideList(IModelBakingContext context, LockedBakedModel self) {
             super(context);
+            this.self = self;
         }
 
         @Override
         public BakedModel resolve(BakedModel originalModel, ItemStack stack, @Nullable ClientLevel world, @Nullable LivingEntity entity, int field) {
-            LockedBakedModel lockedModel = (LockedBakedModel) originalModel;
-
             if (StorageUtil.hasCode(stack)) {
-                return lockedModel.lockedModel;
+                return this.self.lockedModel;
             }
 
-            return lockedModel.unlockedModel;
+            return this.self.unlockedModel;
         }
     }
 }

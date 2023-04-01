@@ -1,9 +1,11 @@
 package com.grim3212.assorted.storage.common.block;
 
+import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.common.inventory.LocksmithWorkbenchContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -29,7 +31,7 @@ public class LocksmithWorkbenchBlock extends Block {
         if (worldIn.isClientSide) {
             return InteractionResult.SUCCESS;
         } else {
-            player.openMenu(state.getMenuProvider(worldIn, pos));
+            Services.PLATFORM.openMenu((ServerPlayer) player, state.getMenuProvider(worldIn, pos), buf -> buf.writeBlockPos(pos));
             player.awardStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
             return InteractionResult.CONSUME;
         }

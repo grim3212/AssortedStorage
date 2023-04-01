@@ -1,10 +1,10 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
 import com.grim3212.assorted.lib.core.inventory.IInventoryBlockEntity;
-import com.grim3212.assorted.lib.core.inventory.IInventoryStorageHandler;
-import com.grim3212.assorted.lib.core.inventory.LockedWorldlyContainer;
+import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.impl.LockedSidedStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
+import com.grim3212.assorted.lib.core.inventory.locking.LockedWorldlyContainer;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
@@ -58,7 +58,7 @@ public class LockedShulkerBoxBlockEntity extends RandomizableContainerBlockEntit
     private DyeColor color = null;
     private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
 
-    private final IInventoryStorageHandler handler;
+    private IPlatformInventoryStorageHandler handler;
 
     public LockedShulkerBoxBlockEntity(StorageMaterial storageMaterial, BlockPos pos, BlockState state) {
         super(StorageBlockEntityTypes.LOCKED_SHULKER_BOX.get(), pos, state);
@@ -66,7 +66,6 @@ public class LockedShulkerBoxBlockEntity extends RandomizableContainerBlockEntit
         int totalItems = storageMaterial != null ? storageMaterial.totalItems() : 27;
         this.itemStacks = NonNullList.withSize(totalItems, ItemStack.EMPTY);
         this.slots = IntStream.range(0, totalItems).toArray();
-        this.handler = this.createStorageHandler();
     }
 
     public LockedShulkerBoxBlockEntity(BlockPos pos, BlockState state) {
@@ -80,22 +79,27 @@ public class LockedShulkerBoxBlockEntity extends RandomizableContainerBlockEntit
         }
         this.itemStacks = NonNullList.withSize(totalItems, ItemStack.EMPTY);
         this.slots = IntStream.range(0, totalItems).toArray();
-        this.handler = this.createStorageHandler();
-    }
-
-    private IInventoryStorageHandler createStorageHandler() {
-        return Services.INVENTORY.createStorageInventoryHandler(new LockedSidedStorageHandler(this, Direction.UP));
     }
 
     @Override
-    public IInventoryStorageHandler getStorageHandler() {
+    public IPlatformInventoryStorageHandler getStorageHandler() {
+        if (this.handler == null) {
+            this.handler = this.createStorageHandler();
+        }
+
         return this.handler;
+    }
+
+    private IPlatformInventoryStorageHandler createStorageHandler() {
+        return Services.INVENTORY.createStorageInventoryHandler(new LockedSidedStorageHandler(this, Direction.UP));
     }
 
     @Override
     public void setRemoved() {
         super.setRemoved();
-        this.handler.invalidate();
+        if (this.handler != null) {
+            this.handler.invalidate();
+        }
     }
 
     public int colorToSave() {

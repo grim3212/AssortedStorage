@@ -1,7 +1,7 @@
 package com.grim3212.assorted.storage.mixin.block;
 
 import com.grim3212.assorted.lib.core.inventory.IInventoryBlockEntity;
-import com.grim3212.assorted.lib.inventory.ForgeInventoryStorageHandler;
+import com.grim3212.assorted.lib.inventory.ForgePlatformInventoryStorageHandler;
 import com.grim3212.assorted.storage.common.block.blockentity.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -25,7 +25,7 @@ public class AddItemHandlerCapabilityBlockEntities extends BlockEntity {
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (!this.isRemoved() && cap == ForgeCapabilities.ITEM_HANDLER) {
             if (this instanceof IInventoryBlockEntity inv) {
-                return ((ForgeInventoryStorageHandler) inv.getStorageHandler()).getCapability(side).cast();
+                return ((ForgePlatformInventoryStorageHandler) inv.getStorageHandler()).getCapability(side).cast();
             }
         }
 

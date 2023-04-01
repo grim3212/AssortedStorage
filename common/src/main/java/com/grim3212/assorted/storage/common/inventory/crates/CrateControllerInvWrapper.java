@@ -1,7 +1,7 @@
 package com.grim3212.assorted.storage.common.inventory.crates;
 
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
-import com.grim3212.assorted.lib.core.inventory.LockedItemHandler;
+import com.grim3212.assorted.lib.core.inventory.locking.LockedItemHandler;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateControllerBlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;

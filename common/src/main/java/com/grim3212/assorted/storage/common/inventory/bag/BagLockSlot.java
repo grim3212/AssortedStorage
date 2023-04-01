@@ -22,10 +22,4 @@ public class BagLockSlot extends SlotStorageHandler {
         return 1;
     }
 
-    @Override
-    public void setChanged() {
-        super.setChanged();
-        if (getItemHandler() instanceof BagItemHandler)
-            ((BagItemHandler) getItemHandler()).setDirty();
-    }
 }

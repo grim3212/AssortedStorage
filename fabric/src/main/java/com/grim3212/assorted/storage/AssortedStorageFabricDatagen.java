@@ -2,7 +2,6 @@ package com.grim3212.assorted.storage;
 
 import com.grim3212.assorted.lib.data.FabricBlockTagProvider;
 import com.grim3212.assorted.lib.data.FabricItemTagProvider;
-import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.data.StorageBlockLoot;
 import com.grim3212.assorted.storage.data.StorageBlockTagProvider;
 import com.grim3212.assorted.storage.data.StorageItemTagProvider;
@@ -14,8 +13,6 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class AssortedStorageFabricDatagen implements DataGeneratorEntrypoint {
     @Override
@@ -24,6 +21,6 @@ public class AssortedStorageFabricDatagen implements DataGeneratorEntrypoint {
         pack.addProvider((output, registriesFuture) -> new StorageRecipes(output));
         FabricBlockTagProvider provider = pack.addProvider((output, registriesFuture) -> new FabricBlockTagProvider(output, registriesFuture, new StorageBlockTagProvider(output, registriesFuture)));
         pack.addProvider((output, registriesFuture) -> new FabricItemTagProvider(output, registriesFuture, provider, new StorageItemTagProvider(output, registriesFuture, provider)));
-        pack.addProvider((output, registriesFuture) -> new LootTableProvider(output, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(() -> new StorageBlockLoot(() -> StorageBlocks.BLOCKS.getEntries().stream().map(Supplier::get).collect(Collectors.toList())), LootContextParamSets.BLOCK))));
+        pack.addProvider((output, registriesFuture) -> new LootTableProvider(output, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(StorageBlockLoot::new, LootContextParamSets.BLOCK))));
     }
 }

@@ -1,11 +1,11 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
 import com.grim3212.assorted.lib.core.inventory.IInventoryBlockEntity;
-import com.grim3212.assorted.lib.core.inventory.IInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.INamed;
-import com.grim3212.assorted.lib.core.inventory.LockedWorldlyContainer;
+import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.impl.LockedSidedStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
+import com.grim3212.assorted.lib.core.inventory.locking.LockedWorldlyContainer;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.blockentity.IStorage;
@@ -46,7 +46,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Lock
     protected float prevRotation;
     private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
     private Component customName;
-    private IInventoryStorageHandler handler;
+    private IPlatformInventoryStorageHandler handler;
 
     protected BaseStorageBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         this(typeIn, pos, state, 27);
@@ -57,12 +57,18 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Lock
 
         if (this.selfInventory())
             setStartingContents(inventorySize);
-
-        if (this.level != null)
-            this.handler = this.createStorageHandler();
     }
 
-    public IInventoryStorageHandler createStorageHandler() {
+    @Override
+    public IPlatformInventoryStorageHandler getStorageHandler() {
+        if (this.handler == null) {
+            this.handler = this.createStorageHandler();
+        }
+
+        return this.handler;
+    }
+
+    public IPlatformInventoryStorageHandler createStorageHandler() {
         return Services.INVENTORY.createStorageInventoryHandler(new LockedSidedStorageHandler(this, null));
     }
 
@@ -310,17 +316,9 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Lock
     @Override
     public void setRemoved() {
         super.setRemoved();
-        this.handler.invalidate();
-    }
-
-    @Override
-    public IInventoryStorageHandler getStorageHandler() {
-        return this.handler;
-    }
-
-    public void setStorageHandler(IInventoryStorageHandler newHandler) {
-        this.handler.invalidate();
-        this.handler = newHandler;
+        if (this.handler != null) {
+            this.handler.invalidate();
+        }
     }
 
     @Override

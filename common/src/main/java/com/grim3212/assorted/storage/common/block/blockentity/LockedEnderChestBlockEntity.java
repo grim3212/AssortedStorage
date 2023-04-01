@@ -1,6 +1,7 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
-import com.grim3212.assorted.lib.core.inventory.IInventoryStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.common.inventory.LockedEnderChestInventory;
@@ -24,17 +25,8 @@ public class LockedEnderChestBlockEntity extends BaseStorageBlockEntity {
         super(StorageBlockEntityTypes.LOCKED_ENDER_CHEST.get(), pos, state);
     }
 
-    public LockedEnderChestInventory getInventory() {
-        if (level != null && inventory == null && isLocked()) {
-            this.inventory = EnderSavedData.get(level).getInventory(this.getStorageLockCode());
-            this.inventory.addWeakListener(this);
-            this.setStorageHandler(Services.INVENTORY.createStorageInventoryHandler(this.inventory));
-        }
-        return this.inventory;
-    }
-
     @Override
-    public IInventoryStorageHandler createStorageHandler() {
+    public IPlatformInventoryStorageHandler createStorageHandler() {
         if (level != null && inventory == null && isLocked()) {
             this.inventory = EnderSavedData.get(level).getInventory(this.getStorageLockCode());
             this.inventory.addWeakListener(this);
@@ -61,13 +53,14 @@ public class LockedEnderChestBlockEntity extends BaseStorageBlockEntity {
 
     @Override
     public int getContainerSize() {
-        return this.getInventory().getSlots();
+        return this.getStorageHandler().getItemStorageHandler().getSlots();
     }
 
     @Override
     public boolean isEmpty() {
-        for (int i = 0; i < this.getInventory().getSlots(); i++) {
-            ItemStack stack = this.getInventory().getStackInSlot(i);
+        IItemStorageHandler handler = this.getStorageHandler().getItemStorageHandler();
+        for (int i = 0; i < handler.getSlots(); i++) {
+            ItemStack stack = handler.getStackInSlot(i);
             if (!stack.isEmpty()) {
                 return false;
             }
@@ -83,19 +76,20 @@ public class LockedEnderChestBlockEntity extends BaseStorageBlockEntity {
     public void setRemoved() {
         this.remove = true;
         this.getStorageHandler().invalidate();
-        invalidateInventory();
+        this.invalidateInventory();
     }
 
     @Override
     public void clearContent() {
-        for (int i = 0; i < this.getInventory().getSlots(); i++) {
-            this.getInventory().setStackInSlot(i, ItemStack.EMPTY);
+        IItemStorageHandler handler = this.getStorageHandler().getItemStorageHandler();
+        for (int i = 0; i < handler.getSlots(); i++) {
+            handler.setStackInSlot(i, ItemStack.EMPTY);
         }
     }
 
     @Override
     public ItemStack getItem(int index) {
-        return this.getInventory().getStackInSlot(index);
+        return this.getStorageHandler().getItemStorageHandler().getStackInSlot(index);
     }
 
     @Override
@@ -105,7 +99,7 @@ public class LockedEnderChestBlockEntity extends BaseStorageBlockEntity {
 
     @Override
     public void setItem(int index, ItemStack stack) {
-        this.getInventory().setStackInSlot(index, stack);
+        this.getStorageHandler().getItemStorageHandler().setStackInSlot(index, stack);
         if (stack.getCount() > this.getMaxStackSize()) {
             stack.setCount(this.getMaxStackSize());
         }

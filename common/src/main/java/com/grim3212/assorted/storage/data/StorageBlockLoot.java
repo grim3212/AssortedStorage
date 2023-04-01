@@ -28,13 +28,14 @@ import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class StorageBlockLoot extends LibBlockLootProvider {
 
     private final List<Block> blocks = new ArrayList<>();
 
-    public StorageBlockLoot(Supplier<Iterable<Block>> knownBlocks) {
-        super(knownBlocks);
+    public StorageBlockLoot() {
+        super(() -> StorageBlocks.BLOCKS.getEntries().stream().map(Supplier::get).collect(Collectors.toList()));
 
         blocks.add(StorageBlocks.WOOD_CABINET.get());
         blocks.add(StorageBlocks.GLASS_CABINET.get());

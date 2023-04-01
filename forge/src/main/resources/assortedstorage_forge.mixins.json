@@ -5,9 +5,7 @@
   "package": "com.grim3212.assorted.storage.mixin",
   "mixins": [
     "block.AddItemHandlerCapabilityBlockEntities",
-    "item.AddItemHandlerCapabilityItems.BagItemCapability",
-    "item.AddItemHandlerCapabilityItems.EnderBagItemCapability",
-    "item.AddItemHandlerCapabilityItems.KeyRingItemCapability"
+    "item.AddItemHandlerCapabilityItems"
   ],
   "client": [],
   "injectors": {

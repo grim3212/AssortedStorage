@@ -1,61 +1,45 @@
 package com.grim3212.assorted.storage.mixin.item;
 
-import com.grim3212.assorted.lib.inventory.ForgeItemStackStorageWrapper;
-import com.grim3212.assorted.storage.api.StorageMaterial;
-import com.grim3212.assorted.storage.common.inventory.bag.BagItemHandler;
-import com.grim3212.assorted.storage.common.inventory.enderbag.EnderBagItemHandler;
-import com.grim3212.assorted.storage.common.inventory.keyring.KeyRingItemHandler;
+import com.grim3212.assorted.lib.core.inventory.IInventoryItem;
+import com.grim3212.assorted.lib.inventory.ForgePlatformInventoryStorageHandler;
 import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.EnderBagItem;
 import com.grim3212.assorted.storage.common.item.KeyRingItem;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 
-public class AddItemHandlerCapabilityItems {
+@Mixin({BagItem.class, EnderBagItem.class, KeyRingItem.class})
+public class AddItemHandlerCapabilityItems extends Item {
 
-    @Mixin(BagItem.class)
-    public static class BagItemCapability extends Item {
-        @Shadow
-        private StorageMaterial material;
-
-        public BagItemCapability(Properties pProperties) {
-            super(pProperties);
-        }
-
-        @Override
-        public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-            return new ForgeItemStackStorageWrapper(new BagItemHandler(stack, this.material));
-        }
+    public AddItemHandlerCapabilityItems(Properties pProperties) {
+        super(pProperties);
     }
 
-    @Mixin(EnderBagItem.class)
-    public static class EnderBagItemCapability extends Item {
-
-        public EnderBagItemCapability(Properties pProperties) {
-            super(pProperties);
+    @Override
+    public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
+        if (!stack.isEmpty()) {
+            if (stack.getItem() instanceof IInventoryItem inv) {
+                return new ICapabilityProvider() {
+                    @Override
+                    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+                        if (cap == ForgeCapabilities.ITEM_HANDLER) {
+                            return ((ForgePlatformInventoryStorageHandler) inv.getStorageHandler(stack)).getCapability(side).cast();
+                        }
+                        return LazyOptional.empty();
+                    }
+                };
+            }
         }
 
-        @Override
-        public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-            return new ForgeItemStackStorageWrapper(new EnderBagItemHandler(stack));
-        }
-    }
-
-    @Mixin(KeyRingItem.class)
-    public static class KeyRingItemCapability extends Item {
-
-        public KeyRingItemCapability(Properties pProperties) {
-            super(pProperties);
-        }
-
-        @Override
-        public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-            return new ForgeItemStackStorageWrapper(new KeyRingItemHandler(stack));
-        }
+        return null;
     }
 }

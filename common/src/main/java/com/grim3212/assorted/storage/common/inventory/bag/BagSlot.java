@@ -15,10 +15,4 @@ public class BagSlot extends SlotStorageHandler {
         return !(stack.getItem() instanceof BagItem) && super.mayPlace(stack);
     }
 
-    @Override
-    public void setChanged() {
-        super.setChanged();
-        if (getItemHandler() instanceof BagItemHandler)
-            ((BagItemHandler) getItemHandler()).setDirty();
-    }
 }
