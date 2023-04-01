@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "assortedstorage:gold_safe",
+    "assortedstorage:chest_gold",
+    "assortedstorage:barrel_gold",
+    "assortedstorage:hopper_gold",
+    "assortedstorage:shulker_box_gold",
+    "assortedstorage:level_upgrade_gold"
+  ]
+}

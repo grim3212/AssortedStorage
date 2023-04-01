@@ -1,102 +1,97 @@
 package com.grim3212.assorted.storage.common.inventory.enderbag;
 
-import javax.annotation.Nonnull;
-
-import com.grim3212.assorted.storage.api.StorageUtil;
-
+import com.grim3212.assorted.lib.core.inventory.ISerializableItemStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemStackHandler;
 
-public class EnderBagItemHandler extends ItemStackHandler {
+import javax.annotation.Nonnull;
 
-	private ItemStack itemStack;
-	private boolean changed = false;
-	private boolean loaded = false;
+public class EnderBagItemHandler extends ItemStackStorageHandler implements ISerializableItemStorageHandler {
 
-	public EnderBagItemHandler(ItemStack itemStack) {
-		// Single slot for the padlock
-		super(1);
-		this.itemStack = itemStack;
-	}
+    private ItemStack itemStack;
+    private boolean changed = false;
 
-	@Nonnull
-	@Override
-	public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-		changed = true;
-		return super.insertItem(slot, stack, simulate);
-	}
+    public EnderBagItemHandler(ItemStack itemStack) {
+        // Single slot for the padlock
+        super(1);
+        this.itemStack = itemStack;
+    }
 
-	@Nonnull
-	@Override
-	public ItemStack extractItem(int slot, int amount, boolean simulate) {
-		changed = true;
-		return super.extractItem(slot, amount, simulate);
-	}
+    @Nonnull
+    @Override
+    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+        changed = true;
+        return super.insertItem(slot, stack, simulate);
+    }
 
-	@Override
-	public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
-		validateSlotIndex(slot);
-		if (!ItemStack.isSame(stack, stacks.get(slot))) {
-			onContentsChanged(slot);
-		}
-		this.stacks.set(slot, stack);
-	}
+    @Nonnull
+    @Override
+    public ItemStack extractItem(int slot, int amount, boolean simulate) {
+        changed = true;
+        return super.extractItem(slot, amount, simulate);
+    }
 
-	public void setDirty() {
-		this.changed = true;
-	}
+    @Override
+    public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
+        validateSlotIndex(slot);
+        if (!ItemStack.isSame(stack, stacks.get(slot))) {
+            onContentsChanged(slot);
+        }
+        this.stacks.set(slot, stack);
+    }
 
-	@Override
-	protected void onContentsChanged(int slot) {
-		super.onContentsChanged(slot);
-		changed = true;
-	}
+    public void setDirty() {
+        this.changed = true;
+    }
 
-	public void load() {
-		load(itemStack.getOrCreateTag());
-	}
+    @Override
+    protected void onContentsChanged(int slot) {
+        super.onContentsChanged(slot);
+        changed = true;
+    }
 
-	public void loadIfNotLoaded() {
-		if (!loaded)
-			load();
-		loaded = true;
-	}
+    @Override
+    public void load() {
+        load(itemStack.getOrCreateTag());
+    }
 
-	public void load(@Nonnull CompoundTag nbt) {
-		if (nbt.contains("Inventory"))
-			deserializeNBT(nbt.getCompound("Inventory"));
-	}
+    public void load(@Nonnull CompoundTag nbt) {
+        if (nbt.contains("Inventory"))
+            deserializeNBT(nbt.getCompound("Inventory"));
+    }
 
-	public void save() {
-		if (changed) {
-			CompoundTag nbt = itemStack.getOrCreateTag();
-			nbt.put("Inventory", serializeNBT());
+    @Override
+    public void save() {
+        if (changed) {
+            CompoundTag nbt = itemStack.getOrCreateTag();
+            nbt.put("Inventory", serializeNBT());
 
-			// If we set the storage lock on each save it should be a bit more performant
-			// then checking the inventory every render to decide if it is locked or not
-			ItemStack storageLock = this.getStackInSlot(0);
-			String newLockCode = StorageUtil.getCode(storageLock);
-			nbt.putString("Storage_Lock", newLockCode);
-			changed = false;
-		}
-	}
+            // If we set the storage lock on each save it should be a bit more performant
+            // then checking the inventory every render to decide if it is locked or not
+            ItemStack storageLock = this.getStackInSlot(0);
+            String newLockCode = StorageUtil.getCode(storageLock);
+            nbt.putString("Storage_Lock", newLockCode);
+            changed = false;
+        }
+    }
 
-	@Override
-	public void deserializeNBT(CompoundTag nbt) {
-		// Extra slot for the lock slot
-		setSize(1);
-		ListTag tagList = nbt.getList("Items", Tag.TAG_COMPOUND);
-		for (int i = 0; i < tagList.size(); i++) {
-			CompoundTag itemTags = tagList.getCompound(i);
-			int slot = itemTags.getInt("Slot");
+    @Override
+    public void deserializeNBT(CompoundTag nbt) {
+        // Extra slot for the lock slot
+        setSize(1);
+        ListTag tagList = nbt.getList("Items", Tag.TAG_COMPOUND);
+        for (int i = 0; i < tagList.size(); i++) {
+            CompoundTag itemTags = tagList.getCompound(i);
+            int slot = itemTags.getInt("Slot");
 
-			if (slot >= 0 && slot < stacks.size()) {
-				stacks.set(slot, ItemStack.of(itemTags));
-			}
-		}
-		onLoad();
-	}
+            if (slot >= 0 && slot < stacks.size()) {
+                stacks.set(slot, ItemStack.of(itemTags));
+            }
+        }
+        onLoad();
+    }
 }

@@ -1,0 +1,36 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "bags"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:gems/sapphire"
+          ]
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:bags/level_1"
+    },
+    "M": {
+      "tag": "c:gems/sapphire"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:bag_sapphire"
+  }
+}

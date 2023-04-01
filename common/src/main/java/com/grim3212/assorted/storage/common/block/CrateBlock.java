@@ -1,6 +1,7 @@
 package com.grim3212.assorted.storage.common.block;
 
 import com.grim3212.assorted.lib.core.block.ExtraPropertyBlock;
+import com.grim3212.assorted.lib.core.block.IBlockOnPlayerBreak;
 import com.grim3212.assorted.lib.core.inventory.INamed;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
@@ -49,7 +50,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class CrateBlock extends ExtraPropertyBlock implements EntityBlock, ICrateSystem {
+public class CrateBlock extends ExtraPropertyBlock implements EntityBlock, ICrateSystem, IBlockOnPlayerBreak {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
@@ -215,7 +216,7 @@ public class CrateBlock extends ExtraPropertyBlock implements EntityBlock, ICrat
             }
         }
 
-        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+        return true;
     }
 
     @Override

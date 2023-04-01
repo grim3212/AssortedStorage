@@ -1,0 +1,36 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "chests"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:gems/emerald"
+          ]
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:chests/level_1"
+    },
+    "M": {
+      "tag": "c:gems/emerald"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:chest_emerald"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "bags"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:ingots/bronze"
+          ]
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:bags/level_2"
+    },
+    "M": {
+      "tag": "c:ingots/bronze"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:bag_bronze"
+  }
+}

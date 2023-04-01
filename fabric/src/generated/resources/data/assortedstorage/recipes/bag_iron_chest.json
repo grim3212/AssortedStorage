@@ -1,0 +1,28 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "assortedlib:part_enabled",
+      "part": "bags"
+    }
+  ],
+  "key": {
+    "C": {
+      "item": "assortedstorage:chest_iron"
+    },
+    "L": {
+      "tag": "c:leather"
+    },
+    "S": {
+      "tag": "c:string"
+    }
+  },
+  "pattern": [
+    "SLS",
+    "LCL",
+    "LLL"
+  ],
+  "result": {
+    "item": "assortedstorage:bag_iron"
+  }
+}

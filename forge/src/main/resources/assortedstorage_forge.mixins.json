@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_17",
+  "package": "com.grim3212.assorted.storage.mixin",
+  "mixins": [
+    "block.AddItemHandlerCapabilityBlockEntities",
+    "item.AddItemHandlerCapabilityItems.BagItemCapability",
+    "item.AddItemHandlerCapabilityItems.EnderBagItemCapability",
+    "item.AddItemHandlerCapabilityItems.KeyRingItemCapability"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "assortedstorage.refmap.json"
+}

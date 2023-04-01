@@ -1,16 +1,18 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
+import com.grim3212.assorted.lib.client.model.data.IBlockModelData;
+import com.grim3212.assorted.lib.client.model.data.IModelDataBuilder;
+import com.grim3212.assorted.lib.core.block.IBlockEntityWithModelData;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.inventory.LockedMaterialContainer;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
+import com.grim3212.assorted.storage.common.properties.StorageModelProperties;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
@@ -19,10 +21,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.IntStream;
 
-public class LockedBarrelBlockEntity extends BaseStorageBlockEntity {
+public class LockedBarrelBlockEntity extends BaseStorageBlockEntity implements IBlockEntityWithModelData {
 
     private final StorageMaterial storageMaterial;
     protected final int[] slots;
@@ -62,26 +65,11 @@ public class LockedBarrelBlockEntity extends BaseStorageBlockEntity {
     }
 
     @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        super.onDataPacket(net, pkt);
-        requestModelDataUpdate();
-        if (level instanceof ClientLevel) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
-        }
-    }
-
-    @Override
     public void setLockCode(String s) {
         super.setLockCode(s);
-        requestModelDataUpdate();
         if (level instanceof ClientLevel) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
         }
-    }
-
-    @Override
-    public ModelData getModelData() {
-        return ModelData.builder().with(ModelProperties.IS_LOCKED, this.isLocked()).build();
     }
 
     @Override
@@ -105,5 +93,10 @@ public class LockedBarrelBlockEntity extends BaseStorageBlockEntity {
         }
 
         return i;
+    }
+
+    @Override
+    public @NotNull IBlockModelData getBlockModelData() {
+        return IModelDataBuilder.create().withInitial(StorageModelProperties.IS_LOCKED, this.isLocked()).build();
     }
 }

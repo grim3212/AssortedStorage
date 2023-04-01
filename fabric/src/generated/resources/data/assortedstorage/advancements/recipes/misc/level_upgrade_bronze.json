@@ -1,0 +1,62 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_material": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "c:ingots/bronze"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "assortedstorage:level_upgrade_bronze"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_upgrade": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "assortedstorage:blank_upgrade"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "upgrades"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:ingots/bronze"
+          ]
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    [
+      "has_upgrade",
+      "has_material",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "assortedstorage:level_upgrade_bronze"
+    ]
+  }
+}

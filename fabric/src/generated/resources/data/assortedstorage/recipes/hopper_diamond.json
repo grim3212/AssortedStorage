@@ -1,0 +1,36 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "hoppers"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:gems/diamond"
+          ]
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:hoppers/level_3"
+    },
+    "M": {
+      "tag": "c:gems/diamond"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:hopper_diamond"
+  }
+}

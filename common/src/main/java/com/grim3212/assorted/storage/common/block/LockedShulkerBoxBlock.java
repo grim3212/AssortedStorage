@@ -74,6 +74,8 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
         super(props.dynamicShape().noOcclusion().isSuffocating(Predicates.isShulkerBlock).isViewBlocking(Predicates.isShulkerBlock));
         this.material = material;
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.UP));
+
+//
     }
 
     @Override

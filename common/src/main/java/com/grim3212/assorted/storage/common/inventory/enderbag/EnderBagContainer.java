@@ -1,7 +1,9 @@
 package com.grim3212.assorted.storage.common.inventory.enderbag;
 
+import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
-import com.grim3212.assorted.storage.api.StorageUtil;
+import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
+import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.common.inventory.LockedEnderChestInventory;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.item.EnderBagItem;
@@ -16,8 +18,6 @@ import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
 
 public class EnderBagContainer extends AbstractContainerMenu {
 
@@ -56,10 +56,10 @@ public class EnderBagContainer extends AbstractContainerMenu {
             playerEnderChest.startOpen(playerEntity);
         }
 
-        IItemHandler itemHandler = stack.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+        IItemStorageHandler storageHandler = Services.INVENTORY.getItemStorageHandler(stack).orElse(null);
 
-        if (itemHandler instanceof EnderBagItemHandler) {
-            handler = (EnderBagItemHandler) itemHandler;
+        if (storageHandler instanceof EnderBagItemHandler) {
+            handler = (EnderBagItemHandler) storageHandler;
             handler.load();
 
             int xRows = 3;

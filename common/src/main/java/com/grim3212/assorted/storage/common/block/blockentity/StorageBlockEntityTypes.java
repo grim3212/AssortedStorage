@@ -38,17 +38,17 @@ public class StorageBlockEntityTypes {
     public static final IRegistryObject<BlockEntityType<CrateCompactingBlockEntity>> CRATE_COMPACTING = BLOCK_ENTITIES.register("crate_compacting", () -> Services.REGISTRY_UTIL.createBlockEntityType(CrateCompactingBlockEntity::new, StorageBlocks.CRATE_COMPACTING.get()));
     public static final IRegistryObject<BlockEntityType<CrateControllerBlockEntity>> CRATE_CONTROLLER = BLOCK_ENTITIES.register("crate_controller", () -> Services.REGISTRY_UTIL.createBlockEntityType(CrateControllerBlockEntity::new, StorageBlocks.CRATE_CONTROLLER.get()));
 
-    private static Block[] getWarehouseCrates() {
+    public static Block[] getWarehouseCrates() {
         return new Block[]{StorageBlocks.OAK_WAREHOUSE_CRATE.get(), StorageBlocks.BIRCH_WAREHOUSE_CRATE.get(), StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get(), StorageBlocks.ACACIA_WAREHOUSE_CRATE.get(), StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get(), StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get(), StorageBlocks.WARPED_WAREHOUSE_CRATE.get(), StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get(), StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get()};
     }
 
-    private static Block[] getChests() {
+    public static Block[] getChests() {
         Set<Block> chests = StorageBlocks.CHESTS.values().stream().map((b) -> b.get()).collect(Collectors.toSet());
         chests.add(StorageBlocks.LOCKED_CHEST.get());
         return chests.toArray(new Block[0]);
     }
 
-    private static Block[] getShulkers() {
+    public static Block[] getShulkers() {
         Set<Block> shulkers = StorageBlocks.SHULKERS.values().stream().map((b) -> b.get()).collect(Collectors.toSet());
         shulkers.add(StorageBlocks.LOCKED_SHULKER_BOX.get());
         return shulkers.toArray(new Block[0]);

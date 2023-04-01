@@ -7,11 +7,9 @@ import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.lib.util.NBTHelper;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.StorageMaterial;
-import com.grim3212.assorted.storage.common.inventory.bag.BagCapabilityProvider;
 import com.grim3212.assorted.storage.common.inventory.bag.BagContainer;
 import com.grim3212.assorted.storage.common.inventory.keyring.KeyRingItemHandler;
 import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -52,11 +50,6 @@ public class BagItem extends Item {
     @LoaderImplement(loader = LoaderImplement.Loader.FABRIC, value = "FabricItem")
     public boolean allowNbtUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
         return false;
-    }
-
-    @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
-        return new BagCapabilityProvider(stack, this.material, nbt);
     }
 
     @Override

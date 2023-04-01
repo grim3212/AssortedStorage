@@ -1,5 +1,6 @@
 package com.grim3212.assorted.storage.client.data;
 
+import com.grim3212.assorted.lib.registry.IRegistryObject;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.api.crates.CrateLayout;
@@ -16,7 +17,6 @@ import net.minecraftforge.client.model.generators.*;
 import net.minecraftforge.client.model.generators.ModelBuilder.FaceRotation;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,11 +55,11 @@ public class StorageBlockstateProvider extends BlockStateProvider {
         blocks.put(StorageBlocks.LOCKED_CHEST.get(), new ResourceLocation("block/oak_planks"));
         blocks.put(StorageBlocks.LOCKED_SHULKER_BOX.get(), new ResourceLocation("block/shulker_box"));
 
-        for (RegistryObject<LockedChestBlock> b : StorageBlocks.CHESTS.values()) {
+        for (IRegistryObject<LockedChestBlock> b : StorageBlocks.CHESTS.values()) {
             blocks.put(b.get(), b.get().getStorageMaterial().getParticle());
         }
 
-        for (RegistryObject<LockedShulkerBoxBlock> b : StorageBlocks.SHULKERS.values()) {
+        for (IRegistryObject<LockedShulkerBoxBlock> b : StorageBlocks.SHULKERS.values()) {
             blocks.put(b.get(), b.get().getStorageMaterial().getParticle());
         }
     }
@@ -93,12 +93,12 @@ public class StorageBlockstateProvider extends BlockStateProvider {
         door(StorageBlocks.LOCKED_IRON_DOOR.get(), resource("block/locked_iron_door_bottom"), resource("block/locked_iron_door_top"));
 
         createNormalBarrel(StorageBlocks.LOCKED_BARREL.get());
-        for (RegistryObject<LockedBarrelBlock> b : StorageBlocks.BARRELS.values()) {
+        for (IRegistryObject<LockedBarrelBlock> b : StorageBlocks.BARRELS.values()) {
             createMaterialBarrel(b.get());
         }
 
         createNormalHopper(StorageBlocks.LOCKED_HOPPER.get());
-        for (RegistryObject<LockedHopperBlock> b : StorageBlocks.HOPPERS.values()) {
+        for (IRegistryObject<LockedHopperBlock> b : StorageBlocks.HOPPERS.values()) {
             createMaterialHopper(b.get());
         }
 

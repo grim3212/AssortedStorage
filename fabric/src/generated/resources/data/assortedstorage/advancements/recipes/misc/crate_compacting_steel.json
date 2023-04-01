@@ -1,0 +1,60 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_pistons": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "c:pistons"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "assortedstorage:crate_compacting_steel"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_triple_crate": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "assortedstorage:crates/triple"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "upgrades"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:ingots/steel"
+          ]
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    [
+      "has_triple_crate",
+      "has_pistons",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "assortedstorage:crate_compacting_steel"
+    ]
+  }
+}

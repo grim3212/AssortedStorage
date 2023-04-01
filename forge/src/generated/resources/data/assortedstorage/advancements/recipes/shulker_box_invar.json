@@ -1,0 +1,58 @@
+{
+  "parent": "minecraft:recipes/root",
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "shulkers"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "forge:ingots/invar"
+        }
+      ]
+    }
+  ],
+  "criteria": {
+    "has_material": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:ingots/invar"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_shulker": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "assortedstorage:shulkers/level_3"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "assortedstorage:shulker_box_invar"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_shulker",
+      "has_material",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "assortedstorage:shulker_box_invar"
+    ]
+  }
+}

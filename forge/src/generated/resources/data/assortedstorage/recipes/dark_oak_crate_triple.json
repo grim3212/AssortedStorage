@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "conditions": [
+    {
+      "type": "assortedlib:part_enabled",
+      "part": "crates"
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "forge:chests/wooden"
+    },
+    "D": {
+      "tag": "forge:deepslate"
+    },
+    "L": {
+      "tag": "minecraft:dark_oak_logs"
+    }
+  },
+  "pattern": [
+    " D ",
+    "LCL",
+    "CDC"
+  ],
+  "result": {
+    "item": "assortedstorage:dark_oak_crate_triple"
+  }
+}

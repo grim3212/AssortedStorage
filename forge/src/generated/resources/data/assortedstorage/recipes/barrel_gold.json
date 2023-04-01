@@ -1,0 +1,34 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "barrels"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "forge:ingots/gold"
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:barrels/level_2"
+    },
+    "M": {
+      "tag": "forge:ingots/gold"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:barrel_gold"
+  }
+}

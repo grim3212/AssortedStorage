@@ -1,0 +1,36 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "barrels"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:ingots/silver"
+          ]
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:barrels/level_2"
+    },
+    "M": {
+      "tag": "c:ingots/silver"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:barrel_silver"
+  }
+}

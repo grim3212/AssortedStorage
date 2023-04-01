@@ -1,0 +1,34 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "bags"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "forge:ingots/netherite"
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:bags/level_4"
+    },
+    "M": {
+      "tag": "forge:ingots/netherite"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:bag_netherite"
+  }
+}

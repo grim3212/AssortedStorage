@@ -1,0 +1,34 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "barrels"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "forge:stone"
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "forge:barrels/wooden"
+    },
+    "M": {
+      "tag": "forge:stone"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:barrel_stone"
+  }
+}

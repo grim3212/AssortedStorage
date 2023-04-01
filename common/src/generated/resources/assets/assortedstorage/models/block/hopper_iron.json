@@ -1,0 +1,9 @@
+{
+  "loader": "assortedstorage:models/barrel",
+  "locked": {
+    "parent": "assortedstorage:block/hopper_iron_locked"
+  },
+  "unlocked": {
+    "parent": "assortedstorage:block/hopper_iron_unlocked"
+  }
+}

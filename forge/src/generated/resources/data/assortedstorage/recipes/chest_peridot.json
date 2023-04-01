@@ -1,0 +1,34 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "chests"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "forge:gems/peridot"
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:chests/level_1"
+    },
+    "M": {
+      "tag": "forge:gems/peridot"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:chest_peridot"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "hoppers"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:stone"
+          ]
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:hopper"
+    },
+    "M": {
+      "tag": "c:stone"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:hopper_stone"
+  }
+}

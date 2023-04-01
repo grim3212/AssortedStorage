@@ -1,0 +1,43 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "upgrades"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:ingots/bronze"
+          ]
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:crates"
+    },
+    "D": {
+      "tag": "c:deepslate"
+    },
+    "I": {
+      "tag": "c:ingots/bronze"
+    },
+    "R": {
+      "item": "minecraft:repeater"
+    }
+  },
+  "pattern": [
+    "DDD",
+    "RCR",
+    "DID"
+  ],
+  "result": {
+    "item": "assortedstorage:crate_bridge"
+  }
+}

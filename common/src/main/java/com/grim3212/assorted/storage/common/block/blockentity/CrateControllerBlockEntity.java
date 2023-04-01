@@ -1,20 +1,24 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
 import com.google.common.collect.Queues;
-import com.grim3212.assorted.lib.core.inventory.INamed;
-import com.grim3212.assorted.lib.core.inventory.LockedWorldlyContainer;
+import com.grim3212.assorted.lib.client.model.data.IBlockModelData;
+import com.grim3212.assorted.lib.client.model.data.IModelDataBuilder;
+import com.grim3212.assorted.lib.core.block.IBlockEntityWithModelData;
+import com.grim3212.assorted.lib.core.inventory.*;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
+import com.grim3212.assorted.lib.platform.Services;
+import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.StorageCommonMod;
 import com.grim3212.assorted.storage.api.crates.CrateConnection;
 import com.grim3212.assorted.storage.api.crates.ICrateSystem;
 import com.grim3212.assorted.storage.common.inventory.crates.CrateControllerInvWrapper;
 import com.grim3212.assorted.storage.common.inventory.crates.CrateSidedInv;
+import com.grim3212.assorted.storage.common.properties.StorageModelProperties;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.InteractionHand;
@@ -31,7 +35,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CrateControllerBlockEntity extends BlockEntity implements LockedWorldlyContainer, INamed, ILockable {
+public class CrateControllerBlockEntity extends BlockEntity implements LockedWorldlyContainer, INamed, ILockable, IBlockEntityWithModelData, IInventoryBlockEntity {
 
     private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
     private Component customName;
@@ -44,6 +48,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
     private UUID playerTimerUUID;
     private long playerTimerMillis;
     private ItemStack playerTimerStack = ItemStack.EMPTY;
+    private IInventoryStorageHandler handler;
 
     public CrateControllerBlockEntity(BlockPos pos, BlockState state) {
         this(StorageBlockEntityTypes.CRATE_CONTROLLER.get(), pos, state);
@@ -53,6 +58,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
         super(type, pos, state);
 
         this.maxRange = StorageCommonMod.COMMON_CONFIG.maxControllerSearchRange.get();
+        this.handler = Services.INVENTORY.createStorageInventoryHandler(new CrateControllerInvWrapper(this, null));
     }
 
     @Override
@@ -112,20 +118,13 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
         return this.saveWithoutMetadata();
     }
 
-    @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        super.onDataPacket(net, pkt);
-        modelUpdate();
-    }
-
     public void modelUpdate() {
-        requestModelDataUpdate();
         this.level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
     }
 
     @Override
-    public ModelData getModelData() {
-        return ModelData.builder().with(ModelProperties.IS_LOCKED, this.isLocked()).build();
+    public @NotNull IBlockModelData getBlockModelData() {
+        return IModelDataBuilder.create().withInitial(StorageModelProperties.IS_LOCKED, this.isLocked()).build();
     }
 
     @Override
@@ -190,9 +189,10 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
             }
 
             if (this.getLevel().getBlockEntity(connection.getPos()) instanceof CrateBlockEntity crate) {
-                CrateSidedInv inv = crate.getCapability(ForgeCapabilities.ITEM_HANDLER, direction).<CrateSidedInv>cast().orElse(null);
-                if (inv != null) {
-                    ItemStack response = code.isEmpty() ? inv.insertItem(slot, itemStackIn, true) : inv.insertItem(slot, itemStackIn, true, code);
+
+                IItemStorageHandler storageHandler = Services.INVENTORY.getItemStorageHandler(crate, direction).orElse(null);
+                if (storageHandler != null && storageHandler instanceof CrateSidedInv crateInv) {
+                    ItemStack response = code.isEmpty() ? crateInv.insertItem(slot, itemStackIn, true) : crateInv.insertItem(slot, itemStackIn, true, code);
                     if (response != itemStackIn) {
                         return true;
                     }
@@ -223,9 +223,9 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
             }
 
             if (this.getLevel().getBlockEntity(connection.getPos()) instanceof CrateBlockEntity crate) {
-                CrateSidedInv inv = crate.getCapability(ForgeCapabilities.ITEM_HANDLER, direction).<CrateSidedInv>cast().orElse(null);
-                if (inv != null) {
-                    ItemStack response = code.isEmpty() ? inv.extractItem(slot, amount, true) : inv.extractItem(slot, amount, true, code);
+                IItemStorageHandler storageHandler = Services.INVENTORY.getItemStorageHandler(crate, direction).orElse(null);
+                if (storageHandler != null && storageHandler instanceof CrateSidedInv crateInv) {
+                    ItemStack response = code.isEmpty() ? crateInv.extractItem(slot, amount, true) : crateInv.extractItem(slot, amount, true, code);
                     if (!response.isEmpty()) {
                         return true;
                     }
@@ -242,23 +242,9 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        if (!this.remove && cap == ForgeCapabilities.ITEM_HANDLER) {
-            return storageItemHandler.cast();
-        }
-        return super.getCapability(cap, side);
-    }
-
-    private LazyOptional<?> storageItemHandler = LazyOptional.of(() -> createSidedHandler());
-
-    protected IItemHandler createSidedHandler() {
-        return new CrateControllerInvWrapper(this, null);
-    }
-
-    @Override
     public void setRemoved() {
         super.setRemoved();
-        this.storageItemHandler.invalidate();
+        this.handler.invalidate();
     }
 
     @Override
@@ -288,7 +274,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
 
     @Override
     public void setItem(int index, ItemStack stack) {
-        AssortedStorage.LOGGER.error("Controller called own setItem (This should not happen)");
+        Constants.LOG.error("Controller called own setItem (This should not happen)");
     }
 
     @Override
@@ -425,9 +411,9 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
             }
 
             if (this.getLevel().getBlockEntity(connection.getPos()) instanceof CrateBlockEntity crate) {
-                CrateSidedInv inv = crate.getCapability(ForgeCapabilities.ITEM_HANDLER).<CrateSidedInv>cast().orElse(null);
-                if (inv != null) {
-                    ItemStack response = inLockCode.isEmpty() ? inv.insertItem(slot, stack, simulate) : inv.insertItem(slot, stack, simulate, inLockCode);
+                IItemStorageHandler storageHandler = Services.INVENTORY.getItemStorageHandler(crate, null).orElse(null);
+                if (storageHandler != null && storageHandler instanceof CrateSidedInv crateInv) {
+                    ItemStack response = inLockCode.isEmpty() ? crateInv.insertItem(slot, stack, simulate) : crateInv.insertItem(slot, stack, simulate, inLockCode);
 
                     if (response != stack) {
                         return response;
@@ -456,9 +442,9 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
             }
 
             if (this.getLevel().getBlockEntity(connection.getPos()) instanceof CrateBlockEntity crate) {
-                CrateSidedInv inv = crate.getCapability(ForgeCapabilities.ITEM_HANDLER).<CrateSidedInv>cast().orElse(null);
-                if (inv != null) {
-                    ItemStack response = inLockCode.isEmpty() ? inv.extractItem(slot, amount, simulate) : inv.extractItem(slot, amount, simulate, inLockCode);
+                IItemStorageHandler storageHandler = Services.INVENTORY.getItemStorageHandler(crate, null).orElse(null);
+                if (storageHandler != null && storageHandler instanceof CrateSidedInv crateInv) {
+                    ItemStack response = inLockCode.isEmpty() ? crateInv.extractItem(slot, amount, simulate) : crateInv.extractItem(slot, amount, simulate, inLockCode);
                     if (!response.isEmpty()) {
                         return response;
                     }
@@ -539,5 +525,10 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
         }
 
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public IInventoryStorageHandler getStorageHandler() {
+        return null;
     }
 }

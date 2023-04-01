@@ -1,5 +1,6 @@
 package com.grim3212.assorted.storage.common.inventory.crates;
 
+import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.LockedItemHandler;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.LargeItemStack;
@@ -7,25 +8,13 @@ import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateCompactingBlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CrateSidedInv implements IItemHandlerModifiable, LockedItemHandler {
+public class CrateSidedInv implements IItemStorageHandler, LockedItemHandler {
     protected final CrateBlockEntity inv;
     @Nullable
     protected final Direction side;
-
-    @SuppressWarnings("unchecked")
-    public static LazyOptional<IItemHandlerModifiable>[] create(CrateBlockEntity inv, Direction... sides) {
-        LazyOptional<IItemHandlerModifiable>[] ret = new LazyOptional[sides.length];
-        for (int x = 0; x < sides.length; x++) {
-            final Direction side = sides[x];
-            ret[x] = LazyOptional.of(() -> new CrateSidedInv(inv, side));
-        }
-        return ret;
-    }
 
     public CrateSidedInv(CrateBlockEntity inv, @Nullable Direction side) {
         this.inv = inv;
@@ -220,14 +209,6 @@ public class CrateSidedInv implements IItemHandlerModifiable, LockedItemHandler 
     }
 
     @Override
-    public void setStackInSlot(int slot, @NotNull ItemStack stack) {
-        int slot1 = getSlot(inv, slot, side);
-
-        if (slot1 != -1)
-            inv.setItem(slot1, stack);
-    }
-
-    @Override
     @NotNull
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
         if (amount == 0)
@@ -304,5 +285,13 @@ public class CrateSidedInv implements IItemHandlerModifiable, LockedItemHandler 
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
         int slot1 = getSlot(inv, slot, side);
         return slot1 == -1 ? false : inv.canPlaceItem(slot1, stack);
+    }
+
+    @Override
+    public void setStackInSlot(int slot, @NotNull ItemStack stack) {
+        int slot1 = getSlot(inv, slot, side);
+
+        if (slot1 != -1)
+            inv.setItem(slot1, stack);
     }
 }

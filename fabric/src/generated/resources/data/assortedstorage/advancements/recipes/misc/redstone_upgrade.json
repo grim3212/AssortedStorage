@@ -1,0 +1,49 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_blank_upgrade": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "assortedstorage:blank_upgrade"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "assortedstorage:redstone_upgrade"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "crates"
+        },
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "upgrades"
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    [
+      "has_blank_upgrade",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "assortedstorage:redstone_upgrade"
+    ]
+  }
+}

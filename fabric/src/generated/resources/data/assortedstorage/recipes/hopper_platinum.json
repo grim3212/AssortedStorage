@@ -1,0 +1,36 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "hoppers"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:ingots/platinum"
+          ]
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:hoppers/level_4"
+    },
+    "M": {
+      "tag": "c:ingots/platinum"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:hopper_platinum"
+  }
+}

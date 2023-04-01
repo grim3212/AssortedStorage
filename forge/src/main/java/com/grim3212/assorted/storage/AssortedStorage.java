@@ -1,19 +1,18 @@
 package com.grim3212.assorted.storage;
 
+import com.grim3212.assorted.lib.data.ForgeBlockTagProvider;
+import com.grim3212.assorted.lib.data.ForgeItemTagProvider;
 import com.grim3212.assorted.storage.client.data.*;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
-import com.grim3212.assorted.storage.common.data.StorageBlockTagProvider;
-import com.grim3212.assorted.storage.common.data.StorageItemTagProvider;
-import com.grim3212.assorted.storage.common.data.StorageLootProvider;
-import com.grim3212.assorted.storage.common.data.StorageLootProvider.BlockTables;
-import com.grim3212.assorted.storage.common.data.StorageRecipes;
+import com.grim3212.assorted.storage.data.StorageBlockLoot;
+import com.grim3212.assorted.storage.data.StorageBlockTagProvider;
+import com.grim3212.assorted.storage.data.StorageItemTagProvider;
+import com.grim3212.assorted.storage.data.StorageRecipes;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -24,24 +23,21 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Mod(Constants.MOD_ID)
 public class AssortedStorage {
 
     public AssortedStorage() {
-        //TODO: Use mixins for capability inialization
-
         final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         modBus.addListener(this::setup);
         modBus.addListener(this::gatherData);
 
         StorageCommonMod.init();
-
-        Block
     }
 
     private void setup(final FMLCommonSetupEvent event) {
-
         event.enqueueWork(() -> {
             StorageBlocks.initDispenserHandlers();
         });
@@ -55,10 +51,10 @@ public class AssortedStorage {
 
         // Server
         datagenerator.addProvider(event.includeServer(), new StorageRecipes(packOutput));
-        StorageBlockTagProvider blockTagProvider = new StorageBlockTagProvider(packOutput, lookupProvider, fileHelper);
+        ForgeBlockTagProvider blockTagProvider = new ForgeBlockTagProvider(packOutput, lookupProvider, fileHelper, Constants.MOD_ID, new StorageBlockTagProvider(packOutput, lookupProvider));
         datagenerator.addProvider(event.includeServer(), blockTagProvider);
-        datagenerator.addProvider(event.includeServer(), new StorageItemTagProvider(packOutput, lookupProvider, blockTagProvider, fileHelper));
-        datagenerator.addProvider(event.includeServer(), new StorageLootProvider(packOutput, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(BlockTables::new, LootContextParamSets.BLOCK))));
+        datagenerator.addProvider(event.includeServer(), new ForgeItemTagProvider(packOutput, lookupProvider, blockTagProvider, fileHelper, Constants.MOD_ID, new StorageItemTagProvider(packOutput, lookupProvider, blockTagProvider)));
+        datagenerator.addProvider(event.includeServer(), new LootTableProvider(packOutput, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(() -> new StorageBlockLoot(() -> StorageBlocks.BLOCKS.getEntries().stream().map(Supplier::get).collect(Collectors.toList())), LootContextParamSets.BLOCK))));
 
         // Client
         LockedModelProvider barrelProvider = new LockedModelProvider(packOutput, fileHelper);

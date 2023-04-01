@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "assortedstorage:bag_emerald",
+    "assortedstorage:bag_peridot",
+    "assortedstorage:bag_nickel",
+    "assortedstorage:bag_sapphire",
+    "assortedstorage:bag_amethyst",
+    "assortedstorage:bag_lead"
+  ]
+}

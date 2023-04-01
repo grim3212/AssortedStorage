@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "assortedstorage:oak_crate",
+    "assortedstorage:spruce_crate",
+    "assortedstorage:birch_crate",
+    "assortedstorage:acacia_crate",
+    "assortedstorage:jungle_crate",
+    "assortedstorage:dark_oak_crate",
+    "assortedstorage:crimson_crate",
+    "assortedstorage:warped_crate",
+    "assortedstorage:mangrove_crate"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "bags"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "forge:gems/topaz"
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:bags/level_0"
+    },
+    "M": {
+      "tag": "forge:gems/topaz"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:bag_topaz"
+  }
+}

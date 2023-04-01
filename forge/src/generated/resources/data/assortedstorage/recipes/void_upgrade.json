@@ -1,0 +1,35 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "crates"
+        },
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "upgrades"
+        }
+      ]
+    }
+  ],
+  "key": {
+    "O": {
+      "tag": "forge:obsidian"
+    },
+    "U": {
+      "item": "assortedstorage:blank_upgrade"
+    }
+  },
+  "pattern": [
+    "OOO",
+    "OUO",
+    "OOO"
+  ],
+  "result": {
+    "item": "assortedstorage:void_upgrade"
+  }
+}

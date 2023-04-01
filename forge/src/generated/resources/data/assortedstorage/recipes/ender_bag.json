@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "conditions": [
+    {
+      "type": "assortedlib:part_enabled",
+      "part": "bags"
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "forge:chests/ender"
+    },
+    "L": {
+      "tag": "forge:leather"
+    },
+    "S": {
+      "tag": "forge:string"
+    }
+  },
+  "pattern": [
+    "SLS",
+    "LCL",
+    "LLL"
+  ],
+  "result": {
+    "item": "assortedstorage:ender_bag"
+  }
+}

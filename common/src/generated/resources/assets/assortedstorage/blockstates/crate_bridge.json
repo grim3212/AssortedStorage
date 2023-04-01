@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "assortedstorage:block/crate_bridge"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "hoppers"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "forge:ingots/lead"
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:hoppers/level_1"
+    },
+    "M": {
+      "tag": "forge:ingots/lead"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:hopper_lead"
+  }
+}

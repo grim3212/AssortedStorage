@@ -1,0 +1,35 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "upgrades"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "forge:ingots/silver"
+        }
+      ]
+    }
+  ],
+  "key": {
+    "B": {
+      "item": "assortedstorage:blank_upgrade"
+    },
+    "M": {
+      "tag": "forge:ingots/silver"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MBM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:level_upgrade_silver"
+  }
+}

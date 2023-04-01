@@ -1,0 +1,43 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "upgrades"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:ingots/aluminum"
+          ]
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:crates/triple"
+    },
+    "D": {
+      "tag": "c:deepslate"
+    },
+    "I": {
+      "tag": "c:ingots/aluminum"
+    },
+    "P": {
+      "tag": "c:pistons"
+    }
+  },
+  "pattern": [
+    "DDD",
+    "PCP",
+    "DID"
+  ],
+  "result": {
+    "item": "assortedstorage:crate_compacting"
+  }
+}

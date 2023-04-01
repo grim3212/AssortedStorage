@@ -1,0 +1,36 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "barrels"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:ingots/platinum"
+          ]
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:barrels/level_4"
+    },
+    "M": {
+      "tag": "c:ingots/platinum"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:barrel_platinum"
+  }
+}

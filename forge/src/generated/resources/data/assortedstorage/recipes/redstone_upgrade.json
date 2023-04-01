@@ -1,0 +1,42 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "crates"
+        },
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "upgrades"
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:comparator"
+    },
+    "D": {
+      "tag": "forge:dusts/redstone"
+    },
+    "R": {
+      "item": "minecraft:repeater"
+    },
+    "U": {
+      "item": "assortedstorage:blank_upgrade"
+    }
+  },
+  "pattern": [
+    "DCD",
+    "RUR",
+    "DCD"
+  ],
+  "result": {
+    "count": 2,
+    "item": "assortedstorage:redstone_upgrade"
+  }
+}

@@ -1,28 +1,17 @@
 package com.grim3212.assorted.storage.common.inventory.crates;
 
+import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.LockedItemHandler;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateControllerBlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CrateControllerInvWrapper implements IItemHandlerModifiable, LockedItemHandler {
+public class CrateControllerInvWrapper implements IItemStorageHandler, LockedItemHandler {
     protected final CrateControllerBlockEntity inv;
     @Nullable
     protected final Direction side;
-
-    @SuppressWarnings("unchecked")
-    public static LazyOptional<IItemHandlerModifiable>[] create(CrateControllerBlockEntity inv, Direction... sides) {
-        LazyOptional<IItemHandlerModifiable>[] ret = new LazyOptional[sides.length];
-        for (int x = 0; x < sides.length; x++) {
-            final Direction side = sides[x];
-            ret[x] = LazyOptional.of(() -> new CrateControllerInvWrapper(inv, side));
-        }
-        return ret;
-    }
 
     public CrateControllerInvWrapper(CrateControllerBlockEntity inv, @Nullable Direction side) {
         this.inv = inv;
@@ -64,10 +53,6 @@ public class CrateControllerInvWrapper implements IItemHandlerModifiable, Locked
     }
 
     @Override
-    public void setStackInSlot(int slot, @NotNull ItemStack stack) {
-    }
-
-    @Override
     @NotNull
     public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
         return inv.insertItem(slot, stack, simulate, "");
@@ -99,5 +84,9 @@ public class CrateControllerInvWrapper implements IItemHandlerModifiable, Locked
     @Override
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
         return inv.canPlaceItem(slot, stack);
+    }
+
+    @Override
+    public void setStackInSlot(int slot, @NotNull ItemStack stack) {
     }
 }

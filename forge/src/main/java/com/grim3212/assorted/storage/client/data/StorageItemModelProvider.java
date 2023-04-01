@@ -1,5 +1,6 @@
 package com.grim3212.assorted.storage.client.data;
 
+import com.grim3212.assorted.lib.registry.IRegistryObject;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.common.block.LockedChestBlock;
@@ -18,7 +19,6 @@ import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,11 +51,11 @@ public class StorageItemModelProvider extends ItemModelProvider {
         items.add(StorageBlocks.LOCKED_CHEST.get().asItem());
         items.add(StorageBlocks.LOCKED_SHULKER_BOX.get().asItem());
 
-        for (RegistryObject<LockedChestBlock> b : StorageBlocks.CHESTS.values()) {
+        for (IRegistryObject<LockedChestBlock> b : StorageBlocks.CHESTS.values()) {
             items.add(b.get().asItem());
         }
 
-        for (RegistryObject<LockedShulkerBoxBlock> b : StorageBlocks.SHULKERS.values()) {
+        for (IRegistryObject<LockedShulkerBoxBlock> b : StorageBlocks.SHULKERS.values()) {
             items.add(b.get().asItem());
         }
     }
@@ -77,11 +77,11 @@ public class StorageItemModelProvider extends ItemModelProvider {
         generateBag(StorageItems.BAG.get());
         generateEnderBag(StorageItems.ENDER_BAG.get());
 
-        for (RegistryObject<BagItem> bag : StorageItems.BAGS.values()) {
+        for (IRegistryObject<BagItem> bag : StorageItems.BAGS.values()) {
             generateMaterialBag(bag.get());
         }
 
-        for (RegistryObject<LockedHopperBlock> b : StorageBlocks.HOPPERS.values()) {
+        for (IRegistryObject<LockedHopperBlock> b : StorageBlocks.HOPPERS.values()) {
             generatedItem(b.get().asItem());
         }
 
@@ -90,7 +90,7 @@ public class StorageItemModelProvider extends ItemModelProvider {
         generatedItem(StorageItems.REDSTONE_UPGRADE.get());
         generatedItem(StorageItems.AMOUNT_UPGRADE.get());
         generatedItem(StorageItems.GLOW_UPGRADE.get());
-        for (RegistryObject<LevelUpgradeItem> levelUpgrade : StorageItems.LEVEL_UPGRADES.values()) {
+        for (IRegistryObject<LevelUpgradeItem> levelUpgrade : StorageItems.LEVEL_UPGRADES.values()) {
             generatedItem(levelUpgrade.get());
         }
     }

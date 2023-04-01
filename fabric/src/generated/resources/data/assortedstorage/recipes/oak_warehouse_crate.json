@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "L": {
+      "tag": "minecraft:oak_logs"
+    },
+    "P": {
+      "item": "minecraft:oak_planks"
+    }
+  },
+  "pattern": [
+    "LLL",
+    "P P",
+    "PPP"
+  ],
+  "result": {
+    "item": "assortedstorage:oak_warehouse_crate"
+  }
+}

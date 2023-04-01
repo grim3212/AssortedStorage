@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "crates"
+        },
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "upgrades"
+        }
+      ]
+    }
+  ],
+  "ingredients": [
+    {
+      "item": "assortedstorage:blank_upgrade"
+    },
+    {
+      "tag": "minecraft:signs"
+    }
+  ],
+  "result": {
+    "item": "assortedstorage:amount_upgrade"
+  }
+}

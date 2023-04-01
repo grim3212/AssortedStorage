@@ -1,0 +1,41 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "upgrades"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "forge:ingots/steel"
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:crates/triple"
+    },
+    "D": {
+      "tag": "forge:deepslate"
+    },
+    "I": {
+      "tag": "forge:ingots/steel"
+    },
+    "P": {
+      "tag": "forge:pistons"
+    }
+  },
+  "pattern": [
+    "DDD",
+    "PCP",
+    "DID"
+  ],
+  "result": {
+    "item": "assortedstorage:crate_compacting"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "#c:storage/level_0_upgrades",
+    "#c:storage/level_1_upgrades",
+    "#c:storage/level_2_upgrades",
+    "#c:storage/level_3_upgrades",
+    "#c:storage/level_4_upgrades",
+    "#c:storage/level_5_upgrades"
+  ]
+}

@@ -1,6 +1,5 @@
 package com.grim3212.assorted.storage.common.block;
 
-import com.google.common.collect.Maps;
 import com.grim3212.assorted.lib.registry.IRegistryObject;
 import com.grim3212.assorted.lib.registry.RegistryProvider;
 import com.grim3212.assorted.storage.Constants;
@@ -22,6 +21,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -38,7 +38,7 @@ public class StorageBlocks {
     public static final IRegistryObject<GlassCabinetBlock> GLASS_CABINET = registerStorageItem("glass_cabinet", () -> new GlassCabinetBlock(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD)));
     public static final IRegistryObject<GoldSafeBlock> GOLD_SAFE = registerStorageItem("gold_safe", () -> new GoldSafeBlock(Block.Properties.of(Material.METAL).sound(SoundType.METAL)));
     public static final IRegistryObject<ObsidianSafeBlock> OBSIDIAN_SAFE = registerStorageItem("obsidian_safe", () -> new ObsidianSafeBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE)));
-    public static final IRegistryObject<LockerBlock> LOCKER = registerWithItem("locker", () -> new LockerBlock(Block.Properties.of(Material.METAL).sound(SoundType.METAL)), lockerItem());
+    public static final IRegistryObject<LockerBlock> LOCKER = registerLocker("locker", () -> new LockerBlock(Block.Properties.of(Material.METAL).sound(SoundType.METAL)));
     public static final IRegistryObject<ItemTowerBlock> ITEM_TOWER = registerStorageItem("item_tower", () -> new ItemTowerBlock(Block.Properties.of(Material.METAL).sound(SoundType.METAL)));
     public static final IRegistryObject<WarehouseCrateBlock> OAK_WAREHOUSE_CRATE = registerCrate("oak_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.OAK));
     public static final IRegistryObject<WarehouseCrateBlock> BIRCH_WAREHOUSE_CRATE = registerCrate("birch_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.BIRCH));
@@ -79,10 +79,10 @@ public class StorageBlocks {
     public static final IRegistryObject<CrateControllerBlock> CRATE_CONTROLLER = register("crate_controller", () -> new CrateControllerBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY).strength(1.5F, 6.0F).sound(SoundType.STONE)));
     public static final IRegistryObject<CrateBridgeBlock> CRATE_BRIDGE = register("crate_bridge", () -> new CrateBridgeBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY).strength(1.5F, 6.0F).sound(SoundType.STONE)));
 
-    public static final Map<StorageMaterial, IRegistryObject<LockedChestBlock>> CHESTS = Maps.newHashMap();
-    public static final Map<StorageMaterial, IRegistryObject<LockedBarrelBlock>> BARRELS = Maps.newHashMap();
-    public static final Map<StorageMaterial, IRegistryObject<LockedHopperBlock>> HOPPERS = Maps.newHashMap();
-    public static final Map<StorageMaterial, IRegistryObject<LockedShulkerBoxBlock>> SHULKERS = Maps.newHashMap();
+    public static final Map<StorageMaterial, IRegistryObject<LockedChestBlock>> CHESTS = new HashMap<>();
+    public static final Map<StorageMaterial, IRegistryObject<LockedBarrelBlock>> BARRELS = new HashMap<>();
+    public static final Map<StorageMaterial, IRegistryObject<LockedHopperBlock>> HOPPERS = new HashMap<>();
+    public static final Map<StorageMaterial, IRegistryObject<LockedShulkerBoxBlock>> SHULKERS = new HashMap<>();
     public static final List<CrateGroup> CRATES = new ArrayList<>();
 
     static {
@@ -109,10 +109,6 @@ public class StorageBlocks {
                 StorageBlocks.LOCKED_GLASS_DOOR.get(), StorageBlocks.LOCKED_STEEL_DOOR.get(), StorageBlocks.LOCKED_CHAIN_LINK_DOOR.get()};
     }
 
-    public static Block[] warehouseCrates() {
-        return new Block[]{StorageBlocks.OAK_WAREHOUSE_CRATE.get(), StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get(), StorageBlocks.BIRCH_WAREHOUSE_CRATE.get(), StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get(), StorageBlocks.ACACIA_WAREHOUSE_CRATE.get(), StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get(), StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get(), StorageBlocks.WARPED_WAREHOUSE_CRATE.get(), StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get()};
-    }
-
     private static <T extends Block> IRegistryObject<T> register(String name, Supplier<? extends T> sup) {
         return register(name, sup, block -> item(block));
     }
@@ -133,8 +129,8 @@ public class StorageBlocks {
         return register(name, sup, block -> shulkerItem(block));
     }
 
-    private static <T extends Block> IRegistryObject<T> registerWithItem(String name, Supplier<? extends T> sup, Supplier<BlockItem> blockItem) {
-        return register(name, sup, block -> blockItem);
+    private static <T extends Block> IRegistryObject<T> registerLocker(String name, Supplier<? extends T> sup) {
+        return register(name, sup, block -> lockerItem(block));
     }
 
     private static <T extends Block> IRegistryObject<T> register(String name, Supplier<? extends T> sup, Function<IRegistryObject<T>, Supplier<? extends Item>> itemCreator) {
@@ -167,8 +163,8 @@ public class StorageBlocks {
         return () -> new ShulkerBoxBlockItem(block.get(), new Item.Properties());
     }
 
-    private static Supplier<BlockItem> lockerItem() {
-        return () -> new LockerItem(new Item.Properties());
+    private static Supplier<BlockItem> lockerItem(final IRegistryObject<? extends Block> lockerBlock) {
+        return () -> new LockerItem(lockerBlock.get(), new Item.Properties());
     }
 
     public static final class CrateGroup {

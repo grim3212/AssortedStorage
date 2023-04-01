@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "values": [
+        "c:ingots/steel"
+      ]
+    }
+  ],
+  "key": {
+    "B": {
+      "tag": "c:rods/blaze"
+    },
+    "I": {
+      "tag": "c:ingots/steel"
+    },
+    "S": {
+      "tag": "c:rods/wooden"
+    }
+  },
+  "pattern": [
+    "I I",
+    " S ",
+    " B "
+  ],
+  "result": {
+    "item": "assortedstorage:rotator_majig"
+  }
+}

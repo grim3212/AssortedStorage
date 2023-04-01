@@ -5,11 +5,9 @@ import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
-import com.grim3212.assorted.storage.common.inventory.enderbag.EnderBagCapabilityProvider;
 import com.grim3212.assorted.storage.common.inventory.enderbag.EnderBagContainer;
 import com.grim3212.assorted.storage.common.inventory.keyring.KeyRingItemHandler;
 import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -39,11 +37,6 @@ public class EnderBagItem extends Item {
     @LoaderImplement(loader = LoaderImplement.Loader.FABRIC, value = "FabricItem")
     public boolean allowNbtUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
         return false;
-    }
-
-    @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
-        return new EnderBagCapabilityProvider(stack, nbt);
     }
 
     @Override

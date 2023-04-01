@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "upgrades"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:gems/peridot"
+          ]
+        }
+      ]
+    }
+  ],
+  "key": {
+    "B": {
+      "item": "assortedstorage:blank_upgrade"
+    },
+    "M": {
+      "tag": "c:gems/peridot"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MBM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:level_upgrade_peridot"
+  }
+}

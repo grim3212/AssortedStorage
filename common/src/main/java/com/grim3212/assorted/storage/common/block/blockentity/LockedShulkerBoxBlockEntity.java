@@ -1,9 +1,12 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
+import com.grim3212.assorted.lib.core.inventory.IInventoryBlockEntity;
+import com.grim3212.assorted.lib.core.inventory.IInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.LockedWorldlyContainer;
-import com.grim3212.assorted.lib.core.inventory.impl.LockedSidedInvWrapper;
+import com.grim3212.assorted.lib.core.inventory.impl.LockedSidedStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
+import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.api.block.IStorageMaterial;
@@ -43,7 +46,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class LockedShulkerBoxBlockEntity extends RandomizableContainerBlockEntity implements LockedWorldlyContainer, ILockable {
+public class LockedShulkerBoxBlockEntity extends RandomizableContainerBlockEntity implements LockedWorldlyContainer, ILockable, IInventoryBlockEntity {
 
     private final StorageMaterial storageMaterial;
     private int openCount;
@@ -55,12 +58,15 @@ public class LockedShulkerBoxBlockEntity extends RandomizableContainerBlockEntit
     private DyeColor color = null;
     private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
 
+    private final IInventoryStorageHandler handler;
+
     public LockedShulkerBoxBlockEntity(StorageMaterial storageMaterial, BlockPos pos, BlockState state) {
         super(StorageBlockEntityTypes.LOCKED_SHULKER_BOX.get(), pos, state);
         this.storageMaterial = storageMaterial;
         int totalItems = storageMaterial != null ? storageMaterial.totalItems() : 27;
         this.itemStacks = NonNullList.withSize(totalItems, ItemStack.EMPTY);
         this.slots = IntStream.range(0, totalItems).toArray();
+        this.handler = this.createStorageHandler();
     }
 
     public LockedShulkerBoxBlockEntity(BlockPos pos, BlockState state) {
@@ -74,6 +80,22 @@ public class LockedShulkerBoxBlockEntity extends RandomizableContainerBlockEntit
         }
         this.itemStacks = NonNullList.withSize(totalItems, ItemStack.EMPTY);
         this.slots = IntStream.range(0, totalItems).toArray();
+        this.handler = this.createStorageHandler();
+    }
+
+    private IInventoryStorageHandler createStorageHandler() {
+        return Services.INVENTORY.createStorageInventoryHandler(new LockedSidedStorageHandler(this, Direction.UP));
+    }
+
+    @Override
+    public IInventoryStorageHandler getStorageHandler() {
+        return this.handler;
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        this.handler.invalidate();
     }
 
     public int colorToSave() {
@@ -308,11 +330,6 @@ public class LockedShulkerBoxBlockEntity extends RandomizableContainerBlockEntit
     }
 
     @Override
-    protected IItemHandler createUnSidedHandler() {
-        return new LockedSidedInvWrapper(this, Direction.UP);
-    }
-
-    @Override
     protected AbstractContainerMenu createMenu(int windowId, Inventory playerInv) {
         return new LockedMaterialContainer(StorageContainerTypes.SHULKERS.get(storageMaterial).get(), windowId, playerInv, this, storageMaterial, true);
     }
@@ -356,4 +373,5 @@ public class LockedShulkerBoxBlockEntity extends RandomizableContainerBlockEntit
 
         this.setChanged();
     }
+
 }

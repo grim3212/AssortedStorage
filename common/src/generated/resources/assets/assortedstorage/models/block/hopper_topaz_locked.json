@@ -1,0 +1,10 @@
+{
+  "parent": "assortedstorage:block/template_hopper",
+  "textures": {
+    "inside": "assortedstorage:block/hoppers/topaz/hopper_inside",
+    "particle": "assortedstorage:block/hoppers/topaz/hopper_outside",
+    "side": "assortedstorage:block/hoppers/topaz/hopper_outside",
+    "top": "assortedstorage:block/hoppers/topaz/hopper_top",
+    "topsides": "assortedstorage:block/hoppers/topaz/locked_hopper_outside"
+  }
+}

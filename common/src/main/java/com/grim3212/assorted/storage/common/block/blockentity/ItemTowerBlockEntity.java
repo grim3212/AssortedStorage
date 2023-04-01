@@ -1,5 +1,8 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
+import com.grim3212.assorted.lib.core.inventory.IInventoryStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.impl.SidedStorageHandler;
+import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.client.model.ItemTowerModel;
 import com.grim3212.assorted.storage.client.model.StorageModelLayers;
@@ -14,11 +17,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
 import java.util.stream.IntStream;
 
@@ -31,6 +29,10 @@ public class ItemTowerBlockEntity extends BaseStorageBlockEntity {
         super(StorageBlockEntityTypes.ITEM_TOWER.get(), pos, state, 18);
     }
 
+    @Override
+    public IInventoryStorageHandler createStorageHandler() {
+        return Services.INVENTORY.createStorageInventoryHandler(new SidedStorageHandler(new ItemTowerInventory(getItemTowers(), this.worldPosition), null));
+    }
 
     public void animate(int animId) {
         if (model == null) {
@@ -58,6 +60,10 @@ public class ItemTowerBlockEntity extends BaseStorageBlockEntity {
     }
 
     public NonNullList<ItemTowerBlockEntity> getItemTowers() {
+        if (this.level == null) {
+            return NonNullList.create();
+        }
+
         BlockState state = level.getBlockState(worldPosition);
         NonNullList<ItemTowerBlockEntity> itemTowers = NonNullList.create();
 
@@ -74,25 +80,5 @@ public class ItemTowerBlockEntity extends BaseStorageBlockEntity {
         }
 
         return itemTowers;
-    }
-
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        if (!this.remove && cap == ForgeCapabilities.ITEM_HANDLER) {
-            return itemTowerItemHandler.cast();
-        }
-        return super.getCapability(cap, side);
-    }
-
-    private LazyOptional<?> itemTowerItemHandler = LazyOptional.of(() -> createSidedHandler());
-
-    protected IItemHandler createSidedHandler() {
-        return new SidedInvWrapper(new ItemTowerInventory(getItemTowers(), this.worldPosition), null);
-    }
-
-    @Override
-    public void setRemoved() {
-        super.setRemoved();
-        this.itemTowerItemHandler.invalidate();
     }
 }

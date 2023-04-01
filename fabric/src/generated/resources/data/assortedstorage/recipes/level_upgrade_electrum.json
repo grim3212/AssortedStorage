@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "upgrades"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:ingots/electrum"
+          ]
+        }
+      ]
+    }
+  ],
+  "key": {
+    "B": {
+      "item": "assortedstorage:blank_upgrade"
+    },
+    "M": {
+      "tag": "c:ingots/electrum"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MBM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:level_upgrade_electrum"
+  }
+}

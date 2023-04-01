@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "conditions": [
+    {
+      "type": "assortedlib:item_tag_populated",
+      "tag": "forge:ingots/aluminum"
+    }
+  ],
+  "key": {
+    "B": {
+      "tag": "forge:rods/blaze"
+    },
+    "I": {
+      "tag": "forge:ingots/aluminum"
+    },
+    "S": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "pattern": [
+    "I I",
+    " B ",
+    " S "
+  ],
+  "result": {
+    "item": "assortedstorage:rotator_majig"
+  }
+}

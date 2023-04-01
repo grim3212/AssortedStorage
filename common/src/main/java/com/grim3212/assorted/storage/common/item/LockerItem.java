@@ -1,17 +1,17 @@
 package com.grim3212.assorted.storage.common.item;
 
 import com.grim3212.assorted.storage.common.block.LockerBlock;
-import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class LockerItem extends BlockItem {
 
-    public LockerItem(Properties builder) {
-        super(StorageBlocks.LOCKER.get(), builder);
+    public LockerItem(Block locker, Properties builder) {
+        super(locker, builder);
     }
 
     @Override

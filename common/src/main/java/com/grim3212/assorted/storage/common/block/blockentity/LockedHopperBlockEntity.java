@@ -1,8 +1,13 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
+import com.grim3212.assorted.lib.client.model.data.IBlockModelData;
+import com.grim3212.assorted.lib.client.model.data.IModelDataBuilder;
+import com.grim3212.assorted.lib.core.block.IBlockEntityWithModelData;
+import com.grim3212.assorted.lib.core.inventory.IInventoryStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.LockedItemHandler;
 import com.grim3212.assorted.lib.core.inventory.LockedWorldlyContainer;
-import com.grim3212.assorted.lib.core.inventory.impl.LockedSidedInvWrapper;
+import com.grim3212.assorted.lib.core.inventory.impl.LockedSidedStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
@@ -11,14 +16,14 @@ import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.inventory.LockedHopperContainer;
 import com.grim3212.assorted.storage.common.inventory.LockedMaterialContainer;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
+import com.grim3212.assorted.storage.common.properties.StorageModelProperties;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.WorldlyContainerHolder;
@@ -40,6 +45,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,7 +56,7 @@ import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements Hopper {
+public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements Hopper, IBlockEntityWithModelData {
 
     private int cooldownTime = -1;
     private long tickedGameTime;
@@ -71,6 +77,11 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
         }
 
         this.slots = IntStream.range(0, this.getContainerSize()).toArray();
+    }
+
+    @Override
+    public IInventoryStorageHandler createStorageHandler() {
+        return Services.INVENTORY.createStorageInventoryHandler(new ItemHandler(this));
     }
 
     public static int getHopperCooldown(StorageMaterial storageMaterial) {
@@ -97,26 +108,16 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
     }
 
     @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-        super.onDataPacket(net, pkt);
-        requestModelDataUpdate();
-        if (level instanceof ClientLevel) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
-        }
-    }
-
-    @Override
     public void setLockCode(String s) {
         super.setLockCode(s);
-        requestModelDataUpdate();
         if (level instanceof ClientLevel) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
         }
     }
 
     @Override
-    public ModelData getModelData() {
-        return ModelData.builder().with(ModelProperties.IS_LOCKED, this.isLocked()).build();
+    public @NotNull IBlockModelData getBlockModelData() {
+        return IModelDataBuilder.create().withInitial(StorageModelProperties.IS_LOCKED, this.isLocked()).build();
     }
 
     @Override
@@ -153,11 +154,6 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
         }
 
         return i;
-    }
-
-    @Override
-    protected IItemHandler createSidedHandler() {
-        return new ItemHandler(this);
     }
 
     public static void pushItemsTick(Level level, BlockPos pos, BlockState state, LockedHopperBlockEntity hopperBE) {
@@ -207,7 +203,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
         return true;
     }
 
-    private static boolean isEmpty(IItemHandler itemHandler) {
+    private static boolean isEmpty(IItemStorageHandler itemHandler) {
         for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
             ItemStack stackInSlot = itemHandler.getStackInSlot(slot);
             if (stackInSlot.getCount() > 0) {
@@ -217,14 +213,31 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
         return true;
     }
 
-    private static Optional<Pair<IItemHandler, Object>> getItemHandler(Level level, Hopper hopper, Direction hopperFacing) {
+    private static Optional<Pair<IItemStorageHandler, Object>> getItemHandler(Level level, Hopper hopper, Direction hopperFacing) {
         double x = hopper.getLevelX() + (double) hopperFacing.getStepX();
         double y = hopper.getLevelY() + (double) hopperFacing.getStepY();
         double z = hopper.getLevelZ() + (double) hopperFacing.getStepZ();
-        return VanillaInventoryCodeHooks.getItemHandler(level, x, y, z, hopperFacing.getOpposite());
+        return getItemHandler(level, x, y, z, hopperFacing.getOpposite());
     }
 
-    private static boolean isFull(IItemHandler itemHandler) {
+    private static Optional<Pair<IItemStorageHandler, Object>> getItemHandler(Level worldIn, double x, double y, double z, final Direction side) {
+        int i = Mth.floor(x);
+        int j = Mth.floor(y);
+        int k = Mth.floor(z);
+        BlockPos blockpos = new BlockPos(i, j, k);
+        net.minecraft.world.level.block.state.BlockState state = worldIn.getBlockState(blockpos);
+
+        if (state.hasBlockEntity()) {
+            BlockEntity blockEntity = worldIn.getBlockEntity(blockpos);
+            if (blockEntity != null) {
+                return Services.INVENTORY.getItemStorageHandler(blockEntity, side).map(storageHandler -> ImmutablePair.of(storageHandler, blockEntity));
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private static boolean isFull(IItemStorageHandler itemHandler) {
         for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
             ItemStack stackInSlot = itemHandler.getStackInSlot(slot);
             if (stackInSlot.isEmpty() || stackInSlot.getCount() < itemHandler.getSlotLimit(slot)) {
@@ -234,14 +247,14 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
         return true;
     }
 
-    private static ItemStack putStackInInventoryAllSlots(LockedHopperBlockEntity source, Object destination, IItemHandler destInventory, ItemStack stack) {
+    private static ItemStack putStackInInventoryAllSlots(LockedHopperBlockEntity source, Object destination, IItemStorageHandler destInventory, ItemStack stack) {
         for (int slot = 0; slot < destInventory.getSlots() && !stack.isEmpty(); slot++) {
             stack = insertStack(source, destination, destInventory, stack, slot);
         }
         return stack;
     }
 
-    private static ItemStack insertStack(LockedHopperBlockEntity source, Object destination, IItemHandler destInventory, ItemStack stack, int slot) {
+    private static ItemStack insertStack(LockedHopperBlockEntity source, Object destination, IItemStorageHandler destInventory, ItemStack stack, int slot) {
         ItemStack itemstack = destInventory.getStackInSlot(slot);
 
         if (destInventory.insertItem(slot, stack, true).isEmpty()) {
@@ -313,7 +326,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
     private static boolean insertHook(LockedHopperBlockEntity hopper) {
         Direction hopperFacing = hopper.getBlockState().getValue(LockedHopperBlock.FACING);
         return getItemHandler(hopper.getLevel(), hopper, hopperFacing).map(destinationResult -> {
-            IItemHandler itemHandler = destinationResult.getKey();
+            IItemStorageHandler itemHandler = destinationResult.getKey();
             Object destination = destinationResult.getValue();
             if (isFull(itemHandler)) {
                 return false;
@@ -340,7 +353,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
     @Nullable
     public static Boolean extractHook(Level level, LockedHopperBlockEntity dest) {
         return getItemHandler(level, dest, Direction.UP).map(itemHandlerResult -> {
-            IItemHandler handler = itemHandlerResult.getKey();
+            IItemStorageHandler handler = itemHandlerResult.getKey();
 
             if (handler instanceof LockedItemHandler lockedItemHandler) {
                 for (int i = 0; i < handler.getSlots(); i++) {
@@ -669,7 +682,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
         return this.tickedGameTime;
     }
 
-    public static class ItemHandler extends LockedSidedInvWrapper {
+    public static class ItemHandler extends LockedSidedStorageHandler {
         private final LockedHopperBlockEntity hopper;
 
         public ItemHandler(LockedHopperBlockEntity hopper) {
@@ -683,7 +696,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
             if (simulate) {
                 return super.insertItem(slot, stack, simulate);
             } else {
-                boolean wasEmpty = getInv().isEmpty();
+                boolean wasEmpty = getLockedContainer().isEmpty();
 
                 int originalStackSize = stack.getCount();
                 stack = super.insertItem(slot, stack, simulate);

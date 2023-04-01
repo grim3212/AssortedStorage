@@ -1,10 +1,13 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
+import com.grim3212.assorted.lib.core.inventory.IInventoryBlockEntity;
+import com.grim3212.assorted.lib.core.inventory.IInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.INamed;
 import com.grim3212.assorted.lib.core.inventory.LockedWorldlyContainer;
-import com.grim3212.assorted.lib.core.inventory.impl.LockedSidedInvWrapper;
+import com.grim3212.assorted.lib.core.inventory.impl.LockedSidedStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
+import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.blockentity.IStorage;
 import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
@@ -34,7 +37,7 @@ import net.minecraft.world.phys.AABB;
 import javax.annotation.Nullable;
 import java.util.stream.IntStream;
 
-public abstract class BaseStorageBlockEntity extends BlockEntity implements LockedWorldlyContainer, MenuProvider, INamed, IStorage, ILockable {
+public abstract class BaseStorageBlockEntity extends BlockEntity implements LockedWorldlyContainer, MenuProvider, INamed, IStorage, ILockable, IInventoryBlockEntity {
 
     private NonNullList<ItemStack> chestContents;
     protected int numPlayersUsing;
@@ -43,6 +46,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Lock
     protected float prevRotation;
     private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
     private Component customName;
+    private IInventoryStorageHandler handler;
 
     protected BaseStorageBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         this(typeIn, pos, state, 27);
@@ -53,6 +57,13 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Lock
 
         if (this.selfInventory())
             setStartingContents(inventorySize);
+
+        if (this.level != null)
+            this.handler = this.createStorageHandler();
+    }
+
+    public IInventoryStorageHandler createStorageHandler() {
+        return Services.INVENTORY.createStorageInventoryHandler(new LockedSidedStorageHandler(this, null));
     }
 
     public void setStartingContents(int inventorySize) {
@@ -293,27 +304,23 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Lock
         return this.chestContents;
     }
 
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        if (!this.remove && cap == ForgeCapabilities.ITEM_HANDLER) {
-            return storageItemHandler.cast();
-        }
-        return super.getCapability(cap, side);
-    }
-
-    private LazyOptional<?> storageItemHandler = LazyOptional.of(() -> createSidedHandler());
-
-    protected IItemHandler createSidedHandler() {
-        return new LockedSidedInvWrapper(this, null);
-    }
-
     /**
      * invalidates a tile entity
      */
     @Override
     public void setRemoved() {
         super.setRemoved();
-        this.storageItemHandler.invalidate();
+        this.handler.invalidate();
+    }
+
+    @Override
+    public IInventoryStorageHandler getStorageHandler() {
+        return this.handler;
+    }
+
+    public void setStorageHandler(IInventoryStorageHandler newHandler) {
+        this.handler.invalidate();
+        this.handler = newHandler;
     }
 
     @Override

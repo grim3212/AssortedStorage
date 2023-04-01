@@ -1,0 +1,10 @@
+{
+  "parent": "assortedstorage:block/template_hopper_side",
+  "textures": {
+    "inside": "assortedstorage:block/hoppers/lead/hopper_inside",
+    "particle": "assortedstorage:block/hoppers/lead/hopper_outside",
+    "side": "assortedstorage:block/hoppers/lead/hopper_outside",
+    "top": "assortedstorage:block/hoppers/lead/hopper_top",
+    "topsides": "assortedstorage:block/hoppers/lead/locked_hopper_outside"
+  }
+}

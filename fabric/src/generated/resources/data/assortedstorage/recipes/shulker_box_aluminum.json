@@ -1,0 +1,36 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "shulkers"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:ingots/aluminum"
+          ]
+        }
+      ]
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "assortedstorage:shulkers/level_0"
+    },
+    "M": {
+      "tag": "c:ingots/aluminum"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "item": "assortedstorage:shulker_box_aluminum"
+  }
+}

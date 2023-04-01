@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "fabric:load_conditions": [
+    {
+      "condition": "assortedlib:part_enabled",
+      "part": "crates"
+    }
+  ],
+  "key": {
+    "C": {
+      "tag": "c:chests/wooden"
+    },
+    "D": {
+      "tag": "c:deepslate"
+    },
+    "L": {
+      "tag": "minecraft:acacia_logs"
+    }
+  },
+  "pattern": [
+    "CDC",
+    "L L",
+    "CDC"
+  ],
+  "result": {
+    "item": "assortedstorage:acacia_crate_quadruple"
+  }
+}

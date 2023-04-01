@@ -135,7 +135,7 @@ public class StorageClient {
         });
 
         ClientServices.CLIENT.registerBEWLR((register) -> {
-            for (Block warehouseCrate : StorageBlocks.warehouseCrates()) {
+            for (Block warehouseCrate : StorageBlockEntityTypes.getWarehouseCrates()) {
                 register.registerBlockEntityWithoutLevelRenderer(warehouseCrate.asItem(), WarehouseCrateBEWLR.WAREHOUSE_CRATE_ITEM_RENDERER);
             }
 
@@ -147,10 +147,9 @@ public class StorageClient {
             register.registerBlockEntityWithoutLevelRenderer(StorageBlocks.LOCKED_ENDER_CHEST.get().asItem(), StorageBEWLR.STORAGE_ITEM_RENDERER);
             register.registerBlockEntityWithoutLevelRenderer(StorageBlocks.LOCKER.get().asItem(), LockerBEWLR.LOCKER_ITEM_RENDERER);
 
-            register.registerBlockEntityWithoutLevelRenderer(StorageBlocks.LOCKED_SHULKER_BOX.get().asItem(), new ShulkerBoxBEWLR(() -> Minecraft.getInstance().getBlockEntityRenderDispatcher(), () -> Minecraft.getInstance().getEntityModels(), StorageBlocks.LOCKED_SHULKER_BOX.get().defaultBlockState()));
-            StorageBlocks.SHULKERS.forEach((mat, r) -> {
-                register.registerBlockEntityWithoutLevelRenderer(r.get().asItem(), new ShulkerBoxBEWLR(() -> Minecraft.getInstance().getBlockEntityRenderDispatcher(), () -> Minecraft.getInstance().getEntityModels(), r.get().defaultBlockState()));
-            });
+            for (Block shulker : StorageBlockEntityTypes.getShulkers()) {
+                register.registerBlockEntityWithoutLevelRenderer(shulker.asItem(), new ShulkerBoxBEWLR(() -> Minecraft.getInstance().getBlockEntityRenderDispatcher(), () -> Minecraft.getInstance().getEntityModels(), shulker.defaultBlockState()));
+            }
 
             register.registerBlockEntityWithoutLevelRenderer(StorageBlocks.LOCKED_CHEST.get().asItem(), new ChestBEWLR(() -> Minecraft.getInstance().getBlockEntityRenderDispatcher(), () -> Minecraft.getInstance().getEntityModels(), StorageBlocks.LOCKED_CHEST.get().defaultBlockState()));
             StorageBlocks.CHESTS.forEach((mat, r) -> {

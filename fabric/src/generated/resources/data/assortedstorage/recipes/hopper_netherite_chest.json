@@ -1,0 +1,25 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "assortedlib:part_enabled",
+      "part": "hoppers"
+    }
+  ],
+  "key": {
+    "C": {
+      "item": "assortedstorage:chest_netherite"
+    },
+    "M": {
+      "tag": "c:ingots/iron"
+    }
+  },
+  "pattern": [
+    "M M",
+    "MCM",
+    " M "
+  ],
+  "result": {
+    "item": "assortedstorage:hopper_netherite"
+  }
+}

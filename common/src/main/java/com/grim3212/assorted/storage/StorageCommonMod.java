@@ -7,6 +7,7 @@ import com.grim3212.assorted.storage.common.crafting.StorageConditions;
 import com.grim3212.assorted.storage.common.crafting.StorageRecipeSerializers;
 import com.grim3212.assorted.storage.common.events.StorageEvents;
 import com.grim3212.assorted.storage.common.handlers.StorageCreativeItems;
+import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.loot.StorageLootConditions;
 import com.grim3212.assorted.storage.common.loot.StorageLootEntries;
 import com.grim3212.assorted.storage.common.network.StoragePackets;
@@ -22,6 +23,7 @@ public class StorageCommonMod {
     public static void init() {
         StorageBlocks.init();
         StorageBlockEntityTypes.init();
+        StorageItems.init();
         StoragePackets.init();
         StorageConditions.init();
         StorageLootConditions.init();

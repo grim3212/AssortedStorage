@@ -1,0 +1,28 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "conditions": [
+    {
+      "type": "assortedlib:part_enabled",
+      "part": "bags"
+    }
+  ],
+  "key": {
+    "C": {
+      "item": "assortedstorage:chest_steel"
+    },
+    "L": {
+      "tag": "forge:leather"
+    },
+    "S": {
+      "tag": "forge:string"
+    }
+  },
+  "pattern": [
+    "SLS",
+    "LCL",
+    "LLL"
+  ],
+  "result": {
+    "item": "assortedstorage:bag_steel"
+  }
+}

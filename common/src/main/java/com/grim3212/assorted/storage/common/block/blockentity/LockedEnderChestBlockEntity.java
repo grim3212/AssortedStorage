@@ -1,5 +1,7 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
+import com.grim3212.assorted.lib.core.inventory.IInventoryStorageHandler;
+import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.common.inventory.LockedEnderChestInventory;
 import com.grim3212.assorted.storage.common.inventory.StorageContainer;
@@ -14,24 +16,30 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
-import javax.annotation.Nonnull;
-
 public class LockedEnderChestBlockEntity extends BaseStorageBlockEntity {
 
     private LockedEnderChestInventory inventory;
-    private LazyOptional<IItemHandler> inventoryLazy = LazyOptional.of(this::getInventory);
 
     public LockedEnderChestBlockEntity(BlockPos pos, BlockState state) {
         super(StorageBlockEntityTypes.LOCKED_ENDER_CHEST.get(), pos, state);
     }
 
-    @Nonnull
-    public IItemHandlerModifiable getInventory() {
+    public LockedEnderChestInventory getInventory() {
         if (level != null && inventory == null && isLocked()) {
-            inventory = EnderSavedData.get(level).getInventory(this.getStorageLockCode());
-            inventory.addWeakListener(this);
+            this.inventory = EnderSavedData.get(level).getInventory(this.getStorageLockCode());
+            this.inventory.addWeakListener(this);
+            this.setStorageHandler(Services.INVENTORY.createStorageInventoryHandler(this.inventory));
         }
-        return inventory;
+        return this.inventory;
+    }
+
+    @Override
+    public IInventoryStorageHandler createStorageHandler() {
+        if (level != null && inventory == null && isLocked()) {
+            this.inventory = EnderSavedData.get(level).getInventory(this.getStorageLockCode());
+            this.inventory.addWeakListener(this);
+        }
+        return Services.INVENTORY.createStorageInventoryHandler(this.inventory);
     }
 
     @Override
@@ -41,9 +49,6 @@ public class LockedEnderChestBlockEntity extends BaseStorageBlockEntity {
     }
 
     private void invalidateInventory() {
-        inventoryLazy.invalidate();
-        inventoryLazy = LazyOptional.of(this::getInventory);
-
         releasePreviousInventory();
     }
 
@@ -71,22 +76,13 @@ public class LockedEnderChestBlockEntity extends BaseStorageBlockEntity {
         return true;
     }
 
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        if (!this.remove && cap == ForgeCapabilities.ITEM_HANDLER) {
-            return inventoryLazy.cast();
-        }
-        return super.getCapability(cap, side);
-    }
-
     /**
      * invalidates a tile entity
      */
     @Override
     public void setRemoved() {
         this.remove = true;
-        this.invalidateCaps();
-        requestModelDataUpdate();
+        this.getStorageHandler().invalidate();
         invalidateInventory();
     }
 
