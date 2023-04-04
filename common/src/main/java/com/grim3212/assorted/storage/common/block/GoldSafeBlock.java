@@ -87,9 +87,9 @@ public class GoldSafeBlock extends BaseStorageBlock {
         BlockEntity tileentity = worldIn.getBlockEntity(pos);
         if (tileentity instanceof GoldSafeBlockEntity) {
             GoldSafeBlockEntity goldsafetileentity = (GoldSafeBlockEntity) tileentity;
-            if (!worldIn.isClientSide && player.isCreative() && !goldsafetileentity.isEmpty()) {
+            if (!worldIn.isClientSide && player.isCreative() && !goldsafetileentity.getItemStackStorageHandler().isEmpty()) {
                 ItemStack itemstack = new ItemStack(StorageBlocks.GOLD_SAFE.get());
-                CompoundTag compoundnbt = goldsafetileentity.saveToNbt(new CompoundTag());
+                CompoundTag compoundnbt = goldsafetileentity.getItemStackStorageHandler().serializeNBT();
                 if (!compoundnbt.isEmpty()) {
                     itemstack.addTagElement("BlockEntityTag", compoundnbt);
                 }
@@ -113,8 +113,8 @@ public class GoldSafeBlock extends BaseStorageBlock {
         if (tileentity instanceof GoldSafeBlockEntity) {
             GoldSafeBlockEntity goldsafetileentity = (GoldSafeBlockEntity) tileentity;
             builder = builder.withDynamicDrop(CONTENTS, (context, stackConsumer) -> {
-                for (int i = 0; i < goldsafetileentity.getContainerSize(); ++i) {
-                    stackConsumer.accept(goldsafetileentity.getItem(i));
+                for (int i = 0; i < goldsafetileentity.getItemStackStorageHandler().getSlots(); ++i) {
+                    stackConsumer.accept(goldsafetileentity.getItemStackStorageHandler().getStackInSlot(i));
                 }
 
             });

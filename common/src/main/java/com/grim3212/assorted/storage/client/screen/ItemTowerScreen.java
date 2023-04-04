@@ -1,5 +1,6 @@
 package com.grim3212.assorted.storage.client.screen;
 
+import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.common.inventory.ItemTowerContainer;
 import com.grim3212.assorted.storage.common.inventory.ItemTowerInventory;
@@ -11,7 +12,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 
 
@@ -19,7 +19,7 @@ public class ItemTowerScreen extends AbstractContainerScreen<ItemTowerContainer>
 
     private static final ResourceLocation ITEM_TOWER_TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/container/item_tower.png");
     private int rowId = 0;
-    private Container towerInventory;
+    private IItemStorageHandler towerInventory;
 
     public ItemTowerScreen(ItemTowerContainer container, Inventory playerInventory, Component title) {
         super(container, playerInventory, title);
@@ -43,9 +43,9 @@ public class ItemTowerScreen extends AbstractContainerScreen<ItemTowerContainer>
     @Override
     protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
         MutableComponent title = Component.literal(this.title.getString());
-        if (this.towerInventory.getContainerSize() > 18) {
+        if (this.towerInventory.getSlots() > 18) {
             title.append(Component.translatable(Constants.MOD_ID + ".container.item_tower.row", this.rowId + 1));
-            title.append(" " + this.towerInventory.getContainerSize() / 9);
+            title.append(" " + this.towerInventory.getSlots() / 9);
         }
 
         this.font.draw(matrixStack, title, 8.0F, 6.0F, 4210752);
@@ -64,7 +64,7 @@ public class ItemTowerScreen extends AbstractContainerScreen<ItemTowerContainer>
 
         this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
 
-        if (this.towerInventory != null && this.towerInventory.getContainerSize() > 18) {
+        if (this.towerInventory != null && this.towerInventory.getSlots() > 18) {
             RenderSystem.enableBlend();
             this.blit(matrixStack, i + this.imageWidth - 3, j, this.imageWidth, 0, 20, 57);
             RenderSystem.disableBlend();
@@ -73,10 +73,10 @@ public class ItemTowerScreen extends AbstractContainerScreen<ItemTowerContainer>
     }
 
     public void scrollInventory(boolean directionDown, boolean playSound) {
-        if (this.towerInventory != null && this.towerInventory.getContainerSize() > 18) {
+        if (this.towerInventory != null && this.towerInventory.getSlots() > 18) {
             int prevRowID = this.rowId;
             if (directionDown) {
-                if (this.rowId < this.towerInventory.getContainerSize() / 9 - 1)
+                if (this.rowId < this.towerInventory.getSlots() / 9 - 1)
                     this.rowId += 1;
                 else {
                     this.rowId = 0;
@@ -90,7 +90,7 @@ public class ItemTowerScreen extends AbstractContainerScreen<ItemTowerContainer>
                 if (this.rowId > 0)
                     this.rowId -= 1;
                 else {
-                    this.rowId = (this.towerInventory.getContainerSize() / 9 - 1);
+                    this.rowId = (this.towerInventory.getSlots() / 9 - 1);
                 }
 
                 if (this.towerInventory instanceof ItemTowerInventory) {

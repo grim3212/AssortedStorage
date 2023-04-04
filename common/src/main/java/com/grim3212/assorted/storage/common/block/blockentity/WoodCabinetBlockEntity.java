@@ -17,7 +17,7 @@ public class WoodCabinetBlockEntity extends BaseStorageBlockEntity {
 
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
-        return StorageContainer.createWoodCabinetContainer(windowId, player, this);
+        return StorageContainer.createWoodCabinetContainer(windowId, player, this.getItemStackStorageHandler());
     }
 
     @Override

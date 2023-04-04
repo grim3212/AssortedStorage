@@ -17,7 +17,7 @@ public class GlassCabinetBlockEntity extends BaseStorageBlockEntity {
 
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
-        return StorageContainer.createGlassCabinetContainer(windowId, player, this);
+        return StorageContainer.createGlassCabinetContainer(windowId, player, this.getItemStackStorageHandler());
     }
 
     @Override

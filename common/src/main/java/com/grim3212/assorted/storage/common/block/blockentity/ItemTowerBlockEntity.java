@@ -1,7 +1,6 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
 import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
-import com.grim3212.assorted.lib.core.inventory.impl.SidedStorageHandler;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.client.model.ItemTowerModel;
@@ -10,7 +9,6 @@ import com.grim3212.assorted.storage.common.inventory.ItemTowerContainer;
 import com.grim3212.assorted.storage.common.inventory.ItemTowerInventory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,20 +16,31 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.stream.IntStream;
-
 public class ItemTowerBlockEntity extends BaseStorageBlockEntity {
 
 
     public ItemTowerModel model;
+    private int lastTowerStack = 0;
 
     public ItemTowerBlockEntity(BlockPos pos, BlockState state) {
         super(StorageBlockEntityTypes.ITEM_TOWER.get(), pos, state, 18);
     }
 
     @Override
+    public IPlatformInventoryStorageHandler getStorageHandler() {
+        if (this.platformInventoryStorageHandler == null || this.lastTowerStack == 0 || this.lastTowerStack != getItemTowers().size()) {
+            this.platformInventoryStorageHandler = this.createStorageHandler();
+        }
+
+        return this.platformInventoryStorageHandler;
+
+    }
+
+    @Override
     public IPlatformInventoryStorageHandler createStorageHandler() {
-        return Services.INVENTORY.createStorageInventoryHandler(new SidedStorageHandler(new ItemTowerInventory(getItemTowers(), this.worldPosition), null));
+        NonNullList<ItemTowerBlockEntity> towers = getItemTowers();
+        this.lastTowerStack = towers.size();
+        return Services.INVENTORY.createStorageInventoryHandler(new ItemTowerInventory(towers, this.worldPosition));
     }
 
     public void animate(int animId) {
@@ -50,13 +59,6 @@ public class ItemTowerBlockEntity extends BaseStorageBlockEntity {
     @Override
     protected Component getDefaultName() {
         return Component.translatable(Constants.MOD_ID + ".container.item_tower");
-    }
-
-    protected static final int[] ITEM_TOWER_SLOTS = IntStream.range(0, 18).toArray();
-
-    @Override
-    public int[] getSlotsForFace(Direction side) {
-        return ITEM_TOWER_SLOTS;
     }
 
     public NonNullList<ItemTowerBlockEntity> getItemTowers() {

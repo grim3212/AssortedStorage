@@ -18,7 +18,7 @@ public class BagLockSlot extends SlotStorageHandler {
     }
 
     @Override
-    public int getMaxStackSize(@NotNull ItemStack stack) {
+    public int getMaxStackSize() {
         return 1;
     }
 

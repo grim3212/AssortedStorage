@@ -9,6 +9,7 @@ import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.StorageAccessUtil;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.api.block.IStorageMaterial;
+import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedBarrelBlockEntity;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.ChatFormatting;
@@ -129,18 +130,17 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
         if (!state.is(newState.getBlock())) {
             BlockEntity tileentity = worldIn.getBlockEntity(pos);
 
-            if (tileentity instanceof ILockable) {
-                ILockable teStorage = (ILockable) tileentity;
+            if (tileentity instanceof BaseStorageBlockEntity storageBlockEntity) {
 
-                if (teStorage.isLocked()) {
+                if (storageBlockEntity.isLocked()) {
                     ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
                     CompoundTag tag = new CompoundTag();
-                    new StorageLockCode(teStorage.getLockCode()).write(tag);
+                    new StorageLockCode(storageBlockEntity.getLockCode()).write(tag);
                     lockStack.setTag(tag);
                     Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
                 }
 
-                Containers.dropContents(worldIn, pos, (WorldlyContainer) tileentity);
+                StorageUtil.dropContents(worldIn, pos, storageBlockEntity.getItemStackStorageHandler());
                 worldIn.updateNeighbourForOutputSignal(pos, this);
             }
 
@@ -260,11 +260,11 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
 
         BlockState state = worldIn.getBlockState(pos);
         if (state.getBlock() instanceof LockedBarrelBlock && worldIn.getBlockEntity(pos) instanceof LockedBarrelBlockEntity barrelBE) {
-            NonNullList<ItemStack> chestItems = NonNullList.withSize(barrelBE.getContainerSize(), ItemStack.EMPTY);
-            for (int i = 0; i < barrelBE.getContainerSize(); i++) {
-                chestItems.set(i, barrelBE.getItem(i).copy());
+            NonNullList<ItemStack> chestItems = NonNullList.withSize(barrelBE.getItemStackStorageHandler().getSlots(), ItemStack.EMPTY);
+            for (int i = 0; i < barrelBE.getItemStackStorageHandler().getSlots(); i++) {
+                chestItems.set(i, barrelBE.getItemStackStorageHandler().getStackInSlot(i).copy());
+                barrelBE.getItemStackStorageHandler().setStackInSlot(i, ItemStack.EMPTY);
             }
-            barrelBE.clearContent();
             barrelBE.setLockCode(null);
 
             worldIn.setBlock(pos, Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, state.getValue(LockedBarrelBlock.FACING)), 3);

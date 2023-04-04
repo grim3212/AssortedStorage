@@ -5,10 +5,9 @@ import com.grim3212.assorted.lib.client.model.data.IModelDataBuilder;
 import com.grim3212.assorted.lib.core.block.IBlockEntityWithModelData;
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
-import com.grim3212.assorted.lib.core.inventory.impl.LockedSidedStorageHandler;
-import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
-import com.grim3212.assorted.lib.core.inventory.locking.LockedItemHandler;
-import com.grim3212.assorted.lib.core.inventory.locking.LockedWorldlyContainer;
+import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.impl.LockedItemStackStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.locking.LockedStorageHandler;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.StorageMaterial;
@@ -16,6 +15,7 @@ import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.inventory.LockedHopperContainer;
 import com.grim3212.assorted.storage.common.inventory.LockedMaterialContainer;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
+import com.grim3212.assorted.storage.common.inventory.StorageItemStackStorageHandler;
 import com.grim3212.assorted.storage.common.properties.StorageModelProperties;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -24,9 +24,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
-import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
-import net.minecraft.world.WorldlyContainerHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -35,16 +33,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.Hopper;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -56,27 +52,24 @@ import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements Hopper, IBlockEntityWithModelData {
+public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements IBlockEntityWithModelData {
 
     private int cooldownTime = -1;
     private long tickedGameTime;
 
     private final StorageMaterial storageMaterial;
-    protected final int[] slots;
 
     public LockedHopperBlockEntity(BlockPos pos, BlockState state) {
         super(StorageBlockEntityTypes.LOCKED_HOPPER.get(), pos, state);
 
         if (state.getBlock() instanceof LockedHopperBlock lockedHopper) {
             this.storageMaterial = lockedHopper.getStorageMaterial();
-            setStartingContents(this.storageMaterial != null ? this.storageMaterial.hopperSize() : 5);
         } else {
-            // Default to regular chest
+            // Default to regular hopper
             this.storageMaterial = null;
-            this.setStartingContents(5);
         }
 
-        this.slots = IntStream.range(0, this.getContainerSize()).toArray();
+        this.setStorageHandler(new StorageItemStackStorageHandler(this, storageMaterial != null ? storageMaterial.totalItems() : 5));
     }
 
     @Override
@@ -89,13 +82,8 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
     }
 
     @Override
-    public int[] getSlotsForFace(Direction side) {
-        return this.slots;
-    }
-
-    @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
-        return new LockedHopperContainer(StorageContainerTypes.HOPPERS.get(storageMaterial).get(), windowId, player, this, storageMaterial);
+        return new LockedHopperContainer(StorageContainerTypes.HOPPERS.get(storageMaterial).get(), windowId, player, this.getItemStackStorageHandler(), storageMaterial);
     }
 
     @Override
@@ -174,7 +162,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
         } else {
             if (!hopperBE.isOnCooldown() && state.getValue(LockedHopperBlock.ENABLED)) {
                 boolean flag = false;
-                if (!hopperBE.isEmpty()) {
+                if (!hopperBE.getItemStackStorageHandler().isEmpty()) {
                     flag = ejectItems(level, pos, state, hopperBE);
                 }
 
@@ -194,7 +182,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
     }
 
     private boolean inventoryFull() {
-        for (ItemStack itemstack : this.getItems()) {
+        for (ItemStack itemstack : this.getItemStackStorageHandler().getStacks()) {
             if (itemstack.isEmpty() || itemstack.getCount() != itemstack.getMaxStackSize()) {
                 return false;
             }
@@ -213,7 +201,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
         return true;
     }
 
-    private static Optional<Pair<IItemStorageHandler, Object>> getItemHandler(Level level, Hopper hopper, Direction hopperFacing) {
+    private static Optional<Pair<IItemStorageHandler, Object>> getItemHandler(Level level, LockedHopperBlockEntity hopper, Direction hopperFacing) {
         double x = hopper.getLevelX() + (double) hopperFacing.getStepX();
         double y = hopper.getLevelY() + (double) hopperFacing.getStepY();
         double z = hopper.getLevelZ() + (double) hopperFacing.getStepZ();
@@ -287,18 +275,18 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
                     }
                 }
             }
-        } else if (destInventory instanceof LockedItemHandler lockedInv) {
-            if (lockedInv.insertItem(slot, stack, true, source.getLockCode()).isEmpty()) {
+        } else if (destInventory instanceof LockedStorageHandler lockedInv) {
+            if (lockedInv.insertItem(slot, stack, true, source.getLockCode(), false).isEmpty()) {
                 boolean insertedItem = false;
                 boolean inventoryWasEmpty = isEmpty(destInventory);
 
                 if (itemstack.isEmpty()) {
-                    lockedInv.insertItem(slot, stack, false, source.getLockCode());
+                    lockedInv.insertItem(slot, stack, false, source.getLockCode(), false);
                     stack = ItemStack.EMPTY;
                     insertedItem = true;
                 } else if (Services.INVENTORY.canItemStacksStack(itemstack, stack)) {
                     int originalSize = stack.getCount();
-                    stack = lockedInv.insertItem(slot, stack, false, source.getLockCode());
+                    stack = lockedInv.insertItem(slot, stack, false, source.getLockCode(), false);
                     insertedItem = originalSize < stack.getCount();
                 }
 
@@ -331,17 +319,18 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
             if (isFull(itemHandler)) {
                 return false;
             } else {
-                for (int i = 0; i < hopper.getContainerSize(); ++i) {
-                    if (!hopper.getItem(i).isEmpty()) {
-                        ItemStack originalSlotContents = hopper.getItem(i).copy();
-                        ItemStack insertStack = hopper.removeItem(i, 1);
+                ItemStackStorageHandler storageHandler = hopper.getItemStackStorageHandler();
+                for (int i = 0; i < storageHandler.getSlots(); ++i) {
+                    if (!storageHandler.getStackInSlot(i).isEmpty()) {
+                        ItemStack originalSlotContents = storageHandler.getStackInSlot(i).copy();
+                        ItemStack insertStack = storageHandler.extractItem(i, 1, false);
                         ItemStack remainder = putStackInInventoryAllSlots(hopper, destination, itemHandler, insertStack);
 
                         if (remainder.isEmpty()) {
                             return true;
                         }
 
-                        hopper.setItem(i, originalSlotContents);
+                        storageHandler.setStackInSlot(i, originalSlotContents);
                     }
                 }
 
@@ -354,20 +343,21 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
     public static Boolean extractHook(Level level, LockedHopperBlockEntity dest) {
         return getItemHandler(level, dest, Direction.UP).map(itemHandlerResult -> {
             IItemStorageHandler handler = itemHandlerResult.getKey();
+            ItemStackStorageHandler storageHandler = dest.getItemStackStorageHandler();
 
-            if (handler instanceof LockedItemHandler lockedItemHandler) {
+            if (handler instanceof LockedStorageHandler lockedItemHandler) {
                 for (int i = 0; i < handler.getSlots(); i++) {
-                    ItemStack extractItem = lockedItemHandler.extractItem(i, 1, true, dest.getLockCode());
+                    ItemStack extractItem = lockedItemHandler.extractItem(i, 1, true, dest.getLockCode(), false);
                     if (!extractItem.isEmpty()) {
-                        for (int j = 0; j < dest.getContainerSize(); j++) {
-                            ItemStack destStack = dest.getItem(j);
-                            if (dest.canPlaceItem(j, extractItem) && (destStack.isEmpty() || destStack.getCount() < destStack.getMaxStackSize() && destStack.getCount() < dest.getMaxStackSize() && Services.INVENTORY.canItemStacksStack(extractItem, destStack))) {
-                                extractItem = lockedItemHandler.extractItem(i, 1, false, dest.getLockCode());
+                        for (int j = 0; j < storageHandler.getSlots(); j++) {
+                            ItemStack destStack = storageHandler.getStackInSlot(j);
+                            if (storageHandler.isItemValid(j, extractItem) && (destStack.isEmpty() || destStack.getCount() < destStack.getMaxStackSize() && destStack.getCount() < storageHandler.getSlotLimit(j) && Services.INVENTORY.canItemStacksStack(extractItem, destStack))) {
+                                extractItem = lockedItemHandler.extractItem(i, 1, false, dest.getLockCode(), false);
                                 if (destStack.isEmpty())
-                                    dest.setItem(j, extractItem);
+                                    storageHandler.setStackInSlot(j, extractItem);
                                 else {
                                     destStack.grow(1);
-                                    dest.setItem(j, destStack);
+                                    storageHandler.setStackInSlot(j, destStack);
                                 }
                                 dest.setChanged();
                                 return true;
@@ -379,15 +369,15 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
                 for (int i = 0; i < handler.getSlots(); i++) {
                     ItemStack extractItem = handler.extractItem(i, 1, true);
                     if (!extractItem.isEmpty()) {
-                        for (int j = 0; j < dest.getContainerSize(); j++) {
-                            ItemStack destStack = dest.getItem(j);
-                            if (dest.canPlaceItem(j, extractItem) && (destStack.isEmpty() || destStack.getCount() < destStack.getMaxStackSize() && destStack.getCount() < dest.getMaxStackSize() && Services.INVENTORY.canItemStacksStack(extractItem, destStack))) {
+                        for (int j = 0; j < storageHandler.getSlots(); j++) {
+                            ItemStack destStack = storageHandler.getStackInSlot(j);
+                            if (storageHandler.isItemValid(j, extractItem) && (destStack.isEmpty() || destStack.getCount() < destStack.getMaxStackSize() && destStack.getCount() < storageHandler.getSlotLimit(j) && Services.INVENTORY.canItemStacksStack(extractItem, destStack))) {
                                 extractItem = handler.extractItem(i, 1, false);
                                 if (destStack.isEmpty())
-                                    dest.setItem(j, extractItem);
+                                    storageHandler.setStackInSlot(j, extractItem);
                                 else {
                                     destStack.grow(1);
-                                    dest.setItem(j, destStack);
+                                    storageHandler.setStackInSlot(j, destStack);
                                 }
                                 dest.setChanged();
                                 return true;
@@ -404,7 +394,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
     private static boolean ejectItems(Level level, BlockPos pos, BlockState state, LockedHopperBlockEntity hopper) {
         if (insertHook(hopper))
             return true;
-        Container container = getAttachedContainer(level, pos, state);
+        IItemStorageHandler container = getAttachedContainer(level, pos, state);
         if (container == null) {
             return false;
         } else {
@@ -412,16 +402,17 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
             if (isFullContainer(container, direction)) {
                 return false;
             } else {
-                for (int i = 0; i < hopper.getContainerSize(); ++i) {
-                    if (!hopper.getItem(i).isEmpty()) {
-                        ItemStack itemstack = hopper.getItem(i).copy();
-                        ItemStack itemstack1 = addItem(hopper, container, hopper.removeItem(i, 1), direction);
+                ItemStackStorageHandler storageHandler = hopper.getItemStackStorageHandler();
+                for (int i = 0; i < storageHandler.getSlots(); ++i) {
+                    if (!storageHandler.getStackInSlot(i).isEmpty()) {
+                        ItemStack itemstack = storageHandler.getStackInSlot(i).copy();
+                        ItemStack itemstack1 = addItem(hopper.getItemStackStorageHandler(), container, storageHandler.extractItem(i, 1, false), direction);
                         if (itemstack1.isEmpty()) {
-                            container.setChanged();
+                            container.onContentsChanged(i);
                             return true;
                         }
 
-                        hopper.setItem(i, itemstack);
+                        storageHandler.setStackInSlot(i, itemstack);
                     }
                 }
 
@@ -430,20 +421,20 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
         }
     }
 
-    private static IntStream getSlots(Container container, Direction dir) {
-        return container instanceof WorldlyContainer ? IntStream.of(((WorldlyContainer) container).getSlotsForFace(dir)) : IntStream.range(0, container.getContainerSize());
+    private static IntStream getSlots(IItemStorageHandler container, Direction dir) {
+        return container instanceof WorldlyContainer ? IntStream.of(((WorldlyContainer) container).getSlotsForFace(dir)) : IntStream.range(0, container.getSlots());
     }
 
-    private static boolean isFullContainer(Container container, Direction dir) {
+    private static boolean isFullContainer(IItemStorageHandler container, Direction dir) {
         return getSlots(container, dir).allMatch((p_59379_) -> {
-            ItemStack itemstack = container.getItem(p_59379_);
+            ItemStack itemstack = container.getStackInSlot(p_59379_);
             return itemstack.getCount() >= itemstack.getMaxStackSize();
         });
     }
 
-    private static boolean isEmptyContainer(Container container, Direction dir) {
+    private static boolean isEmptyContainer(IItemStorageHandler container, Direction dir) {
         return getSlots(container, dir).allMatch((p_59319_) -> {
-            return container.getItem(p_59319_).isEmpty();
+            return container.getStackInSlot(p_59319_).isEmpty();
         });
     }
 
@@ -451,15 +442,15 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
         Boolean ret = extractHook(level, hopper);
         if (ret != null)
             return ret;
-        Container container = getSourceContainer(level, hopper);
+        IItemStorageHandler container = getSourceContainer(level, hopper);
         if (container != null) {
             Direction direction = Direction.DOWN;
             return isEmptyContainer(container, direction) ? false : getSlots(container, direction).anyMatch((p_59363_) -> {
-                return tryTakeInItemFromSlot(hopper, container, p_59363_, direction);
+                return tryTakeInItemFromSlot(hopper.getItemStackStorageHandler(), container, p_59363_, direction);
             });
         } else {
             for (ItemEntity itementity : getItemsAtAndAbove(level, hopper)) {
-                if (addItem(hopper, itementity)) {
+                if (addItem(hopper.getItemStackStorageHandler(), itementity)) {
                     return true;
                 }
             }
@@ -468,26 +459,25 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
         }
     }
 
-    private static boolean tryTakeInItemFromSlot(Hopper self, Container dest, int slot, Direction dir) {
-        ItemStack itemstack = dest.getItem(slot);
-        if (!itemstack.isEmpty() && canTakeItemFromContainer(dest, self, itemstack, slot, dir)) {
+    private static boolean tryTakeInItemFromSlot(IItemStorageHandler self, IItemStorageHandler dest, int slot, Direction dir) {
+        ItemStack itemstack = dest.getStackInSlot(slot);
+        if (!itemstack.isEmpty() && dest.extractItem(slot, 1, true) != ItemStack.EMPTY) {
             ItemStack itemstack1 = itemstack.copy();
-            ItemStack itemstack2 = addItem(dest, self, dest.removeItem(slot, 1), (Direction) null);
+            ItemStack itemstack2 = addItem(dest, self, dest.extractItem(slot, 1, false), (Direction) null);
             if (itemstack2.isEmpty()) {
-                dest.setChanged();
                 return true;
             }
 
-            dest.setItem(slot, itemstack1);
+            dest.setStackInSlot(slot, itemstack1);
         }
 
         return false;
     }
 
-    public static boolean addItem(Container p_59332_, ItemEntity p_59333_) {
+    public static boolean addItem(IItemStorageHandler p_59332_, ItemEntity p_59333_) {
         boolean flag = false;
         ItemStack itemstack = p_59333_.getItem().copy();
-        ItemStack itemstack1 = addItem((Container) null, p_59332_, itemstack, (Direction) null);
+        ItemStack itemstack1 = addItem((IItemStorageHandler) null, p_59332_, itemstack, (Direction) null);
         if (itemstack1.isEmpty()) {
             flag = true;
             p_59333_.discard();
@@ -498,7 +488,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
         return flag;
     }
 
-    public static ItemStack addItem(@Nullable Container self, Container dest, ItemStack stack, @Nullable Direction dir) {
+    public static ItemStack addItem(@Nullable IItemStorageHandler self, IItemStorageHandler dest, ItemStack stack, @Nullable Direction dir) {
         if (dest instanceof WorldlyContainer worldlycontainer && dir != null) {
             int[] aint = worldlycontainer.getSlotsForFace(dir);
 
@@ -506,7 +496,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
                 stack = tryMoveInItem(self, dest, stack, aint[k], dir);
             }
         } else {
-            int i = dest.getContainerSize();
+            int i = dest.getSlots();
 
             for (int j = 0; j < i && !stack.isEmpty(); ++j) {
                 stack = tryMoveInItem(self, dest, stack, j, dir);
@@ -516,39 +506,13 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
         return stack;
     }
 
-    private static boolean canPlaceItemInContainer(Container dest, @Nullable Container self, ItemStack stack, int slot, @Nullable Direction dir) {
-        if (!dest.canPlaceItem(slot, stack)) {
-            return false;
-        } else {
-            if (dest instanceof LockedWorldlyContainer destLocked) {
-                if (self instanceof ILockable lockedBE) {
-                    return destLocked.canPlaceItemThroughFace(slot, stack, dir, lockedBE.getLockCode(), false);
-                } else {
-                    return destLocked.canPlaceItemThroughFace(slot, stack, dir, "", self == null);
-                }
-            }
-
-            return !(dest instanceof WorldlyContainer) || ((WorldlyContainer) dest).canPlaceItemThroughFace(slot, stack, dir);
-        }
-    }
-
-    private static boolean canTakeItemFromContainer(Container dest, @Nullable Container self, ItemStack stack, int slot, Direction dir) {
-        if (dest instanceof LockedWorldlyContainer destLocked) {
-            if (self instanceof ILockable lockedBE) {
-                return destLocked.canTakeItemThroughFace(slot, stack, dir, lockedBE.getLockCode(), false);
-            }
-        }
-
-        return !(dest instanceof WorldlyContainer) || ((WorldlyContainer) dest).canTakeItemThroughFace(slot, stack, dir);
-    }
-
-    private static ItemStack tryMoveInItem(@Nullable Container self, Container dest, ItemStack stack, int slot, @Nullable Direction dir) {
-        ItemStack itemstack = dest.getItem(slot);
-        if (canPlaceItemInContainer(dest, self, stack, slot, dir)) {
+    private static ItemStack tryMoveInItem(@Nullable IItemStorageHandler self, IItemStorageHandler dest, ItemStack stack, int slot, @Nullable Direction dir) {
+        ItemStack itemstack = dest.getStackInSlot(slot);
+        if (dest.isItemValid(slot, stack)) {
             boolean flag = false;
             boolean flag1 = dest.isEmpty();
             if (itemstack.isEmpty()) {
-                dest.setItem(slot, stack);
+                dest.setStackInSlot(slot, stack);
                 stack = ItemStack.EMPTY;
                 flag = true;
             } else if (canMergeItems(itemstack, stack)) {
@@ -576,8 +540,6 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
                         }
                     }
                 }
-
-                dest.setChanged();
             }
         }
 
@@ -585,53 +547,37 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
     }
 
     @Nullable
-    private static Container getAttachedContainer(Level p_155593_, BlockPos p_155594_, BlockState p_155595_) {
+    private static IItemStorageHandler getAttachedContainer(Level p_155593_, BlockPos p_155594_, BlockState p_155595_) {
         Direction direction = p_155595_.getValue(LockedHopperBlock.FACING);
-        return getContainerAt(p_155593_, p_155594_.relative(direction));
+        return getContainerAt(p_155593_, p_155594_, direction);
     }
 
     @Nullable
-    private static Container getSourceContainer(Level p_155597_, Hopper p_155598_) {
-        return getContainerAt(p_155597_, p_155598_.getLevelX(), p_155598_.getLevelY() + 1.0D, p_155598_.getLevelZ());
+    private static IItemStorageHandler getSourceContainer(Level p_155597_, LockedHopperBlockEntity p_155598_) {
+        return getContainerAt(p_155597_, p_155598_.getLevelX(), p_155598_.getLevelY() + 1.0D, p_155598_.getLevelZ(), null);
     }
 
-    public static List<ItemEntity> getItemsAtAndAbove(Level p_155590_, Hopper p_155591_) {
+    public static List<ItemEntity> getItemsAtAndAbove(Level p_155590_, LockedHopperBlockEntity p_155591_) {
         return p_155591_.getSuckShape().toAabbs().stream().flatMap((p_155558_) -> {
             return p_155590_.getEntitiesOfClass(ItemEntity.class, p_155558_.move(p_155591_.getLevelX() - 0.5D, p_155591_.getLevelY() - 0.5D, p_155591_.getLevelZ() - 0.5D), EntitySelector.ENTITY_STILL_ALIVE).stream();
         }).collect(Collectors.toList());
     }
 
     @Nullable
-    public static Container getContainerAt(Level p_59391_, BlockPos p_59392_) {
-        return getContainerAt(p_59391_, (double) p_59392_.getX() + 0.5D, (double) p_59392_.getY() + 0.5D, (double) p_59392_.getZ() + 0.5D);
+    public static IItemStorageHandler getContainerAt(Level p_59391_, BlockPos p_59392_, @Nullable Direction direction) {
+        return getContainerAt(p_59391_, (double) p_59392_.getX() + 0.5D, (double) p_59392_.getY() + 0.5D, (double) p_59392_.getZ() + 0.5D, direction);
     }
 
     @Nullable
-    private static Container getContainerAt(Level p_59348_, double p_59349_, double p_59350_, double p_59351_) {
-        Container container = null;
+    private static IItemStorageHandler getContainerAt(Level p_59348_, double p_59349_, double p_59350_, double p_59351_, @Nullable Direction direction) {
         BlockPos blockpos = new BlockPos(p_59349_, p_59350_, p_59351_);
         BlockState blockstate = p_59348_.getBlockState(blockpos);
-        Block block = blockstate.getBlock();
-        if (block instanceof WorldlyContainerHolder) {
-            container = ((WorldlyContainerHolder) block).getContainer(blockstate, p_59348_, blockpos);
-        } else if (blockstate.hasBlockEntity()) {
-            BlockEntity blockentity = p_59348_.getBlockEntity(blockpos);
-            if (blockentity instanceof Container) {
-                container = (Container) blockentity;
-                if (container instanceof ChestBlockEntity && block instanceof ChestBlock) {
-                    container = ChestBlock.getContainer((ChestBlock) block, blockstate, p_59348_, blockpos, true);
-                }
-            }
+
+        if (blockstate.hasBlockEntity()) {
+            return Services.INVENTORY.getItemStorageHandler(p_59348_.getBlockEntity(blockpos), direction).orElse(null);
         }
 
-        if (container == null) {
-            List<Entity> list = p_59348_.getEntities((Entity) null, new AABB(p_59349_ - 0.5D, p_59350_ - 0.5D, p_59351_ - 0.5D, p_59349_ + 0.5D, p_59350_ + 0.5D, p_59351_ + 0.5D), EntitySelector.CONTAINER_ENTITY_SELECTOR);
-            if (!list.isEmpty()) {
-                container = (Container) list.get(p_59348_.random.nextInt(list.size()));
-            }
-        }
-
-        return container;
+        return null;
     }
 
     private static boolean canMergeItems(ItemStack p_59345_, ItemStack p_59346_) {
@@ -658,6 +604,10 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
         return (double) this.worldPosition.getZ() + 0.5D;
     }
 
+    public VoxelShape getSuckShape() {
+        return Hopper.SUCK;
+    }
+
     public void setCooldown(int p_59396_) {
         this.cooldownTime = p_59396_;
     }
@@ -673,7 +623,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
     public static void entityInside(Level level, BlockPos pos, BlockState state, Entity entity, LockedHopperBlockEntity hopperBE) {
         if (entity instanceof ItemEntity && Shapes.joinIsNotEmpty(Shapes.create(entity.getBoundingBox().move((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()))), hopperBE.getSuckShape(), BooleanOp.AND)) {
             tryMoveItems(level, pos, state, hopperBE, () -> {
-                return addItem(hopperBE, (ItemEntity) entity);
+                return addItem(hopperBE.getItemStackStorageHandler(), (ItemEntity) entity);
             });
         }
     }
@@ -682,7 +632,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
         return this.tickedGameTime;
     }
 
-    public static class ItemHandler extends LockedSidedStorageHandler {
+    public static class ItemHandler extends LockedItemStackStorageHandler {
         private final LockedHopperBlockEntity hopper;
 
         public ItemHandler(LockedHopperBlockEntity hopper) {
@@ -696,7 +646,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements H
             if (simulate) {
                 return super.insertItem(slot, stack, simulate);
             } else {
-                boolean wasEmpty = getLockedContainer().isEmpty();
+                boolean wasEmpty = this.hopper.getItemStackStorageHandler().isEmpty();
 
                 int originalStackSize = stack.getCount();
                 stack = super.insertItem(slot, stack, simulate);

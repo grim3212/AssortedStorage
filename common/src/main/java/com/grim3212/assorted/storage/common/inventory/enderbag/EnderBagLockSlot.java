@@ -18,7 +18,7 @@ public class EnderBagLockSlot extends SlotStorageHandler {
     }
 
     @Override
-    public int getMaxStackSize(@NotNull ItemStack stack) {
+    public int getMaxStackSize() {
         return 1;
     }
 

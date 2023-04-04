@@ -200,7 +200,7 @@ public class PadlockItem extends CombinationItem {
                     worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(ShulkerBoxBlock.FACING, currentBlockState.getValue(ShulkerBoxBlock.FACING)), 3);
                     worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
                     if (worldIn.getBlockEntity(pos) instanceof LockedShulkerBoxBlockEntity shulkerBE) {
-                        shulkerBE.setItems(shulkerItems);
+                        shulkerBE.getItemStackStorageHandler().setStacks(shulkerItems);
                         shulkerBE.setLockCode(code);
                         shulkerBE.setColor(ShulkerBoxBlock.getColorFromBlock(currentBlockState.getBlock()));
                     }
@@ -242,7 +242,7 @@ public class PadlockItem extends CombinationItem {
                     worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
                     if (worldIn.getBlockEntity(pos) instanceof LockedChestBlockEntity chestBE) {
                         chestBE.setLockCode(code);
-                        chestBE.setItems(chestItems);
+                        chestBE.getItemStackStorageHandler().setStacks(chestItems);
                     }
 
                     return true;
@@ -282,7 +282,7 @@ public class PadlockItem extends CombinationItem {
                     worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
                     if (worldIn.getBlockEntity(pos) instanceof LockedBarrelBlockEntity barrelBE) {
                         barrelBE.setLockCode(code);
-                        barrelBE.setItems(chestItems);
+                        barrelBE.getItemStackStorageHandler().setStacks(chestItems);
                     }
 
                     return true;
@@ -322,7 +322,7 @@ public class PadlockItem extends CombinationItem {
                     worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
                     if (worldIn.getBlockEntity(pos) instanceof LockedHopperBlockEntity hopperBE) {
                         hopperBE.setLockCode(code);
-                        hopperBE.setItems(chestItems);
+                        hopperBE.getItemStackStorageHandler().setStacks(chestItems);
                     }
 
                     return true;
@@ -343,30 +343,31 @@ public class PadlockItem extends CombinationItem {
                 BlockState currentDoor = worldIn.getBlockState(pos);
 
                 Block newDoor = getMatchingBlock(currentDoor.getBlock());
-                if (newDoor == Blocks.AIR) {
+                if (newDoor == Blocks.AIR || currentDoor.isAir()) {
                     return false;
                 }
 
                 if (!entityplayer.isCreative())
                     itemstack.shrink(1);
 
-                worldIn.setBlock(pos, newDoor.defaultBlockState().setValue(DoorBlock.FACING, currentDoor.getValue(DoorBlock.FACING)).setValue(DoorBlock.OPEN, currentDoor.getValue(DoorBlock.OPEN)).setValue(DoorBlock.HINGE, currentDoor.getValue(DoorBlock.HINGE)).setValue(DoorBlock.HALF, currentDoor.getValue(DoorBlock.HALF)), 3);
-                worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
-                BaseLockedBlockEntity currentTE = (BaseLockedBlockEntity) worldIn.getBlockEntity(pos);
-                currentTE.setLockCode(code);
-
-                if (currentDoor.getValue(DoorBlock.HALF) == DoubleBlockHalf.UPPER) {
-                    BlockState downState = worldIn.getBlockState(pos.below());
-                    worldIn.setBlock(pos.below(), newDoor.defaultBlockState().setValue(DoorBlock.FACING, downState.getValue(DoorBlock.FACING)).setValue(DoorBlock.OPEN, downState.getValue(DoorBlock.OPEN)).setValue(DoorBlock.HINGE, downState.getValue(DoorBlock.HINGE)).setValue(DoorBlock.HALF, downState.getValue(DoorBlock.HALF)), 3);
-                    BaseLockedBlockEntity downTE = (BaseLockedBlockEntity) worldIn.getBlockEntity(pos.below());
-                    downTE.setLockCode(code);
+                BlockState newState = newDoor.defaultBlockState().setValue(DoorBlock.FACING, currentDoor.getValue(DoorBlock.FACING)).setValue(DoorBlock.OPEN, currentDoor.getValue(DoorBlock.OPEN)).setValue(DoorBlock.HINGE, currentDoor.getValue(DoorBlock.HINGE));
+                DoubleBlockHalf currentHalf = currentDoor.getValue(DoorBlock.HALF);
+                worldIn.setBlock(pos, newState.setValue(DoorBlock.HALF, currentHalf), Block.UPDATE_KNOWN_SHAPE);
+                if (currentHalf == DoubleBlockHalf.UPPER) {
+                    worldIn.setBlock(pos.below(), newState.setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER), Block.UPDATE_ALL);
                 } else {
-                    BlockState upState = worldIn.getBlockState(pos.above());
-                    worldIn.setBlock(pos.above(), newDoor.defaultBlockState().setValue(DoorBlock.FACING, upState.getValue(DoorBlock.FACING)).setValue(DoorBlock.OPEN, upState.getValue(DoorBlock.OPEN)).setValue(DoorBlock.HINGE, upState.getValue(DoorBlock.HINGE)).setValue(DoorBlock.HALF, upState.getValue(DoorBlock.HALF)), 3);
-                    BaseLockedBlockEntity upTE = (BaseLockedBlockEntity) worldIn.getBlockEntity(pos.above());
-                    upTE.setLockCode(code);
+                    worldIn.setBlock(pos.above(), newState.setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER), Block.UPDATE_ALL);
                 }
 
+                if (worldIn.getBlockEntity(pos) instanceof BaseLockedBlockEntity lockedDoor) {
+                    lockedDoor.setLockCode(code);
+                }
+
+                if (worldIn.getBlockEntity(currentHalf == DoubleBlockHalf.UPPER ? pos.below() : pos.above()) instanceof BaseLockedBlockEntity otherHalfLockedDoor) {
+                    otherHalfLockedDoor.setLockCode(code);
+                }
+
+                worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
                 return true;
             }
 

@@ -15,6 +15,7 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class LockedMaterialScreen extends AbstractContainerScreen<LockedMaterialContainer> implements MenuAccess<LockedMaterialContainer> {
 
+    // TODO: 9 box eventually
     private static final ResourceLocation CHEST_GUI_TEXTURE_9_COLS = new ResourceLocation(Constants.MOD_ID, "textures/gui/container/generic_9x9.png");
     private static final ResourceLocation CHEST_GUI_TEXTURE_10_COLS = new ResourceLocation(Constants.MOD_ID, "textures/gui/container/generic_9x10.png");
     private static final ResourceLocation CHEST_GUI_TEXTURE_11_COLS = new ResourceLocation(Constants.MOD_ID, "textures/gui/container/generic_9x11.png");

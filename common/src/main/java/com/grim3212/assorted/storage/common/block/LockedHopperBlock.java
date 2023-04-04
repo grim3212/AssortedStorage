@@ -207,11 +207,11 @@ public class LockedHopperBlock extends HopperBlock implements IStorageMaterial {
 
         BlockState state = worldIn.getBlockState(pos);
         if (state.getBlock() instanceof LockedHopperBlock && worldIn.getBlockEntity(pos) instanceof LockedHopperBlockEntity hopperBE) {
-            NonNullList<ItemStack> chestItems = NonNullList.withSize(hopperBE.getContainerSize(), ItemStack.EMPTY);
-            for (int i = 0; i < hopperBE.getContainerSize(); i++) {
-                chestItems.set(i, hopperBE.getItem(i).copy());
+            NonNullList<ItemStack> chestItems = NonNullList.withSize(hopperBE.getItemStackStorageHandler().getSlots(), ItemStack.EMPTY);
+            for (int i = 0; i < hopperBE.getItemStackStorageHandler().getSlots(); i++) {
+                chestItems.set(i, hopperBE.getItemStackStorageHandler().getStackInSlot(i).copy());
+                hopperBE.getItemStackStorageHandler().setStackInSlot(i, ItemStack.EMPTY);
             }
-            hopperBE.clearContent();
             hopperBE.setLockCode(null);
 
             worldIn.setBlock(pos, Blocks.HOPPER.defaultBlockState().setValue(HopperBlock.FACING, state.getValue(LockedHopperBlock.FACING)), 3);

@@ -1,122 +1,83 @@
 package com.grim3212.assorted.storage.common.inventory;
 
-import java.util.stream.IntStream;
-
+import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.Direction;
+import org.jetbrains.annotations.NotNull;
 
-public class DualLockerInventory implements WorldlyContainer {
+public class DualLockerInventory extends ItemStackStorageHandler {
 
-	private final WorldlyContainer topLocker;
-	private final WorldlyContainer bottomLocker;
+    private final IItemStorageHandler topLocker;
+    private final IItemStorageHandler bottomLocker;
 
-	public DualLockerInventory(WorldlyContainer bottomLocker, WorldlyContainer topLocker) {
-		this.bottomLocker = bottomLocker;
-		this.topLocker = topLocker;
-	}
+    public DualLockerInventory(IItemStorageHandler bottomLocker, IItemStorageHandler topLocker) {
+        super(topLocker != null ? topLocker.getSlots() + bottomLocker.getSlots() : bottomLocker.getSlots());
+        this.bottomLocker = bottomLocker;
+        this.topLocker = topLocker;
+    }
 
-	private boolean hasTopLocker() {
-		return this.topLocker != null;
-	}
+    private boolean hasTopLocker() {
+        return this.topLocker != null;
+    }
 
-	private int getLocalSlot(int slot) {
-		if (!hasTopLocker() || getInvFromSlot(slot) == this.topLocker)
-			return slot;
-		return slot - this.topLocker.getContainerSize();
-	}
+    private int getLocalSlot(int slot) {
+        if (!hasTopLocker() || getInvFromSlot(slot) == this.topLocker)
+            return slot;
+        return slot - this.topLocker.getSlots();
+    }
 
-	private WorldlyContainer getInvFromSlot(int slot) {
-		return !hasTopLocker() ? this.bottomLocker : slot < this.topLocker.getContainerSize() ? this.topLocker : this.bottomLocker;
-	}
+    private IItemStorageHandler getInvFromSlot(int slot) {
+        return !hasTopLocker() ? this.bottomLocker : slot < this.topLocker.getSlots() ? this.topLocker : this.bottomLocker;
+    }
 
-	@Override
-	public int getContainerSize() {
-		return hasTopLocker() ? this.topLocker.getContainerSize() : 0 + this.bottomLocker.getContainerSize();
-	}
+    @Override
+    public boolean stillValid(Player player) {
+        return hasTopLocker() ? this.topLocker.stillValid(player) : true && this.bottomLocker.stillValid(player);
+    }
 
-	@Override
-	public boolean isEmpty() {
-		return this.bottomLocker.isEmpty() && hasTopLocker() ? this.topLocker.isEmpty() : true;
-	}
+    @Override
+    public @NotNull ItemStack getStackInSlot(int slot) {
+        return getInvFromSlot(slot).getStackInSlot(getLocalSlot(slot));
+    }
 
-	@Override
-	public ItemStack getItem(int index) {
-		return getInvFromSlot(index).getItem(getLocalSlot(index));
-	}
+    @Override
+    public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+        return getInvFromSlot(slot).insertItem(getLocalSlot(slot), stack, simulate);
+    }
 
-	@Override
-	public ItemStack removeItem(int index, int count) {
-		return getInvFromSlot(index).removeItem(getLocalSlot(index), count);
-	}
+    @Override
+    public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
+        return getInvFromSlot(slot).extractItem(getLocalSlot(slot), amount, simulate);
+    }
 
-	@Override
-	public ItemStack removeItemNoUpdate(int index) {
-		return this.getInvFromSlot(index).removeItemNoUpdate(getLocalSlot(index));
-	}
+    @Override
+    public int getSlotLimit(int slot) {
+        return getInvFromSlot(slot).getSlotLimit(getLocalSlot(slot));
+    }
 
-	@Override
-	public void setItem(int index, ItemStack stack) {
-		getInvFromSlot(index).setItem(getLocalSlot(index), stack);
-	}
+    @Override
+    public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+        return getInvFromSlot(slot).isItemValid(getLocalSlot(slot), stack);
+    }
 
-	@Override
-	public void setChanged() {
-		this.bottomLocker.setChanged();
-		if (hasTopLocker())
-			this.topLocker.setChanged();
-	}
+    @Override
+    public void setStackInSlot(int slot, @NotNull ItemStack stack) {
+        getInvFromSlot(slot).setStackInSlot(getLocalSlot(slot), stack);
+    }
 
-	@Override
-	public boolean stillValid(Player player) {
-		return hasTopLocker() ? this.topLocker.stillValid(player) : true && this.bottomLocker.stillValid(player);
-	}
+    @Override
+    public void startOpen(Player player) {
+        this.bottomLocker.startOpen(player);
+        if (hasTopLocker())
+            this.topLocker.startOpen(player);
+    }
 
-	@Override
-	public void startOpen(Player player) {
-		this.bottomLocker.startOpen(player);
-		if (hasTopLocker())
-			this.topLocker.startOpen(player);
-	}
-
-	@Override
-	public void stopOpen(Player player) {
-		this.bottomLocker.stopOpen(player);
-		if (hasTopLocker())
-			this.topLocker.stopOpen(player);
-	}
-
-	@Override
-	public boolean canPlaceItem(int index, ItemStack stack) {
-		return getInvFromSlot(index).canPlaceItem(getLocalSlot(index), stack);
-	}
-
-	@Override
-	public void clearContent() {
-		this.bottomLocker.clearContent();
-		if (hasTopLocker())
-			this.topLocker.clearContent();
-	}
-
-	private static final int[] ONE_LOCKER = IntStream.range(0, 45).toArray();
-	private static final int[] TWO_LOCKER = IntStream.range(0, 90).toArray();
-
-	@Override
-	public int[] getSlotsForFace(Direction side) {
-		if (hasTopLocker())
-			return TWO_LOCKER;
-		return ONE_LOCKER;
-	}
-
-	@Override
-	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction) {
-		return this.bottomLocker.canPlaceItemThroughFace(index, itemStackIn, direction);
-	}
-
-	@Override
-	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
-		return this.bottomLocker.canTakeItemThroughFace(index, stack, direction);
-	}
+    @Override
+    public void stopOpen(Player player) {
+        this.bottomLocker.stopOpen(player);
+        if (hasTopLocker())
+            this.topLocker.stopOpen(player);
+    }
 
 }

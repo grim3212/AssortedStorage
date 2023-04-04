@@ -24,29 +24,6 @@ public class EnderBagSlot extends SlotStorageHandler {
         return !(stack.getItem() instanceof EnderBagItem) && !stack.isEmpty();
     }
 
-    @Override
-    public int getMaxStackSize(@NotNull ItemStack stack) {
-        if (this.getItemHandler() instanceof LockedEnderChestInventory enderChest) {
-
-            ItemStack maxAdd = stack.copy();
-            int maxInput = stack.getMaxStackSize();
-            maxAdd.setCount(maxInput);
-
-            ItemStack currentStack = enderChest.getStackInSlot(index);
-
-            enderChest.setStackInSlot(index, ItemStack.EMPTY);
-
-            ItemStack remainder = enderChest.insertItem(index, maxAdd, true, lockCode);
-
-            enderChest.setStackInSlot(index, currentStack);
-
-            return maxInput - remainder.getCount();
-
-        } else {
-            return super.getMaxStackSize(stack);
-        }
-    }
-
     private ItemStack extractItem(int slot, int amount, boolean simulate) {
         if (amount == 0)
             return ItemStack.EMPTY;

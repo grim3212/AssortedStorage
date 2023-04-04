@@ -3,18 +3,15 @@ package com.grim3212.assorted.storage.common.block.blockentity;
 import com.grim3212.assorted.lib.core.inventory.IInventoryBlockEntity;
 import com.grim3212.assorted.lib.core.inventory.INamed;
 import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
-import com.grim3212.assorted.lib.core.inventory.impl.LockedSidedStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
-import com.grim3212.assorted.lib.core.inventory.locking.LockedWorldlyContainer;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.blockentity.IStorage;
 import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.inventory.StorageContainer;
+import com.grim3212.assorted.storage.common.inventory.StorageItemStackStorageHandler;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -22,10 +19,8 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.Block;
@@ -35,18 +30,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 import javax.annotation.Nullable;
-import java.util.stream.IntStream;
 
-public abstract class BaseStorageBlockEntity extends BlockEntity implements LockedWorldlyContainer, MenuProvider, INamed, IStorage, ILockable, IInventoryBlockEntity {
+// TODO: Replace usage of Container and see if Fabric starts to work might be able to keep most of the container stuff and just have it in a separate interface
+public abstract class BaseStorageBlockEntity extends BlockEntity implements MenuProvider, INamed, IStorage, ILockable, IInventoryBlockEntity {
 
-    private NonNullList<ItemStack> chestContents;
-    protected int numPlayersUsing;
+    public int numPlayersUsing;
     private int ticksSinceSync;
     protected float rotation;
     protected float prevRotation;
     private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
     private Component customName;
-    private IPlatformInventoryStorageHandler handler;
+    protected IPlatformInventoryStorageHandler platformInventoryStorageHandler;
+    private StorageItemStackStorageHandler storageHandler;
 
     protected BaseStorageBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         this(typeIn, pos, state, 27);
@@ -55,39 +50,28 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Lock
     protected BaseStorageBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state, int inventorySize) {
         super(typeIn, pos, state);
 
-        if (this.selfInventory())
-            setStartingContents(inventorySize);
+        this.storageHandler = new StorageItemStackStorageHandler(this, inventorySize);
     }
 
     @Override
     public IPlatformInventoryStorageHandler getStorageHandler() {
-        if (this.handler == null) {
-            this.handler = this.createStorageHandler();
+        if (this.platformInventoryStorageHandler == null) {
+            this.platformInventoryStorageHandler = this.createStorageHandler();
         }
 
-        return this.handler;
+        return this.platformInventoryStorageHandler;
     }
 
     public IPlatformInventoryStorageHandler createStorageHandler() {
-        return Services.INVENTORY.createStorageInventoryHandler(new LockedSidedStorageHandler(this, null));
+        return Services.INVENTORY.createStorageInventoryHandler(this.storageHandler);
     }
 
-    public void setStartingContents(int inventorySize) {
-        this.chestContents = NonNullList.<ItemStack>withSize(inventorySize, ItemStack.EMPTY);
+    public StorageItemStackStorageHandler getItemStackStorageHandler() {
+        return this.storageHandler;
     }
 
-    public void setItems(NonNullList<ItemStack> itemsIn) {
-        if (itemsIn.size() == this.chestContents.size()) {
-            this.chestContents = itemsIn;
-        }
-
-        this.chestContents = NonNullList.<ItemStack>withSize(this.chestContents.size(), ItemStack.EMPTY);
-
-        for (int i = 0; i < itemsIn.size(); i++) {
-            this.chestContents.set(i, itemsIn.get(i));
-        }
-
-        this.setChanged();
+    public void setStorageHandler(StorageItemStackStorageHandler storageHandler) {
+        this.storageHandler = storageHandler;
     }
 
     @Override
@@ -118,10 +102,11 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Lock
     @Override
     public void load(CompoundTag nbt) {
         super.load(nbt);
-        if (this.selfInventory()) {
-            this.chestContents = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
 
-            ContainerHelper.loadAllItems(nbt, this.chestContents);
+        if (this.selfInventory()) {
+            if (nbt.contains("Inventory"))
+                this.storageHandler.deserializeNBT(nbt.getCompound("Inventory"));
+
         }
 
         if (nbt.contains("CustomName", 8)) {
@@ -135,7 +120,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Lock
     protected void saveAdditional(CompoundTag compound) {
         super.saveAdditional(compound);
         if (this.selfInventory()) {
-            ContainerHelper.saveAllItems(compound, this.chestContents);
+            compound.put("Inventory", this.storageHandler.serializeNBT());
         }
 
         if (this.customName != null) {
@@ -146,7 +131,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Lock
     }
 
     public CompoundTag saveToNbt(CompoundTag compound) {
-        ContainerHelper.saveAllItems(compound, this.chestContents, false);
+        compound.put("Inventory", this.storageHandler.serializeNBT());
         return compound;
     }
 
@@ -158,22 +143,6 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Lock
     @Override
     public CompoundTag getUpdateTag() {
         return this.saveWithoutMetadata();
-    }
-
-    @Override
-    public int getContainerSize() {
-        return this.getItems().size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        for (ItemStack itemstack : this.chestContents) {
-            if (!itemstack.isEmpty()) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     protected boolean selfInventory() {
@@ -224,7 +193,6 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Lock
     }
 
     @Override
-
     public float getRotation(float partialTicks) {
         return Mth.lerp(partialTicks, this.prevRotation, this.rotation);
     }
@@ -275,27 +243,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Lock
         }
     }
 
-    @Override
-    public void startOpen(Player player) {
-        if (!player.isSpectator()) {
-            if (this.numPlayersUsing < 0) {
-                this.numPlayersUsing = 0;
-            }
-
-            ++this.numPlayersUsing;
-            this.onOpenOrClose();
-        }
-    }
-
-    @Override
-    public void stopOpen(Player player) {
-        if (!player.isSpectator()) {
-            --this.numPlayersUsing;
-            this.onOpenOrClose();
-        }
-    }
-
-    protected void onOpenOrClose() {
+    public void onOpenOrClose() {
         Block block = this.getBlockState().getBlock();
 
         if (block instanceof BaseStorageBlock) {
@@ -306,24 +254,15 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Lock
         }
     }
 
-    public NonNullList<ItemStack> getItems() {
-        return this.chestContents;
-    }
-
     /**
      * invalidates a tile entity
      */
     @Override
     public void setRemoved() {
         super.setRemoved();
-        if (this.handler != null) {
-            this.handler.invalidate();
+        if (this.platformInventoryStorageHandler != null) {
+            this.platformInventoryStorageHandler.invalidate();
         }
-    }
-
-    @Override
-    public void clearContent() {
-        this.getItems().clear();
     }
 
     @Override
@@ -345,71 +284,5 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Lock
     @Nullable
     public Component getCustomName() {
         return this.customName;
-    }
-
-    @Override
-    public ItemStack getItem(int index) {
-        return this.getItems().get(index);
-    }
-
-    @Override
-    public ItemStack removeItem(int index, int count) {
-        ItemStack itemstack = ContainerHelper.removeItem(this.getItems(), index, count);
-        if (!itemstack.isEmpty()) {
-            this.setChanged();
-        }
-
-        return itemstack;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int index) {
-        return ContainerHelper.takeItem(this.getItems(), index);
-    }
-
-    @Override
-    public void setItem(int index, ItemStack stack) {
-        this.getItems().set(index, stack);
-        if (stack.getCount() > this.getMaxStackSize()) {
-            stack.setCount(this.getMaxStackSize());
-        }
-
-        this.setChanged();
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        if (this.level.getBlockEntity(this.worldPosition) != this) {
-            return false;
-        } else {
-            return !(player.distanceToSqr((double) this.worldPosition.getX() + 0.5D, (double) this.worldPosition.getY() + 0.5D, (double) this.worldPosition.getZ() + 0.5D) > 64.0D);
-        }
-    }
-
-    protected static final int[] DEFAULT_SLOTS = IntStream.range(0, 27).toArray();
-
-    @Override
-    public int[] getSlotsForFace(Direction side) {
-        return DEFAULT_SLOTS;
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction) {
-        return !this.isLocked();
-    }
-
-    @Override
-    public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
-        return !this.isLocked();
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction, String code, boolean force) {
-        return force || (this.isLocked() ? this.lockCode.getLockCode().equals(code) : true);
-    }
-
-    @Override
-    public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction, String code, boolean force) {
-        return force || (this.isLocked() ? this.lockCode.getLockCode().equals(code) : true);
     }
 }

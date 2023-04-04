@@ -1,10 +1,10 @@
 package com.grim3212.assorted.storage.common.inventory;
 
+import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
 import com.grim3212.assorted.storage.common.block.blockentity.ItemTowerBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class ItemTowerContainer extends AbstractContainerMenu {
 
-    private final Container inventory;
+    private final IItemStorageHandler inventory;
 
     public static ItemTowerContainer create(int windowId, Inventory inv, FriendlyByteBuf data) {
         Level world = inv.player.level;
@@ -28,20 +28,20 @@ public class ItemTowerContainer extends AbstractContainerMenu {
             return new ItemTowerContainer(StorageContainerTypes.ITEM_TOWER.get(), windowId, inv, new ItemTowerInventory(towerTileEntity.getItemTowers(), pos));
         }
 
-        return new ItemTowerContainer(StorageContainerTypes.ITEM_TOWER.get(), windowId, inv, new SimpleContainer(18));
+        return new ItemTowerContainer(StorageContainerTypes.ITEM_TOWER.get(), windowId, inv, new ItemStackStorageHandler(18));
     }
 
-    public static ItemTowerContainer createItemTowerContainer(int windowId, Inventory playerInventory, Container inventory) {
+    public static ItemTowerContainer createItemTowerContainer(int windowId, Inventory playerInventory, IItemStorageHandler inventory) {
         return new ItemTowerContainer(StorageContainerTypes.ITEM_TOWER.get(), windowId, playerInventory, inventory);
     }
 
-    public ItemTowerContainer(MenuType<?> containerType, int windowId, Inventory playerInventory, Container inventory) {
+    public ItemTowerContainer(MenuType<?> containerType, int windowId, Inventory playerInventory, IItemStorageHandler inventory) {
         super(containerType, windowId);
         this.inventory = inventory;
 
         inventory.startOpen(playerInventory.player);
 
-        int numRows = this.inventory.getContainerSize() / 9;
+        int numRows = this.inventory.getSlots() / 9;
 
         for (int chestRow = 0; chestRow < numRows; chestRow++) {
             for (int chestCol = 0; chestCol < 9; chestCol++) {
@@ -67,7 +67,7 @@ public class ItemTowerContainer extends AbstractContainerMenu {
             setDisplayRow(0);
     }
 
-    public Container getItemTowerInventory() {
+    public IItemStorageHandler getItemTowerInventory() {
         return inventory;
     }
 
@@ -76,7 +76,7 @@ public class ItemTowerContainer extends AbstractContainerMenu {
         int minSlot = row * 9;
         int maxSlot = (row + 2) * 9;
 
-        int numRows = this.inventory.getContainerSize() / 9;
+        int numRows = this.inventory.getSlots() / 9;
 
         for (int slotIndex = 0; slotIndex < numRows * 9; slotIndex++) {
             if (row == (numRows - 1)) {
@@ -116,7 +116,7 @@ public class ItemTowerContainer extends AbstractContainerMenu {
         if (slot != null && slot.hasItem()) {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
-            int maxSlot = this.inventory.getContainerSize();
+            int maxSlot = this.inventory.getSlots();
 
             if (index < maxSlot) {
                 if (!this.moveItemStackTo(itemstack1, maxSlot, this.slots.size(), true)) {

@@ -1,7 +1,7 @@
 package com.grim3212.assorted.storage.mixin.item;
 
 import com.grim3212.assorted.lib.core.inventory.IInventoryItem;
-import com.grim3212.assorted.lib.inventory.ForgePlatformInventoryStorageHandler;
+import com.grim3212.assorted.lib.inventory.ForgePlatformInventoryStorageHandlerUnsided;
 import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.EnderBagItem;
 import com.grim3212.assorted.storage.common.item.KeyRingItem;
@@ -31,10 +31,24 @@ public class AddItemHandlerCapabilityItems extends Item {
                 return new ICapabilityProvider() {
                     @Override
                     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+                        if (stack.getCount() > 1) {
+                            return LazyOptional.empty();
+                        }
+
+                        getStorageHandler();
                         if (cap == ForgeCapabilities.ITEM_HANDLER) {
-                            return ((ForgePlatformInventoryStorageHandler) inv.getStorageHandler(stack)).getCapability(side).cast();
+                            return getStorageHandler().getCapability().cast();
                         }
                         return LazyOptional.empty();
+                    }
+
+                    private ForgePlatformInventoryStorageHandlerUnsided storageHandler;
+
+                    private ForgePlatformInventoryStorageHandlerUnsided getStorageHandler() {
+                        if (storageHandler == null) {
+                            storageHandler = ((ForgePlatformInventoryStorageHandlerUnsided) inv.getStorageHandler(stack));
+                        }
+                        return storageHandler;
                     }
                 };
             }

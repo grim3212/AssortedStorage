@@ -90,7 +90,7 @@ public class LevelUpgradeItem extends Item implements ICrateUpgrade {
 
                     currentLockCode = storageBE.getLockCode();
                     currentCustomName = storageBE.getCustomName();
-                    currentItems = storageBE.getItems();
+                    currentItems = storageBE.getItemStackStorageHandler().getStacks();
 
                     newState = StorageBlocks.CHESTS.get(storageMaterial).get().defaultBlockState().setValue(BaseStorageBlock.FACING, world.getBlockState(pos).getValue(BaseStorageBlock.FACING));
                     newBlockEntity = new LockedChestBlockEntity(pos, newState);
@@ -114,7 +114,7 @@ public class LevelUpgradeItem extends Item implements ICrateUpgrade {
 
                     currentLockCode = barrelBE.getLockCode();
                     currentCustomName = barrelBE.getCustomName();
-                    currentItems = barrelBE.getItems();
+                    currentItems = barrelBE.getItemStackStorageHandler().getStacks();
 
                     newState = StorageBlocks.BARRELS.get(storageMaterial).get().defaultBlockState().setValue(LockedBarrelBlock.FACING, world.getBlockState(pos).getValue(LockedBarrelBlock.FACING));
                     newBlockEntity = new LockedBarrelBlockEntity(pos, newState);
@@ -138,7 +138,7 @@ public class LevelUpgradeItem extends Item implements ICrateUpgrade {
 
                     currentLockCode = hopperBE.getLockCode();
                     currentCustomName = hopperBE.getCustomName();
-                    currentItems = hopperBE.getItems();
+                    currentItems = hopperBE.getItemStackStorageHandler().getStacks();
 
                     newState = StorageBlocks.HOPPERS.get(storageMaterial).get().defaultBlockState().setValue(LockedHopperBlock.FACING, world.getBlockState(pos).getValue(LockedHopperBlock.FACING)).setValue(LockedHopperBlock.ENABLED, world.getBlockState(pos).getValue(LockedHopperBlock.ENABLED));
                     newBlockEntity = new LockedHopperBlockEntity(pos, newState);
@@ -162,7 +162,7 @@ public class LevelUpgradeItem extends Item implements ICrateUpgrade {
 
                     currentLockCode = storageBE.getLockCode();
                     currentCustomName = storageBE.getCustomName();
-                    currentItems = storageBE.getItems();
+                    currentItems = storageBE.getItemStackStorageHandler().getStacks();
 
                     newState = StorageBlocks.SHULKERS.get(storageMaterial).get().defaultBlockState().setValue(ShulkerBoxBlock.FACING, world.getBlockState(pos).getValue(ShulkerBoxBlock.FACING));
 
@@ -285,7 +285,7 @@ public class LevelUpgradeItem extends Item implements ICrateUpgrade {
                 chestBE.setCustomName(currentCustomName);
             }
 
-            chestBE.setItems(currentItems);
+            chestBE.getItemStackStorageHandler().setStacks(currentItems);
             chestBE.setLockCode(currentLockCode);
 
             if (!player.isCreative())
@@ -297,7 +297,7 @@ public class LevelUpgradeItem extends Item implements ICrateUpgrade {
                 barrelBE.setCustomName(currentCustomName);
             }
 
-            barrelBE.setItems(currentItems);
+            barrelBE.getItemStackStorageHandler().setStacks(currentItems);
             barrelBE.setLockCode(currentLockCode);
 
             if (!player.isCreative())
@@ -309,7 +309,7 @@ public class LevelUpgradeItem extends Item implements ICrateUpgrade {
                 shulkerBE.setCustomName(currentCustomName);
             }
 
-            shulkerBE.setItems(currentItems);
+            shulkerBE.getItemStackStorageHandler().setStacks(currentItems);
             shulkerBE.setLockCode(currentLockCode);
 
             if (!player.isCreative())

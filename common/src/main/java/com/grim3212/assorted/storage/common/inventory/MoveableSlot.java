@@ -1,14 +1,14 @@
 package com.grim3212.assorted.storage.common.inventory;
 
+import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.slot.SlotStorageHandler;
 import com.grim3212.assorted.storage.mixin.inventory.SlotAccessor;
-import net.minecraft.world.Container;
-import net.minecraft.world.inventory.Slot;
 
-public class MoveableSlot extends Slot {
+public class MoveableSlot extends SlotStorageHandler {
 
     private boolean shouldRender = true;
 
-    public MoveableSlot(Container par1iInventory, int par2, int par3, int par4) {
+    public MoveableSlot(IItemStorageHandler par1iInventory, int par2, int par3, int par4) {
         super(par1iInventory, par2, par3, par4);
     }
 
@@ -23,7 +23,6 @@ public class MoveableSlot extends Slot {
     }
 
     @Override
-
     public boolean isActive() {
         return this.shouldRender;
     }

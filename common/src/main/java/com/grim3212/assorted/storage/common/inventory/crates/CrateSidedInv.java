@@ -1,7 +1,7 @@
 package com.grim3212.assorted.storage.common.inventory.crates;
 
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
-import com.grim3212.assorted.lib.core.inventory.locking.LockedItemHandler;
+import com.grim3212.assorted.lib.core.inventory.locking.LockedStorageHandler;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.LargeItemStack;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CrateSidedInv implements IItemStorageHandler, LockedItemHandler {
+public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler {
     protected final CrateBlockEntity inv;
     @Nullable
     protected final Direction side;
@@ -137,7 +137,7 @@ public class CrateSidedInv implements IItemStorageHandler, LockedItemHandler {
 
     @Override
     @NotNull
-    public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate, String inLockCode) {
+    public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate, String inLockCode, boolean ignoreLock) {
         if (stack.isEmpty())
             return ItemStack.EMPTY;
 
@@ -156,7 +156,7 @@ public class CrateSidedInv implements IItemStorageHandler, LockedItemHandler {
             if (!Services.INVENTORY.canItemStacksStack(stack, stackInSlot.getStack()))
                 return stack;
 
-            if (!inv.canPlaceItemThroughFace(slot1, stack, side, inLockCode, false) || !inv.canPlaceItem(slot1, stack))
+            if (!inv.canPlaceItemThroughFace(slot1, stack, side, inLockCode, ignoreLock) || !inv.canPlaceItem(slot1, stack))
                 return stack;
 
             m = getSlotLimit(slot) - stackInSlot.getAmount();
@@ -179,7 +179,7 @@ public class CrateSidedInv implements IItemStorageHandler, LockedItemHandler {
                 }
             }
         } else {
-            if (!inv.canPlaceItemThroughFace(slot1, stack, side, inLockCode, false) || !inv.canPlaceItem(slot1, stack))
+            if (!inv.canPlaceItemThroughFace(slot1, stack, side, inLockCode, ignoreLock) || !inv.canPlaceItem(slot1, stack))
                 return stack;
 
             if (inv instanceof CrateCompactingBlockEntity compactingCrate) {
@@ -244,7 +244,7 @@ public class CrateSidedInv implements IItemStorageHandler, LockedItemHandler {
 
     @Override
     @NotNull
-    public ItemStack extractItem(int slot, int amount, boolean simulate, String inLockCode) {
+    public ItemStack extractItem(int slot, int amount, boolean simulate, String inLockCode, boolean ignoreLock) {
         if (amount == 0)
             return ItemStack.EMPTY;
 
@@ -258,7 +258,7 @@ public class CrateSidedInv implements IItemStorageHandler, LockedItemHandler {
         if (stackInSlot.isEmpty())
             return ItemStack.EMPTY;
 
-        if (!inv.canTakeItemThroughFace(slot1, stackInSlot.getStack(), side, inLockCode, false))
+        if (!inv.canTakeItemThroughFace(slot1, stackInSlot.getStack(), side, inLockCode, ignoreLock))
             return ItemStack.EMPTY;
 
         if (simulate) {
@@ -293,5 +293,15 @@ public class CrateSidedInv implements IItemStorageHandler, LockedItemHandler {
 
         if (slot1 != -1)
             inv.setItem(slot1, stack);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public void onContentsChanged(int slot) {
+        inv.setChanged();
     }
 }

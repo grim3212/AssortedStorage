@@ -1,14 +1,14 @@
 package com.grim3212.assorted.storage.common.inventory.crates;
 
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
-import com.grim3212.assorted.lib.core.inventory.locking.LockedItemHandler;
+import com.grim3212.assorted.lib.core.inventory.locking.LockedStorageHandler;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateControllerBlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CrateControllerInvWrapper implements IItemStorageHandler, LockedItemHandler {
+public class CrateControllerInvWrapper implements IItemStorageHandler, LockedStorageHandler {
     protected final CrateControllerBlockEntity inv;
     @Nullable
     protected final Direction side;
@@ -55,25 +55,25 @@ public class CrateControllerInvWrapper implements IItemStorageHandler, LockedIte
     @Override
     @NotNull
     public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
-        return inv.insertItem(slot, stack, simulate, "");
+        return inv.insertItem(slot, stack, simulate, "", false);
     }
 
     @Override
     @NotNull
-    public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate, String inLockCode) {
-        return inv.insertItem(slot, stack, simulate, inLockCode);
+    public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate, String inLockCode, boolean ignoreLock) {
+        return inv.insertItem(slot, stack, simulate, inLockCode, ignoreLock);
     }
 
     @Override
     @NotNull
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        return inv.extractItem(slot, amount, simulate, "");
+        return inv.extractItem(slot, amount, simulate, "", false);
     }
 
     @Override
     @NotNull
-    public ItemStack extractItem(int slot, int amount, boolean simulate, String inLockCode) {
-        return inv.extractItem(slot, amount, simulate, inLockCode);
+    public ItemStack extractItem(int slot, int amount, boolean simulate, String inLockCode, boolean ignoreLock) {
+        return inv.extractItem(slot, amount, simulate, inLockCode, ignoreLock);
     }
 
     @Override
@@ -88,5 +88,10 @@ public class CrateControllerInvWrapper implements IItemStorageHandler, LockedIte
 
     @Override
     public void setStackInSlot(int slot, @NotNull ItemStack stack) {
+    }
+
+    @Override
+    public void onContentsChanged(int slot) {
+        inv.setChanged();
     }
 }

@@ -18,6 +18,7 @@ import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.config.StorageClientConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -64,21 +65,24 @@ public class StorageClient {
         ClientServices.CLIENT.registerScreen(StorageContainerTypes.CRATE::get, CrateScreen::new);
         ClientServices.CLIENT.registerScreen(StorageContainerTypes.CRATE_COMPACTING::get, CrateCompactingScreen::new);
 
-        StorageContainerTypes.CHESTS.forEach((material, menu) -> {
-            ClientServices.CLIENT.registerScreen(menu::get, LockedMaterialScreen::new);
-        });
-
-        StorageContainerTypes.BARRELS.forEach((material, menu) -> {
-            ClientServices.CLIENT.registerScreen(menu::get, LockedMaterialScreen::new);
-        });
-
         StorageContainerTypes.HOPPERS.forEach((material, menu) -> {
             ClientServices.CLIENT.registerScreen(menu::get, LockedHopperScreen::new);
         });
 
-        StorageContainerTypes.SHULKERS.forEach((material, menu) -> {
-            ClientServices.CLIENT.registerScreen(menu::get, LockedMaterialScreen::new);
-        });
+        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_OAK_DOOR::get, RenderType.cutout());
+        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_SPRUCE_DOOR::get, RenderType.cutout());
+        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_BIRCH_DOOR::get, RenderType.cutout());
+        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_JUNGLE_DOOR::get, RenderType.cutout());
+        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_ACACIA_DOOR::get, RenderType.cutout());
+        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_DARK_OAK_DOOR::get, RenderType.cutout());
+        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_CRIMSON_DOOR::get, RenderType.cutout());
+        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_WARPED_DOOR::get, RenderType.cutout());
+        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_MANGROVE_DOOR::get, RenderType.cutout());
+        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_IRON_DOOR::get, RenderType.cutout());
+        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_QUARTZ_DOOR::get, RenderType.cutout());
+        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_GLASS_DOOR::get, RenderType.cutout());
+        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_STEEL_DOOR::get, RenderType.cutout());
+        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_CHAIN_LINK_DOOR::get, RenderType.cutout());
 
         ClientServices.CLIENT.registerBlockEntityRenderer(StorageBlockEntityTypes.WOOD_CABINET, WoodCabinetBlockEntityRenderer::new);
         ClientServices.CLIENT.registerBlockEntityRenderer(StorageBlockEntityTypes.GLASS_CABINET, GlassCabinetBlockEntityRenderer::new);

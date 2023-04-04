@@ -208,7 +208,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
 
                 IItemStorageHandler storageHandler = Services.INVENTORY.getItemStorageHandler(crate, direction).orElse(null);
                 if (storageHandler != null && storageHandler instanceof CrateSidedInv crateInv) {
-                    ItemStack response = code.isEmpty() ? crateInv.insertItem(slot, itemStackIn, true) : crateInv.insertItem(slot, itemStackIn, true, code);
+                    ItemStack response = code.isEmpty() ? crateInv.insertItem(slot, itemStackIn, true) : crateInv.insertItem(slot, itemStackIn, true, code, force);
                     if (response != itemStackIn) {
                         return true;
                     }
@@ -241,7 +241,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
             if (this.getLevel().getBlockEntity(connection.getPos()) instanceof CrateBlockEntity crate) {
                 IItemStorageHandler storageHandler = Services.INVENTORY.getItemStorageHandler(crate, direction).orElse(null);
                 if (storageHandler != null && storageHandler instanceof CrateSidedInv crateInv) {
-                    ItemStack response = code.isEmpty() ? crateInv.extractItem(slot, amount, true) : crateInv.extractItem(slot, amount, true, code);
+                    ItemStack response = code.isEmpty() ? crateInv.extractItem(slot, amount, true) : crateInv.extractItem(slot, amount, true, code, force);
                     if (!response.isEmpty()) {
                         return true;
                     }
@@ -412,10 +412,11 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
         return this.canPlaceItemThroughFace(slot, stack, null, getLockCode(), true);
     }
 
-    public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate, String inLockCode) {
+    public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate, String inLockCode, boolean ignoreLock) {
         if (stack.isEmpty())
             return ItemStack.EMPTY;
 
+        // TODO: Use ignoreLock
         // Can't insert since this is locked
         if (this.isLocked() && !this.getLockCode().equals(inLockCode)) {
             return stack;
@@ -431,7 +432,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
             if (this.getLevel().getBlockEntity(connection.getPos()) instanceof CrateBlockEntity crate) {
                 IItemStorageHandler storageHandler = Services.INVENTORY.getItemStorageHandler(crate, null).orElse(null);
                 if (storageHandler != null && storageHandler instanceof CrateSidedInv crateInv) {
-                    ItemStack response = inLockCode.isEmpty() ? crateInv.insertItem(slot, stack, simulate) : crateInv.insertItem(slot, stack, simulate, inLockCode);
+                    ItemStack response = inLockCode.isEmpty() ? crateInv.insertItem(slot, stack, simulate) : crateInv.insertItem(slot, stack, simulate, inLockCode, ignoreLock);
 
                     if (response != stack) {
                         return response;
@@ -443,10 +444,11 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
         return stack;
     }
 
-    public ItemStack extractItem(int slot, int amount, boolean simulate, String inLockCode) {
+    public ItemStack extractItem(int slot, int amount, boolean simulate, String inLockCode, boolean ignoreLock) {
         if (amount == 0)
             return ItemStack.EMPTY;
 
+        // TODO: Use ignoreLock
         // Can't insert since this is locked
         if (this.isLocked() && !this.getLockCode().equals(inLockCode)) {
             return ItemStack.EMPTY;
@@ -462,7 +464,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
             if (this.getLevel().getBlockEntity(connection.getPos()) instanceof CrateBlockEntity crate) {
                 IItemStorageHandler storageHandler = Services.INVENTORY.getItemStorageHandler(crate, null).orElse(null);
                 if (storageHandler != null && storageHandler instanceof CrateSidedInv crateInv) {
-                    ItemStack response = inLockCode.isEmpty() ? crateInv.extractItem(slot, amount, simulate) : crateInv.extractItem(slot, amount, simulate, inLockCode);
+                    ItemStack response = inLockCode.isEmpty() ? crateInv.extractItem(slot, amount, simulate) : crateInv.extractItem(slot, amount, simulate, inLockCode, ignoreLock);
                     if (!response.isEmpty()) {
                         return response;
                     }
@@ -484,7 +486,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
 
                 for (int i = 0; i < possibleSlots.length; i++) {
                     int connectionSlot = possibleSlots[i];
-                    ItemStack insertReturn = this.insertItem(connectionSlot, slotItem, false, this.getLockCode());
+                    ItemStack insertReturn = this.insertItem(connectionSlot, slotItem, false, this.getLockCode(), false);
 
                     // We added all of the stack to this slot
                     if (insertReturn.isEmpty()) {
@@ -514,7 +516,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements LockedWor
 
         ItemStack playerItem = player.getItemInHand(handIn).copy();
         for (int connectionSlot = 0; connectionSlot < this.slottedConnections.size(); connectionSlot++) {
-            ItemStack insertReturn = this.insertItem(connectionSlot, playerItem, false, this.getLockCode());
+            ItemStack insertReturn = this.insertItem(connectionSlot, playerItem, false, this.getLockCode(), false);
 
             // We added all of the stack to this slot
             if (insertReturn.isEmpty()) {

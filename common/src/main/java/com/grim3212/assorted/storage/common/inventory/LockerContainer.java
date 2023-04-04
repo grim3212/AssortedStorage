@@ -1,8 +1,8 @@
 package com.grim3212.assorted.storage.common.inventory;
 
+import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -12,26 +12,26 @@ import net.minecraft.world.item.ItemStack;
 
 public class LockerContainer extends AbstractContainerMenu {
 
-    private final Container inventory;
+    private final IItemStorageHandler inventory;
     private final int numRows;
 
     public static LockerContainer createLockerContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
-        return new LockerContainer(StorageContainerTypes.LOCKER.get(), windowId, playerInventory, new SimpleContainer(45), 5);
+        return new LockerContainer(StorageContainerTypes.LOCKER.get(), windowId, playerInventory, new ItemStackStorageHandler(45), 5);
     }
 
-    public static LockerContainer createLockerContainer(int windowId, Inventory playerInventory, Container inventory) {
+    public static LockerContainer createLockerContainer(int windowId, Inventory playerInventory, IItemStorageHandler inventory) {
         return new LockerContainer(StorageContainerTypes.LOCKER.get(), windowId, playerInventory, inventory, 5);
     }
 
     public static LockerContainer createDualLockerContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
-        return new LockerContainer(StorageContainerTypes.DUAL_LOCKER.get(), windowId, playerInventory, new SimpleContainer(90), 10);
+        return new LockerContainer(StorageContainerTypes.DUAL_LOCKER.get(), windowId, playerInventory, new ItemStackStorageHandler(90), 10);
     }
 
-    public static LockerContainer createDualLockerContainer(int windowId, Inventory playerInventory, Container inventory) {
+    public static LockerContainer createDualLockerContainer(int windowId, Inventory playerInventory, IItemStorageHandler inventory) {
         return new LockerContainer(StorageContainerTypes.DUAL_LOCKER.get(), windowId, playerInventory, inventory, 10);
     }
 
-    public LockerContainer(MenuType<?> containerType, int windowId, Inventory playerInventory, Container inventory, int numRows) {
+    public LockerContainer(MenuType<?> containerType, int windowId, Inventory playerInventory, IItemStorageHandler inventory, int numRows) {
         super(containerType, windowId);
         this.inventory = inventory;
         this.numRows = numRows;
@@ -93,7 +93,7 @@ public class LockerContainer extends AbstractContainerMenu {
         if (slot != null && slot.hasItem()) {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
-            int maxSlot = this.inventory.getContainerSize();
+            int maxSlot = this.inventory.getSlots();
 
             if (index < maxSlot) {
                 if (!this.moveItemStackTo(itemstack1, maxSlot, this.slots.size(), true)) {

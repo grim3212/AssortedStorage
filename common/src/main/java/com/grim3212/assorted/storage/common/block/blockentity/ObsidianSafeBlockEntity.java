@@ -17,7 +17,7 @@ public class ObsidianSafeBlockEntity extends BaseStorageBlockEntity {
 
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
-        return StorageContainer.createObsidianSafeContainer(windowId, player, this);
+        return StorageContainer.createObsidianSafeContainer(windowId, player, this.getItemStackStorageHandler());
     }
 
     @Override

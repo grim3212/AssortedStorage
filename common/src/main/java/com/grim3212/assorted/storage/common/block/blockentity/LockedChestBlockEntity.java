@@ -5,8 +5,8 @@ import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.common.block.LockedChestBlock;
 import com.grim3212.assorted.storage.common.inventory.LockedMaterialContainer;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
+import com.grim3212.assorted.storage.common.inventory.StorageItemStackStorageHandler;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -15,36 +15,26 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
-import java.util.stream.IntStream;
-
 public class LockedChestBlockEntity extends BaseStorageBlockEntity {
 
     private final StorageMaterial storageMaterial;
-    protected final int[] slots;
 
     public LockedChestBlockEntity(BlockPos pos, BlockState state) {
         super(StorageBlockEntityTypes.LOCKED_CHEST.get(), pos, state);
 
         if (state.getBlock() instanceof LockedChestBlock lockedChest) {
             this.storageMaterial = lockedChest.getStorageMaterial();
-            setStartingContents(this.storageMaterial != null ? this.storageMaterial.totalItems() : 27);
         } else {
             // Default to regular chest
             this.storageMaterial = null;
-            this.setStartingContents(27);
         }
 
-        this.slots = IntStream.range(0, this.getContainerSize()).toArray();
-    }
-
-    @Override
-    public int[] getSlotsForFace(Direction side) {
-        return this.slots;
+        this.setStorageHandler(new StorageItemStackStorageHandler(this, storageMaterial != null ? storageMaterial.totalItems() : 27));
     }
 
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
-        return new LockedMaterialContainer(StorageContainerTypes.CHESTS.get(storageMaterial).get(), windowId, player, this, storageMaterial, false);
+        return new LockedMaterialContainer(StorageContainerTypes.CHESTS.get(storageMaterial).get(), windowId, player, this.getItemStackStorageHandler(), storageMaterial, false);
     }
 
     @Override

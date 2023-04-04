@@ -34,7 +34,7 @@ public class EnderSavedData extends SavedData implements IEnderData {
     }
 
     private static EnderSavedData DUMMY_SAVE = new EnderSavedData() {
-        private final LockedEnderChestInventory inv = new LockedEnderChestInventory(this, 27) {
+        private final LockedEnderChestInventory inv = new LockedEnderChestInventory(this, "", 27) {
             @Nonnull
             @Override
             public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
@@ -96,7 +96,7 @@ public class EnderSavedData extends SavedData implements IEnderData {
             LockedEnderChestInventory inventory = enderChests.get(code.getLockCode());
 
             if (inventory == null) {
-                inventory = new LockedEnderChestInventory(this, 27);
+                inventory = new LockedEnderChestInventory(this, code.getLockCode(), 27);
                 enderChests.put(code.getLockCode(), inventory);
             }
 
@@ -127,9 +127,10 @@ public class EnderSavedData extends SavedData implements IEnderData {
 
             for (int i = 0; i < enderChestsNBT.size(); ++i) {
                 CompoundTag chest = enderChestsNBT.getCompound(i);
-                LockedEnderChestInventory inventory = new LockedEnderChestInventory(this, 27);
+                String lockCode = chest.getString("Code");
+                LockedEnderChestInventory inventory = new LockedEnderChestInventory(this, lockCode, 27);
                 inventory.deserializeNBT(chest.getCompound("Inventory"));
-                this.enderChests.put(chest.getString("Code"), inventory);
+                this.enderChests.put(lockCode, inventory);
             }
         }
 

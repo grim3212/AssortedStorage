@@ -1,17 +1,15 @@
 package com.grim3212.assorted.storage.common.inventory;
 
+import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.common.block.blockentity.ItemTowerBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.stream.IntStream;
-
-public class ItemTowerInventory implements WorldlyContainer {
+public class ItemTowerInventory extends ItemStackStorageHandler {
 
     private final NonNullList<ItemTowerBlockEntity> itemTowers;
     private final BlockPos openedFrom;
@@ -22,11 +20,13 @@ public class ItemTowerInventory implements WorldlyContainer {
         // Grab the first element
         if (itemTowers.size() < 1) {
             Constants.LOG.error("Opened tower without any tileentities! Something went wrong!");
+        } else {
+            setSize(this.getSlots());
         }
     }
 
-    public WorldlyContainer getMainInventory() {
-        return this.itemTowers.get(0);
+    public StorageItemStackStorageHandler getMainInventory() {
+        return this.itemTowers.get(0).getItemStackStorageHandler();
     }
 
     public void setAnimation(int animID) {
@@ -35,23 +35,18 @@ public class ItemTowerInventory implements WorldlyContainer {
     }
 
     private int getLocalSlot(int slot) {
-        return slot % this.getMainInventory().getContainerSize();
+        return slot % this.getMainInventory().getSlots();
     }
 
-    private WorldlyContainer getInvFromSlot(int slot) {
-        int inventoryIndex = (int) Math.floor(slot / this.getMainInventory().getContainerSize());
-        return (WorldlyContainer) this.itemTowers.get(inventoryIndex);
-    }
-
-    @Override
-    public int getContainerSize() {
-        return this.getMainInventory().getContainerSize() * this.itemTowers.size();
+    private StorageItemStackStorageHandler getInvFromSlot(int slot) {
+        int inventoryIndex = (int) Math.floor(slot / this.getMainInventory().getSlots());
+        return this.itemTowers.get(inventoryIndex).getItemStackStorageHandler();
     }
 
     @Override
     public boolean isEmpty() {
-        for (WorldlyContainer inv : itemTowers) {
-            if (!inv.isEmpty()) {
+        for (ItemTowerBlockEntity inv : itemTowers) {
+            if (!inv.getItemStackStorageHandler().isEmpty()) {
                 return false;
             }
         }
@@ -60,34 +55,38 @@ public class ItemTowerInventory implements WorldlyContainer {
     }
 
     @Override
-    public boolean canPlaceItem(int index, ItemStack stack) {
-        return getInvFromSlot(index).canPlaceItem(getLocalSlot(index), stack);
+    public int getSlots() {
+        return this.getMainInventory().getSlots() * this.itemTowers.size();
     }
 
     @Override
-    public ItemStack getItem(int index) {
-        return getInvFromSlot(index).getItem(getLocalSlot(index));
+    public ItemStack getStackInSlot(int index) {
+        return getInvFromSlot(index).getStackInSlot(getLocalSlot(index));
     }
 
     @Override
-    public ItemStack removeItem(int index, int count) {
-        return getInvFromSlot(index).removeItem(getLocalSlot(index), count);
+    public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+        return getInvFromSlot(slot).insertItem(getLocalSlot(slot), stack, simulate);
     }
 
     @Override
-    public ItemStack removeItemNoUpdate(int index) {
-        return this.getInvFromSlot(index).removeItemNoUpdate(getLocalSlot(index));
+    public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
+        return getInvFromSlot(slot).extractItem(getLocalSlot(slot), amount, simulate);
     }
 
     @Override
-    public void setItem(int index, ItemStack stack) {
-        getInvFromSlot(index).setItem(getLocalSlot(index), stack);
+    public int getSlotLimit(int slot) {
+        return getInvFromSlot(slot).getSlotLimit(getLocalSlot(slot));
     }
 
     @Override
-    public void setChanged() {
-        for (WorldlyContainer inventory : this.itemTowers)
-            inventory.setChanged();
+    public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+        return getInvFromSlot(slot).isItemValid(getLocalSlot(slot), stack);
+    }
+
+    @Override
+    public void setStackInSlot(int slot, @NotNull ItemStack stack) {
+        getInvFromSlot(slot).setStackInSlot(getLocalSlot(slot), stack);
     }
 
     @Override
@@ -97,35 +96,13 @@ public class ItemTowerInventory implements WorldlyContainer {
 
     @Override
     public void startOpen(Player player) {
-        for (WorldlyContainer inventory : this.itemTowers)
-            inventory.startOpen(player);
+        for (ItemTowerBlockEntity inventory : this.itemTowers)
+            inventory.getItemStackStorageHandler().startOpen(player);
     }
 
     @Override
     public void stopOpen(Player player) {
-        for (WorldlyContainer inventory : this.itemTowers)
-            inventory.stopOpen(player);
-    }
-
-    @Override
-    public void clearContent() {
-        for (WorldlyContainer inv : itemTowers) {
-            inv.clearContent();
-        }
-    }
-
-    @Override
-    public int[] getSlotsForFace(Direction side) {
-        return IntStream.range(0, this.getContainerSize()).toArray();
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction) {
-        return this.getMainInventory().canPlaceItemThroughFace(index, itemStackIn, direction);
-    }
-
-    @Override
-    public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
-        return this.getMainInventory().canPlaceItemThroughFace(index, stack, direction);
+        for (ItemTowerBlockEntity inventory : this.itemTowers)
+            inventory.getItemStackStorageHandler().stopOpen(player);
     }
 }

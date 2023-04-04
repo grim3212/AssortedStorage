@@ -85,9 +85,6 @@ public class KeyRingContainer extends AbstractContainerMenu {
         if (clickTypeIn == ClickType.SWAP)
             return;
 
-        if (slot >= 0)
-            getSlot(slot).container.setChanged();
-
         super.clicked(slot, dragType, clickTypeIn, player);
     }
 

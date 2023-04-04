@@ -1,8 +1,9 @@
 package com.grim3212.assorted.storage.common.inventory;
 
+import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.slot.SlotStorageHandler;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -12,67 +13,67 @@ import net.minecraft.world.item.ItemStack;
 
 public class StorageContainer extends AbstractContainerMenu {
 
-    private final Container inventory;
+    private final IItemStorageHandler inventory;
 
     public static StorageContainer createGlassCabinetContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
-        return new StorageContainer(StorageContainerTypes.GLASS_CABINET.get(), windowId, playerInventory, new SimpleContainer(27));
+        return new StorageContainer(StorageContainerTypes.GLASS_CABINET.get(), windowId, playerInventory, new ItemStackStorageHandler(27));
     }
 
-    public static StorageContainer createGlassCabinetContainer(int windowId, Inventory playerInventory, Container inventory) {
+    public static StorageContainer createGlassCabinetContainer(int windowId, Inventory playerInventory, IItemStorageHandler inventory) {
         return new StorageContainer(StorageContainerTypes.GLASS_CABINET.get(), windowId, playerInventory, inventory);
     }
 
     public static StorageContainer createWoodCabinetContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
-        return new StorageContainer(StorageContainerTypes.WOOD_CABINET.get(), windowId, playerInventory, new SimpleContainer(27));
+        return new StorageContainer(StorageContainerTypes.WOOD_CABINET.get(), windowId, playerInventory, new ItemStackStorageHandler(27));
     }
 
-    public static StorageContainer createWoodCabinetContainer(int windowId, Inventory playerInventory, Container inventory) {
+    public static StorageContainer createWoodCabinetContainer(int windowId, Inventory playerInventory, IItemStorageHandler inventory) {
         return new StorageContainer(StorageContainerTypes.WOOD_CABINET.get(), windowId, playerInventory, inventory);
     }
 
     public static StorageContainer createWarehouseCrateContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
-        return new StorageContainer(StorageContainerTypes.WAREHOUSE_CRATE.get(), windowId, playerInventory, new SimpleContainer(27));
+        return new StorageContainer(StorageContainerTypes.WAREHOUSE_CRATE.get(), windowId, playerInventory, new ItemStackStorageHandler(27));
     }
 
-    public static StorageContainer createWarehouseCrateContainer(int windowId, Inventory playerInventory, Container inventory) {
+    public static StorageContainer createWarehouseCrateContainer(int windowId, Inventory playerInventory, IItemStorageHandler inventory) {
         return new StorageContainer(StorageContainerTypes.WAREHOUSE_CRATE.get(), windowId, playerInventory, inventory);
     }
 
     public static StorageContainer createGoldSafeContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
-        return new StorageContainer(StorageContainerTypes.GOLD_SAFE.get(), windowId, playerInventory, new SimpleContainer(36));
+        return new StorageContainer(StorageContainerTypes.GOLD_SAFE.get(), windowId, playerInventory, new ItemStackStorageHandler(36));
     }
 
-    public static StorageContainer createGoldSafeContainer(int windowId, Inventory playerInventory, Container inventory) {
+    public static StorageContainer createGoldSafeContainer(int windowId, Inventory playerInventory, IItemStorageHandler inventory) {
         return new StorageContainer(StorageContainerTypes.GOLD_SAFE.get(), windowId, playerInventory, inventory);
     }
 
     public static StorageContainer createEnderChestContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
-        return new StorageContainer(StorageContainerTypes.LOCKED_ENDER_CHEST.get(), windowId, playerInventory, new SimpleContainer(27));
+        return new StorageContainer(StorageContainerTypes.LOCKED_ENDER_CHEST.get(), windowId, playerInventory, new ItemStackStorageHandler(27));
     }
 
-    public static StorageContainer createEnderChestContainer(int windowId, Inventory playerInventory, Container inventory) {
+    public static StorageContainer createEnderChestContainer(int windowId, Inventory playerInventory, IItemStorageHandler inventory) {
         return new StorageContainer(StorageContainerTypes.LOCKED_ENDER_CHEST.get(), windowId, playerInventory, inventory);
     }
 
     public static StorageContainer createObsidianSafeContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
-        return new StorageContainer(StorageContainerTypes.OBSIDIAN_SAFE.get(), windowId, playerInventory, new SimpleContainer(27));
+        return new StorageContainer(StorageContainerTypes.OBSIDIAN_SAFE.get(), windowId, playerInventory, new ItemStackStorageHandler(27));
     }
 
-    public static StorageContainer createObsidianSafeContainer(int windowId, Inventory playerInventory, Container inventory) {
+    public static StorageContainer createObsidianSafeContainer(int windowId, Inventory playerInventory, IItemStorageHandler inventory) {
         return new StorageContainer(StorageContainerTypes.OBSIDIAN_SAFE.get(), windowId, playerInventory, inventory);
     }
 
-    public StorageContainer(MenuType<?> containerType, int windowId, Inventory playerInventory, Container inventory) {
+    public StorageContainer(MenuType<?> containerType, int windowId, Inventory playerInventory, IItemStorageHandler inventory) {
         super(containerType, windowId);
         this.inventory = inventory;
 
-        int numRows = inventory.getContainerSize() / 9;
+        int numRows = inventory.getSlots() / 9;
 
         inventory.startOpen(playerInventory.player);
 
         for (int chestRow = 0; chestRow < numRows; chestRow++) {
             for (int chestCol = 0; chestCol < 9; chestCol++) {
-                this.addSlot(new Slot(inventory, chestCol + chestRow * 9, 8 + chestCol * 18, 18 + chestRow * 18));
+                this.addSlot(new SlotStorageHandler(inventory, chestCol + chestRow * 9, 8 + chestCol * 18, 18 + chestRow * 18));
             }
         }
 
@@ -104,7 +105,7 @@ public class StorageContainer extends AbstractContainerMenu {
         if (slot != null && slot.hasItem()) {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
-            int maxSlot = this.inventory.getContainerSize();
+            int maxSlot = this.inventory.getSlots();
 
             if (index < maxSlot) {
                 if (!this.moveItemStackTo(itemstack1, maxSlot, this.slots.size(), true)) {

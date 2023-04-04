@@ -74,8 +74,6 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
         super(props.dynamicShape().noOcclusion().isSuffocating(Predicates.isShulkerBlock).isViewBlocking(Predicates.isShulkerBlock));
         this.material = material;
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.UP));
-
-//
     }
 
     @Override
@@ -118,8 +116,8 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
             DyeColor color = shulkerBE.getColor();
             level.setBlock(pos, ShulkerBoxBlock.getBlockByColor(color).defaultBlockState().setValue(ShulkerBoxBlock.FACING, state.getValue(LockedShulkerBoxBlock.FACING)), 3);
             if (level.getBlockEntity(pos) instanceof ShulkerBoxBlockEntity newShulkerBE) {
-                for (int i = 0; i < shulkerBE.getContainerSize(); i++) {
-                    newShulkerBE.setItem(i, shulkerBE.getItem(i).copy());
+                for (int i = 0; i < shulkerBE.getItemStackStorageHandler().getSlots(); i++) {
+                    newShulkerBE.setItem(i, shulkerBE.getItemStackStorageHandler().getStackInSlot(i).copy());
                 }
 
             }
@@ -276,7 +274,7 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
     public void playerWillDestroy(Level worldIn, BlockPos pos, BlockState state, Player player) {
         BlockEntity tileentity = worldIn.getBlockEntity(pos);
         if (tileentity instanceof LockedShulkerBoxBlockEntity shulkerBE) {
-            if (!worldIn.isClientSide && player.isCreative() && !shulkerBE.isEmpty()) {
+            if (!worldIn.isClientSide && player.isCreative() && !shulkerBE.getItemStackStorageHandler().isEmpty()) {
                 ItemStack itemstack = new ItemStack(this);
                 tileentity.saveToItem(itemstack);
                 NBTHelper.putInt(itemstack, "Color", shulkerBE.colorToSave());
@@ -302,8 +300,8 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
         BlockEntity tileentity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (tileentity instanceof LockedShulkerBoxBlockEntity shulkerBE) {
             builder = builder.withDynamicDrop(CONTENTS, (context, stackConsumer) -> {
-                for (int i = 0; i < shulkerBE.getContainerSize(); ++i) {
-                    stackConsumer.accept(shulkerBE.getItem(i));
+                for (int i = 0; i < shulkerBE.getItemStackStorageHandler().getSlots(); ++i) {
+                    stackConsumer.accept(shulkerBE.getItemStackStorageHandler().getStackInSlot(i));
                 }
             });
         }

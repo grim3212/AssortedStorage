@@ -135,18 +135,17 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
         if (!state.is(newState.getBlock())) {
             BlockEntity tileentity = worldIn.getBlockEntity(pos);
 
-            if (tileentity instanceof ILockable) {
-                ILockable teStorage = (ILockable) tileentity;
+            if (tileentity instanceof BaseStorageBlockEntity storageBlockEntity) {
 
-                if (teStorage.isLocked()) {
+                if (storageBlockEntity.isLocked()) {
                     ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
                     CompoundTag tag = new CompoundTag();
-                    new StorageLockCode(teStorage.getLockCode()).write(tag);
+                    new StorageLockCode(storageBlockEntity.getLockCode()).write(tag);
                     lockStack.setTag(tag);
                     Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
                 }
 
-                Containers.dropContents(worldIn, pos, (WorldlyContainer) tileentity);
+                StorageUtil.dropContents(worldIn, pos, storageBlockEntity.getItemStackStorageHandler());
                 worldIn.updateNeighbourForOutputSignal(pos, this);
             }
 

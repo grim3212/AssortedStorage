@@ -17,7 +17,7 @@ public class WarehouseCrateBlockEntity extends BaseStorageBlockEntity {
 
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
-        return StorageContainer.createWarehouseCrateContainer(windowId, player, this);
+        return StorageContainer.createWarehouseCrateContainer(windowId, player, this.getItemStackStorageHandler());
     }
 
     @Override

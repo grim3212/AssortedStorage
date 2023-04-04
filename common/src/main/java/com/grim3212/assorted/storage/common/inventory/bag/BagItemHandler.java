@@ -21,14 +21,7 @@ public class BagItemHandler extends ItemStackStorageHandler {
     }
 
     @Override
-    public void load() {
-        CompoundTag tag = itemStack.getOrCreateTag();
-        if (tag.contains("Inventory"))
-            deserializeNBT(tag.getCompound("Inventory"));
-    }
-
-    @Override
-    public void save() {
+    public void onContentsChanged(int slot) {
         CompoundTag nbt = itemStack.getOrCreateTag();
         nbt.put("Inventory", serializeNBT());
 
@@ -37,5 +30,11 @@ public class BagItemHandler extends ItemStackStorageHandler {
         ItemStack storageLock = this.getStackInSlot(0);
         String newLockCode = StorageUtil.getCode(storageLock);
         nbt.putString("Storage_Lock", newLockCode);
+    }
+
+    public void load() {
+        CompoundTag tag = itemStack.getOrCreateTag();
+        if (tag.contains("Inventory"))
+            deserializeNBT(tag.getCompound("Inventory"));
     }
 }

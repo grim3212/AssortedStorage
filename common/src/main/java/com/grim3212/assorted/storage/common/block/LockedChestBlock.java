@@ -110,11 +110,11 @@ public class LockedChestBlock extends BaseStorageBlock implements IStorageMateri
 
         BlockState state = worldIn.getBlockState(pos);
         if (state.getBlock() instanceof LockedChestBlock && worldIn.getBlockEntity(pos) instanceof LockedChestBlockEntity chestBE) {
-            NonNullList<ItemStack> chestItems = NonNullList.withSize(chestBE.getContainerSize(), ItemStack.EMPTY);
-            for (int i = 0; i < chestBE.getContainerSize(); i++) {
-                chestItems.set(i, chestBE.getItem(i).copy());
+            NonNullList<ItemStack> chestItems = NonNullList.withSize(chestBE.getItemStackStorageHandler().getSlots(), ItemStack.EMPTY);
+            for (int i = 0; i < chestBE.getItemStackStorageHandler().getSlots(); i++) {
+                chestItems.set(i, chestBE.getItemStackStorageHandler().getStackInSlot(i).copy());
+                chestBE.getItemStackStorageHandler().setStackInSlot(i, ItemStack.EMPTY);
             }
-            chestBE.clearContent();
             chestBE.setLockCode(null);
 
             worldIn.setBlock(pos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, state.getValue(LockedChestBlock.FACING)), 3);

@@ -33,8 +33,8 @@ public class StorageContainerTypes {
     public static final IRegistryObject<MenuType<StorageContainer>> LOCKED_ENDER_CHEST = CONTAINERS.register("locked_ender_chest", () -> Services.PLATFORM.createMenuType(StorageContainer::createEnderChestContainer));
     public static final IRegistryObject<MenuType<BagContainer>> BAG = CONTAINERS.register("bag", () -> Services.PLATFORM.createMenuType(BagContainer::new));
     public static final IRegistryObject<MenuType<EnderBagContainer>> ENDER_BAG = CONTAINERS.register("ender_bag", () -> Services.PLATFORM.createMenuType(EnderBagContainer::new));
-    public static final IRegistryObject<MenuType<CrateContainer>> CRATE = CONTAINERS.register("crate", () -> Services.PLATFORM.createMenuType((syncId, inv, c) -> CrateContainer.createCrateContainer(syncId, inv, c)));
-    public static final IRegistryObject<MenuType<CrateCompactingContainer>> CRATE_COMPACTING = CONTAINERS.register("crate_compacting", () -> Services.PLATFORM.createMenuType((syncId, inv, c) -> CrateCompactingContainer.createCrateContainer(syncId, inv, c)));
+    public static final IRegistryObject<MenuType<CrateContainer>> CRATE = CONTAINERS.register("crate", () -> Services.PLATFORM.createMenuType(CrateContainer::createCrateContainer));
+    public static final IRegistryObject<MenuType<CrateCompactingContainer>> CRATE_COMPACTING = CONTAINERS.register("crate_compacting", () -> Services.PLATFORM.createMenuType(CrateCompactingContainer::createCrateContainer));
 
     public static final Map<StorageMaterial, IRegistryObject<MenuType<LockedMaterialContainer>>> CHESTS = Maps.newHashMap();
     public static final Map<StorageMaterial, IRegistryObject<MenuType<LockedMaterialContainer>>> SHULKERS = Maps.newHashMap();

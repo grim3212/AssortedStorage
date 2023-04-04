@@ -15,15 +15,14 @@ public class KeyRingItemHandler extends ItemStackStorageHandler {
     }
 
     @Override
+    public void onContentsChanged(int slot) {
+        CompoundTag nbt = itemStack.getOrCreateTag();
+        nbt.put("Inventory", serializeNBT());
+    }
+
     public void load() {
         CompoundTag tag = itemStack.getOrCreateTag();
         if (tag.contains("Inventory"))
             deserializeNBT(tag.getCompound("Inventory"));
-    }
-
-    @Override
-    public void save() {
-        CompoundTag nbt = itemStack.getOrCreateTag();
-        nbt.put("Inventory", serializeNBT());
     }
 }
