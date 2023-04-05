@@ -1,13 +1,16 @@
 package com.grim3212.assorted.storage.common.block;
 
 import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
+import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.common.block.blockentity.GoldSafeBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -73,30 +76,28 @@ public class GoldSafeBlock extends BaseStorageBlock {
     @Override
     public ItemStack getCloneItemStack(BlockGetter worldIn, BlockPos pos, BlockState state) {
         ItemStack itemstack = super.getCloneItemStack(worldIn, pos, state);
-        GoldSafeBlockEntity goldsafetileentity = (GoldSafeBlockEntity) worldIn.getBlockEntity(pos);
-        CompoundTag compoundnbt = goldsafetileentity.saveToNbt(new CompoundTag());
-        if (!compoundnbt.isEmpty()) {
-            itemstack.addTagElement("BlockEntityTag", compoundnbt);
-        }
-
+        worldIn.getBlockEntity(pos, StorageBlockEntityTypes.GOLD_SAFE.get()).ifPresent((goldSafeBlockEntity) -> {
+            goldSafeBlockEntity.saveToItem(itemstack);
+            String lockCode = StorageUtil.getCode(goldSafeBlockEntity);
+            StorageUtil.writeCodeToStack(lockCode, itemstack);
+        });
         return itemstack;
     }
 
     @Override
     public void playerWillDestroy(Level worldIn, BlockPos pos, BlockState state, Player player) {
         BlockEntity tileentity = worldIn.getBlockEntity(pos);
-        if (tileentity instanceof GoldSafeBlockEntity) {
-            GoldSafeBlockEntity goldsafetileentity = (GoldSafeBlockEntity) tileentity;
-            if (!worldIn.isClientSide && player.isCreative() && !goldsafetileentity.getItemStackStorageHandler().isEmpty()) {
-                ItemStack itemstack = new ItemStack(StorageBlocks.GOLD_SAFE.get());
-                CompoundTag compoundnbt = goldsafetileentity.getItemStackStorageHandler().serializeNBT();
-                if (!compoundnbt.isEmpty()) {
-                    itemstack.addTagElement("BlockEntityTag", compoundnbt);
+        if (tileentity instanceof GoldSafeBlockEntity goldSafeBlockEntity) {
+            if (!worldIn.isClientSide && player.isCreative() && !goldSafeBlockEntity.getItemStackStorageHandler().isEmpty()) {
+                ItemStack itemstack = new ItemStack(this);
+                tileentity.saveToItem(itemstack);
+
+                if (goldSafeBlockEntity.hasCustomName()) {
+                    itemstack.setHoverName(goldSafeBlockEntity.getCustomName());
                 }
 
-                if (goldsafetileentity.hasCustomName()) {
-                    itemstack.setHoverName(goldsafetileentity.getCustomName());
-                }
+                String lockCode = StorageUtil.getCode(goldSafeBlockEntity);
+                StorageUtil.writeCodeToStack(lockCode, itemstack);
 
                 ItemEntity itementity = new ItemEntity(worldIn, (double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D, itemstack);
                 itementity.setDefaultPickUpDelay();
@@ -110,13 +111,11 @@ public class GoldSafeBlock extends BaseStorageBlock {
     @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
         BlockEntity tileentity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
-        if (tileentity instanceof GoldSafeBlockEntity) {
-            GoldSafeBlockEntity goldsafetileentity = (GoldSafeBlockEntity) tileentity;
+        if (tileentity instanceof GoldSafeBlockEntity goldSafeBlockEntity) {
             builder = builder.withDynamicDrop(CONTENTS, (context, stackConsumer) -> {
-                for (int i = 0; i < goldsafetileentity.getItemStackStorageHandler().getSlots(); ++i) {
-                    stackConsumer.accept(goldsafetileentity.getItemStackStorageHandler().getStackInSlot(i));
+                for (int i = 0; i < goldSafeBlockEntity.getItemStackStorageHandler().getSlots(); ++i) {
+                    stackConsumer.accept(goldSafeBlockEntity.getItemStackStorageHandler().getStackInSlot(i).copy());
                 }
-
             });
         }
 
@@ -126,15 +125,19 @@ public class GoldSafeBlock extends BaseStorageBlock {
     @Override
     public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, worldIn, tooltip, flagIn);
-        CompoundTag compoundnbt = stack.getTagElement("BlockEntityTag");
-        if (compoundnbt != null) {
-            if (compoundnbt.contains("LootTable", 8)) {
-                tooltip.add(Component.literal("???????"));
-            }
 
-            if (compoundnbt.contains("Items", 9)) {
+        String code = StorageUtil.getCode(stack);
+
+        if (!code.isEmpty()) {
+            tooltip.add(Component.translatable(Constants.MOD_ID + ".info.combo", Component.literal(code).withStyle(ChatFormatting.AQUA)));
+        }
+
+        CompoundTag compoundnbt = stack.getTagElement("BlockEntityTag");
+        if (compoundnbt != null && compoundnbt.contains("Inventory", Tag.TAG_COMPOUND)) {
+            CompoundTag inventory = compoundnbt.getCompound("Inventory");
+            if (inventory.contains("Items", Tag.TAG_LIST)) {
                 NonNullList<ItemStack> nonnulllist = NonNullList.withSize(27, ItemStack.EMPTY);
-                ContainerHelper.loadAllItems(compoundnbt, nonnulllist);
+                ContainerHelper.loadAllItems(inventory, nonnulllist);
                 int i = 0;
                 int j = 0;
 

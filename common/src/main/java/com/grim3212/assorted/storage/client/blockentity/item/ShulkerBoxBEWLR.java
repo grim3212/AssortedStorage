@@ -40,6 +40,8 @@ public class ShulkerBoxBEWLR extends BlockEntityWithoutLevelRenderer {
 
             if (StorageUtil.hasCode(stack)) {
                 this.blockEntity.setLockCode(StorageUtil.getCode(stack));
+            } else {
+                this.blockEntity.setLockCode(null);
             }
 
             this.blockEntityRenderDispatcher.get().renderItem(this.blockEntity, matrix, renderer, light, overlayLight);

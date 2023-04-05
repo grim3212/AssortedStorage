@@ -1,6 +1,7 @@
 package com.grim3212.assorted.storage.common.inventory;
 
 import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.impl.LockedItemStackStorageHandler;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.common.block.blockentity.ItemTowerBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -25,7 +26,7 @@ public class ItemTowerInventory extends ItemStackStorageHandler {
         }
     }
 
-    public StorageItemStackStorageHandler getMainInventory() {
+    public LockedItemStackStorageHandler getMainInventory() {
         return this.itemTowers.get(0).getItemStackStorageHandler();
     }
 
@@ -38,7 +39,7 @@ public class ItemTowerInventory extends ItemStackStorageHandler {
         return slot % this.getMainInventory().getSlots();
     }
 
-    private StorageItemStackStorageHandler getInvFromSlot(int slot) {
+    private LockedItemStackStorageHandler getInvFromSlot(int slot) {
         int inventoryIndex = (int) Math.floor(slot / this.getMainInventory().getSlots());
         return this.itemTowers.get(inventoryIndex).getItemStackStorageHandler();
     }

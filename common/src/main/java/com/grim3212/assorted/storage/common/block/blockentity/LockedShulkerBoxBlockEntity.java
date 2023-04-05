@@ -1,20 +1,16 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.api.block.IStorageMaterial;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.inventory.LockedMaterialContainer;
+import com.grim3212.assorted.storage.common.inventory.ShulkerItemStackStorageHandler;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
-import com.grim3212.assorted.storage.common.inventory.StorageItemStackStorageHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
@@ -26,7 +22,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity.AnimationStatus;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -40,7 +35,6 @@ public class LockedShulkerBoxBlockEntity extends BaseStorageBlockEntity {
     private float progress;
     private float progressOld;
     private DyeColor color = null;
-    private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
 
     public LockedShulkerBoxBlockEntity(StorageMaterial storageMaterial, BlockPos pos, BlockState state) {
         super(StorageBlockEntityTypes.LOCKED_SHULKER_BOX.get(), pos, state, storageMaterial != null ? storageMaterial.totalItems() : 27);
@@ -54,7 +48,7 @@ public class LockedShulkerBoxBlockEntity extends BaseStorageBlockEntity {
         } else {
             this.storageMaterial = null;
         }
-        this.setStorageHandler(new StorageItemStackStorageHandler(this, storageMaterial != null ? storageMaterial.totalItems() : 27));
+        this.setStorageHandler(new ShulkerItemStackStorageHandler(this, storageMaterial != null ? storageMaterial.totalItems() : 27));
     }
 
     public int colorToSave() {
@@ -158,33 +152,6 @@ public class LockedShulkerBoxBlockEntity extends BaseStorageBlockEntity {
         state.updateNeighbourShapes(level, pos, 3);
     }
 
-    public void startOpen(Player player) {
-        if (!player.isSpectator()) {
-            if (this.numPlayersUsing < 0) {
-                this.numPlayersUsing = 0;
-            }
-
-            ++this.numPlayersUsing;
-            this.level.blockEvent(this.worldPosition, this.getBlockState().getBlock(), 1, this.numPlayersUsing);
-            if (this.numPlayersUsing == 1) {
-                this.level.gameEvent(player, GameEvent.CONTAINER_OPEN, this.worldPosition);
-                this.level.playSound((Player) null, this.worldPosition, SoundEvents.SHULKER_BOX_OPEN, SoundSource.BLOCKS, 0.5F, this.level.random.nextFloat() * 0.1F + 0.9F);
-            }
-        }
-
-    }
-
-    public void stopOpen(Player player) {
-        if (!player.isSpectator()) {
-            --this.numPlayersUsing;
-            this.level.blockEvent(this.worldPosition, this.getBlockState().getBlock(), 1, this.numPlayersUsing);
-            if (this.numPlayersUsing <= 0) {
-                this.level.gameEvent(player, GameEvent.CONTAINER_CLOSE, this.worldPosition);
-                this.level.playSound((Player) null, this.worldPosition, SoundEvents.SHULKER_BOX_CLOSE, SoundSource.BLOCKS, 0.5F, this.level.random.nextFloat() * 0.1F + 0.9F);
-            }
-        }
-    }
-
     @Override
     protected Component getDefaultName() {
         if (this.storageMaterial == null) {
@@ -202,7 +169,6 @@ public class LockedShulkerBoxBlockEntity extends BaseStorageBlockEntity {
     public void load(CompoundTag compound) {
         super.load(compound);
         this.color = colorFromCompound(compound);
-        this.lockCode = StorageLockCode.read(compound);
     }
 
     @Override
@@ -222,41 +188,6 @@ public class LockedShulkerBoxBlockEntity extends BaseStorageBlockEntity {
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
         return new LockedMaterialContainer(StorageContainerTypes.SHULKERS.get(storageMaterial).get(), windowId, player, this.getItemStackStorageHandler(), storageMaterial, true);
-    }
-
-    @Override
-    public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public CompoundTag getUpdateTag() {
-        return this.saveWithoutMetadata();
-    }
-
-    @Override
-    public boolean isLocked() {
-        return this.lockCode != null && this.lockCode != StorageLockCode.EMPTY_CODE;
-    }
-
-    @Override
-    public StorageLockCode getStorageLockCode() {
-        return this.lockCode;
-    }
-
-    @Override
-    public String getLockCode() {
-        return this.lockCode.getLockCode();
-    }
-
-    @Override
-    public void setLockCode(String s) {
-        if (s == null || s.isEmpty())
-            this.lockCode = StorageLockCode.EMPTY_CODE;
-        else
-            this.lockCode = new StorageLockCode(s);
-
-        this.setChanged();
     }
 
 }

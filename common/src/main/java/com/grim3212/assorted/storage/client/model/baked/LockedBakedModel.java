@@ -50,9 +50,7 @@ public class LockedBakedModel implements IDataAwareBakedModel {
         this.name = name;
         this.context = context;
         this.itemOverrideList = new LockedItemOverrideList(context, this);
-
-        Material particle = context.getMaterial("particle").orElse(null);
-        this.particle = particle != null ? spriteGetter.apply(particle) : null;
+        this.particle = unlockedModel.getParticleIcon();
     }
 
     @Override
@@ -84,8 +82,7 @@ public class LockedBakedModel implements IDataAwareBakedModel {
     public ItemTransforms getTransforms() {
         return this.context.getTransforms();
     }
-
-
+    
     @Override
     public ItemOverrides getOverrides() {
         return this.itemOverrideList;

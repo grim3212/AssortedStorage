@@ -29,9 +29,8 @@ public class StorageAccessUtil {
                     } else if (itemstack.getItem() == StorageItems.KEY_RING.get()) {
                         IItemStorageHandler itemStorageHandler = Services.INVENTORY.getItemStorageHandler(itemstack).orElse(null);
 
-                        if (itemStorageHandler instanceof KeyRingItemHandler) {
-                            KeyRingItemHandler handler = (KeyRingItemHandler) itemStorageHandler;
-                            handler.load();
+                        if (itemStorageHandler instanceof KeyRingItemHandler keyRingItemHandler) {
+                            keyRingItemHandler.load();
 
                             for (int keyRingSlot = 0; keyRingSlot < itemStorageHandler.getSlots(); keyRingSlot++) {
                                 ItemStack keyRingStack = itemStorageHandler.getStackInSlot(keyRingSlot);
@@ -57,27 +56,31 @@ public class StorageAccessUtil {
 
     public static boolean canAccess(ItemStack stack, Player entityplayer) {
         if (stack.hasTag() && stack.getTag().contains("Storage_Lock")) {
+            String currentLock = stack.getTag().getString("Storage_Lock");
+            if (currentLock == null || currentLock.isEmpty()) {
+                return true;
+            }
+
             for (int slot = 0; slot < entityplayer.getInventory().getContainerSize(); slot++) {
                 ItemStack itemstack = entityplayer.getInventory().getItem(slot);
 
                 if (!itemstack.isEmpty()) {
                     if (itemstack.getItem() == StorageItems.LOCKSMITH_KEY.get()) {
-                        if (StorageUtil.hasCodeWithMatch(itemstack, stack.getTag().getString("Storage_Lock"))) {
+                        if (StorageUtil.hasCodeWithMatch(itemstack, currentLock)) {
                             return true;
                         }
                     } else if (itemstack.getItem() == StorageItems.KEY_RING.get()) {
                         IItemStorageHandler itemStorageHandler = Services.INVENTORY.getItemStorageHandler(itemstack).orElse(null);
 
-                        if (itemStorageHandler instanceof KeyRingItemHandler) {
-                            KeyRingItemHandler handler = (KeyRingItemHandler) itemStorageHandler;
-                            handler.load();
+                        if (itemStorageHandler instanceof KeyRingItemHandler keyRingItemHandler) {
+                            keyRingItemHandler.load();
 
                             for (int keyRingSlot = 0; keyRingSlot < itemStorageHandler.getSlots(); keyRingSlot++) {
                                 ItemStack keyRingStack = itemStorageHandler.getStackInSlot(keyRingSlot);
 
                                 if (!keyRingStack.isEmpty()) {
                                     if (keyRingStack.getItem() == StorageItems.LOCKSMITH_KEY.get()) {
-                                        if (StorageUtil.hasCodeWithMatch(keyRingStack, stack.getTag().getString("Storage_Lock"))) {
+                                        if (StorageUtil.hasCodeWithMatch(keyRingStack, currentLock)) {
                                             return true;
                                         }
                                     }

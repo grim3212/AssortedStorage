@@ -143,7 +143,6 @@ public class LockedUpgradingRecipe implements CraftingRecipe {
                     DyeColor dyeColor = ShulkerBoxBlock.getColorFromItem(stack.getItem());
                     int color = dyeColor == null ? -1 : dyeColor.getId();
                     itemstack = NBTHelper.putIntItemStack(stack.copy(), "Color", color);
-
                 }
             }
         }

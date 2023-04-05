@@ -34,14 +34,15 @@ public class LockerBlockEntityRenderer<T extends BlockEntity & IStorage> impleme
     @Override
     public void render(T tileEntityIn, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
         LockerBlockEntity tileEntity = (LockerBlockEntity) tileEntityIn;
-        if (tileEntity != null && tileEntity.isUpperLocker()) {
+        Level world = tileEntity.getLevel();
+        boolean placedInLevel = world != null;
+
+        // We don't want to render the model if this is the top locker block
+        if (tileEntity == null || (placedInLevel && world.getBlockEntity(tileEntity.getBlockPos().below()) instanceof LockerBlockEntity)) {
             return;
         }
 
-        Level world = tileEntity.getLevel();
-        boolean flag = world != null;
-
-        BlockState blockstate = flag ? tileEntity.getBlockState() : (BlockState) tileEntity.getBlockState().setValue(BaseStorageBlock.FACING, Direction.SOUTH);
+        BlockState blockstate = placedInLevel ? tileEntity.getBlockState() : tileEntity.getBlockState().setValue(BaseStorageBlock.FACING, Direction.SOUTH);
         Block block = blockstate.getBlock();
 
         if (block instanceof BaseStorageBlock) {
@@ -56,7 +57,7 @@ public class LockerBlockEntityRenderer<T extends BlockEntity & IStorage> impleme
 
             VertexConsumer ivertexbuilder = bufferIn.getBuffer(this.model.renderType(LOCKER_TEXTURE));
 
-            if (tileEntity.getUpperLocker() != null) {
+            if (placedInLevel && world.getBlockEntity(tileEntity.getBlockPos().above()) instanceof LockerBlockEntity topLocker) {
                 this.dualModel.doorAngle = angle;
                 this.dualModel.renderHandle = !tileEntity.isLocked();
 

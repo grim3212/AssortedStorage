@@ -22,7 +22,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.*;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -108,18 +111,17 @@ public class LockedHopperBlock extends HopperBlock implements IStorageMaterial {
         if (!state.is(newState.getBlock())) {
             BlockEntity tileentity = worldIn.getBlockEntity(pos);
 
-            if (tileentity instanceof ILockable) {
-                ILockable teStorage = (ILockable) tileentity;
+            if (tileentity instanceof LockedHopperBlockEntity hopperBlockEntity) {
 
-                if (teStorage.isLocked()) {
+                if (hopperBlockEntity.isLocked()) {
                     ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
                     CompoundTag tag = new CompoundTag();
-                    new StorageLockCode(teStorage.getLockCode()).write(tag);
+                    new StorageLockCode(hopperBlockEntity.getLockCode()).write(tag);
                     lockStack.setTag(tag);
                     Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
                 }
 
-                Containers.dropContents(worldIn, pos, (WorldlyContainer) tileentity);
+                StorageUtil.dropContents(worldIn, pos, hopperBlockEntity.getItemStackStorageHandler());
                 worldIn.updateNeighbourForOutputSignal(pos, this);
             }
 

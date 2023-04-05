@@ -46,7 +46,7 @@ public class LockerBlockEntity extends BaseStorageBlockEntity {
                 return;
             }
             this.lastCachedInventory = LastCachedInventory.TOP;
-            this.platformInventoryStorageHandler = Services.INVENTORY.createStorageInventoryHandler(new DualLockerInventory(this.getItemStackStorageHandler(), topLocker.getItemStackStorageHandler()));
+            this.platformInventoryStorageHandler = Services.INVENTORY.createStorageInventoryHandler(new DualLockerInventory(this, this.getItemStackStorageHandler(), topLocker.getItemStackStorageHandler()));
             return;
         }
 
@@ -56,7 +56,7 @@ public class LockerBlockEntity extends BaseStorageBlockEntity {
                 return;
             }
             this.lastCachedInventory = LastCachedInventory.BOTTOM;
-            this.platformInventoryStorageHandler = Services.INVENTORY.createStorageInventoryHandler(new DualLockerInventory(bottomLocker.getItemStackStorageHandler(), this.getItemStackStorageHandler()));
+            this.platformInventoryStorageHandler = Services.INVENTORY.createStorageInventoryHandler(new DualLockerInventory(this, bottomLocker.getItemStackStorageHandler(), this.getItemStackStorageHandler()));
             return;
         }
 
@@ -72,12 +72,12 @@ public class LockerBlockEntity extends BaseStorageBlockEntity {
     public IPlatformInventoryStorageHandler createStorageHandler() {
         if (level.getBlockEntity(worldPosition.above()) instanceof LockerBlockEntity lockerUp) {
             this.lastCachedInventory = LastCachedInventory.TOP;
-            return Services.INVENTORY.createStorageInventoryHandler(new DualLockerInventory(this.getItemStackStorageHandler(), lockerUp.getItemStackStorageHandler()));
+            return Services.INVENTORY.createStorageInventoryHandler(new DualLockerInventory(this, this.getItemStackStorageHandler(), lockerUp.getItemStackStorageHandler()));
         }
 
         if (level.getBlockEntity(worldPosition.below()) instanceof LockerBlockEntity lockerDown) {
             this.lastCachedInventory = LastCachedInventory.BOTTOM;
-            return Services.INVENTORY.createStorageInventoryHandler(new DualLockerInventory(lockerDown.getItemStackStorageHandler(), this.getItemStackStorageHandler()));
+            return Services.INVENTORY.createStorageInventoryHandler(new DualLockerInventory(this, lockerDown.getItemStackStorageHandler(), this.getItemStackStorageHandler()));
         }
 
         this.lastCachedInventory = LastCachedInventory.SELF;
@@ -87,7 +87,7 @@ public class LockerBlockEntity extends BaseStorageBlockEntity {
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
         if (level.getBlockEntity(worldPosition.above()) instanceof LockerBlockEntity lockerUp) {
-            return LockerContainer.createDualLockerContainer(windowId, player, new DualLockerInventory(this.getItemStackStorageHandler(), lockerUp.getItemStackStorageHandler()));
+            return LockerContainer.createDualLockerContainer(windowId, player, new DualLockerInventory(this, this.getItemStackStorageHandler(), lockerUp.getItemStackStorageHandler()));
         }
 
         return LockerContainer.createLockerContainer(windowId, player, this.getItemStackStorageHandler());
@@ -96,41 +96,5 @@ public class LockerBlockEntity extends BaseStorageBlockEntity {
     @Override
     protected Component getDefaultName() {
         return Component.translatable(Constants.MOD_ID + ".container.locker");
-    }
-
-    public boolean isUpperLocker() {
-        if (this.level == null)
-            return false;
-        return this.level.getBlockState(worldPosition.below()) == this.level.getBlockState(worldPosition);
-    }
-
-    public boolean hasUpperLocker() {
-        if (this.level == null)
-            return false;
-        return this.level.getBlockState(this.worldPosition.above()) == this.level.getBlockState(worldPosition);
-    }
-
-    public LockerBlockEntity getUpperLocker() {
-        if (this.level == null || !hasUpperLocker())
-            return null;
-        return (LockerBlockEntity) this.level.getBlockEntity(worldPosition.above());
-    }
-
-    public boolean isBottomLocker() {
-        if (this.level == null)
-            return false;
-        return this.level.getBlockState(worldPosition.above()) == this.level.getBlockState(worldPosition);
-    }
-
-    public boolean hasBottomLocker() {
-        if (this.level == null)
-            return false;
-        return this.level.getBlockState(this.worldPosition.below()) == this.level.getBlockState(worldPosition);
-    }
-
-    public LockerBlockEntity getBottomLocker() {
-        if (this.level == null || !hasUpperLocker())
-            return null;
-        return (LockerBlockEntity) this.level.getBlockEntity(worldPosition.below());
     }
 }

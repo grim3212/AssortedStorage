@@ -42,6 +42,7 @@ public class StorageContainerTypes {
     public static final Map<StorageMaterial, IRegistryObject<MenuType<LockedHopperContainer>>> HOPPERS = Maps.newHashMap();
 
     static {
+        // TODO: Should be able to read these values from FriendlyByteBuf 🤞
         CHESTS.put(null, CONTAINERS.register("locked_chest", () -> Services.PLATFORM.createMenuType((syncId, inv, c) -> LockedMaterialContainer.createChestContainer(syncId, inv, null))));
         SHULKERS.put(null, CONTAINERS.register("locked_shulker_box", () -> Services.PLATFORM.createMenuType((syncId, inv, c) -> LockedMaterialContainer.createShulkerContainer(syncId, inv, null))));
         BARRELS.put(null, CONTAINERS.register("locked_barrel", () -> Services.PLATFORM.createMenuType((syncId, inv, c) -> LockedMaterialContainer.createBarrelContainer(syncId, inv, null))));

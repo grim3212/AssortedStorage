@@ -1,18 +1,18 @@
 package com.grim3212.assorted.storage.common.inventory;
 
-import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
-import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.impl.LockedItemStackStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public class DualLockerInventory extends ItemStackStorageHandler {
+public class DualLockerInventory extends LockedItemStackStorageHandler {
 
-    private final IItemStorageHandler topLocker;
-    private final IItemStorageHandler bottomLocker;
+    private final LockedItemStackStorageHandler topLocker;
+    private final LockedItemStackStorageHandler bottomLocker;
 
-    public DualLockerInventory(IItemStorageHandler bottomLocker, IItemStorageHandler topLocker) {
-        super(topLocker != null ? topLocker.getSlots() + bottomLocker.getSlots() : bottomLocker.getSlots());
+    public DualLockerInventory(ILockable lockCode, LockedItemStackStorageHandler bottomLocker, LockedItemStackStorageHandler topLocker) {
+        super(lockCode, topLocker != null ? topLocker.getSlots() + bottomLocker.getSlots() : bottomLocker.getSlots());
         this.bottomLocker = bottomLocker;
         this.topLocker = topLocker;
     }
@@ -27,7 +27,7 @@ public class DualLockerInventory extends ItemStackStorageHandler {
         return slot - this.topLocker.getSlots();
     }
 
-    private IItemStorageHandler getInvFromSlot(int slot) {
+    private LockedItemStackStorageHandler getInvFromSlot(int slot) {
         return !hasTopLocker() ? this.bottomLocker : slot < this.topLocker.getSlots() ? this.topLocker : this.bottomLocker;
     }
 
@@ -42,13 +42,13 @@ public class DualLockerInventory extends ItemStackStorageHandler {
     }
 
     @Override
-    public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
-        return getInvFromSlot(slot).insertItem(getLocalSlot(slot), stack, simulate);
+    public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate, String inLockCode, boolean ignoreLock) {
+        return getInvFromSlot(slot).insertItem(getLocalSlot(slot), stack, simulate, inLockCode, ignoreLock);
     }
 
     @Override
-    public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
-        return getInvFromSlot(slot).extractItem(getLocalSlot(slot), amount, simulate);
+    public ItemStack extractItem(int slot, int amount, boolean simulate, String inLockCode, boolean ignoreLock) {
+        return getInvFromSlot(slot).extractItem(getLocalSlot(slot), amount, simulate, inLockCode, ignoreLock);
     }
 
     @Override

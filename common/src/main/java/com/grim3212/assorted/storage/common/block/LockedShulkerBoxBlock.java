@@ -18,6 +18,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -301,7 +302,7 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
         if (tileentity instanceof LockedShulkerBoxBlockEntity shulkerBE) {
             builder = builder.withDynamicDrop(CONTENTS, (context, stackConsumer) -> {
                 for (int i = 0; i < shulkerBE.getItemStackStorageHandler().getSlots(); ++i) {
-                    stackConsumer.accept(shulkerBE.getItemStackStorageHandler().getStackInSlot(i));
+                    stackConsumer.accept(shulkerBE.getItemStackStorageHandler().getStackInSlot(i).copy());
                 }
             });
         }
@@ -320,15 +321,13 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
 
         tooltip.add(Component.translatable(Constants.MOD_ID + ".info.level_upgrade_level", Component.literal("" + (material == null ? 0 : material.getStorageLevel())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
 
+        // TODO: Fix item tag
         CompoundTag compoundnbt = stack.getTagElement("BlockEntityTag");
-        if (compoundnbt != null) {
-            if (compoundnbt.contains("LootTable", 8)) {
-                tooltip.add(Component.literal("???????"));
-            }
-
-            if (compoundnbt.contains("Items", 9)) {
+        if (compoundnbt != null && compoundnbt.contains("Inventory", Tag.TAG_COMPOUND)) {
+            CompoundTag inventory = compoundnbt.getCompound("Inventory");
+            if (inventory.contains("Items", Tag.TAG_LIST)) {
                 NonNullList<ItemStack> nonnulllist = NonNullList.withSize(27, ItemStack.EMPTY);
-                ContainerHelper.loadAllItems(compoundnbt, nonnulllist);
+                ContainerHelper.loadAllItems(inventory, nonnulllist);
                 int i = 0;
                 int j = 0;
 
@@ -372,6 +371,7 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
 
     @Override
     public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        // TODO: remove usage of Container
         return AbstractContainerMenu.getRedstoneSignalFromContainer((Container) level.getBlockEntity(pos));
     }
 

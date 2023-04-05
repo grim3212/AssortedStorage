@@ -6,10 +6,7 @@ import com.grim3212.assorted.storage.api.StorageAccessUtil;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.api.crates.ICrateUpgrade;
 import com.grim3212.assorted.storage.common.block.*;
-import com.grim3212.assorted.storage.common.block.blockentity.LockedBarrelBlockEntity;
-import com.grim3212.assorted.storage.common.block.blockentity.LockedChestBlockEntity;
-import com.grim3212.assorted.storage.common.block.blockentity.LockedHopperBlockEntity;
-import com.grim3212.assorted.storage.common.block.blockentity.LockedShulkerBoxBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.*;
 import com.grim3212.assorted.storage.mixin.block.BarrelBlockEntityAccessor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -280,37 +277,13 @@ public class LevelUpgradeItem extends Item implements ICrateUpgrade {
 
         BlockEntity freshlySetBE = world.getBlockEntity(pos);
 
-        if (freshlySetBE instanceof LockedChestBlockEntity chestBE) {
+        if (freshlySetBE instanceof BaseStorageBlockEntity baseStorageBlockEntity) {
             if (currentCustomName != null) {
-                chestBE.setCustomName(currentCustomName);
+                baseStorageBlockEntity.setCustomName(currentCustomName);
             }
 
-            chestBE.getItemStackStorageHandler().setStacks(currentItems);
-            chestBE.setLockCode(currentLockCode);
-
-            if (!player.isCreative())
-                itemstack.shrink(1);
-
-            world.playSound(player, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
-        } else if (freshlySetBE instanceof LockedBarrelBlockEntity barrelBE) {
-            if (currentCustomName != null) {
-                barrelBE.setCustomName(currentCustomName);
-            }
-
-            barrelBE.getItemStackStorageHandler().setStacks(currentItems);
-            barrelBE.setLockCode(currentLockCode);
-
-            if (!player.isCreative())
-                itemstack.shrink(1);
-
-            world.playSound(player, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
-        } else if (freshlySetBE instanceof LockedShulkerBoxBlockEntity shulkerBE) {
-            if (currentCustomName != null) {
-                shulkerBE.setCustomName(currentCustomName);
-            }
-
-            shulkerBE.getItemStackStorageHandler().setStacks(currentItems);
-            shulkerBE.setLockCode(currentLockCode);
+            baseStorageBlockEntity.getItemStackStorageHandler().setStacks(currentItems);
+            baseStorageBlockEntity.setLockCode(currentLockCode);
 
             if (!player.isCreative())
                 itemstack.shrink(1);

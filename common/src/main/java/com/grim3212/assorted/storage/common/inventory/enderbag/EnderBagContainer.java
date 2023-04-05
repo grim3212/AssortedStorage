@@ -55,6 +55,9 @@ public class EnderBagContainer extends AbstractContainerMenu {
         if (playerEnderChest != null) {
             playerEnderChest.startOpen(playerEntity);
         }
+        if (lockedEnderChestInv != null) {
+            lockedEnderChestInv.startOpen(playerEntity);
+        }
 
         IItemStorageHandler storageHandler = Services.INVENTORY.getItemStorageHandler(stack).orElse(null);
 
@@ -98,6 +101,9 @@ public class EnderBagContainer extends AbstractContainerMenu {
             if (playerEnderChest != null) {
                 playerEnderChest.stopOpen(playerEntity);
             }
+            if (lockedEnderChestInv != null) {
+                lockedEnderChestInv.stopOpen(playerEntity);
+            }
         }
     }
 
@@ -106,6 +112,9 @@ public class EnderBagContainer extends AbstractContainerMenu {
         super.removed(player);
         if (playerEnderChest != null) {
             playerEnderChest.stopOpen(player);
+        }
+        if (lockedEnderChestInv != null) {
+            lockedEnderChestInv.stopOpen(player);
         }
     }
 

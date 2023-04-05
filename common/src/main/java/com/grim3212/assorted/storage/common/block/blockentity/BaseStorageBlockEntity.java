@@ -3,14 +3,17 @@ package com.grim3212.assorted.storage.common.block.blockentity;
 import com.grim3212.assorted.lib.core.inventory.IInventoryBlockEntity;
 import com.grim3212.assorted.lib.core.inventory.INamed;
 import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.impl.LockedItemStackStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
+import com.grim3212.assorted.lib.platform.ClientServices;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.blockentity.IStorage;
 import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.inventory.StorageContainer;
 import com.grim3212.assorted.storage.common.inventory.StorageItemStackStorageHandler;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -41,7 +44,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
     private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
     private Component customName;
     protected IPlatformInventoryStorageHandler platformInventoryStorageHandler;
-    private StorageItemStackStorageHandler storageHandler;
+    private LockedItemStackStorageHandler storageHandler;
 
     protected BaseStorageBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         this(typeIn, pos, state, 27);
@@ -66,11 +69,11 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
         return Services.INVENTORY.createStorageInventoryHandler(this.storageHandler);
     }
 
-    public StorageItemStackStorageHandler getItemStackStorageHandler() {
+    public LockedItemStackStorageHandler getItemStackStorageHandler() {
         return this.storageHandler;
     }
 
-    public void setStorageHandler(StorageItemStackStorageHandler storageHandler) {
+    public void setStorageHandler(LockedItemStackStorageHandler storageHandler) {
         this.storageHandler = storageHandler;
     }
 
@@ -97,6 +100,19 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
             this.lockCode = new StorageLockCode(s);
 
         this.setChanged();
+
+        this.modelDataUpdate();
+
+        if (level instanceof ClientLevel) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
+        }
+    }
+
+    protected void modelDataUpdate() {
+        Level level = this.getLevel();
+        if (level != null && level.isClientSide) {
+            ClientServices.MODELS.requestModelDataRefresh(this);
+        }
     }
 
     @Override

@@ -7,7 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 public class StorageItemStackStorageHandler extends LockedItemStackStorageHandler {
-    private final BaseStorageBlockEntity lockable;
+    protected final BaseStorageBlockEntity lockable;
 
     public StorageItemStackStorageHandler(BaseStorageBlockEntity lockable, int size) {
         super(lockable, size);

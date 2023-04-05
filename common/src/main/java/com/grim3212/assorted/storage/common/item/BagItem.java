@@ -2,16 +2,15 @@ package com.grim3212.assorted.storage.common.item;
 
 import com.grim3212.assorted.lib.annotations.LoaderImplement;
 import com.grim3212.assorted.lib.core.inventory.IInventoryItem;
-import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.lib.util.NBTHelper;
 import com.grim3212.assorted.storage.Constants;
+import com.grim3212.assorted.storage.api.StorageAccessUtil;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.common.inventory.bag.BagContainer;
 import com.grim3212.assorted.storage.common.inventory.bag.BagItemHandler;
-import com.grim3212.assorted.storage.common.inventory.keyring.KeyRingItemHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -73,7 +72,7 @@ public class BagItem extends Item implements IInventoryItem {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player playerIn, InteractionHand handIn) {
-        if (canAccess(playerIn.getItemInHand(handIn), playerIn)) {
+        if (StorageAccessUtil.canAccess(playerIn.getItemInHand(handIn), playerIn)) {
             if (!level.isClientSide) {
                 Services.PLATFORM.openMenu((ServerPlayer) playerIn, new MenuProvider() {
                     @Override
@@ -107,44 +106,5 @@ public class BagItem extends Item implements IInventoryItem {
     @Override
     public boolean canFitInsideContainerItems() {
         return false;
-    }
-
-    private boolean canAccess(ItemStack stack, Player player) {
-        String lockCode = StorageUtil.getCode(stack);
-
-        if (!lockCode.isEmpty()) {
-            for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
-                ItemStack itemstack = player.getInventory().getItem(slot);
-
-                if (!itemstack.isEmpty()) {
-                    if (itemstack.getItem() == StorageItems.LOCKSMITH_KEY.get()) {
-                        if (StorageUtil.hasCodeWithMatch(itemstack, lockCode)) {
-                            return true;
-                        }
-                    } else if (itemstack.getItem() == StorageItems.KEY_RING.get()) {
-                        IItemStorageHandler itemStorageHandler = Services.INVENTORY.getItemStorageHandler(itemstack).orElse(null);
-
-                        if (itemStorageHandler instanceof KeyRingItemHandler keyItemhandler) {
-                            keyItemhandler.load();
-
-                            for (int keyRingSlot = 0; keyRingSlot < itemStorageHandler.getSlots(); keyRingSlot++) {
-                                ItemStack keyRingStack = itemStorageHandler.getStackInSlot(keyRingSlot);
-
-                                if (!keyRingStack.isEmpty()) {
-                                    if (keyRingStack.getItem() == StorageItems.LOCKSMITH_KEY.get()) {
-                                        if (StorageUtil.hasCodeWithMatch(keyRingStack, lockCode)) {
-                                            return true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
-        return true;
     }
 }

@@ -95,7 +95,6 @@ public class LockedEnderChestBlock extends BaseStorageBlock {
     }
 
     @Override
-
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         for (int i = 0; i < 3; ++i) {
             int j = random.nextInt(2) * 2 - 1;

@@ -156,7 +156,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
     @Override
     public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
         if (this.canBeLocked(worldIn, pos) && player.getItemInHand(handIn).getItem() == StorageItems.LOCKSMITH_LOCK.get()) {
-            if (tryPlaceLock(worldIn, pos, player, handIn))
+            if (this.placeLock(worldIn, pos, player, handIn))
                 return InteractionResult.SUCCESS;
         }
 
@@ -233,6 +233,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
 
     @Override
     public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
+        // TODO: Fix this
         return AbstractContainerMenu.getRedstoneSignalFromContainer((Container) worldIn.getBlockEntity(pos));
     }
 
@@ -266,16 +267,23 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
         return true;
     }
 
+    protected boolean placeLock(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
+        return tryPlaceLock(worldIn, pos, entityplayer, hand);
+    }
+
     public static boolean tryPlaceLock(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
-        BlockEntity tileentity = worldIn.getBlockEntity(pos);
-        ILockable lockeable = (ILockable) tileentity;
         ItemStack itemstack = entityplayer.getItemInHand(hand);
         String code = StorageUtil.getCode(itemstack);
+        if (code.isEmpty()) {
+            return false;
+        }
 
-        if (!code.isEmpty()) {
+        BlockEntity tileentity = worldIn.getBlockEntity(pos);
+
+        if (tileentity instanceof ILockable lockable) {
             if (!entityplayer.isCreative())
                 itemstack.shrink(1);
-            lockeable.setLockCode(code);
+            lockable.setLockCode(code);
             worldIn.playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
             return true;
         }

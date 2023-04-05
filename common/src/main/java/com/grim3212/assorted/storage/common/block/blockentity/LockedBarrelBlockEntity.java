@@ -10,7 +10,6 @@ import com.grim3212.assorted.storage.common.inventory.LockedMaterialContainer;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.inventory.StorageItemStackStorageHandler;
 import com.grim3212.assorted.storage.common.properties.StorageModelProperties;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
@@ -52,14 +51,6 @@ public class LockedBarrelBlockEntity extends BaseStorageBlockEntity implements I
         }
 
         return Component.translatable(Constants.MOD_ID + ".container.barrel_" + this.storageMaterial.toString());
-    }
-
-    @Override
-    public void setLockCode(String s) {
-        super.setLockCode(s);
-        if (level instanceof ClientLevel) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
-        }
     }
 
     @Override

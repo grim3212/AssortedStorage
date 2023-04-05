@@ -4,6 +4,8 @@ import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
@@ -15,9 +17,13 @@ public class BagItemHandler extends ItemStackStorageHandler {
 
     public BagItemHandler(ItemStack itemStack, @Nullable StorageMaterial material) {
         // Extra slot for the lock slot
-        super(material == null ? 28 : material.totalItems() + 1);
+        super(numStacks(material));
         this.itemStack = itemStack;
         this.material = material;
+    }
+
+    private static int numStacks(@Nullable StorageMaterial material) {
+        return material == null ? 28 : material.totalItems() + 1;
     }
 
     @Override
@@ -30,6 +36,21 @@ public class BagItemHandler extends ItemStackStorageHandler {
         ItemStack storageLock = this.getStackInSlot(0);
         String newLockCode = StorageUtil.getCode(storageLock);
         nbt.putString("Storage_Lock", newLockCode);
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag nbt) {
+        setSize(numStacks(this.material));
+        ListTag tagList = nbt.getList("Items", Tag.TAG_COMPOUND);
+        for (int i = 0; i < tagList.size(); i++) {
+            CompoundTag itemTags = tagList.getCompound(i);
+            int slot = itemTags.getInt("Slot");
+
+            if (slot >= 0 && slot < stacks.size()) {
+                stacks.set(slot, ItemStack.of(itemTags));
+            }
+        }
+        onLoad();
     }
 
     public void load() {
