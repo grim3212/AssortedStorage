@@ -12,6 +12,7 @@ import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.common.block.LockedHopperBlock;
 import com.grim3212.assorted.storage.common.inventory.LockedHopperContainer;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
+import com.grim3212.assorted.storage.common.inventory.StorageItemStackStorageHandler;
 import com.grim3212.assorted.storage.common.properties.StorageModelProperties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -65,13 +66,13 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements I
         this.setStorageHandler(new ItemHandler(this));
     }
 
-    public static int getHopperCooldown(StorageMaterial storageMaterial) {
-        return storageMaterial == null ? HopperBlockEntity.MOVE_ITEM_SPEED : storageMaterial.hopperCooldown();
-    }
-
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
         return new LockedHopperContainer(StorageContainerTypes.HOPPERS.get(storageMaterial).get(), windowId, player, this.getItemStackStorageHandler(), storageMaterial);
+    }
+
+    public static int getHopperCooldown(StorageMaterial storageMaterial) {
+        return storageMaterial == null ? HopperBlockEntity.MOVE_ITEM_SPEED : storageMaterial.hopperCooldown();
     }
 
     @Override
@@ -589,11 +590,11 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements I
         return this.tickedGameTime;
     }
 
-    public static class ItemHandler extends LockedItemStackStorageHandler {
+    public static class ItemHandler extends StorageItemStackStorageHandler {
         private final LockedHopperBlockEntity hopper;
 
         public ItemHandler(LockedHopperBlockEntity hopper) {
-            super(hopper, hopper.storageMaterial != null ? hopper.storageMaterial.totalItems() : 5);
+            super(hopper, hopper.storageMaterial != null ? hopper.storageMaterial.hopperSize() : 5);
             this.hopper = hopper;
         }
 
