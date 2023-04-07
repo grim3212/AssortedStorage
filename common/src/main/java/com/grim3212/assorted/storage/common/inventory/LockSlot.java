@@ -1,14 +1,13 @@
-package com.grim3212.assorted.storage.common.inventory.enderbag;
+package com.grim3212.assorted.storage.common.inventory;
 
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.core.inventory.slot.SlotStorageHandler;
 import com.grim3212.assorted.storage.common.item.PadlockItem;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
-public class EnderBagLockSlot extends SlotStorageHandler {
-    public EnderBagLockSlot(IItemStorageHandler itemHandler, int index, int xPosition, int yPosition) {
+public class LockSlot extends SlotStorageHandler {
+    public LockSlot(IItemStorageHandler itemHandler, int index, int xPosition, int yPosition) {
         super(itemHandler, index, xPosition, yPosition);
     }
 
@@ -21,5 +20,4 @@ public class EnderBagLockSlot extends SlotStorageHandler {
     public int getMaxStackSize() {
         return 1;
     }
-
 }

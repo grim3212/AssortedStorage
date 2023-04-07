@@ -36,7 +36,7 @@ public class SyncCrate {
     public static void handle(SyncCrate packet, Player player) {
         BlockEntity blockEntity = Minecraft.getInstance().player.getCommandSenderWorld().getBlockEntity(packet.pos);
         if (blockEntity instanceof CrateBlockEntity crate) {
-            crate.setItem(packet.slot, packet.stack);
+            crate.getItemStackStorageHandler().setItem(packet.slot, packet.stack);
         }
     }
 }

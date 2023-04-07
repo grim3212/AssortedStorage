@@ -7,6 +7,7 @@ import com.grim3212.assorted.storage.api.crates.CrateLayout;
 import com.grim3212.assorted.storage.api.crates.ICrateUpgrade;
 import com.grim3212.assorted.storage.client.screen.buttons.ImageToggleButton;
 import com.grim3212.assorted.storage.common.inventory.crates.CrateContainer;
+import com.grim3212.assorted.storage.common.inventory.crates.CrateSidedInv;
 import com.grim3212.assorted.storage.common.inventory.crates.LargeItemStackSlot;
 import com.grim3212.assorted.storage.common.network.SetSlotLockPacket;
 import com.mojang.blaze3d.platform.Lighting;
@@ -46,7 +47,7 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
         this.imageWidth = 176;
 
         this.passEvents = true;
-        this.renderStack = new ItemStack(container.getInventory().getBlockState().getBlock());
+        this.renderStack = new ItemStack(container.getCrateBlockEntity().getBlockState().getBlock());
     }
 
     @Override
@@ -64,7 +65,7 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
             if (this.hoveredSlot instanceof LargeItemStackSlot slot) {
                 int curSlot = slot.getContainerSlot();
                 LargeItemStack stackInSlot = this.getStack(curSlot);
-                int maxStackSize = this.menu.getInventory().getMaxStackSizeForSlot(curSlot);
+                int maxStackSize = this.getCrateInventory().getMaxStackSizeForSlot(curSlot);
                 tooltip.add(Component.translatable(Constants.MOD_ID + ".info.amount", Component.literal(String.valueOf(stackInSlot.getAmount() + "/" + maxStackSize)).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
                 tooltip.add(Component.translatable(Constants.MOD_ID + ".info.upgrade_redstone.mode.slot", Component.literal(String.valueOf(curSlot)).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
                 this.renderTooltip(stack, tooltip, tooltipComponents, mouseX, mouseY);
@@ -84,8 +85,12 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
         }
     }
 
+    protected CrateSidedInv getCrateInventory() {
+        return this.menu.getCrateBlockEntity().getItemStackStorageHandler();
+    }
+
     protected LargeItemStack getStack(int slot) {
-        return this.menu.getInventory().getLargeItemStack(slot);
+        return this.getCrateInventory().getLargeItemStack(slot);
     }
 
     private int getSlotAmount(int slotId) {
@@ -104,12 +109,12 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
 
         return new ImageToggleButton(i + x, j + y, 10, 10, 0, 0, 10, CHECKBOX_LOCATION, 32, 32, (button) -> {
             CrateScreen.this.toggleSlotLock(slot);
-        }, this.menu.getInventory().isSlotLocked(slot), Component.translatable(Constants.MOD_ID + ".info.item_lock", Component.literal(String.valueOf(slot)).withStyle(ChatFormatting.AQUA)));
+        }, this.getCrateInventory().isSlotLocked(slot), Component.translatable(Constants.MOD_ID + ".info.item_lock", Component.literal(String.valueOf(slot)).withStyle(ChatFormatting.AQUA)));
     }
 
     private void toggleSlotLock(int slot) {
-        boolean newLock = !this.menu.getInventory().isSlotLocked(slot);
-        this.menu.getInventory().setSlotLocked(slot, newLock);
+        boolean newLock = !this.getCrateInventory().isSlotLocked(slot);
+        this.getCrateInventory().setSlotLocked(slot, newLock);
         Services.NETWORK.sendToServer(new SetSlotLockPacket(slot, newLock));
     }
 
@@ -118,7 +123,7 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
         super.init();
         this.clearWidgets();
 
-        CrateLayout layout = this.menu.getInventory().getLayout();
+        CrateLayout layout = this.menu.getCrateBlockEntity().getLayout();
 
         switch (layout) {
             case SINGLE:
@@ -157,7 +162,7 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
         this.font.draw(matrixStack, this.playerInventoryTitle, 8.0F, this.imageHeight - 93, 4210752);
         this.font.draw(matrixStack, Component.translatable("assortedstorage.container.storage_crate.upgrades"), 8.0F, this.imageHeight - 124, 4210752);
 
-        int mod = this.menu.getInventory().getStorageModifier();
+        int mod = this.getCrateInventory().getStorageModifier();
         if (mod > 0) {
             String s = "X " + mod;
             this.font.draw(matrixStack, s, 160F - this.font.width(s), this.imageHeight - 93, DyeColor.GRAY.getTextColor());
@@ -167,7 +172,7 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
         matrixStack.translate(0F, 0F, 300F);
         matrixStack.scale(0.5F, 0.5F, 0.5F);
 
-        CrateLayout layout = menu.getInventory().getLayout();
+        CrateLayout layout = this.menu.getCrateBlockEntity().getLayout();
 
         switch (layout) {
             case SINGLE:

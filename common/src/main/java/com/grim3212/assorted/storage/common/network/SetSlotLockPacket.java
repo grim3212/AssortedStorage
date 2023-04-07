@@ -25,7 +25,7 @@ public class SetSlotLockPacket {
 
     public static void handle(SetSlotLockPacket packet, Player player) {
         if (player.containerMenu instanceof CrateContainer crate) {
-            crate.getInventory().setSlotLocked(packet.slot, packet.locked);
+            crate.getCrateBlockEntity().getItemStackStorageHandler().setSlotLocked(packet.slot, packet.locked);
         }
     }
 }

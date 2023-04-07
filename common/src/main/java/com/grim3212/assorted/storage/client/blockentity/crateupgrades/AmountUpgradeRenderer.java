@@ -19,9 +19,9 @@ public class AmountUpgradeRenderer implements ICrateUpgradeRenderer {
     public static final AmountUpgradeRenderer INSTANCE = new AmountUpgradeRenderer();
 
     private String getSlotAmount(CrateBlockEntity tileEntityIn, int slotId, boolean showFull) {
-        int amount = tileEntityIn.getLargeItemStack(slotId).getAmount();
+        int amount = tileEntityIn.getItemStackStorageHandler().getLargeItemStack(slotId).getAmount();
         if (showFull) {
-            int max = tileEntityIn.getMaxStackSizeForSlot(slotId);
+            int max = tileEntityIn.getItemStackStorageHandler().getMaxStackSizeForSlot(slotId);
             return amount > 0 ? amount + "/" + max : "";
         }
 
@@ -60,7 +60,7 @@ public class AmountUpgradeRenderer implements ICrateUpgradeRenderer {
         float scale = 0.012F * 0.6666667F;
         matrixStack.scale(scale, -scale, scale);
 
-        int light = tileEntityIn.hasGlowUpgrade() ? LightTexture.FULL_BRIGHT : combinedLightIn;
+        int light = tileEntityIn.getItemStackStorageHandler().hasGlowUpgrade() ? LightTexture.FULL_BRIGHT : combinedLightIn;
 
         switch (tileEntityIn.getLayout()) {
             case SINGLE:

@@ -39,10 +39,10 @@ public class StorageEvents {
         if (stack.getItem() instanceof LevelUpgradeItem) {
             BlockEntity entity = level.getBlockEntity(pos);
             if (entity instanceof CrateBlockEntity crate) {
-                int firstEmptySlot = (crate.getEnhancements().subList(1, crate.getEnhancements().size()).indexOf(ItemStack.EMPTY) + 1);
+                int firstEmptySlot = (crate.getItemStackStorageHandler().getEnhancements().subList(1, crate.getItemStackStorageHandler().getEnhancements().size()).indexOf(ItemStack.EMPTY) + 1);
                 // The 0 slot is for Padlocks only
                 if (firstEmptySlot > 0) {
-                    crate.getEnhancements().set(firstEmptySlot, stack.copyWithCount(1));
+                    crate.getItemStackStorageHandler().getEnhancements().set(firstEmptySlot, stack.copyWithCount(1));
                     stack.shrink(1);
                     return InteractionResult.SUCCESS;
                 }
@@ -53,7 +53,7 @@ public class StorageEvents {
             BlockEntity entity = level.getBlockEntity(pos);
             if (entity instanceof CrateBlockEntity crate) {
                 if (!crate.isLocked() && StorageUtil.hasCode(stack)) {
-                    crate.getEnhancements().set(0, stack.copyWithCount(1));
+                    crate.getItemStackStorageHandler().getEnhancements().set(0, stack.copyWithCount(1));
                     stack.shrink(1);
                     return InteractionResult.SUCCESS;
                 }
@@ -63,12 +63,12 @@ public class StorageEvents {
         } else if (stack.getItem() instanceof ICrateUpgrade) {
             BlockEntity entity = level.getBlockEntity(pos);
             if (entity instanceof CrateBlockEntity crate) {
-                int firstEmptySlot = (crate.getEnhancements().subList(1, crate.getEnhancements().size()).indexOf(ItemStack.EMPTY) + 1);
+                int firstEmptySlot = (crate.getItemStackStorageHandler().getEnhancements().subList(1, crate.getItemStackStorageHandler().getEnhancements().size()).indexOf(ItemStack.EMPTY) + 1);
                 // The 0 slot is for Padlocks only
                 if (firstEmptySlot > 0) {
-                    boolean alreadyExists = crate.getEnhancements().stream().anyMatch(slotStack -> slotStack.getItem() == stack.getItem());
+                    boolean alreadyExists = crate.getItemStackStorageHandler().getEnhancements().stream().anyMatch(slotStack -> slotStack.getItem() == stack.getItem());
                     if (!alreadyExists) {
-                        crate.getEnhancements().set(firstEmptySlot, stack.copyWithCount(1));
+                        crate.getItemStackStorageHandler().getEnhancements().set(firstEmptySlot, stack.copyWithCount(1));
                         stack.shrink(1);
                         return InteractionResult.SUCCESS;
                     }

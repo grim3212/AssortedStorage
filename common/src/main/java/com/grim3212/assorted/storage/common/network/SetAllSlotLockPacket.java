@@ -22,7 +22,7 @@ public class SetAllSlotLockPacket {
 
     public static void handle(SetAllSlotLockPacket packet, Player player) {
         if (player.containerMenu instanceof CrateContainer crate) {
-            crate.getInventory().setAllSlotsLocked(packet.locked);
+            crate.getCrateBlockEntity().getItemStackStorageHandler().setAllSlotsLocked(packet.locked);
         }
     }
 }

@@ -172,10 +172,10 @@ public class CrateBlock extends ExtraPropertyBlock implements EntityBlock, ICrat
             BlockEntity tileentity = worldIn.getBlockEntity(pos);
 
             if (tileentity instanceof CrateBlockEntity crate) {
-                for (int slot = 0; slot < crate.getContainerSize(); slot++) {
-                    Containers.dropContents(worldIn, pos, crate.getLargeItemStack(slot).asItemStacks());
+                for (int slot = 0; slot < crate.getItemStackStorageHandler().getSlots(); slot++) {
+                    Containers.dropContents(worldIn, pos, crate.getItemStackStorageHandler().getLargeItemStack(slot).asItemStacks());
                 }
-                Containers.dropContents(worldIn, pos, crate.getEnhancements());
+                Containers.dropContents(worldIn, pos, crate.getItemStackStorageHandler().getEnhancements());
 
                 worldIn.updateNeighbourForOutputSignal(pos, this);
             }
@@ -205,7 +205,7 @@ public class CrateBlock extends ExtraPropertyBlock implements EntityBlock, ICrat
         BlockEntity tileentity = level.getBlockEntity(pos);
 
         if (player.isCreative() && tileentity instanceof CrateBlockEntity crate) {
-            if (!crate.isEmpty()) {
+            if (!crate.getItemStackStorageHandler().isEmpty()) {
                 // Simulate an attack in the instance that we failed
                 if (StorageAccessUtil.canAccess(level, pos, player)) {
                     BlockHitResult result = getPlayerPOVHitResult(level, player);
@@ -269,7 +269,7 @@ public class CrateBlock extends ExtraPropertyBlock implements EntityBlock, ICrat
     @Override
     public int getSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction dir) {
         if (getter.getBlockEntity(pos) instanceof CrateBlockEntity crate) {
-            return crate.getSignalStrength();
+            return crate.getItemStackStorageHandler().getSignalStrength();
         }
 
         return 0;
@@ -288,7 +288,7 @@ public class CrateBlock extends ExtraPropertyBlock implements EntityBlock, ICrat
     @Override
     public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
         if (worldIn.getBlockEntity(pos) instanceof CrateBlockEntity crate) {
-            return crate.getSignalStrength();
+            return crate.getItemStackStorageHandler().getSignalStrength();
         }
 
         return 0;
@@ -325,7 +325,7 @@ public class CrateBlock extends ExtraPropertyBlock implements EntityBlock, ICrat
     @Override
     public int numSlots(Level level, BlockPos pos) {
         if (level.getBlockEntity(pos) instanceof CrateBlockEntity crate) {
-            return crate.getContainerSize();
+            return crate.getItemStackStorageHandler().getSlots();
         }
 
         return ICrateSystem.super.numSlots(level, pos);

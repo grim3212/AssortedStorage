@@ -3,6 +3,7 @@ package com.grim3212.assorted.storage.common.inventory.bag;
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.StorageMaterial;
+import com.grim3212.assorted.storage.common.inventory.LockSlot;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.item.BagItem;
 import net.minecraft.core.BlockPos;
@@ -55,7 +56,7 @@ public class BagContainer extends AbstractContainerMenu {
                 yCols = storageMaterial.getYCols();
             }
 
-            this.addSlot(new BagLockSlot(storageHandler, 0, 18 + yCols * 18, 18));
+            this.addSlot(new LockSlot(storageHandler, 0, 18 + yCols * 18, 18));
 
             for (int chestRow = 0; chestRow < xRows; chestRow++) {
                 for (int chestCol = 0; chestCol < yCols; chestCol++) {

@@ -18,15 +18,15 @@ public class CrateCompactingScreen extends CrateScreen {
 
     @Override
     protected LargeItemStack getStack(int slot) {
-        if (this.menu.getInventory() instanceof CrateCompactingBlockEntity compactCrate) {
-            return compactCrate.getLargeItemStack(slot);
+        if (this.menu.getCrateBlockEntity() instanceof CrateCompactingBlockEntity compactCrate) {
+            return compactCrate.getItemStackStorageHandler().getLargeItemStack(slot);
         }
 
         return super.getStack(slot);
     }
 
     private void addSlotButton(int x, int y) {
-        if (!this.menu.getInventory().areSlotsEmpty()) {
+        if (!this.getCrateInventory().areSlotsEmpty()) {
             this.addRenderableWidget(this.createImageButton(x, y));
         }
     }
@@ -37,12 +37,12 @@ public class CrateCompactingScreen extends CrateScreen {
 
         return new ImageToggleButton(i + x, j + y, 10, 10, 0, 0, 10, CHECKBOX_LOCATION, 32, 32, (button) -> {
             CrateCompactingScreen.this.toggleAllSlotsLock();
-        }, this.menu.getInventory().isSlotLocked(0), Component.translatable(Constants.MOD_ID + ".info.compact_item_lock"));
+        }, this.getCrateInventory().isSlotLocked(0), Component.translatable(Constants.MOD_ID + ".info.compact_item_lock"));
     }
 
     private void toggleAllSlotsLock() {
-        boolean newLock = !this.menu.getInventory().isSlotLocked(0);
-        this.menu.getInventory().setAllSlotsLocked(newLock);
+        boolean newLock = !this.getCrateInventory().isSlotLocked(0);
+        this.getCrateInventory().setAllSlotsLocked(newLock);
         Services.NETWORK.sendToServer(new SetAllSlotLockPacket(newLock));
     }
 

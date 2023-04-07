@@ -48,7 +48,7 @@ public class CrateBlockEntityRenderer implements BlockEntityRenderer<CrateBlockE
     private void renderItemInSlot(CrateBlockEntity tileEntityIn, int slot, PoseStack matrixStackIn, double x, double y, int light, int overlay, MultiBufferSource bufferIn) {
         matrixStackIn.pushPose();
         matrixStackIn.translate(x, y, 0.0D);
-        LargeItemStack largeStack = tileEntityIn.getLargeItemStack(slot);
+        LargeItemStack largeStack = tileEntityIn.getItemStackStorageHandler().getLargeItemStack(slot);
         matrixStackIn.mulPose(Axis.ZP.rotationDegrees((float) -largeStack.getRotation() * 360.0F / 16.0F));
         this.itemRenderer.renderStatic(largeStack.getStack(), ItemTransforms.TransformType.GUI, light, overlay, matrixStackIn, bufferIn, 0);
         matrixStackIn.popPose();
@@ -75,7 +75,7 @@ public class CrateBlockEntityRenderer implements BlockEntityRenderer<CrateBlockE
         matrixStackIn.scale(0.5f, 0.5f, 0.5f);
         matrixStackIn.mulPoseMatrix(new Matrix4f().scale(1, 1, 0.001f));
 
-        int itemLight = tileEntityIn.hasGlowUpgrade() ? LightTexture.FULL_BRIGHT : combinedLightIn;
+        int itemLight = tileEntityIn.getItemStackStorageHandler().hasGlowUpgrade() ? LightTexture.FULL_BRIGHT : combinedLightIn;
 
         switch (tileEntityIn.getLayout()) {
             case SINGLE:
@@ -104,7 +104,7 @@ public class CrateBlockEntityRenderer implements BlockEntityRenderer<CrateBlockE
 
         matrixStackIn.pushPose();
         // Unique upgrades only
-        tileEntityIn.getEnhancements().stream().filter(StreamHelper.distinctByKey(p -> p.getItem())).forEach(stack -> {
+        tileEntityIn.getItemStackStorageHandler().getEnhancements().stream().filter(StreamHelper.distinctByKey(p -> p.getItem())).forEach(stack -> {
             if (stack.getItem() instanceof PadlockItem) {
                 PadlockUpgradeRenderer.INSTANCE.render(tileEntityIn, stack, partialTicks, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
             } else if (stack.getItem() instanceof VoidUpgradeItem) {
@@ -117,7 +117,7 @@ public class CrateBlockEntityRenderer implements BlockEntityRenderer<CrateBlockE
 
         // Any slot locks
         matrixStackIn.pushPose();
-        boolean anyLocked = tileEntityIn.getItems().stream().anyMatch(stack -> stack.isLocked());
+        boolean anyLocked = tileEntityIn.getItemStackStorageHandler().anySlotsLocked();
 
         if (anyLocked) {
             float rot = facing.toYRot();
@@ -161,7 +161,7 @@ public class CrateBlockEntityRenderer implements BlockEntityRenderer<CrateBlockE
     }
 
     private void renderLockIcon(CrateBlockEntity tileEntityIn, VertexConsumer vertexConsumer, PoseStack stack, int x, int y, int packedLight, int slot) {
-        if (tileEntityIn.isSlotLocked(slot)) {
+        if (tileEntityIn.getItemStackStorageHandler().isSlotLocked(slot)) {
             RenderHelper.lightedBlit(vertexConsumer, stack, x, y, 0, 2, 0, 5, 5, 8, 8, packedLight);
         }
     }

@@ -4,6 +4,7 @@ import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
+import com.grim3212.assorted.storage.common.inventory.LockSlot;
 import com.grim3212.assorted.storage.common.inventory.LockedEnderChestInventory;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.item.EnderBagItem;
@@ -68,7 +69,7 @@ public class EnderBagContainer extends AbstractContainerMenu {
             int xRows = 3;
             int yCols = 9;
 
-            this.addSlot(new EnderBagLockSlot(handler, 0, 18 + yCols * 18, 18));
+            this.addSlot(new LockSlot(handler, 0, 18 + yCols * 18, 18));
 
             for (int chestRow = 0; chestRow < xRows; chestRow++) {
                 for (int chestCol = 0; chestCol < yCols; chestCol++) {

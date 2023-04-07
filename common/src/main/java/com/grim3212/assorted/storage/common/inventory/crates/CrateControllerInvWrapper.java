@@ -2,48 +2,32 @@ package com.grim3212.assorted.storage.common.inventory.crates;
 
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.LockedStorageHandler;
+import com.grim3212.assorted.lib.platform.Services;
+import com.grim3212.assorted.storage.api.crates.CrateConnection;
+import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateControllerBlockEntity;
-import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class CrateControllerInvWrapper implements IItemStorageHandler, LockedStorageHandler {
     protected final CrateControllerBlockEntity inv;
-    @Nullable
-    protected final Direction side;
 
-    public CrateControllerInvWrapper(CrateControllerBlockEntity inv, @Nullable Direction side) {
+    public CrateControllerInvWrapper(CrateControllerBlockEntity inv) {
         this.inv = inv;
-        this.side = side;
     }
 
     public CrateControllerBlockEntity getInv() {
         return inv;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-
-        CrateControllerInvWrapper that = (CrateControllerInvWrapper) o;
-
-        return inv.equals(that.inv) && side == that.side;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = inv.hashCode();
-        result = 31 * result + (side == null ? 0 : side.hashCode());
-        return result;
-    }
 
     @Override
     public int getSlots() {
-        return inv.getSlotsForFace(null).length;
+        return this.inv.getPossibleSlots().length;
     }
 
     @Override
@@ -55,25 +39,75 @@ public class CrateControllerInvWrapper implements IItemStorageHandler, LockedSto
     @Override
     @NotNull
     public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
-        return inv.insertItem(slot, stack, simulate, "", false);
+        return this.insertItem(slot, stack, simulate, "", false);
     }
 
     @Override
     @NotNull
     public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate, String inLockCode, boolean ignoreLock) {
-        return inv.insertItem(slot, stack, simulate, inLockCode, ignoreLock);
+        if (stack.isEmpty())
+            return ItemStack.EMPTY;
+
+        if (!codeMatches(inLockCode) && !ignoreLock)
+            return stack;
+
+        List<CrateConnection> connections = this.inv.findSlottedCrates(slot);
+
+        for (CrateConnection connection : connections) {
+            if (connection == null) {
+                continue;
+            }
+
+            if (this.inv.getLevel().getBlockEntity(connection.getPos()) instanceof CrateBlockEntity crate) {
+                IItemStorageHandler storageHandler = Services.INVENTORY.getItemStorageHandler(crate, null).orElse(null);
+                if (storageHandler != null && storageHandler instanceof CrateSidedInv crateInv) {
+                    ItemStack response = inLockCode.isEmpty() ? crateInv.insertItem(slot, stack, simulate) : crateInv.insertItem(slot, stack, simulate, inLockCode, ignoreLock);
+
+                    if (response != stack) {
+                        return response;
+                    }
+                }
+            }
+        }
+
+        return stack;
     }
 
     @Override
     @NotNull
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        return inv.extractItem(slot, amount, simulate, "", false);
+        return this.extractItem(slot, amount, simulate, "", false);
     }
 
     @Override
     @NotNull
     public ItemStack extractItem(int slot, int amount, boolean simulate, String inLockCode, boolean ignoreLock) {
-        return inv.extractItem(slot, amount, simulate, inLockCode, ignoreLock);
+        if (amount == 0 || (!codeMatches(inLockCode) && !ignoreLock))
+            return ItemStack.EMPTY;
+
+        List<CrateConnection> connections = this.inv.findSlottedCrates(slot);
+
+        for (CrateConnection connection : connections) {
+            if (connection == null) {
+                continue;
+            }
+
+            if (this.inv.getLevel().getBlockEntity(connection.getPos()) instanceof CrateBlockEntity crate) {
+                IItemStorageHandler storageHandler = Services.INVENTORY.getItemStorageHandler(crate, null).orElse(null);
+                if (storageHandler != null && storageHandler instanceof CrateSidedInv crateInv) {
+                    ItemStack response = inLockCode.isEmpty() ? crateInv.extractItem(slot, amount, simulate) : crateInv.extractItem(slot, amount, simulate, inLockCode, ignoreLock);
+                    if (!response.isEmpty()) {
+                        return response;
+                    }
+                }
+            }
+        }
+
+        return ItemStack.EMPTY;
+    }
+
+    private boolean codeMatches(String s) {
+        return !this.inv.isLocked() || this.inv.getLockCode().equals(s);
     }
 
     @Override
@@ -83,7 +117,7 @@ public class CrateControllerInvWrapper implements IItemStorageHandler, LockedSto
 
     @Override
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-        return inv.canPlaceItem(slot, stack);
+        return this.insertItem(slot, stack, true, "", true) == ItemStack.EMPTY;
     }
 
     @Override
@@ -93,5 +127,15 @@ public class CrateControllerInvWrapper implements IItemStorageHandler, LockedSto
     @Override
     public void onContentsChanged(int slot) {
         inv.setChanged();
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        BlockPos cratePos = this.inv.getBlockPos();
+        if (this.inv.getLevel().getBlockEntity(cratePos) != this.inv) {
+            return false;
+        } else {
+            return !(player.distanceToSqr((double) cratePos.getX() + 0.5D, (double) cratePos.getY() + 0.5D, (double) cratePos.getZ() + 0.5D) > 64.0D);
+        }
     }
 }
