@@ -2,7 +2,6 @@ package com.grim3212.assorted.storage.common.block;
 
 import com.grim3212.assorted.lib.core.inventory.INamed;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
@@ -22,12 +21,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.*;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -135,7 +136,7 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
                 if (storageBlockEntity.isLocked()) {
                     ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
                     CompoundTag tag = new CompoundTag();
-                    new StorageLockCode(storageBlockEntity.getLockCode()).write(tag);
+                    StorageUtil.writeLock(tag, storageBlockEntity.getLockCode());
                     lockStack.setTag(tag);
                     Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
                 }
@@ -163,7 +164,7 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
                 if (teStorage.isLocked()) {
                     ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
                     CompoundTag tag = new CompoundTag();
-                    new StorageLockCode(teStorage.getLockCode()).write(tag);
+                    StorageUtil.writeLock(tag, teStorage.getLockCode());
                     lockStack.setTag(tag);
 
                     if (removeLock(worldIn, pos, player)) {
@@ -184,7 +185,10 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
             if (!worldIn.isClientSide) {
                 MenuProvider inamedcontainerprovider = this.getMenuProvider(state, worldIn, pos);
                 if (inamedcontainerprovider != null) {
-                    Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> byteBuf.writeBlockPos(pos));
+                    Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> {
+                        byteBuf.writeEnum(this.material);
+                        byteBuf.writeBlockPos(pos);
+                    });
                     player.awardStat(Stats.OPEN_BARREL);
                     PiglinAi.angerNearbyPiglins(player, true);
                 }
@@ -223,7 +227,11 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
 
     @Override
     public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
-        return AbstractContainerMenu.getRedstoneSignalFromContainer((Container) worldIn.getBlockEntity(pos));
+        if (worldIn.getBlockEntity(pos) instanceof BaseStorageBlockEntity storageBlockEntity) {
+            return BaseStorageBlock.getRedstoneSignalFromContainer(storageBlockEntity.getItemStackStorageHandler());
+        }
+
+        return super.getAnalogOutputSignal(blockState, worldIn, pos);
     }
 
     @Override

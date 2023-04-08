@@ -1,6 +1,5 @@
 package com.grim3212.assorted.storage.common.block;
 
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockerBlockEntity;
@@ -58,7 +57,7 @@ public class LockerBlock extends BaseStorageBlock {
                 if (storageBlockEntity.isLocked() && worldIn.getBlockState(pos.above()) != state && worldIn.getBlockState(pos.below()) != state) {
                     ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
                     CompoundTag tag = new CompoundTag();
-                    new StorageLockCode(storageBlockEntity.getLockCode()).write(tag);
+                    StorageUtil.writeLock(tag, storageBlockEntity.getLockCode());
                     lockStack.setTag(tag);
                     Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
                 }

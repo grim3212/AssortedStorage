@@ -8,7 +8,8 @@ import com.grim3212.assorted.lib.core.inventory.IInventoryBlockEntity;
 import com.grim3212.assorted.lib.core.inventory.INamed;
 import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
+import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
+import com.grim3212.assorted.lib.platform.ClientServices;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.StorageCommonMod;
 import com.grim3212.assorted.storage.api.crates.CrateConnection;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
 
 public class CrateControllerBlockEntity extends BlockEntity implements INamed, ILockable, IBlockEntityWithModelData, IInventoryBlockEntity {
 
-    private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
+    private String lockCode = "";
     private Component customName;
 
     private List<CrateConnection> connectedStorageCrates = new ArrayList<>();
@@ -80,28 +81,25 @@ public class CrateControllerBlockEntity extends BlockEntity implements INamed, I
 
     @Override
     public boolean isLocked() {
-        return this.lockCode != null && this.lockCode != StorageLockCode.EMPTY_CODE;
+        return this.lockCode != null && !this.lockCode.isEmpty();
     }
 
-    @Override
-    public StorageLockCode getStorageLockCode() {
-        return this.lockCode;
-    }
 
     @Override
     public String getLockCode() {
-        return this.lockCode.getLockCode();
+        return this.lockCode;
     }
 
     @Override
     public void setLockCode(String s) {
         if (s == null || s.isEmpty())
-            this.lockCode = StorageLockCode.EMPTY_CODE;
+            this.lockCode = "";
         else
-            this.lockCode = new StorageLockCode(s);
+            this.lockCode = s;
 
         this.setChanged();
         this.modelUpdate();
+        ClientServices.MODELS.requestModelDataRefresh(this);
     }
 
     @Override
@@ -111,7 +109,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements INamed, I
             this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"));
         }
 
-        this.lockCode = StorageLockCode.read(nbt);
+        this.lockCode = StorageUtil.readLock(nbt);
     }
 
     @Override
@@ -122,7 +120,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements INamed, I
             compound.putString("CustomName", Component.Serializer.toJson(this.customName));
         }
 
-        this.lockCode.write(compound);
+        StorageUtil.writeLock(compound, this.lockCode);
     }
 
     @Override

@@ -12,6 +12,8 @@ import com.grim3212.assorted.storage.common.inventory.enderbag.EnderBagItemHandl
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.MenuProvider;
@@ -56,8 +58,8 @@ public class EnderBagItem extends Item implements IInventoryItem {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player playerIn, InteractionHand handIn) {
-        // TODO: Make ender sound
         if (StorageAccessUtil.canAccess(playerIn.getItemInHand(handIn), playerIn)) {
+            level.playSound(playerIn, playerIn.blockPosition(), SoundEvents.ENDER_CHEST_OPEN, SoundSource.PLAYERS);
             if (!level.isClientSide) {
                 Services.PLATFORM.openMenu((ServerPlayer) playerIn, new MenuProvider() {
                     @Override

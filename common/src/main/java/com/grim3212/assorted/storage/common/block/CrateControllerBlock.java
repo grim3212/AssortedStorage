@@ -2,7 +2,6 @@ package com.grim3212.assorted.storage.common.block;
 
 import com.grim3212.assorted.lib.core.inventory.INamed;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
@@ -20,7 +19,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -103,12 +101,11 @@ public class CrateControllerBlock extends Block implements EntityBlock, ICrateSy
                 if (teStorage.isLocked()) {
                     ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
                     CompoundTag tag = new CompoundTag();
-                    new StorageLockCode(teStorage.getLockCode()).write(tag);
+                    StorageUtil.writeLock(tag, teStorage.getLockCode());
                     lockStack.setTag(tag);
                     Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
                 }
 
-                Containers.dropContents(worldIn, pos, (WorldlyContainer) tileentity);
                 worldIn.updateNeighbourForOutputSignal(pos, this);
             }
 
@@ -132,7 +129,7 @@ public class CrateControllerBlock extends Block implements EntityBlock, ICrateSy
                     if (teStorage.isLocked()) {
                         ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
                         CompoundTag tag = new CompoundTag();
-                        new StorageLockCode(teStorage.getLockCode()).write(tag);
+                        StorageUtil.writeLock(tag, teStorage.getLockCode());
                         lockStack.setTag(tag);
 
                         if (BaseStorageBlock.tryRemoveLock(worldIn, pos, player)) {

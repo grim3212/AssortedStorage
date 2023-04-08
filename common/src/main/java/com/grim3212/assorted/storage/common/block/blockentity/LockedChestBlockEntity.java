@@ -34,7 +34,7 @@ public class LockedChestBlockEntity extends BaseStorageBlockEntity {
 
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
-        return new LockedMaterialContainer(StorageContainerTypes.CHESTS.get(storageMaterial).get(), windowId, player, this.getItemStackStorageHandler(), storageMaterial, false);
+        return new LockedMaterialContainer(StorageContainerTypes.LOCKED_CHEST.get(), windowId, player, this.getItemStackStorageHandler(), storageMaterial, false);
     }
 
     @Override

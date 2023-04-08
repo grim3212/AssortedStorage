@@ -1,6 +1,5 @@
 package com.grim3212.assorted.storage.common.block;
 
-import com.grim3212.assorted.lib.core.block.ExtraPropertyBlock;
 import com.grim3212.assorted.lib.core.block.IBlockOnPlayerBreak;
 import com.grim3212.assorted.lib.core.inventory.INamed;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
@@ -50,7 +49,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class CrateBlock extends ExtraPropertyBlock implements EntityBlock, ICrateSystem, IBlockOnPlayerBreak {
+public class CrateBlock extends Block implements IBlockOnPlayerBreak, EntityBlock, ICrateSystem {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
@@ -77,7 +76,7 @@ public class CrateBlock extends ExtraPropertyBlock implements EntityBlock, ICrat
     public static final VoxelShape FINAL_VERTICAL_SHAPE = Shapes.or(TOP_VERTICAL_SHAPE, INSIDE_VERTICAL_SHAPE, BOTTOM_VERTICAL_SHAPE, SIDE_VERTICAL_1, SIDE_VERTICAL_2, SIDE_VERTICAL_3, SIDE_VERTICAL_4);
 
     public CrateBlock(Wood type, CrateLayout layout, Block.Properties props) {
-        super(props);
+        super(props.lightLevel(x -> 1));
 
         this.type = type;
         this.layout = layout;
@@ -95,14 +94,6 @@ public class CrateBlock extends ExtraPropertyBlock implements EntityBlock, ICrat
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return state.getValue(FACING).getAxis().isHorizontal() ? FINAL_SHAPE : FINAL_VERTICAL_SHAPE;
-    }
-
-    @Override
-    public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
-        // Because of MineCrafts lighting or model rendering it
-        // can make these type of models pretty dark and ugly
-        // This makes it look a bit better
-        return 1;
     }
 
     @Override
@@ -216,7 +207,8 @@ public class CrateBlock extends ExtraPropertyBlock implements EntityBlock, ICrat
             }
         }
 
-        return true;
+        this.playerWillDestroy(level, pos, state, player);
+        return level.setBlock(pos, fluid.createLegacyBlock(), level.isClientSide ? Block.UPDATE_ALL_IMMEDIATE : Block.UPDATE_ALL);
     }
 
     @Override

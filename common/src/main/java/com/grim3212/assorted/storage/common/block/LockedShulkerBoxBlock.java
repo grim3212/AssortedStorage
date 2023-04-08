@@ -2,7 +2,6 @@ package com.grim3212.assorted.storage.common.block;
 
 import com.grim3212.assorted.lib.core.block.IBlockMapColor;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.lib.util.NBTHelper;
@@ -10,6 +9,7 @@ import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.StorageAccessUtil;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.api.block.IStorageMaterial;
+import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedShulkerBoxBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import com.grim3212.assorted.storage.common.item.StorageItems;
@@ -26,13 +26,15 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.*;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -141,7 +143,7 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
                 if (teStorage.isLocked()) {
                     ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
                     CompoundTag tag = new CompoundTag();
-                    new StorageLockCode(teStorage.getLockCode()).write(tag);
+                    StorageUtil.writeLock(tag, teStorage.getLockCode());
                     lockStack.setTag(tag);
 
                     if (removeLock(level, pos, player)) {
@@ -164,7 +166,10 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
                 if (!level.isClientSide) {
                     MenuProvider inamedcontainerprovider = this.getMenuProvider(state, level, pos);
                     if (inamedcontainerprovider != null) {
-                        Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> byteBuf.writeBlockPos(pos));
+                        Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> {
+                            byteBuf.writeEnum(this.material);
+                            byteBuf.writeBlockPos(pos);
+                        });
                         player.awardStat(Stats.OPEN_SHULKER_BOX);
                         PiglinAi.angerNearbyPiglins(player, true);
                     }
@@ -321,7 +326,6 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
 
         tooltip.add(Component.translatable(Constants.MOD_ID + ".info.level_upgrade_level", Component.literal("" + (material == null ? 0 : material.getStorageLevel())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
 
-        // TODO: Fix item tag
         CompoundTag compoundnbt = stack.getTagElement("BlockEntityTag");
         if (compoundnbt != null && compoundnbt.contains("Inventory", Tag.TAG_COMPOUND)) {
             CompoundTag inventory = compoundnbt.getCompound("Inventory");
@@ -371,8 +375,11 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
 
     @Override
     public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
-        // TODO: remove usage of Container
-        return AbstractContainerMenu.getRedstoneSignalFromContainer((Container) level.getBlockEntity(pos));
+        if (level.getBlockEntity(pos) instanceof BaseStorageBlockEntity storageBlockEntity) {
+            return BaseStorageBlock.getRedstoneSignalFromContainer(storageBlockEntity.getItemStackStorageHandler());
+        }
+
+        return super.getAnalogOutputSignal(state, level, pos);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.grim3212.assorted.storage.common.save;
 
 import com.google.common.collect.Maps;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.util.ITagSerializable;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.common.inventory.LockedEnderChestInventory;
@@ -48,7 +47,7 @@ public class EnderSavedData extends SavedData implements IEnderData {
         };
 
         @Override
-        public LockedEnderChestInventory getInventory(StorageLockCode code) {
+        public LockedEnderChestInventory getInventory(String code) {
             return inv;
         }
     };
@@ -76,7 +75,7 @@ public class EnderSavedData extends SavedData implements IEnderData {
     }
 
     @Override
-    public LockedEnderChestInventory getInventory(StorageLockCode code) {
+    public LockedEnderChestInventory getInventory(String code) {
         return enderData.getInventory(code);
     }
 
@@ -92,12 +91,12 @@ public class EnderSavedData extends SavedData implements IEnderData {
         private Map<String, LockedEnderChestInventory> enderChests = Maps.newHashMap();
 
         @Override
-        public LockedEnderChestInventory getInventory(StorageLockCode code) {
-            LockedEnderChestInventory inventory = enderChests.get(code.getLockCode());
+        public LockedEnderChestInventory getInventory(String code) {
+            LockedEnderChestInventory inventory = enderChests.get(code);
 
             if (inventory == null) {
-                inventory = new LockedEnderChestInventory(this, code.getLockCode(), 27);
-                enderChests.put(code.getLockCode(), inventory);
+                inventory = new LockedEnderChestInventory(this, code, 27);
+                enderChests.put(code, inventory);
             }
 
             return inventory;

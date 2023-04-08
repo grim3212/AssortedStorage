@@ -64,22 +64,10 @@ public class StorageClient {
         ClientServices.CLIENT.registerScreen(StorageContainerTypes.LOCKED_ENDER_CHEST::get, LockedEnderChestScreen::new);
         ClientServices.CLIENT.registerScreen(StorageContainerTypes.CRATE::get, CrateScreen::new);
         ClientServices.CLIENT.registerScreen(StorageContainerTypes.CRATE_COMPACTING::get, CrateCompactingScreen::new);
-
-        StorageContainerTypes.CHESTS.forEach((material, menu) -> {
-            ClientServices.CLIENT.registerScreen(menu::get, LockedMaterialScreen::new);
-        });
-
-        StorageContainerTypes.BARRELS.forEach((material, menu) -> {
-            ClientServices.CLIENT.registerScreen(menu::get, LockedMaterialScreen::new);
-        });
-
-        StorageContainerTypes.HOPPERS.forEach((material, menu) -> {
-            ClientServices.CLIENT.registerScreen(menu::get, LockedHopperScreen::new);
-        });
-
-        StorageContainerTypes.SHULKERS.forEach((material, menu) -> {
-            ClientServices.CLIENT.registerScreen(menu::get, LockedMaterialScreen::new);
-        });
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.LOCKED_CHEST::get, LockedMaterialScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.LOCKED_BARREL::get, LockedMaterialScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.LOCKED_SHULKER_BOX::get, LockedMaterialScreen::new);
+        ClientServices.CLIENT.registerScreen(StorageContainerTypes.LOCKED_HOPPER::get, LockedHopperScreen::new);
 
         ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_OAK_DOOR::get, RenderType.cutout());
         ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_SPRUCE_DOOR::get, RenderType.cutout());

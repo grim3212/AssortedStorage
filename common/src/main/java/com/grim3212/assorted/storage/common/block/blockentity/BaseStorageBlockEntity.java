@@ -5,7 +5,7 @@ import com.grim3212.assorted.lib.core.inventory.INamed;
 import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.impl.LockedItemStackStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
+import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.ClientServices;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.blockentity.IStorage;
@@ -13,7 +13,6 @@ import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.inventory.StorageContainer;
 import com.grim3212.assorted.storage.common.inventory.StorageItemStackStorageHandler;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -34,14 +33,13 @@ import net.minecraft.world.phys.AABB;
 
 import javax.annotation.Nullable;
 
-// TODO: Replace usage of Container and see if Fabric starts to work might be able to keep most of the container stuff and just have it in a separate interface
 public abstract class BaseStorageBlockEntity extends BlockEntity implements MenuProvider, INamed, IStorage, ILockable, IInventoryBlockEntity {
 
     public int numPlayersUsing;
     private int ticksSinceSync;
     protected float rotation;
     protected float prevRotation;
-    private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
+    private String lockCode = "";
     private Component customName;
     protected IPlatformInventoryStorageHandler platformInventoryStorageHandler;
     private LockedItemStackStorageHandler storageHandler;
@@ -79,31 +77,26 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
 
     @Override
     public boolean isLocked() {
-        return this.lockCode != null && this.lockCode != StorageLockCode.EMPTY_CODE;
-    }
-
-    @Override
-    public StorageLockCode getStorageLockCode() {
-        return this.lockCode;
+        return this.lockCode != null && !this.lockCode.isEmpty();
     }
 
     @Override
     public String getLockCode() {
-        return this.lockCode.getLockCode();
+        return this.lockCode;
     }
 
     @Override
     public void setLockCode(String s) {
         if (s == null || s.isEmpty())
-            this.lockCode = StorageLockCode.EMPTY_CODE;
+            this.lockCode = "";
         else
-            this.lockCode = new StorageLockCode(s);
+            this.lockCode = s;
 
         this.setChanged();
 
         this.modelDataUpdate();
 
-        if (level instanceof ClientLevel) {
+        if (level != null && level.isClientSide) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
         }
     }
@@ -129,7 +122,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
             this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"));
         }
 
-        this.lockCode = StorageLockCode.read(nbt);
+        this.lockCode = StorageUtil.readLock(nbt);
     }
 
     @Override
@@ -143,7 +136,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
             compound.putString("CustomName", Component.Serializer.toJson(this.customName));
         }
 
-        this.lockCode.write(compound);
+        StorageUtil.writeLock(compound, this.lockCode);
     }
 
     public CompoundTag saveToNbt(CompoundTag compound) {

@@ -1,8 +1,8 @@
 package com.grim3212.assorted.storage.common.block;
 
 import com.grim3212.assorted.lib.core.inventory.INamed;
+import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.StorageAccessUtil;
@@ -17,12 +17,15 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.*;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -140,7 +143,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
                 if (storageBlockEntity.isLocked()) {
                     ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
                     CompoundTag tag = new CompoundTag();
-                    new StorageLockCode(storageBlockEntity.getLockCode()).write(tag);
+                    StorageUtil.writeLock(tag, storageBlockEntity.getLockCode());
                     lockStack.setTag(tag);
                     Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
                 }
@@ -168,7 +171,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
                 if (teStorage.isLocked()) {
                     ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
                     CompoundTag tag = new CompoundTag();
-                    new StorageLockCode(teStorage.getLockCode()).write(tag);
+                    StorageUtil.writeLock(tag, teStorage.getLockCode());
                     lockStack.setTag(tag);
 
                     if (removeLock(worldIn, pos, player)) {
@@ -189,13 +192,17 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
             if (!worldIn.isClientSide) {
                 MenuProvider inamedcontainerprovider = this.getMenuProvider(state, worldIn, pos);
                 if (inamedcontainerprovider != null) {
-                    Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> byteBuf.writeBlockPos(pos));
+                    this.openMenu(player, inamedcontainerprovider, pos);
                     player.awardStat(this.getOpenStat());
                     PiglinAi.angerNearbyPiglins(player, true);
                 }
             }
         }
         return InteractionResult.SUCCESS;
+    }
+
+    protected void openMenu(Player player, MenuProvider provider, BlockPos pos) {
+        Services.PLATFORM.openMenu((ServerPlayer) player, provider, byteBuf -> byteBuf.writeBlockPos(pos));
     }
 
     // TODO: Create custom stat for this
@@ -233,8 +240,11 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
 
     @Override
     public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
-        // TODO: Fix this
-        return AbstractContainerMenu.getRedstoneSignalFromContainer((Container) worldIn.getBlockEntity(pos));
+        if (worldIn.getBlockEntity(pos) instanceof BaseStorageBlockEntity storageBlockEntity) {
+            return getRedstoneSignalFromContainer(storageBlockEntity.getItemStackStorageHandler());
+        }
+
+        return super.getAnalogOutputSignal(blockState, worldIn, pos);
     }
 
     @Override
@@ -289,5 +299,25 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
         }
 
         return false;
+    }
+
+    public static int getRedstoneSignalFromContainer(@Nullable ItemStackStorageHandler itemHandler) {
+        if (itemHandler == null) {
+            return 0;
+        } else {
+            int $$1 = 0;
+            float $$2 = 0.0F;
+
+            for (int slot = 0; slot < itemHandler.getSlots(); ++slot) {
+                ItemStack stack = itemHandler.getStackInSlot(slot);
+                if (!stack.isEmpty()) {
+                    $$2 += (float) stack.getCount() / (float) Math.min(itemHandler.getSlotLimit(slot), stack.getMaxStackSize());
+                    ++$$1;
+                }
+            }
+
+            $$2 /= (float) itemHandler.getSlots();
+            return Mth.floor($$2 * 14.0F) + ($$1 > 0 ? 1 : 0);
+        }
     }
 }

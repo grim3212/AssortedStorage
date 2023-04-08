@@ -262,17 +262,12 @@ public class CompactingCrateInventory extends CrateSidedInv {
             return 0;
         }
 
-        ItemStack checkStack = this.getStackInSlot(slot).copyWithCount(1);
-        if (this.haveMatchForItemStack(checkStack)) {
-            if (slot == 2) {
-                // Multiply by two to account for the
-                return this.matches.get(2).getItem().isEmpty() ? 0 : (baseStackSize * 2) * this.matches.get(0).getNumRequired();
-            } else if (slot == 1) {
-                // If this only includes 2 items then this slot is not the base
-                return (baseStackSize * 2) * (this.matches.get(2).getItem().isEmpty() ? this.matches.get(0).getNumRequired() : this.matches.get(1).getNumRequired());
-            }
-        } else {
-            this.findResults(checkStack);
+        if (slot == 2) {
+            // Multiply by two to account for the
+            return this.matches.get(2).getItem().isEmpty() ? 0 : baseStackSize * 2 * this.matches.get(0).getNumRequired();
+        } else if (slot == 1) {
+            // If this only includes 2 items then this slot is not the base
+            return (baseStackSize * 2) * (this.matches.get(2).getItem().isEmpty() ? this.matches.get(0).getNumRequired() : this.matches.get(1).getNumRequired());
         }
 
         return baseStackSize;

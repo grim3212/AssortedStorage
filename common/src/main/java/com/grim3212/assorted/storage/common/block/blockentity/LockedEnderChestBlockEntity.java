@@ -27,7 +27,7 @@ public class LockedEnderChestBlockEntity extends BaseStorageBlockEntity {
     @Override
     public IPlatformInventoryStorageHandler createStorageHandler() {
         if (level != null && inventory == null && isLocked()) {
-            this.inventory = EnderSavedData.get(level).getInventory(this.getStorageLockCode());
+            this.inventory = EnderSavedData.get(level).getInventory(this.getLockCode());
             this.inventory.addWeakListener(this);
         }
         return Services.INVENTORY.createStorageInventoryHandler(this.inventory);

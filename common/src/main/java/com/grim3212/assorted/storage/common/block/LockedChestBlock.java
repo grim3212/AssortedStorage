@@ -2,6 +2,7 @@ package com.grim3212.assorted.storage.common.block;
 
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
+import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.api.block.IStorageMaterial;
@@ -10,8 +11,10 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -52,6 +55,14 @@ public class LockedChestBlock extends BaseStorageBlock implements IStorageMateri
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new LockedChestBlockEntity(pos, state);
+    }
+
+    @Override
+    protected void openMenu(Player player, MenuProvider provider, BlockPos pos) {
+        Services.PLATFORM.openMenu((ServerPlayer) player, provider, byteBuf -> {
+            byteBuf.writeEnum(this.material);
+            byteBuf.writeBlockPos(pos);
+        });
     }
 
     @Override

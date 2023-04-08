@@ -1,7 +1,6 @@
 package com.grim3212.assorted.storage.common.inventory.enderbag;
 
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.common.inventory.LockSlot;
@@ -41,7 +40,7 @@ public class EnderBagContainer extends AbstractContainerMenu {
         ItemStack stack = findBag(playerEntity);
 
         if (world != null && StorageUtil.hasCode(stack)) {
-            lockedEnderChestInv = EnderSavedData.get(world).getInventory(new StorageLockCode(StorageUtil.getCode(stack)));
+            lockedEnderChestInv = EnderSavedData.get(world).getInventory(StorageUtil.getCode(stack));
             playerEnderChest = null;
         } else {
             playerEnderChest = playerEntity.getEnderChestInventory();

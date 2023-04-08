@@ -3,7 +3,9 @@ package com.grim3212.assorted.storage.common.inventory.crates;
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.slot.SlotStorageHandler;
 import com.grim3212.assorted.storage.api.crates.ICrateUpgrade;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class EnhancementSlot extends SlotStorageHandler {
 
@@ -17,12 +19,17 @@ public class EnhancementSlot extends SlotStorageHandler {
     }
 
     @Override
+    public boolean mayPickup(Player playerIn) {
+        return true;
+    }
+
+    @Override
     public ItemStack getItem() {
         if (this.getItemHandler() instanceof CrateSidedInv crate) {
             return crate.getEnhancements().get(this.getContainerSlot());
         }
 
-        return super.getItem();
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -31,12 +38,15 @@ public class EnhancementSlot extends SlotStorageHandler {
     }
 
     @Override
+    public int getMaxStackSize(@NotNull ItemStack stack) {
+        return 1;
+    }
+
+    @Override
     public void set(ItemStack stack) {
         if (this.getItemHandler() instanceof CrateSidedInv crate) {
             crate.getEnhancements().set(this.getContainerSlot(), stack);
             this.setChanged();
-        } else {
-            super.set(stack);
         }
     }
 
@@ -45,8 +55,6 @@ public class EnhancementSlot extends SlotStorageHandler {
         if (this.getItemHandler() instanceof CrateSidedInv crate) {
             crate.getEnhancements().set(this.getContainerSlot(), stack);
             this.setChanged();
-        } else {
-            super.initialize(stack);
         }
     }
 
@@ -56,6 +64,6 @@ public class EnhancementSlot extends SlotStorageHandler {
             return crate.removeEnhancement(this.getContainerSlot(), amount);
         }
 
-        return super.remove(amount);
+        return ItemStack.EMPTY;
     }
 }

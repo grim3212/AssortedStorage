@@ -68,7 +68,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements I
 
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
-        return new LockedHopperContainer(StorageContainerTypes.HOPPERS.get(storageMaterial).get(), windowId, player, this.getItemStackStorageHandler(), storageMaterial);
+        return new LockedHopperContainer(StorageContainerTypes.LOCKED_HOPPER.get(), windowId, player, this.getItemStackStorageHandler(), storageMaterial);
     }
 
     public static int getHopperCooldown(StorageMaterial storageMaterial) {

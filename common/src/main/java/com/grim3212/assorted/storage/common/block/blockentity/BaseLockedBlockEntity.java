@@ -1,7 +1,7 @@
 package com.grim3212.assorted.storage.common.block.blockentity;
 
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
+import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class BaseLockedBlockEntity extends BlockEntity implements ILockable {
 
-    private StorageLockCode lockCode = StorageLockCode.EMPTY_CODE;
+    private String lockCode = "";
 
     public BaseLockedBlockEntity(BlockEntityType<BaseLockedBlockEntity> tileEntityType, BlockPos pos, BlockState state) {
         super(StorageBlockEntityTypes.BASE_LOCKED.get(), pos, state);
@@ -23,39 +23,34 @@ public class BaseLockedBlockEntity extends BlockEntity implements ILockable {
 
     @Override
     public boolean isLocked() {
-        return this.lockCode != null && this.lockCode != StorageLockCode.EMPTY_CODE;
+        return this.lockCode != null && !this.lockCode.isEmpty();
     }
 
     @Override
     public String getLockCode() {
-        return this.lockCode.getLockCode();
+        return this.lockCode;
     }
 
     @Override
     public void setLockCode(String s) {
         if (s == null || s.isEmpty())
-            this.lockCode = StorageLockCode.EMPTY_CODE;
+            this.lockCode = "";
         else
-            this.lockCode = new StorageLockCode(s);
+            this.lockCode = s;
 
         this.setChanged();
     }
 
     @Override
-    public StorageLockCode getStorageLockCode() {
-        return this.lockCode;
-    }
-
-    @Override
     public void load(CompoundTag nbt) {
         super.load(nbt);
-        this.lockCode = StorageLockCode.read(nbt);
+        this.lockCode = StorageUtil.readLock(nbt);
     }
 
     @Override
     protected void saveAdditional(CompoundTag cmp) {
         super.saveAdditional(cmp);
-        this.lockCode.write(cmp);
+        StorageUtil.writeLock(cmp, this.lockCode);
     }
 
     @Override

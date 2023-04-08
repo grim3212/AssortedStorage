@@ -1,6 +1,5 @@
 package com.grim3212.assorted.storage.common.block;
 
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.common.block.blockentity.GoldSafeBlockEntity;
@@ -59,7 +58,7 @@ public class GoldSafeBlock extends BaseStorageBlock {
                 if (goldsafetileentity.isLocked()) {
                     ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
                     CompoundTag tag = new CompoundTag();
-                    new StorageLockCode(goldsafetileentity.getLockCode()).write(tag);
+                    StorageUtil.writeLock(tag, goldsafetileentity.getLockCode());
                     lockStack.setTag(tag);
                     Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
                 }

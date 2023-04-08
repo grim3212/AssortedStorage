@@ -1,9 +1,8 @@
 package com.grim3212.assorted.storage.common.inventory;
 
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
+import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.CombinationItem;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -173,19 +172,7 @@ public class LocksmithWorkbenchContainer extends AbstractContainerMenu {
 
         if (!itemstack.isEmpty() && itemstack.getItem() instanceof CombinationItem) {
             if (!StringUtils.isBlank(lock)) {
-                StorageLockCode code = new StorageLockCode(lock);
-
-                ItemStack output = itemstack.copy();
-
-                if (output.hasTag()) {
-                    code.write(output.getTag());
-                } else {
-                    CompoundTag tag = new CompoundTag();
-                    code.write(tag);
-                    output.setTag(tag);
-                }
-
-                this.resultSlot.set(output);
+                this.resultSlot.set(StorageUtil.setCodeOnStack(lock, itemstack));
             } else {
                 this.resultSlot.set(ItemStack.EMPTY);
             }

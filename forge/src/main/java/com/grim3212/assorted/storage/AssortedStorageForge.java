@@ -2,7 +2,6 @@ package com.grim3212.assorted.storage;
 
 import com.grim3212.assorted.lib.data.ForgeBlockTagProvider;
 import com.grim3212.assorted.lib.data.ForgeItemTagProvider;
-import com.grim3212.assorted.storage.client.StorageClient;
 import com.grim3212.assorted.storage.client.data.*;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.data.StorageBlockLoot;
@@ -14,11 +13,9 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -28,12 +25,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Mod(Constants.MOD_ID)
-public class AssortedStorage {
+public class AssortedStorageForge {
 
-    public AssortedStorage() {
-        // Initialize client side
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> StorageClient::init);
-
+    public AssortedStorageForge() {
         final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         modBus.addListener(this::setup);
         modBus.addListener(this::gatherData);

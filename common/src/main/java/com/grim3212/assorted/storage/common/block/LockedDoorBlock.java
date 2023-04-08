@@ -1,7 +1,7 @@
 package com.grim3212.assorted.storage.common.block;
 
 import com.grim3212.assorted.lib.core.block.IBlockCloneStack;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
+import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.StorageAccessUtil;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseLockedBlockEntity;
@@ -135,7 +135,7 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockClo
                 if (teStorage.isLocked() && state.getValue(HALF) == DoubleBlockHalf.UPPER) {
                     ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
                     CompoundTag tag = new CompoundTag();
-                    new StorageLockCode(teStorage.getLockCode()).write(tag);
+                    StorageUtil.writeLock(tag, teStorage.getLockCode());
                     lockStack.setTag(tag);
                     Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
                 }

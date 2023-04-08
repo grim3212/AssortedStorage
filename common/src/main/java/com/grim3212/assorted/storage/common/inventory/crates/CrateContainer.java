@@ -91,7 +91,6 @@ public class CrateContainer extends AbstractContainerMenu {
         return this.getCrateBlockEntity().getItemStackStorageHandler().stillValid(playerIn);
     }
 
-    // TODO: Fix shift click here?
     @Override
     public ItemStack quickMoveStack(Player playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;

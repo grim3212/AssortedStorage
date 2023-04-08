@@ -41,7 +41,7 @@ public class LockedBarrelBlockEntity extends BaseStorageBlockEntity implements I
 
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
-        return new LockedMaterialContainer(StorageContainerTypes.BARRELS.get(storageMaterial).get(), windowId, player, this.getItemStackStorageHandler(), storageMaterial, false);
+        return new LockedMaterialContainer(StorageContainerTypes.LOCKED_BARREL.get(), windowId, player, this.getItemStackStorageHandler(), storageMaterial, false);
     }
 
     @Override

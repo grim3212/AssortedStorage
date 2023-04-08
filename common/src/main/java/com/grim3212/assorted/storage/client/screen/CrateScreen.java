@@ -15,13 +15,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -48,13 +46,6 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
 
         this.passEvents = true;
         this.renderStack = new ItemStack(container.getCrateBlockEntity().getBlockState().getBlock());
-    }
-
-    @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderTooltip(matrixStack, mouseX, mouseY);
     }
 
     @Override
@@ -198,39 +189,40 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
     }
 
     @Override
+    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(matrixStack);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
+    }
+
+    @Override
     protected void renderBg(PoseStack matrixStack, float partialTicks, int x, int y) {
         RenderSystem.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
+
         this.blit(matrixStack, i, j, 0, 0, this.imageWidth + 26, this.imageHeight);
-        this.itemRenderer.blitOffset = 100.0F;
 
         matrixStack.pushPose();
-        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        PoseStack posestack = RenderSystem.getModelViewStack();
-        posestack.pushPose();
-        posestack.translate(i + 80, j + 34, 0);
-        posestack.translate(8.0F, 8.0F, 0.0F);
-        posestack.scale(1.0F, -1.0F, 1.0F);
-        posestack.scale(16.0F, 16.0F, 16.0F);
-        RenderSystem.applyModelViewMatrix();
-        PoseStack blockRenderPoseStack = new PoseStack();
-        blockRenderPoseStack.pushPose();
-        // Translate so it does not hide foreground items
-        blockRenderPoseStack.translate(0.0D, 0.0D, -5.0D);
-        blockRenderPoseStack.mulPose(Axis.YP.rotationDegrees(180));
-        blockRenderPoseStack.scale(3.2F, 3.2F, 3.2F);
-        MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         Lighting.setupForFlatItems();
-        itemRenderer.renderStatic(this.renderStack, TransformType.NONE, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, blockRenderPoseStack, buffer, 0);
+        MultiBufferSource.BufferSource buffer = this.minecraft.renderBuffers().bufferSource();
+        this.setBlitOffset(200);
+        this.itemRenderer.blitOffset = 200.0F;
+
+        matrixStack.translate(i + 80, j + 34, 0);
+        matrixStack.translate(8.0F, 8.0F, 0.0F);
+        matrixStack.scale(1.0F, -1.0F, 1.0F);
+        matrixStack.scale(16.0F, 16.0F, 16.0F);
+        matrixStack.mulPose(Axis.YP.rotationDegrees(180));
+        matrixStack.scale(3.2F, 3.2F, 3.2F);
+
+        this.minecraft.getItemRenderer().renderStatic(this.renderStack, TransformType.NONE, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, matrixStack, buffer, 0);
+
+        this.setBlitOffset(0);
+        this.itemRenderer.blitOffset = 0.0F;
         buffer.endBatch();
         Lighting.setupFor3DItems();
-        blockRenderPoseStack.popPose();
-        posestack.popPose();
-        RenderSystem.applyModelViewMatrix();
         matrixStack.popPose();
-
-        this.itemRenderer.blitOffset = 0.0F;
     }
 }

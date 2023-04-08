@@ -2,7 +2,6 @@ package com.grim3212.assorted.storage.common.block;
 
 import com.grim3212.assorted.lib.core.inventory.INamed;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
@@ -116,7 +115,7 @@ public class LockedHopperBlock extends HopperBlock implements IStorageMaterial {
                 if (hopperBlockEntity.isLocked()) {
                     ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
                     CompoundTag tag = new CompoundTag();
-                    new StorageLockCode(hopperBlockEntity.getLockCode()).write(tag);
+                    StorageUtil.writeLock(tag, hopperBlockEntity.getLockCode());
                     lockStack.setTag(tag);
                     Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
                 }
@@ -144,7 +143,7 @@ public class LockedHopperBlock extends HopperBlock implements IStorageMaterial {
                 if (teStorage.isLocked()) {
                     ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
                     CompoundTag tag = new CompoundTag();
-                    new StorageLockCode(teStorage.getLockCode()).write(tag);
+                    StorageUtil.writeLock(tag, teStorage.getLockCode());
                     lockStack.setTag(tag);
 
                     if (removeLock(worldIn, pos, player)) {
@@ -165,7 +164,10 @@ public class LockedHopperBlock extends HopperBlock implements IStorageMaterial {
             if (!worldIn.isClientSide) {
                 MenuProvider inamedcontainerprovider = this.getMenuProvider(state, worldIn, pos);
                 if (inamedcontainerprovider != null) {
-                    Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> byteBuf.writeBlockPos(pos));
+                    Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> {
+                        byteBuf.writeEnum(this.material);
+                        byteBuf.writeBlockPos(pos);
+                    });
                     player.awardStat(Stats.INSPECT_HOPPER);
                 }
             }

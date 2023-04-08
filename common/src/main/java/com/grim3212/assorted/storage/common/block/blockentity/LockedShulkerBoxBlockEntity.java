@@ -187,7 +187,7 @@ public class LockedShulkerBoxBlockEntity extends BaseStorageBlockEntity {
 
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
-        return new LockedMaterialContainer(StorageContainerTypes.SHULKERS.get(storageMaterial).get(), windowId, player, this.getItemStackStorageHandler(), storageMaterial, true);
+        return new LockedMaterialContainer(StorageContainerTypes.LOCKED_SHULKER_BOX.get(), windowId, player, this.getItemStackStorageHandler(), storageMaterial, true);
     }
 
 }

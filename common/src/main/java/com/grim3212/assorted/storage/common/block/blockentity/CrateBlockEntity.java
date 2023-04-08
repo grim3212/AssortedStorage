@@ -4,7 +4,6 @@ import com.grim3212.assorted.lib.core.inventory.IInventoryBlockEntity;
 import com.grim3212.assorted.lib.core.inventory.INamed;
 import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageLockCode;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
@@ -92,11 +91,6 @@ public class CrateBlockEntity extends BlockEntity implements MenuProvider, IName
     }
 
     @Override
-    public StorageLockCode getStorageLockCode() {
-        return getLockCode() == null || getLockCode().isEmpty() ? StorageLockCode.EMPTY_CODE : new StorageLockCode(getLockCode());
-    }
-
-    @Override
     public String getLockCode() {
         return StorageUtil.getCode(this.getItemStackStorageHandler().getLockStack());
     }
@@ -104,7 +98,7 @@ public class CrateBlockEntity extends BlockEntity implements MenuProvider, IName
     @Override
     public void setLockCode(String s) {
         if (s != null && !s.isEmpty()) {
-            this.getItemStackStorageHandler().setLockStack(StorageUtil.setCodeOnStack(new StorageLockCode(s), new ItemStack(StorageItems.LOCKSMITH_LOCK.get())));
+            this.getItemStackStorageHandler().setLockStack(StorageUtil.setCodeOnStack(s, new ItemStack(StorageItems.LOCKSMITH_LOCK.get())));
 
             this.setChanged();
             this.modelUpdate();
