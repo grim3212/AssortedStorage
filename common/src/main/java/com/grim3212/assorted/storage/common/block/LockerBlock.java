@@ -1,10 +1,11 @@
 package com.grim3212.assorted.storage.common.block;
 
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
-import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
+import com.grim3212.assorted.storage.api.LockerHalf;
 import com.grim3212.assorted.storage.common.block.blockentity.LockerBlockEntity;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -13,17 +14,28 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class LockerBlock extends BaseStorageBlock {
 
+    public static final EnumProperty<LockerHalf> HALF = EnumProperty.create("half", LockerHalf.class);
+
     public LockerBlock(Properties properties) {
         super(properties.requiresCorrectToolForDrops().strength(3.0F, 6.0F));
+
+        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(WATERLOGGED, false).setValue(HALF, LockerHalf.SINGLE));
     }
 
     @Override
@@ -32,8 +44,50 @@ public class LockerBlock extends BaseStorageBlock {
     }
 
     @Override
+    public BlockState updateShape(BlockState state, Direction dir, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+        if (neighborState.is(this) && dir.getAxis().isVertical()) {
+            LockerHalf half = neighborState.getValue(HALF);
+            if (state.getValue(HALF) == LockerHalf.SINGLE && half != LockerHalf.SINGLE && state.getValue(FACING) == neighborState.getValue(FACING) && getConnectedDirection(neighborState) == dir.getOpposite()) {
+                return state.setValue(HALF, half.getOpposite());
+            }
+        } else if (getConnectedDirection(state) == dir) {
+            return state.setValue(HALF, LockerHalf.SINGLE);
+        }
+
+        return super.updateShape(state, dir, neighborState, level, pos, neighborPos);
+    }
+
+    public static Direction getConnectedDirection(BlockState state) {
+        return state.getValue(HALF) == LockerHalf.BOTTOM ? Direction.UP : Direction.DOWN;
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+
+        BlockState upState = level.getBlockState(pos.above());
+        if (upState.is(this) && upState.getValue(HALF) == LockerHalf.SINGLE) {
+            return this.defaultBlockState().setValue(FACING, upState.getValue(FACING)).setValue(HALF, LockerHalf.BOTTOM).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
+        }
+
+        BlockState bottomState = level.getBlockState(pos.below());
+        if (bottomState.is(this) && bottomState.getValue(HALF) == LockerHalf.SINGLE) {
+            return this.defaultBlockState().setValue(FACING, bottomState.getValue(FACING)).setValue(HALF, LockerHalf.TOP).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
+        }
+
+        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite()).setValue(HALF, LockerHalf.SINGLE).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> $$0) {
+        $$0.add(FACING, HALF, WATERLOGGED);
+    }
+
+    @Override
     public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
-        if (isDualLocker(worldIn, pos) && isTopLocker(worldIn, pos))
+        if (state.getValue(HALF) == LockerHalf.TOP)
             return super.getShape(state, worldIn, pos, context);
 
         return ObsidianSafeBlock.SAFE_SHAPE;
@@ -81,25 +135,29 @@ public class LockerBlock extends BaseStorageBlock {
         super.setPlacedBy(worldIn, pos, state, placer, stack);
 
         BlockEntity tileentitytop = worldIn.getBlockEntity(pos.above());
-        if (isBottomLocker(worldIn, pos) && tileentitytop != null && tileentitytop instanceof LockerBlockEntity topLocker) {
-            BaseStorageBlockEntity tileentitythis = (BaseStorageBlockEntity) worldIn.getBlockEntity(pos);
+        if (state.getValue(HALF) == LockerHalf.BOTTOM && tileentitytop != null && tileentitytop instanceof LockerBlockEntity topLocker) {
+            LockerBlockEntity tileentitythis = (LockerBlockEntity) worldIn.getBlockEntity(pos);
+
+            tileentitythis.refreshStorageHandler();
+            topLocker.refreshStorageHandler();
 
             if (topLocker.isLocked()) {
                 tileentitythis.setLockCode(topLocker.getLockCode());
             }
+            return;
         }
-    }
 
-    public static boolean isDualLocker(BlockGetter world, BlockPos pos) {
-        return isTopLocker(world, pos) || isBottomLocker(world, pos);
-    }
+        BlockEntity tileEntityBelow = worldIn.getBlockEntity(pos.below());
+        if (state.getValue(HALF) == LockerHalf.TOP && tileEntityBelow != null && tileEntityBelow instanceof LockerBlockEntity belowLocker) {
+            LockerBlockEntity tileentitythis = (LockerBlockEntity) worldIn.getBlockEntity(pos);
 
-    public static boolean isTopLocker(BlockGetter world, BlockPos pos) {
-        return world.getBlockState(pos.below()) == world.getBlockState(pos);
-    }
+            tileentitythis.refreshStorageHandler();
+            belowLocker.refreshStorageHandler();
 
-    public static boolean isBottomLocker(BlockGetter world, BlockPos pos) {
-        return world.getBlockState(pos.above()) == world.getBlockState(pos);
+            if (belowLocker.isLocked()) {
+                tileentitythis.setLockCode(belowLocker.getLockCode());
+            }
+        }
     }
 
     @Override

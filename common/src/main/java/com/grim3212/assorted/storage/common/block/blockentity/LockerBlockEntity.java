@@ -3,6 +3,8 @@ package com.grim3212.assorted.storage.common.block.blockentity;
 import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
+import com.grim3212.assorted.storage.api.LockerHalf;
+import com.grim3212.assorted.storage.common.block.LockerBlock;
 import com.grim3212.assorted.storage.common.inventory.DualLockerInventory;
 import com.grim3212.assorted.storage.common.inventory.LockerContainer;
 import net.minecraft.core.BlockPos;
@@ -14,80 +16,44 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class LockerBlockEntity extends BaseStorageBlockEntity {
 
-    enum LastCachedInventory {
-        TOP,
-        BOTTOM,
-        SELF
-    }
-
-    private LastCachedInventory lastCachedInventory = null;
-
     public LockerBlockEntity(BlockPos pos, BlockState state) {
         super(StorageBlockEntityTypes.LOCKER.get(), pos, state, 45);
     }
 
     @Override
     public IPlatformInventoryStorageHandler getStorageHandler() {
-        if (this.platformInventoryStorageHandler == null || this.lastCachedInventory == null) {
+        if (this.platformInventoryStorageHandler == null) {
             this.platformInventoryStorageHandler = this.createStorageHandler();
-        } else {
-            this.checkCache();
         }
-
 
         return this.platformInventoryStorageHandler;
     }
 
-    private void checkCache() {
-        //TODO: Look into something like how double chests work so we don't need this AFAIK
-        if (level.getBlockEntity(worldPosition.above()) instanceof LockerBlockEntity topLocker) {
-            if (this.lastCachedInventory == LastCachedInventory.TOP) {
-                // We are up to date
-                return;
-            }
-            this.lastCachedInventory = LastCachedInventory.TOP;
-            this.platformInventoryStorageHandler = Services.INVENTORY.createStorageInventoryHandler(new DualLockerInventory(this, this.getItemStackStorageHandler(), topLocker.getItemStackStorageHandler()));
-            return;
-        }
-
-        if (level.getBlockEntity(worldPosition.below()) instanceof LockerBlockEntity bottomLocker) {
-            if (this.lastCachedInventory == LastCachedInventory.BOTTOM) {
-                // We are up to date
-                return;
-            }
-            this.lastCachedInventory = LastCachedInventory.BOTTOM;
-            this.platformInventoryStorageHandler = Services.INVENTORY.createStorageInventoryHandler(new DualLockerInventory(this, bottomLocker.getItemStackStorageHandler(), this.getItemStackStorageHandler()));
-            return;
-        }
-
-        if (this.lastCachedInventory == LastCachedInventory.SELF) {
-            // We are up to date
-            return;
-        }
-        this.lastCachedInventory = LastCachedInventory.SELF;
-        this.platformInventoryStorageHandler = super.createStorageHandler();
-    }
-
     @Override
     public IPlatformInventoryStorageHandler createStorageHandler() {
-        if (level.getBlockEntity(worldPosition.above()) instanceof LockerBlockEntity lockerUp) {
-            this.lastCachedInventory = LastCachedInventory.TOP;
+        if (this.getBlockState().getValue(LockerBlock.HALF) == LockerHalf.BOTTOM && level.getBlockEntity(worldPosition.above()) instanceof LockerBlockEntity lockerUp) {
             return Services.INVENTORY.createStorageInventoryHandler(new DualLockerInventory(this, this.getItemStackStorageHandler(), lockerUp.getItemStackStorageHandler()));
         }
 
-        if (level.getBlockEntity(worldPosition.below()) instanceof LockerBlockEntity lockerDown) {
-            this.lastCachedInventory = LastCachedInventory.BOTTOM;
+        if (this.getBlockState().getValue(LockerBlock.HALF) == LockerHalf.TOP && level.getBlockEntity(worldPosition.below()) instanceof LockerBlockEntity lockerDown) {
             return Services.INVENTORY.createStorageInventoryHandler(new DualLockerInventory(this, lockerDown.getItemStackStorageHandler(), this.getItemStackStorageHandler()));
         }
 
-        this.lastCachedInventory = LastCachedInventory.SELF;
         return super.createStorageHandler();
+    }
+
+    public void refreshStorageHandler() {
+        this.platformInventoryStorageHandler = this.createStorageHandler();
     }
 
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
-        if (level.getBlockEntity(worldPosition.above()) instanceof LockerBlockEntity lockerUp) {
+        if (this.getBlockState().getValue(LockerBlock.HALF) == LockerHalf.BOTTOM && this.getLevel().getBlockEntity(this.getBlockPos().above()) instanceof LockerBlockEntity lockerUp) {
             return LockerContainer.createDualLockerContainer(windowId, player, new DualLockerInventory(this, this.getItemStackStorageHandler(), lockerUp.getItemStackStorageHandler()));
+        }
+
+        if (this.getBlockState().getValue(LockerBlock.HALF) == LockerHalf.TOP && this.getLevel().getBlockEntity(this.getBlockPos().below()) instanceof LockerBlockEntity lockerBelow) {
+            return LockerContainer.createDualLockerContainer(windowId, player, new DualLockerInventory(this, lockerBelow.getItemStackStorageHandler(), this.getItemStackStorageHandler()));
         }
 
         return LockerContainer.createLockerContainer(windowId, player, this.getItemStackStorageHandler());

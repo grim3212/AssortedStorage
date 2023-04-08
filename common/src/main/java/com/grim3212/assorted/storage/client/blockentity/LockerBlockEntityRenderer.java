@@ -1,11 +1,13 @@
 package com.grim3212.assorted.storage.client.blockentity;
 
 import com.grim3212.assorted.storage.Constants;
+import com.grim3212.assorted.storage.api.LockerHalf;
 import com.grim3212.assorted.storage.api.blockentity.IStorage;
 import com.grim3212.assorted.storage.client.model.DualLockerModel;
 import com.grim3212.assorted.storage.client.model.LockerModel;
 import com.grim3212.assorted.storage.client.model.StorageModelLayers;
 import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
+import com.grim3212.assorted.storage.common.block.LockerBlock;
 import com.grim3212.assorted.storage.common.block.blockentity.LockerBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -38,7 +40,7 @@ public class LockerBlockEntityRenderer<T extends BlockEntity & IStorage> impleme
         boolean placedInLevel = world != null;
 
         // We don't want to render the model if this is the top locker block
-        if (tileEntity == null || (placedInLevel && world.getBlockEntity(tileEntity.getBlockPos().below()) instanceof LockerBlockEntity)) {
+        if (tileEntity == null || (placedInLevel && tileEntity.getBlockState().getValue(LockerBlock.HALF) == LockerHalf.TOP)) {
             return;
         }
 
@@ -57,7 +59,7 @@ public class LockerBlockEntityRenderer<T extends BlockEntity & IStorage> impleme
 
             VertexConsumer ivertexbuilder = bufferIn.getBuffer(this.model.renderType(LOCKER_TEXTURE));
 
-            if (placedInLevel && world.getBlockEntity(tileEntity.getBlockPos().above()) instanceof LockerBlockEntity topLocker) {
+            if (placedInLevel && tileEntity.getBlockState().getValue(LockerBlock.HALF) == LockerHalf.BOTTOM) {
                 this.dualModel.doorAngle = angle;
                 this.dualModel.renderHandle = !tileEntity.isLocked();
 

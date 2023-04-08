@@ -11,6 +11,8 @@ public class AssortedStorageFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        Constants.LOG.info(Constants.MOD_NAME + " starting up...");
+
         StorageCommonMod.init();
 
         StorageBlocks.initDispenserHandlers();

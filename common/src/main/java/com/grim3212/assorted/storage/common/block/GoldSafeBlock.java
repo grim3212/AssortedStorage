@@ -87,7 +87,7 @@ public class GoldSafeBlock extends BaseStorageBlock {
     public void playerWillDestroy(Level worldIn, BlockPos pos, BlockState state, Player player) {
         BlockEntity tileentity = worldIn.getBlockEntity(pos);
         if (tileentity instanceof GoldSafeBlockEntity goldSafeBlockEntity) {
-            if (!worldIn.isClientSide && player.isCreative() && !goldSafeBlockEntity.getItemStackStorageHandler().isEmpty()) {
+            if (!worldIn.isClientSide && player.isCreative() && (!goldSafeBlockEntity.getItemStackStorageHandler().isEmpty() || goldSafeBlockEntity.isLocked())) {
                 ItemStack itemstack = new ItemStack(this);
                 tileentity.saveToItem(itemstack);
 

@@ -93,18 +93,14 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
             this.lockCode = s;
 
         this.setChanged();
-
         this.modelDataUpdate();
-
-        if (level != null && level.isClientSide) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
-        }
     }
 
     protected void modelDataUpdate() {
         Level level = this.getLevel();
         if (level != null && level.isClientSide) {
             ClientServices.MODELS.requestModelDataRefresh(this);
+            this.level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
         }
     }
 

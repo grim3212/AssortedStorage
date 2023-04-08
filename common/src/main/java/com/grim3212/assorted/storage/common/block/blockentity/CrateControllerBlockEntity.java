@@ -25,6 +25,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -98,8 +99,15 @@ public class CrateControllerBlockEntity extends BlockEntity implements INamed, I
             this.lockCode = s;
 
         this.setChanged();
-        this.modelUpdate();
-        ClientServices.MODELS.requestModelDataRefresh(this);
+        this.modelDataUpdate();
+    }
+
+    protected void modelDataUpdate() {
+        Level level = this.getLevel();
+        if (level != null && level.isClientSide) {
+            ClientServices.MODELS.requestModelDataRefresh(this);
+            this.level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
+        }
     }
 
     @Override
@@ -131,10 +139,6 @@ public class CrateControllerBlockEntity extends BlockEntity implements INamed, I
     @Override
     public CompoundTag getUpdateTag() {
         return this.saveWithoutMetadata();
-    }
-
-    public void modelUpdate() {
-        this.level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
     }
 
     @Override

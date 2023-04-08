@@ -21,10 +21,7 @@ public class StorageEvents {
     public static void init() {
         Services.EVENTS.registerEvent(UseBlockEvent.class, (final UseBlockEvent event) -> {
             InteractionResult result = useOnBlock(event.getPlayer(), event.getLevel(), event.getHand(), event.getHitResult());
-            if (result == InteractionResult.SUCCESS) {
-                event.setCanceled(true);
-                event.setResult(result);
-            }
+            event.setResult(result);
         });
     }
 

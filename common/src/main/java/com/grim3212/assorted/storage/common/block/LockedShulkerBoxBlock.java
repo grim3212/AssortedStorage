@@ -280,7 +280,7 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
     public void playerWillDestroy(Level worldIn, BlockPos pos, BlockState state, Player player) {
         BlockEntity tileentity = worldIn.getBlockEntity(pos);
         if (tileentity instanceof LockedShulkerBoxBlockEntity shulkerBE) {
-            if (!worldIn.isClientSide && player.isCreative() && !shulkerBE.getItemStackStorageHandler().isEmpty()) {
+            if (!worldIn.isClientSide && player.isCreative() && (!shulkerBE.getItemStackStorageHandler().isEmpty() || shulkerBE.isLocked())) {
                 ItemStack itemstack = new ItemStack(this);
                 tileentity.saveToItem(itemstack);
                 NBTHelper.putInt(itemstack, "Color", shulkerBE.colorToSave());
