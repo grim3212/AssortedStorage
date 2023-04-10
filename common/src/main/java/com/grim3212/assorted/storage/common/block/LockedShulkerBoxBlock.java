@@ -376,7 +376,7 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
     @Override
     public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         if (level.getBlockEntity(pos) instanceof BaseStorageBlockEntity storageBlockEntity) {
-            return BaseStorageBlock.getRedstoneSignalFromContainer(storageBlockEntity.getItemStackStorageHandler());
+            return StorageUtil.getRedstoneSignalFromContainer(storageBlockEntity.getItemStackStorageHandler());
         }
 
         return super.getAnalogOutputSignal(state, level, pos);

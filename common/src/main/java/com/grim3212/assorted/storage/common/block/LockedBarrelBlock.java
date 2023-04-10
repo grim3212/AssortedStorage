@@ -228,7 +228,7 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
     @Override
     public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
         if (worldIn.getBlockEntity(pos) instanceof BaseStorageBlockEntity storageBlockEntity) {
-            return BaseStorageBlock.getRedstoneSignalFromContainer(storageBlockEntity.getItemStackStorageHandler());
+            return StorageUtil.getRedstoneSignalFromContainer(storageBlockEntity.getItemStackStorageHandler());
         }
 
         return super.getAnalogOutputSignal(blockState, worldIn, pos);

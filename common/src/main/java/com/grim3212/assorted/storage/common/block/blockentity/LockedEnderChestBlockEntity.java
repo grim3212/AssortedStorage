@@ -73,7 +73,7 @@ public class LockedEnderChestBlockEntity extends BaseStorageBlockEntity {
 
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory playerInv, Player player) {
-        return StorageContainer.createEnderChestContainer(windowId, playerInv, this.getStorageHandler().getItemStorageHandler());
+        return StorageContainer.createEnderChestContainer(windowId, playerInv, this.getStorageHandler().getItemStorageHandler(null));
     }
 
     @Override

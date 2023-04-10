@@ -111,7 +111,6 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
         if (this.selfInventory()) {
             if (nbt.contains("Inventory"))
                 this.storageHandler.deserializeNBT(nbt.getCompound("Inventory"));
-
         }
 
         if (nbt.contains("CustomName", 8)) {
@@ -133,11 +132,6 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
         }
 
         StorageUtil.writeLock(compound, this.lockCode);
-    }
-
-    public CompoundTag saveToNbt(CompoundTag compound) {
-        compound.put("Inventory", this.storageHandler.serializeNBT());
-        return compound;
     }
 
     @Override

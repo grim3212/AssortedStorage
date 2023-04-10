@@ -1,7 +1,6 @@
 package com.grim3212.assorted.storage.common.block;
 
 import com.grim3212.assorted.lib.core.inventory.INamed;
-import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
@@ -17,7 +16,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -241,7 +239,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
     @Override
     public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
         if (worldIn.getBlockEntity(pos) instanceof BaseStorageBlockEntity storageBlockEntity) {
-            return getRedstoneSignalFromContainer(storageBlockEntity.getItemStackStorageHandler());
+            return StorageUtil.getRedstoneSignalFromContainer(storageBlockEntity.getItemStackStorageHandler());
         }
 
         return super.getAnalogOutputSignal(blockState, worldIn, pos);
@@ -299,25 +297,5 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
         }
 
         return false;
-    }
-
-    public static int getRedstoneSignalFromContainer(@Nullable ItemStackStorageHandler itemHandler) {
-        if (itemHandler == null) {
-            return 0;
-        } else {
-            int $$1 = 0;
-            float $$2 = 0.0F;
-
-            for (int slot = 0; slot < itemHandler.getSlots(); ++slot) {
-                ItemStack stack = itemHandler.getStackInSlot(slot);
-                if (!stack.isEmpty()) {
-                    $$2 += (float) stack.getCount() / (float) Math.min(itemHandler.getSlotLimit(slot), stack.getMaxStackSize());
-                    ++$$1;
-                }
-            }
-
-            $$2 /= (float) itemHandler.getSlots();
-            return Mth.floor($$2 * 14.0F) + ($$1 > 0 ? 1 : 0);
-        }
     }
 }

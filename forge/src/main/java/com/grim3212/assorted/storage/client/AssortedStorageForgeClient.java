@@ -1,7 +1,6 @@
-package com.grim3212.assorted.storage.client.data;
+package com.grim3212.assorted.storage.client;
 
 import com.grim3212.assorted.storage.Constants;
-import com.grim3212.assorted.storage.client.StorageClient;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

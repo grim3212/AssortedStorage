@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.grim3212.assorted.lib.client.model.loaders.IModelSpecification;
 import com.grim3212.assorted.lib.client.model.loaders.IModelSpecificationLoader;
 import com.grim3212.assorted.lib.client.model.loaders.context.IModelBakingContext;
-import com.grim3212.assorted.lib.platform.ClientServices;
 import com.grim3212.assorted.storage.Constants;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -36,7 +35,8 @@ public class LockedModel implements IModelSpecification<LockedModel> {
 
         BakedModel bakedUnlockedBarrel = unbakedUnlockedModel.bake(baker, spriteGetter, modelState, modelLocation);
         BakedModel bakedLockedBarrel = unbakedLockedModel.bake(baker, spriteGetter, modelState, modelLocation);
-        return ClientServices.MODELS.adaptToPlatform(new LockedBakedModel(context, bakedUnlockedBarrel, bakedLockedBarrel, baker, spriteGetter, modelState, modelLocation));
+        //TODO: Verify locked models still work
+        return new LockedBakedModel(context, bakedUnlockedBarrel, bakedLockedBarrel, baker, spriteGetter, modelState, modelLocation);
     }
 
     public enum Loader implements IModelSpecificationLoader<LockedModel> {

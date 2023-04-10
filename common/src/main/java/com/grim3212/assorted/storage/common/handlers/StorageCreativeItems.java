@@ -2,13 +2,17 @@ package com.grim3212.assorted.storage.common.handlers;
 
 import com.grim3212.assorted.lib.core.creative.CreativeTabItems;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
+import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.lib.util.NBTHelper;
+import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.StorageCommonMod;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
@@ -17,9 +21,10 @@ import java.util.List;
 
 public class StorageCreativeItems {
 
-    public static List<ItemStack> getCreativeItems() {
+    private static List<ItemStack> getCreativeItems() {
         CreativeTabItems items = new CreativeTabItems();
 
+        items.add(StorageBlocks.LOCKSMITH_WORKBENCH.get());
         items.add(StorageItems.LOCKSMITH_KEY.get());
         items.add(StorageItems.LOCKSMITH_LOCK.get());
         items.add(StorageItems.KEY_RING.get());
@@ -76,7 +81,6 @@ public class StorageCreativeItems {
         }
 
         // Blocks
-        items.add(StorageBlocks.LOCKSMITH_WORKBENCH.get());
         items.add(StorageBlocks.WOOD_CABINET.get());
         items.add(StorageBlocks.GLASS_CABINET.get());
         items.add(StorageBlocks.GOLD_SAFE.get());
@@ -164,5 +168,9 @@ public class StorageCreativeItems {
 
     private static boolean canNotCraft(StorageMaterial type) {
         return StorageCommonMod.COMMON_CONFIG.hideUncraftableItems.get() && BuiltInRegistries.ITEM.getTag(type.getMaterial()).isPresent() && BuiltInRegistries.ITEM.getTag(type.getMaterial()).get().stream().count() < 1;
+    }
+
+    public static void init() {
+        Services.PLATFORM.registerCreativeTab(new ResourceLocation(Constants.MOD_ID, "tab"), Component.translatable("itemGroup." + Constants.MOD_ID), () -> new ItemStack(StorageBlocks.WOOD_CABINET.get()), StorageCreativeItems::getCreativeItems);
     }
 }
