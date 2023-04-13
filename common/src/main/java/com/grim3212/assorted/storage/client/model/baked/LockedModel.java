@@ -35,7 +35,6 @@ public class LockedModel implements IModelSpecification<LockedModel> {
 
         BakedModel bakedUnlockedBarrel = unbakedUnlockedModel.bake(baker, spriteGetter, modelState, modelLocation);
         BakedModel bakedLockedBarrel = unbakedLockedModel.bake(baker, spriteGetter, modelState, modelLocation);
-        //TODO: Verify locked models still work
         return new LockedBakedModel(context, bakedUnlockedBarrel, bakedLockedBarrel, baker, spriteGetter, modelState, modelLocation);
     }
 

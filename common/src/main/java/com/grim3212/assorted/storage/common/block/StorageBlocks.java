@@ -54,8 +54,8 @@ public class StorageBlocks {
         return 7;
     })));
 
-    public static final IRegistryObject<LockedChestBlock> LOCKED_CHEST = registerChest("locked_chest", () -> new LockedChestBlock(null, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
-    public static final IRegistryObject<LockedShulkerBoxBlock> LOCKED_SHULKER_BOX = registerShulker("locked_shulker_box", () -> new LockedShulkerBoxBlock(null, BlockBehaviour.Properties.of(Material.SHULKER_SHELL)));
+    public static final IRegistryObject<LockedChestBlock> LOCKED_CHEST = registerChest("locked_chest", () -> new LockedChestBlock(null, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)), new Item.Properties());
+    public static final IRegistryObject<LockedShulkerBoxBlock> LOCKED_SHULKER_BOX = registerShulker("locked_shulker_box", () -> new LockedShulkerBoxBlock(null, BlockBehaviour.Properties.of(Material.SHULKER_SHELL)), new Item.Properties());
     public static final IRegistryObject<LockedBarrelBlock> LOCKED_BARREL = register("locked_barrel", () -> new LockedBarrelBlock(null, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
     public static final IRegistryObject<LockedHopperBlock> LOCKED_HOPPER = register("locked_hopper", () -> new LockedHopperBlock(null, BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).requiresCorrectToolForDrops().strength(3.0F, 4.8F).sound(SoundType.METAL).noOcclusion()));
 
@@ -87,10 +87,10 @@ public class StorageBlocks {
 
     static {
         Stream.of(StorageMaterial.values()).forEach((type) -> {
-            CHESTS.put(type, registerChest("chest_" + type.toString(), () -> new LockedChestBlock(type)));
-            BARRELS.put(type, register("barrel_" + type.toString(), () -> new LockedBarrelBlock(type)));
-            HOPPERS.put(type, register("hopper_" + type.toString(), () -> new LockedHopperBlock(type)));
-            SHULKERS.put(type, registerShulker("shulker_box_" + type.toString(), () -> new LockedShulkerBoxBlock(type)));
+            CHESTS.put(type, registerChest("chest_" + type.toString(), () -> new LockedChestBlock(type), type == StorageMaterial.NETHERITE ? new Item.Properties().fireResistant() : new Item.Properties()));
+            BARRELS.put(type, register("barrel_" + type.toString(), () -> new LockedBarrelBlock(type), type == StorageMaterial.NETHERITE ? new Item.Properties().fireResistant() : new Item.Properties()));
+            HOPPERS.put(type, register("hopper_" + type.toString(), () -> new LockedHopperBlock(type), type == StorageMaterial.NETHERITE ? new Item.Properties().fireResistant() : new Item.Properties()));
+            SHULKERS.put(type, registerShulker("shulker_box_" + type.toString(), () -> new LockedShulkerBoxBlock(type), type == StorageMaterial.NETHERITE ? new Item.Properties().fireResistant() : new Item.Properties()));
         });
 
         Stream.of(Wood.values()).forEach((type) -> {
@@ -110,7 +110,11 @@ public class StorageBlocks {
     }
 
     private static <T extends Block> IRegistryObject<T> register(String name, Supplier<? extends T> sup) {
-        return register(name, sup, block -> item(block));
+        return register(name, sup, new Item.Properties());
+    }
+
+    private static <T extends Block> IRegistryObject<T> register(String name, Supplier<? extends T> sup, Item.Properties itemProperties) {
+        return register(name, sup, block -> item(block, itemProperties));
     }
 
     private static <T extends Block> IRegistryObject<T> registerCrate(String name, Supplier<? extends T> sup) {
@@ -121,12 +125,12 @@ public class StorageBlocks {
         return register(name, sup, block -> storageItem(block));
     }
 
-    private static <T extends LockedChestBlock> IRegistryObject<T> registerChest(String name, Supplier<? extends T> sup) {
-        return register(name, sup, block -> chestItem(block));
+    private static <T extends LockedChestBlock> IRegistryObject<T> registerChest(String name, Supplier<? extends T> sup, Item.Properties itemProperties) {
+        return register(name, sup, block -> chestItem(block, itemProperties));
     }
 
-    private static <T extends LockedShulkerBoxBlock> IRegistryObject<T> registerShulker(String name, Supplier<? extends T> sup) {
-        return register(name, sup, block -> shulkerItem(block));
+    private static <T extends LockedShulkerBoxBlock> IRegistryObject<T> registerShulker(String name, Supplier<? extends T> sup, Item.Properties itemProperties) {
+        return register(name, sup, block -> shulkerItem(block, itemProperties));
     }
 
     private static <T extends Block> IRegistryObject<T> registerLocker(String name, Supplier<? extends T> sup) {
@@ -143,8 +147,8 @@ public class StorageBlocks {
         return BLOCKS.register(name, sup);
     }
 
-    private static Supplier<BlockItem> item(final IRegistryObject<? extends Block> block) {
-        return () -> new BlockItem(block.get(), new Item.Properties());
+    private static Supplier<BlockItem> item(final IRegistryObject<? extends Block> block, Item.Properties itemProperties) {
+        return () -> new BlockItem(block.get(), itemProperties);
     }
 
     private static Supplier<StorageBlockItem> storageItem(final IRegistryObject<? extends Block> block) {
@@ -155,12 +159,12 @@ public class StorageBlocks {
         return () -> new WarehouseCrateBlockItem(block.get(), new Item.Properties());
     }
 
-    private static Supplier<ChestBlockItem> chestItem(final IRegistryObject<? extends Block> block) {
-        return () -> new ChestBlockItem(block.get(), new Item.Properties());
+    private static Supplier<ChestBlockItem> chestItem(final IRegistryObject<? extends Block> block, Item.Properties itemProperties) {
+        return () -> new ChestBlockItem(block.get(), itemProperties);
     }
 
-    private static Supplier<ShulkerBoxBlockItem> shulkerItem(final IRegistryObject<? extends Block> block) {
-        return () -> new ShulkerBoxBlockItem(block.get(), new Item.Properties());
+    private static Supplier<ShulkerBoxBlockItem> shulkerItem(final IRegistryObject<? extends Block> block, Item.Properties itemProperties) {
+        return () -> new ShulkerBoxBlockItem(block.get(), itemProperties);
     }
 
     private static Supplier<BlockItem> lockerItem(final IRegistryObject<? extends Block> lockerBlock) {

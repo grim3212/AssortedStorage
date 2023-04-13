@@ -18,7 +18,7 @@
       "com.grim3212.assorted.storage.AssortedStorageFabric"
     ],
     "client": [
-      "com.grim3212.assorted.storage.client.AssortedStorageFabricClient"
+      "com.grim3212.assorted.storage.AssortedStorageFabricClient"
     ],
     "fabric-datagen": [
       "com.grim3212.assorted.storage.AssortedStorageFabricDatagen"

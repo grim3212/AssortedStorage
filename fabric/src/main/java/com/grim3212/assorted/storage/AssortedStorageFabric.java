@@ -1,7 +1,7 @@
 package com.grim3212.assorted.storage;
 
 import com.grim3212.assorted.lib.core.inventory.IInventoryBlockEntity;
-import com.grim3212.assorted.lib.inventory.FabricPlatformInventoryStorageHandler;
+import com.grim3212.assorted.lib.inventory.FabricPlatformInventoryStorageHandlerUnsided;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import net.fabricmc.api.ModInitializer;
@@ -18,7 +18,7 @@ public class AssortedStorageFabric implements ModInitializer {
         ItemStorage.SIDED.registerForBlockEntities((be, direction) ->
                 {
                     if (be instanceof IInventoryBlockEntity inv)
-                        return ((FabricPlatformInventoryStorageHandler) inv.getStorageHandler()).getFabricInventory();
+                        return ((FabricPlatformInventoryStorageHandlerUnsided) inv.getStorageHandler()).getFabricInventory();
                     return null;
                 },
                 StorageBlockEntityTypes.WOOD_CABINET.get(),
