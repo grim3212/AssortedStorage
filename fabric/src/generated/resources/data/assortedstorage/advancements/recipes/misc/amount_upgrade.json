@@ -1,4 +1,19 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "crates"
+        },
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "upgrades"
+        }
+      ]
+    }
+  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_blank_upgrade": {
@@ -20,21 +35,6 @@
       "trigger": "minecraft:recipe_unlocked"
     }
   },
-  "fabric:load_conditions": [
-    {
-      "condition": "fabric:and",
-      "values": [
-        {
-          "condition": "assortedlib:part_enabled",
-          "part": "crates"
-        },
-        {
-          "condition": "assortedlib:part_enabled",
-          "part": "upgrades"
-        }
-      ]
-    }
-  ],
   "requirements": [
     [
       "has_blank_upgrade",

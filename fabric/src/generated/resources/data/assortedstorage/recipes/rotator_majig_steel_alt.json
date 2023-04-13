@@ -1,6 +1,4 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "category": "equipment",
   "fabric:load_conditions": [
     {
       "condition": "fabric:tags_populated",
@@ -9,6 +7,8 @@
       ]
     }
   ],
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
   "key": {
     "B": {
       "tag": "c:rods/blaze"

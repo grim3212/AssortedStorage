@@ -1,4 +1,10 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "assortedlib:part_enabled",
+      "part": "hoppers"
+    }
+  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_chest": {
@@ -30,12 +36,6 @@
       "trigger": "minecraft:recipe_unlocked"
     }
   },
-  "fabric:load_conditions": [
-    {
-      "condition": "assortedlib:part_enabled",
-      "part": "hoppers"
-    }
-  ],
   "requirements": [
     [
       "has_chest",

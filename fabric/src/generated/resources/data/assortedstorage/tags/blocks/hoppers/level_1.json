@@ -1,10 +1,10 @@
 {
   "replace": false,
   "values": [
-    "assortedstorage:hopper_tin",
-    "assortedstorage:hopper_aluminum",
     "assortedstorage:hopper_iron",
     "assortedstorage:hopper_topaz",
-    "assortedstorage:hopper_copper"
+    "assortedstorage:hopper_copper",
+    "assortedstorage:hopper_tin",
+    "assortedstorage:hopper_aluminum"
   ]
 }

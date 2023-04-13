@@ -1,6 +1,4 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "fabric:load_conditions": [
     {
       "condition": "fabric:and",
@@ -16,6 +14,8 @@
       ]
     }
   ],
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
   "ingredients": [
     {
       "item": "assortedstorage:blank_upgrade"

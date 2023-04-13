@@ -1,9 +1,9 @@
 {
   "replace": false,
   "values": [
-    "assortedstorage:bag_bronze",
     "assortedstorage:bag_gold",
+    "assortedstorage:bag_ruby",
     "assortedstorage:bag_silver",
-    "assortedstorage:bag_ruby"
+    "assortedstorage:bag_bronze"
   ]
 }

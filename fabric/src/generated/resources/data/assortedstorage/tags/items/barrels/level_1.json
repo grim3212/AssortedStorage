@@ -1,10 +1,10 @@
 {
   "replace": false,
   "values": [
-    "assortedstorage:barrel_tin",
-    "assortedstorage:barrel_aluminum",
     "assortedstorage:barrel_iron",
     "assortedstorage:barrel_topaz",
-    "assortedstorage:barrel_copper"
+    "assortedstorage:barrel_copper",
+    "assortedstorage:barrel_tin",
+    "assortedstorage:barrel_aluminum"
   ]
 }

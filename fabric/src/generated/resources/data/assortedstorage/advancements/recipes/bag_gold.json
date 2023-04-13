@@ -1,4 +1,21 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "bags"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:ingots/gold"
+          ]
+        }
+      ]
+    }
+  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_bag": {
@@ -28,23 +45,6 @@
       "trigger": "minecraft:recipe_unlocked"
     }
   },
-  "fabric:load_conditions": [
-    {
-      "condition": "fabric:and",
-      "values": [
-        {
-          "condition": "assortedlib:part_enabled",
-          "part": "bags"
-        },
-        {
-          "condition": "fabric:tags_populated",
-          "values": [
-            "c:ingots/gold"
-          ]
-        }
-      ]
-    }
-  ],
   "requirements": [
     [
       "has_bag",

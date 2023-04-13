@@ -1,4 +1,10 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "assortedlib:part_enabled",
+      "part": "bags"
+    }
+  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_chest": {
@@ -28,12 +34,6 @@
       "trigger": "minecraft:recipe_unlocked"
     }
   },
-  "fabric:load_conditions": [
-    {
-      "condition": "assortedlib:part_enabled",
-      "part": "bags"
-    }
-  ],
   "requirements": [
     [
       "has_leather",

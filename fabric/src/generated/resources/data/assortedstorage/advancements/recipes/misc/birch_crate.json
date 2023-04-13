@@ -1,4 +1,10 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "assortedlib:part_enabled",
+      "part": "crates"
+    }
+  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_chest": {
@@ -28,12 +34,6 @@
       "trigger": "minecraft:recipe_unlocked"
     }
   },
-  "fabric:load_conditions": [
-    {
-      "condition": "assortedlib:part_enabled",
-      "part": "crates"
-    }
-  ],
   "requirements": [
     [
       "has_chest",

@@ -1,6 +1,4 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "fabric:load_conditions": [
     {
       "condition": "fabric:and",
@@ -18,6 +16,8 @@
       ]
     }
   ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "key": {
     "B": {
       "item": "assortedstorage:blank_upgrade"

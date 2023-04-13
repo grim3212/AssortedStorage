@@ -1,4 +1,21 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "upgrades"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "values": [
+            "c:ingots/platinum"
+          ]
+        }
+      ]
+    }
+  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_material": {
@@ -30,23 +47,6 @@
       "trigger": "minecraft:inventory_changed"
     }
   },
-  "fabric:load_conditions": [
-    {
-      "condition": "fabric:and",
-      "values": [
-        {
-          "condition": "assortedlib:part_enabled",
-          "part": "upgrades"
-        },
-        {
-          "condition": "fabric:tags_populated",
-          "values": [
-            "c:ingots/platinum"
-          ]
-        }
-      ]
-    }
-  ],
   "requirements": [
     [
       "has_upgrade",

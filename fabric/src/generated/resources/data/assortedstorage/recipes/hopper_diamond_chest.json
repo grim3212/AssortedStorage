@@ -1,11 +1,11 @@
 {
-  "type": "assortedstorage:locked_upgrading",
   "fabric:load_conditions": [
     {
       "condition": "assortedlib:part_enabled",
       "part": "hoppers"
     }
   ],
+  "type": "assortedstorage:locked_upgrading",
   "key": {
     "C": {
       "item": "assortedstorage:chest_diamond"
