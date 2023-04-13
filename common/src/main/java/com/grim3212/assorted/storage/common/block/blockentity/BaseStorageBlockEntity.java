@@ -109,8 +109,12 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
         super.load(nbt);
 
         if (this.selfInventory()) {
-            if (nbt.contains("Inventory"))
+            if (nbt.contains("Inventory")) {
                 this.storageHandler.deserializeNBT(nbt.getCompound("Inventory"));
+            } else if (nbt.contains("Items")) {
+                // Backwards compatible, will not be saved again like this
+                this.storageHandler.deserializeNBT(nbt);
+            }
         }
 
         if (nbt.contains("CustomName", 8)) {

@@ -7,6 +7,7 @@ import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
+import com.grim3212.assorted.storage.api.LargeItemStack;
 import com.grim3212.assorted.storage.api.crates.CrateLayout;
 import com.grim3212.assorted.storage.common.block.CrateBlock;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
@@ -17,6 +18,7 @@ import com.grim3212.assorted.storage.common.network.SyncCrate;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
@@ -111,10 +113,37 @@ public class CrateBlockEntity extends BlockEntity implements MenuProvider, IName
 
         if (nbt.contains("Inventory")) {
             this.getItemStackStorageHandler().deserializeNBT(nbt.getCompound("Inventory"));
+        } else if (nbt.contains("Items") || nbt.contains("Enhancements")) {
+            this.legacyLoad(nbt);
         }
 
         if (nbt.contains("CustomName", 8)) {
             this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"));
+        }
+    }
+
+    // TODO: remove in future versions
+    private void legacyLoad(CompoundTag tag) {
+        ListTag items = tag.getList("Items", 10);
+        for (int i = 0; i < items.size(); i++) {
+            CompoundTag slot = items.getCompound(i);
+            int slotIdx = slot.getByte("Slot") & 255;
+            if (slotIdx >= 0 && slotIdx < this.getItemStackStorageHandler().getSlots()) {
+                int amount = slot.getInt("SlotAmount");
+                int rotation = slot.getInt("SlotRotation");
+                boolean locked = slot.getBoolean("SlotLocked");
+                ItemStack stack = ItemStack.of(slot);
+                this.getItemStackStorageHandler().getSlotContents().set(slotIdx, new LargeItemStack(stack, amount, rotation, locked));
+            }
+        }
+
+        ListTag enhancementItems = tag.getList("Enhancements", 10);
+        for (int i = 0; i < enhancementItems.size(); i++) {
+            CompoundTag slot = enhancementItems.getCompound(i);
+            int slotIdx = slot.getByte("Slot") & 255;
+            if (slotIdx >= 0 && slotIdx < this.getItemStackStorageHandler().getEnhancements().size()) {
+                this.getItemStackStorageHandler().getEnhancements().set(slotIdx, ItemStack.of(slot));
+            }
         }
     }
 

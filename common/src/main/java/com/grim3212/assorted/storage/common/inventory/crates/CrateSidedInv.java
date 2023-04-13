@@ -49,6 +49,10 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
         return enhancements;
     }
 
+    public NonNullList<LargeItemStack> getSlotContents() {
+        return slotContents;
+    }
+
     public ItemStack removeEnhancement(int index, int count) {
         ItemStack stack = ContainerHelper.removeItem(this.enhancements, index, count);
         if (!stack.isEmpty()) {
