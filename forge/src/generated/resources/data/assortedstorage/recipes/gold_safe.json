@@ -16,5 +16,6 @@
   ],
   "result": {
     "item": "assortedstorage:gold_safe"
-  }
+  },
+  "show_notification": true
 }

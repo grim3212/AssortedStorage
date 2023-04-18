@@ -25,5 +25,6 @@
   ],
   "result": {
     "item": "assortedstorage:birch_crate_triple"
-  }
+  },
+  "show_notification": true
 }

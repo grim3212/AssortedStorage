@@ -11,7 +11,6 @@ import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.item.upgrades.LevelUpgradeItem;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -26,7 +25,7 @@ import java.util.function.Function;
 public class StorageItemTagProvider extends LibItemTagProvider {
 
 
-    public StorageItemTagProvider(PackOutput output, CompletableFuture<Provider> lookup, TagsProvider<Block> blockTags) {
+    public StorageItemTagProvider(PackOutput output, CompletableFuture<Provider> lookup, CompletableFuture<TagLookup<Block>> blockTags) {
         super(output, lookup, blockTags);
     }
 

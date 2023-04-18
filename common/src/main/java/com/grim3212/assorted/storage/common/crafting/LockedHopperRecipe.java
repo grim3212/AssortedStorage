@@ -3,6 +3,7 @@ package com.grim3212.assorted.storage.common.crafting;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.StorageItems;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.AirItem;
@@ -46,7 +47,7 @@ public class LockedHopperRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv) {
+    public ItemStack assemble(CraftingContainer inv, RegistryAccess registryAccess) {
         ItemStack hopper = ItemStack.EMPTY;
         ItemStack lock = ItemStack.EMPTY;
 

@@ -33,5 +33,6 @@
   ],
   "result": {
     "item": "assortedstorage:level_upgrade_tin"
-  }
+  },
+  "show_notification": true
 }

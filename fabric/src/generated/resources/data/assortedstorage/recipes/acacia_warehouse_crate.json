@@ -16,5 +16,6 @@
   ],
   "result": {
     "item": "assortedstorage:acacia_warehouse_crate"
-  }
+  },
+  "show_notification": true
 }

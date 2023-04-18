@@ -64,28 +64,28 @@ public class AmountUpgradeRenderer implements ICrateUpgradeRenderer {
 
         switch (tileEntityIn.getLayout()) {
             case SINGLE:
-                font.drawInBatch(slotAmount, getTextOffset(font, slotAmount, scale) + 63F, 90.0F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, false, 0, light);
+                font.drawInBatch(slotAmount, getTextOffset(font, slotAmount, scale) + 63F, 90.0F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, Font.DisplayMode.NORMAL, 0, light, false);
                 break;
             case DOUBLE:
                 slotAmount1 = getSlotAmount(tileEntityIn, 1, showFull);
-                font.drawInBatch(slotAmount, getTextOffset(font, slotAmount, scale) + 63F, 45.25F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, false, 0, light);
-                font.drawInBatch(slotAmount1, getTextOffset(font, slotAmount1, scale) + 63F, 100.0F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, false, 0, light);
+                font.drawInBatch(slotAmount, getTextOffset(font, slotAmount, scale) + 63F, 45.25F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, Font.DisplayMode.NORMAL, 0, light, false);
+                font.drawInBatch(slotAmount1, getTextOffset(font, slotAmount1, scale) + 63F, 100.0F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, Font.DisplayMode.NORMAL, 0, light, false);
                 break;
             case TRIPLE:
                 slotAmount1 = getSlotAmount(tileEntityIn, 1, showFull);
                 slotAmount2 = getSlotAmount(tileEntityIn, 2, showFull);
-                font.drawInBatch(slotAmount, getTextOffset(font, slotAmount, scale) + 63F, 45.25F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, false, 0, light);
-                font.drawInBatch(slotAmount1, getTextOffset(font, slotAmount1, scale) + 35.5F, 100.0F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, false, 0, light);
-                font.drawInBatch(slotAmount2, getTextOffset(font, slotAmount2, scale) + 90F, 100.0F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, false, 0, light);
+                font.drawInBatch(slotAmount, getTextOffset(font, slotAmount, scale) + 63F, 45.25F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, Font.DisplayMode.NORMAL, 0, light, false);
+                font.drawInBatch(slotAmount1, getTextOffset(font, slotAmount1, scale) + 35.5F, 100.0F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, Font.DisplayMode.NORMAL, 0, light, false);
+                font.drawInBatch(slotAmount2, getTextOffset(font, slotAmount2, scale) + 90F, 100.0F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, Font.DisplayMode.NORMAL, 0, light, false);
                 break;
             case QUADRUPLE:
                 slotAmount1 = getSlotAmount(tileEntityIn, 1, showFull);
                 slotAmount2 = getSlotAmount(tileEntityIn, 2, showFull);
                 slotAmount3 = getSlotAmount(tileEntityIn, 3, showFull);
-                font.drawInBatch(slotAmount, getTextOffset(font, slotAmount, scale) + 35.5F, 45.25F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, false, 0, light);
-                font.drawInBatch(slotAmount1, getTextOffset(font, slotAmount1, scale) + 90F, 45.25F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, false, 0, light);
-                font.drawInBatch(slotAmount2, getTextOffset(font, slotAmount2, scale) + 35.5F, 100.0F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, false, 0, light);
-                font.drawInBatch(slotAmount3, getTextOffset(font, slotAmount3, scale) + 90F, 100.0F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, false, 0, light);
+                font.drawInBatch(slotAmount, getTextOffset(font, slotAmount, scale) + 35.5F, 45.25F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, Font.DisplayMode.NORMAL, 0, light, false);
+                font.drawInBatch(slotAmount1, getTextOffset(font, slotAmount1, scale) + 90F, 45.25F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, Font.DisplayMode.NORMAL, 0, light, false);
+                font.drawInBatch(slotAmount2, getTextOffset(font, slotAmount2, scale) + 35.5F, 100.0F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, Font.DisplayMode.NORMAL, 0, light, false);
+                font.drawInBatch(slotAmount3, getTextOffset(font, slotAmount3, scale) + 90F, 100.0F, DyeColor.WHITE.getTextColor(), false, matrixStack.last().pose(), bufferIn, Font.DisplayMode.NORMAL, 0, light, false);
                 break;
         }
 

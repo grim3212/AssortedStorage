@@ -31,5 +31,6 @@
   ],
   "result": {
     "item": "assortedstorage:level_upgrade_steel"
-  }
+  },
+  "show_notification": true
 }

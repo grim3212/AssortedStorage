@@ -22,5 +22,6 @@
   ],
   "result": {
     "item": "assortedstorage:blank_upgrade"
-  }
+  },
+  "show_notification": true
 }

@@ -19,13 +19,13 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
@@ -207,8 +207,6 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
         matrixStack.pushPose();
         Lighting.setupForFlatItems();
         MultiBufferSource.BufferSource buffer = this.minecraft.renderBuffers().bufferSource();
-        this.setBlitOffset(200);
-        this.itemRenderer.blitOffset = 200.0F;
 
         matrixStack.translate(i + 80, j + 34, 0);
         matrixStack.translate(8.0F, 8.0F, 0.0F);
@@ -217,10 +215,8 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
         matrixStack.mulPose(Axis.YP.rotationDegrees(180));
         matrixStack.scale(3.2F, 3.2F, 3.2F);
 
-        this.minecraft.getItemRenderer().renderStatic(this.renderStack, TransformType.NONE, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, matrixStack, buffer, 0);
+        this.minecraft.getItemRenderer().renderStatic(this.renderStack, ItemDisplayContext.NONE, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, matrixStack, buffer, this.menu.getCrateBlockEntity().getLevel(), 0);
 
-        this.setBlitOffset(0);
-        this.itemRenderer.blitOffset = 0.0F;
         buffer.endBatch();
         Lighting.setupFor3DItems();
         matrixStack.popPose();

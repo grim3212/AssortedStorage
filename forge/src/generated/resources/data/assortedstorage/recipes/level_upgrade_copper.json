@@ -31,5 +31,6 @@
   ],
   "result": {
     "item": "assortedstorage:level_upgrade_copper"
-  }
+  },
+  "show_notification": true
 }

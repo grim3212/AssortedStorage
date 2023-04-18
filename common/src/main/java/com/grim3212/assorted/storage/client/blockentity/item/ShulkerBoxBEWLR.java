@@ -7,10 +7,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -30,7 +30,7 @@ public class ShulkerBoxBEWLR extends BlockEntityWithoutLevelRenderer {
     }
 
     @Override
-    public void renderByItem(@Nonnull ItemStack stack, @Nonnull TransformType transformType, @Nonnull PoseStack matrix, @Nonnull MultiBufferSource renderer, int light, int overlayLight) {
+    public void renderByItem(@Nonnull ItemStack stack, @Nonnull ItemDisplayContext transformType, @Nonnull PoseStack matrix, @Nonnull MultiBufferSource renderer, int light, int overlayLight) {
         if (this.blockEntity != null) {
             if (NBTHelper.hasTag(stack, "Color")) {
                 int savedColor = NBTHelper.getInt(stack, "Color");

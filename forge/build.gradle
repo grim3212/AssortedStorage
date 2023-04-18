@@ -81,7 +81,7 @@ minecraft {
             ideaModule "${rootProject.name}.${project.name}.main"
             // Client side data can all be considered common so generate in common package
             args '--mod', mod_id, '--client', '--output', file('../common/src/generated/resources/'), '--existing', file('../common/src/main/resources/')
-            taskName 'Data'
+            taskName 'clientData'
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             mods {

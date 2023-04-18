@@ -41,7 +41,7 @@ public class LargeItemStackSlot extends SlotStorageHandler {
     }
 
     @Override
-    public void initialize(ItemStack stack) {
+    public void setByPlayer(ItemStack stack) {
     }
 
     @Override

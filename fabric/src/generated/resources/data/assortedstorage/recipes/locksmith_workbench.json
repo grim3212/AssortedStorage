@@ -19,5 +19,6 @@
   ],
   "result": {
     "item": "assortedstorage:locksmith_workbench"
-  }
+  },
+  "show_notification": true
 }

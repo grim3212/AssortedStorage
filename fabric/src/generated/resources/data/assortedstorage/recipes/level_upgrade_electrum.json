@@ -33,5 +33,6 @@
   ],
   "result": {
     "item": "assortedstorage:level_upgrade_electrum"
-  }
+  },
+  "show_notification": true
 }

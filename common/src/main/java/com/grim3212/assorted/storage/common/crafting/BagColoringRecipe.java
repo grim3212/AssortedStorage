@@ -4,6 +4,7 @@ import com.grim3212.assorted.lib.util.DyeHelper;
 import com.grim3212.assorted.lib.util.LibCommonTags;
 import com.grim3212.assorted.lib.util.NBTHelper;
 import com.grim3212.assorted.storage.common.item.BagItem;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.DyeColor;
@@ -75,7 +76,7 @@ public class BagColoringRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer container) {
+    public ItemStack assemble(CraftingContainer container, RegistryAccess registryAccess) {
         ItemStack itemstack = ItemStack.EMPTY;
         int bagXSlot = -1;
 

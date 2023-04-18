@@ -16,5 +16,6 @@
   ],
   "result": {
     "item": "assortedstorage:locker"
-  }
+  },
+  "show_notification": true
 }

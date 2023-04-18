@@ -10,10 +10,10 @@ import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.item.upgrades.LevelUpgradeItem;
-import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
@@ -153,7 +153,7 @@ public class StorageItemModelProvider extends ItemModelProvider {
 
     private void builtinEntity(Item i) {
         String name = name(i);
-        getBuilder(name).parent(new ModelFile.UncheckedModelFile("builtin/entity")).transforms().transform(TransformType.GUI).rotation(30, 45, 0).scale(0.625F).end().transform(TransformType.GROUND).translation(0, 3, 0).scale(0.25F).end().transform(TransformType.HEAD).rotation(0, 180, 0).end().transform(TransformType.FIXED).rotation(0, 180, 0).scale(0.5F).end().transform(TransformType.THIRD_PERSON_RIGHT_HAND).rotation(75, 315, 0).translation(0, 2.5F, 0).scale(0.375F).end()
-                .transform(TransformType.FIRST_PERSON_RIGHT_HAND).rotation(0, 315, 0).scale(0.4F).end().end();
+        getBuilder(name).parent(new ModelFile.UncheckedModelFile("builtin/entity")).transforms().transform(ItemDisplayContext.GUI).rotation(30, 45, 0).scale(0.625F).end().transform(ItemDisplayContext.GROUND).translation(0, 3, 0).scale(0.25F).end().transform(ItemDisplayContext.HEAD).rotation(0, 180, 0).end().transform(ItemDisplayContext.FIXED).rotation(0, 180, 0).scale(0.5F).end().transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND).rotation(75, 315, 0).translation(0, 2.5F, 0).scale(0.375F).end()
+                .transform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND).rotation(0, 315, 0).scale(0.4F).end().end();
     }
 }

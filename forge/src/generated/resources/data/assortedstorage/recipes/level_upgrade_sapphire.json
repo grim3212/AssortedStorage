@@ -31,5 +31,6 @@
   ],
   "result": {
     "item": "assortedstorage:level_upgrade_sapphire"
-  }
+  },
+  "show_notification": true
 }

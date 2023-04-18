@@ -528,7 +528,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements I
 
     @Nullable
     private static IItemStorageHandler getContainerAt(Level p_59348_, double p_59349_, double p_59350_, double p_59351_, @Nullable Direction direction) {
-        BlockPos blockpos = new BlockPos(p_59349_, p_59350_, p_59351_);
+        BlockPos blockpos = BlockPos.containing(p_59349_, p_59350_, p_59351_);
         BlockState blockstate = p_59348_.getBlockState(blockpos);
 
         if (blockstate.hasBlockEntity()) {

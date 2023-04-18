@@ -31,5 +31,6 @@
   ],
   "result": {
     "item": "assortedstorage:void_upgrade"
-  }
+  },
+  "show_notification": true
 }

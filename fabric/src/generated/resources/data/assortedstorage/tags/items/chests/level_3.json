@@ -1,9 +1,0 @@
-{
-  "replace": false,
-  "values": [
-    "assortedstorage:chest_gold",
-    "assortedstorage:chest_ruby",
-    "assortedstorage:chest_silver",
-    "assortedstorage:chest_bronze"
-  ]
-}

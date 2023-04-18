@@ -1,12 +1,12 @@
 {
   "values": [
-    "assortedstorage:chest_stone",
-    "#forge:chests/wooden",
     "assortedstorage:barrel_stone",
     "#forge:barrels/wooden",
     "assortedstorage:hopper_stone",
     "minecraft:hopper",
     "assortedstorage:locked_hopper",
+    "assortedstorage:chest_stone",
+    "#forge:chests/wooden",
     "assortedstorage:shulker_box_stone",
     "minecraft:shulker_box",
     "minecraft:black_shulker_box",

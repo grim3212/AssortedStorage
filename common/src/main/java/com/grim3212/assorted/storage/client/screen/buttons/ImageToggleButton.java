@@ -55,7 +55,7 @@ public class ImageToggleButton extends Button {
     }
 
     @Override
-    public void renderButton(PoseStack stack, int mouseX, int mouseY, float partialTick) {
+    public void renderWidget(PoseStack stack, int mouseX, int mouseY, float partialTick) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, this.resourceLocation);
         int i = this.yTexStart;

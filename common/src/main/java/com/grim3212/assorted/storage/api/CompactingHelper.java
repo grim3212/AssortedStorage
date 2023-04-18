@@ -139,7 +139,7 @@ public class CompactingHelper {
 
         ComparisonCraftingContainer craftingContainer = new ComparisonCraftingContainer(1);
         for (CraftingRecipe craftingRecipe : level.getRecipeManager().getAllRecipesFor(RecipeType.CRAFTING)) {
-            ItemStack output = craftingRecipe.getResultItem();
+            ItemStack output = craftingRecipe.getResultItem(level.registryAccess());
             // If the output is not this item check the next recipe
             if (!ItemStack.isSame(stack, output))
                 continue;
@@ -180,7 +180,7 @@ public class CompactingHelper {
     }
 
     private List<ItemStack> findMatchingStacks(CraftingContainer crafting) {
-        return level.getRecipeManager().getRecipesFor(RecipeType.CRAFTING, crafting, level).stream().filter(x -> x.matches(crafting, level)).map(r -> r.assemble(crafting)).filter(i -> !i.isEmpty()).collect(Collectors.toList());
+        return level.getRecipeManager().getRecipesFor(RecipeType.CRAFTING, crafting, level).stream().filter(x -> x.matches(crafting, level)).map(r -> r.assemble(crafting, level.registryAccess())).filter(i -> !i.isEmpty()).collect(Collectors.toList());
     }
 
     private ItemStack findSameItems(ItemStack stack, List<ItemStack> ingredientItems) {

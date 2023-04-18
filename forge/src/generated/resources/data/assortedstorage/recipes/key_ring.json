@@ -16,5 +16,6 @@
   ],
   "result": {
     "item": "assortedstorage:key_ring"
-  }
+  },
+  "show_notification": true
 }

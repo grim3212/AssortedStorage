@@ -25,5 +25,6 @@
   ],
   "result": {
     "item": "assortedstorage:spruce_crate_triple"
-  }
+  },
+  "show_notification": true
 }

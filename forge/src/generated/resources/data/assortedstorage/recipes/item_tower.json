@@ -17,5 +17,6 @@
   "result": {
     "count": 2,
     "item": "assortedstorage:item_tower"
-  }
+  },
+  "show_notification": true
 }

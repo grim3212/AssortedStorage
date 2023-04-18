@@ -20,11 +20,11 @@ import com.mojang.math.Axis;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix4f;
 
@@ -50,7 +50,7 @@ public class CrateBlockEntityRenderer implements BlockEntityRenderer<CrateBlockE
         matrixStackIn.translate(x, y, 0.0D);
         LargeItemStack largeStack = tileEntityIn.getItemStackStorageHandler().getLargeItemStack(slot);
         matrixStackIn.mulPose(Axis.ZP.rotationDegrees((float) -largeStack.getRotation() * 360.0F / 16.0F));
-        this.itemRenderer.renderStatic(largeStack.getStack(), ItemTransforms.TransformType.GUI, light, overlay, matrixStackIn, bufferIn, 0);
+        this.itemRenderer.renderStatic(largeStack.getStack(), ItemDisplayContext.GUI, light, overlay, matrixStackIn, bufferIn, tileEntityIn.getLevel(), 0);
         matrixStackIn.popPose();
     }
 

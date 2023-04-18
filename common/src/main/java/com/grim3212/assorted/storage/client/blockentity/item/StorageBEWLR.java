@@ -8,11 +8,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -45,7 +45,7 @@ public class StorageBEWLR extends BlockEntityWithoutLevelRenderer {
     }
 
     @Override
-    public void renderByItem(@Nonnull ItemStack stack, @Nonnull TransformType transformType, @Nonnull PoseStack matrix, @Nonnull MultiBufferSource renderer, int light, int overlayLight) {
+    public void renderByItem(@Nonnull ItemStack stack, @Nonnull ItemDisplayContext transformType, @Nonnull PoseStack matrix, @Nonnull MultiBufferSource renderer, int light, int overlayLight) {
         Item item = stack.getItem();
         if (item instanceof BlockItem) {
             Block block = ((BlockItem) item).getBlock();

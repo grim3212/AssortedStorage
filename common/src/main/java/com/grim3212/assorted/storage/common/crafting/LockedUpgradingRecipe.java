@@ -12,6 +12,7 @@ import com.grim3212.assorted.storage.common.block.LockedChestBlock;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.item.BagItem;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -65,30 +66,37 @@ public class LockedUpgradingRecipe implements CraftingRecipe {
         this.result = p_44158_;
     }
 
+    @Override
     public ResourceLocation getId() {
         return this.id;
     }
 
+    @Override
     public RecipeSerializer<?> getSerializer() {
         return StorageRecipeSerializers.LOCKED_UPGRADING.get();
     }
 
+    @Override
     public String getGroup() {
         return this.group;
     }
 
-    public ItemStack getResultItem() {
+    @Override
+    public ItemStack getResultItem(RegistryAccess registryAccess) {
         return this.result;
     }
 
+    @Override
     public NonNullList<Ingredient> getIngredients() {
         return this.recipeItems;
     }
 
+    @Override
     public boolean canCraftInDimensions(int p_44161_, int p_44162_) {
         return p_44161_ >= this.width && p_44162_ >= this.height;
     }
 
+    @Override
     public boolean matches(CraftingContainer p_44176_, Level p_44177_) {
         for (int i = 0; i <= p_44176_.getWidth() - this.width; ++i) {
             for (int j = 0; j <= p_44176_.getHeight() - this.height; ++j) {
@@ -128,8 +136,9 @@ public class LockedUpgradingRecipe implements CraftingRecipe {
         return true;
     }
 
-    public ItemStack assemble(CraftingContainer container) {
-        ItemStack output = this.getResultItem().copy();
+    @Override
+    public ItemStack assemble(CraftingContainer container, RegistryAccess registryAccess) {
+        ItemStack output = this.getResultItem(registryAccess).copy();
 
         ItemStack itemstack = ItemStack.EMPTY;
 

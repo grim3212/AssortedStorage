@@ -10,12 +10,12 @@ import com.grim3212.assorted.storage.common.item.*;
 import net.minecraft.core.dispenser.ShulkerBoxDispenseBehavior;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
@@ -70,10 +70,10 @@ public class StorageBlocks {
     public static final IRegistryObject<LockedDoorBlock> LOCKED_MANGROVE_DOOR = registerNoItem("locked_mangrove_door", () -> new LockedDoorBlock((DoorBlock) Blocks.MANGROVE_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.COLOR_RED).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
     public static final IRegistryObject<LockedDoorBlock> LOCKED_IRON_DOOR = registerNoItem("locked_iron_door", () -> new LockedDoorBlock((DoorBlock) Blocks.IRON_DOOR, Block.Properties.of(Material.METAL, MaterialColor.METAL).requiresCorrectToolForDrops().strength(5.0F).sound(SoundType.METAL).noOcclusion()));
 
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_QUARTZ_DOOR = registerNoItem("locked_quartz_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:quartz_door"), SoundEvents.WOODEN_DOOR_CLOSE, SoundEvents.WOODEN_DOOR_OPEN, Block.Properties.of(Material.METAL, MaterialColor.QUARTZ).requiresCorrectToolForDrops().strength(5.0F).sound(SoundType.METAL).noOcclusion()));
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_GLASS_DOOR = registerNoItem("locked_glass_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:glass_door"), SoundEvents.WOODEN_DOOR_CLOSE, SoundEvents.WOODEN_DOOR_OPEN, Block.Properties.of(Material.GLASS, Blocks.GLASS.defaultMaterialColor()).strength(0.75F, 7.5F).sound(SoundType.GLASS).noOcclusion()));
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_STEEL_DOOR = registerNoItem("locked_steel_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:steel_door"), SoundEvents.IRON_DOOR_CLOSE, SoundEvents.IRON_DOOR_OPEN, Block.Properties.of(Material.METAL).strength(1.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_CHAIN_LINK_DOOR = registerNoItem("locked_chain_link_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:chain_link_door"), SoundEvents.IRON_DOOR_CLOSE, SoundEvents.IRON_DOOR_OPEN, Block.Properties.of(Material.DECORATION).strength(0.5F, 5.0F).sound(SoundType.METAL).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_QUARTZ_DOOR = registerNoItem("locked_quartz_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:quartz_door"), BlockSetType.IRON, Block.Properties.of(Material.METAL, MaterialColor.QUARTZ).requiresCorrectToolForDrops().strength(5.0F).sound(SoundType.METAL).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_GLASS_DOOR = registerNoItem("locked_glass_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:glass_door"), BlockSetType.IRON, Block.Properties.of(Material.GLASS, Blocks.GLASS.defaultMaterialColor()).strength(0.75F, 7.5F).sound(SoundType.GLASS).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_STEEL_DOOR = registerNoItem("locked_steel_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:steel_door"), BlockSetType.IRON, Block.Properties.of(Material.METAL).strength(1.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_CHAIN_LINK_DOOR = registerNoItem("locked_chain_link_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:chain_link_door"), BlockSetType.IRON, Block.Properties.of(Material.DECORATION).strength(0.5F, 5.0F).sound(SoundType.METAL).noOcclusion()));
 
     public static final IRegistryObject<CrateCompactingBlock> CRATE_COMPACTING = register("crate_compacting", () -> new CrateCompactingBlock(CrateLayout.TRIPLE, BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY).strength(1.5F, 6.0F).sound(SoundType.STONE)));
     public static final IRegistryObject<CrateControllerBlock> CRATE_CONTROLLER = register("crate_controller", () -> new CrateControllerBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY).strength(1.5F, 6.0F).sound(SoundType.STONE)));

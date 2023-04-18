@@ -16,5 +16,6 @@
   ],
   "result": {
     "item": "assortedstorage:warped_warehouse_crate"
-  }
+  },
+  "show_notification": true
 }

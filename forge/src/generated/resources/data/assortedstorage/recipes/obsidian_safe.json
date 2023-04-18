@@ -16,5 +16,6 @@
   ],
   "result": {
     "item": "assortedstorage:obsidian_safe"
-  }
+  },
+  "show_notification": true
 }

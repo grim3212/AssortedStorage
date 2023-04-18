@@ -25,5 +25,6 @@
   ],
   "result": {
     "item": "assortedstorage:rotator_majig"
-  }
+  },
+  "show_notification": true
 }

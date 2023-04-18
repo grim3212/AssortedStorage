@@ -1,8 +1,8 @@
 {
   "replace": false,
   "values": [
-    "assortedstorage:barrel_gold",
     "assortedstorage:barrel_ruby",
+    "assortedstorage:barrel_gold",
     "assortedstorage:barrel_silver",
     "assortedstorage:barrel_bronze"
   ]

@@ -19,5 +19,6 @@
   ],
   "result": {
     "item": "assortedstorage:glass_cabinet"
-  }
+  },
+  "show_notification": true
 }

@@ -28,5 +28,6 @@
   ],
   "result": {
     "item": "assortedstorage:crate_compacting"
-  }
+  },
+  "show_notification": true
 }

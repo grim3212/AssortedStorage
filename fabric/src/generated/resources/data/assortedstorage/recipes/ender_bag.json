@@ -25,5 +25,6 @@
   ],
   "result": {
     "item": "assortedstorage:ender_bag"
-  }
+  },
+  "show_notification": true
 }

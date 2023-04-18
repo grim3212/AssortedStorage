@@ -28,5 +28,6 @@
   ],
   "result": {
     "item": "assortedstorage:crate_bridge"
-  }
+  },
+  "show_notification": true
 }

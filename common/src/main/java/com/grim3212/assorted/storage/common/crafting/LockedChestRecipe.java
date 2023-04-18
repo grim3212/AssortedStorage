@@ -4,6 +4,7 @@ import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.util.LibCommonTags;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.StorageItems;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.AirItem;
@@ -46,7 +47,7 @@ public class LockedChestRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv) {
+    public ItemStack assemble(CraftingContainer inv, RegistryAccess registryAccess) {
         ItemStack enderChest = ItemStack.EMPTY;
         ItemStack lock = ItemStack.EMPTY;
 

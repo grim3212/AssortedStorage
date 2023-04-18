@@ -16,5 +16,6 @@
   ],
   "result": {
     "item": "assortedstorage:wood_cabinet"
-  }
+  },
+  "show_notification": true
 }

@@ -14,5 +14,6 @@
   "result": {
     "count": 3,
     "item": "assortedstorage:locksmith_lock"
-  }
+  },
+  "show_notification": true
 }

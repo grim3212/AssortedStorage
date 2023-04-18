@@ -16,5 +16,6 @@
   ],
   "result": {
     "item": "assortedstorage:dark_oak_warehouse_crate"
-  }
+  },
+  "show_notification": true
 }

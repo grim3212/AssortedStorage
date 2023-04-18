@@ -1,8 +1,8 @@
 {
   "values": [
     "assortedstorage:level_upgrade_bronze",
-    "assortedstorage:level_upgrade_ruby",
+    "assortedstorage:level_upgrade_gold",
     "assortedstorage:level_upgrade_silver",
-    "assortedstorage:level_upgrade_gold"
+    "assortedstorage:level_upgrade_ruby"
   ]
 }

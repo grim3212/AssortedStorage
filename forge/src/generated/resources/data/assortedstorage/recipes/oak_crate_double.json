@@ -25,5 +25,6 @@
   ],
   "result": {
     "item": "assortedstorage:oak_crate_double"
-  }
+  },
+  "show_notification": true
 }

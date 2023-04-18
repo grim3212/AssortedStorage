@@ -4,6 +4,7 @@ import com.grim3212.assorted.lib.util.DyeHelper;
 import com.grim3212.assorted.lib.util.LibCommonTags;
 import com.grim3212.assorted.lib.util.NBTHelper;
 import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.DyeColor;
@@ -50,7 +51,8 @@ public class LockedShulkerBoxColoring extends CustomRecipe {
         return i == 1 && j == 1;
     }
 
-    public ItemStack assemble(CraftingContainer container) {
+    @Override
+    public ItemStack assemble(CraftingContainer container, RegistryAccess registryAccess) {
         ItemStack itemstack = ItemStack.EMPTY;
         DyeColor dyecolor = DyeColor.WHITE;
 

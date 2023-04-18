@@ -12,7 +12,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
@@ -30,6 +29,7 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.BlockHitResult;
@@ -42,13 +42,13 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockClo
     private final Block parent;
 
     public LockedDoorBlock(DoorBlock parent, Properties builder) {
-        super(builder, ((DoorBlockAccessor) parent).getCloseSound(), ((DoorBlockAccessor) parent).getOpenSound());
+        super(builder, ((DoorBlockAccessor) parent).getType());
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(OPEN, false).setValue(HINGE, DoorHingeSide.LEFT).setValue(POWERED, false).setValue(HALF, DoubleBlockHalf.LOWER));
         this.parent = parent;
     }
 
-    public LockedDoorBlock(ResourceLocation parent, SoundEvent closeSound, SoundEvent openSound, Properties builder) {
-        super(builder, closeSound, openSound);
+    public LockedDoorBlock(ResourceLocation parent, BlockSetType type, Properties builder) {
+        super(builder, type);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(OPEN, false).setValue(HINGE, DoorHingeSide.LEFT).setValue(POWERED, false).setValue(HALF, DoubleBlockHalf.LOWER));
         this.parent = Services.PLATFORM.getRegistry(Registries.BLOCK).getValue(parent).orElse(Blocks.AIR);
     }
@@ -107,7 +107,7 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockClo
     }
 
     private void playSound(@Nullable Entity entity, Level level, BlockPos pos, boolean isOpen) {
-        level.playSound(entity, pos, isOpen ? ((DoorBlockAccessor) this).getOpenSound() : ((DoorBlockAccessor) this).getCloseSound(), SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.1F + 0.9F);
+        level.playSound(entity, pos, isOpen ? ((DoorBlockAccessor) this).getType().doorOpen() : ((DoorBlockAccessor) this).getType().doorClose(), SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.1F + 0.9F);
     }
 
     @Override
