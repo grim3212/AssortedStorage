@@ -1,11 +1,11 @@
 {
   "replace": false,
   "values": [
-    "assortedstorage:level_upgrade_sapphire",
-    "assortedstorage:level_upgrade_lead",
+    "assortedstorage:level_upgrade_nickel",
     "assortedstorage:level_upgrade_amethyst",
-    "assortedstorage:level_upgrade_peridot",
     "assortedstorage:level_upgrade_emerald",
-    "assortedstorage:level_upgrade_nickel"
+    "assortedstorage:level_upgrade_peridot",
+    "assortedstorage:level_upgrade_sapphire",
+    "assortedstorage:level_upgrade_lead"
   ]
 }

@@ -2,8 +2,8 @@
   "replace": false,
   "values": [
     "assortedstorage:barrel_steel",
-    "assortedstorage:barrel_diamond",
     "assortedstorage:barrel_invar",
-    "assortedstorage:barrel_electrum"
+    "assortedstorage:barrel_electrum",
+    "assortedstorage:barrel_diamond"
   ]
 }

@@ -60,7 +60,7 @@ public class LockedChestBlock extends BaseStorageBlock implements IStorageMateri
     @Override
     protected void openMenu(Player player, MenuProvider provider, BlockPos pos) {
         Services.PLATFORM.openMenu((ServerPlayer) player, provider, byteBuf -> {
-            byteBuf.writeEnum(this.material);
+            StorageMaterial.write(byteBuf, this.material);
             byteBuf.writeBlockPos(pos);
         });
     }

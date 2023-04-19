@@ -1,11 +1,13 @@
 {
   "replace": false,
   "values": [
-    "assortedstorage:barrel_stone",
-    "#c:barrels/wooden",
     "assortedstorage:hopper_stone",
     "minecraft:hopper",
     "assortedstorage:locked_hopper",
+    "assortedstorage:chest_stone",
+    "#c:chests/wooden",
+    "assortedstorage:barrel_stone",
+    "#c:barrels/wooden",
     "assortedstorage:shulker_box_stone",
     "minecraft:shulker_box",
     "minecraft:black_shulker_box",
@@ -23,8 +25,6 @@
     "minecraft:purple_shulker_box",
     "minecraft:red_shulker_box",
     "minecraft:white_shulker_box",
-    "minecraft:yellow_shulker_box",
-    "assortedstorage:chest_stone",
-    "#c:chests/wooden"
+    "minecraft:yellow_shulker_box"
   ]
 }

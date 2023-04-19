@@ -1,10 +1,10 @@
 {
   "replace": false,
   "values": [
-    "assortedstorage:chest_copper",
+    "assortedstorage:chest_topaz",
     "assortedstorage:chest_aluminum",
     "assortedstorage:chest_tin",
-    "assortedstorage:chest_topaz",
+    "assortedstorage:chest_copper",
     "assortedstorage:chest_iron"
   ]
 }

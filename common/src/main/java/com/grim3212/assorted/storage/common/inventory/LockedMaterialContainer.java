@@ -18,17 +18,17 @@ public class LockedMaterialContainer extends AbstractContainerMenu {
     private final StorageMaterial storageMaterial;
 
     public static LockedMaterialContainer createChestContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
-        StorageMaterial storageMaterial = byteBuf.readEnum(StorageMaterial.class);
+        StorageMaterial storageMaterial = StorageMaterial.read(byteBuf);
         return new LockedMaterialContainer(StorageContainerTypes.LOCKED_CHEST.get(), windowId, playerInventory, new ItemStackStorageHandler(storageMaterial == null ? 27 : storageMaterial.totalItems()), storageMaterial, false);
     }
 
     public static LockedMaterialContainer createShulkerContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
-        StorageMaterial storageMaterial = byteBuf.readEnum(StorageMaterial.class);
+        StorageMaterial storageMaterial = StorageMaterial.read(byteBuf);
         return new LockedMaterialContainer(StorageContainerTypes.LOCKED_SHULKER_BOX.get(), windowId, playerInventory, new ItemStackStorageHandler(storageMaterial == null ? 27 : storageMaterial.totalItems()), storageMaterial, true);
     }
 
     public static LockedMaterialContainer createBarrelContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
-        StorageMaterial storageMaterial = byteBuf.readEnum(StorageMaterial.class);
+        StorageMaterial storageMaterial = StorageMaterial.read(byteBuf);
         return new LockedMaterialContainer(StorageContainerTypes.LOCKED_BARREL.get(), windowId, playerInventory, new ItemStackStorageHandler(storageMaterial == null ? 27 : storageMaterial.totalItems()), storageMaterial, false);
     }
 
