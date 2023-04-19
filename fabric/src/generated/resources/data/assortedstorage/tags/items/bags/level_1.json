@@ -2,9 +2,9 @@
   "replace": false,
   "values": [
     "assortedstorage:bag_iron",
-    "assortedstorage:bag_topaz",
-    "assortedstorage:bag_copper",
     "assortedstorage:bag_tin",
+    "assortedstorage:bag_copper",
+    "assortedstorage:bag_topaz",
     "assortedstorage:bag_aluminum"
   ]
 }

@@ -167,7 +167,7 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
                     MenuProvider inamedcontainerprovider = this.getMenuProvider(state, level, pos);
                     if (inamedcontainerprovider != null) {
                         Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> {
-                            byteBuf.writeEnum(this.material);
+                            StorageMaterial.write(byteBuf, this.material);
                             byteBuf.writeBlockPos(pos);
                         });
                         player.awardStat(Stats.OPEN_SHULKER_BOX);

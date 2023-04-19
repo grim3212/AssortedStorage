@@ -2,8 +2,8 @@
   "replace": false,
   "values": [
     "assortedstorage:hopper_gold",
+    "assortedstorage:hopper_bronze",
     "assortedstorage:hopper_ruby",
-    "assortedstorage:hopper_silver",
-    "assortedstorage:hopper_bronze"
+    "assortedstorage:hopper_silver"
   ]
 }

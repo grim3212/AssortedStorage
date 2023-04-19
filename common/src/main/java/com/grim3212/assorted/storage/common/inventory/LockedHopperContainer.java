@@ -18,7 +18,7 @@ public class LockedHopperContainer extends AbstractContainerMenu {
     private final StorageMaterial storageMaterial;
 
     public static LockedHopperContainer createHopperContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
-        StorageMaterial storageMaterial = byteBuf.readEnum(StorageMaterial.class);
+        StorageMaterial storageMaterial = StorageMaterial.read(byteBuf);
         return new LockedHopperContainer(StorageContainerTypes.LOCKED_HOPPER.get(), windowId, playerInventory, new ItemStackStorageHandler(storageMaterial == null ? 5 : storageMaterial.hopperSize()), storageMaterial);
     }
 

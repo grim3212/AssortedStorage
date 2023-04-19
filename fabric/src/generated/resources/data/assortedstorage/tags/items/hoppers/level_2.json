@@ -1,11 +1,11 @@
 {
   "replace": false,
   "values": [
-    "assortedstorage:hopper_nickel",
-    "assortedstorage:hopper_emerald",
     "assortedstorage:hopper_amethyst",
-    "assortedstorage:hopper_lead",
     "assortedstorage:hopper_sapphire",
-    "assortedstorage:hopper_peridot"
+    "assortedstorage:hopper_peridot",
+    "assortedstorage:hopper_emerald",
+    "assortedstorage:hopper_lead",
+    "assortedstorage:hopper_nickel"
   ]
 }

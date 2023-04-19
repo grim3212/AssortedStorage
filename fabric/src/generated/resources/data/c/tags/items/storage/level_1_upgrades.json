@@ -2,9 +2,9 @@
   "replace": false,
   "values": [
     "assortedstorage:level_upgrade_iron",
-    "assortedstorage:level_upgrade_topaz",
-    "assortedstorage:level_upgrade_copper",
     "assortedstorage:level_upgrade_tin",
+    "assortedstorage:level_upgrade_copper",
+    "assortedstorage:level_upgrade_topaz",
     "assortedstorage:level_upgrade_aluminum"
   ]
 }

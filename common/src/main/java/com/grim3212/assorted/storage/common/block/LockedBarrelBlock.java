@@ -186,7 +186,7 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
                 MenuProvider inamedcontainerprovider = this.getMenuProvider(state, worldIn, pos);
                 if (inamedcontainerprovider != null) {
                     Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> {
-                        byteBuf.writeEnum(this.material);
+                        StorageMaterial.write(byteBuf, this.material);
                         byteBuf.writeBlockPos(pos);
                     });
                     player.awardStat(Stats.OPEN_BARREL);

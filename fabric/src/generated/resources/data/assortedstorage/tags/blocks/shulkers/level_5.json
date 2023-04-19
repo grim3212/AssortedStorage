@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "assortedstorage:shulker_box_netherite",
-    "assortedstorage:shulker_box_platinum"
+    "assortedstorage:shulker_box_platinum",
+    "assortedstorage:shulker_box_netherite"
   ]
 }

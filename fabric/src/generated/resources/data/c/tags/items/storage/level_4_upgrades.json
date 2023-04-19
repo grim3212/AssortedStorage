@@ -1,9 +1,9 @@
 {
   "replace": false,
   "values": [
-    "assortedstorage:level_upgrade_invar",
-    "assortedstorage:level_upgrade_steel",
     "assortedstorage:level_upgrade_diamond",
-    "assortedstorage:level_upgrade_electrum"
+    "assortedstorage:level_upgrade_electrum",
+    "assortedstorage:level_upgrade_invar",
+    "assortedstorage:level_upgrade_steel"
   ]
 }
