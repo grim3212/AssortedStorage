@@ -153,6 +153,10 @@ public class CompactingHelper {
                     itemOptions.put(match, recipeSize);
                 }
 
+                if (stack.is(StorageTags.Items.ONE_TO_ONE_CRAFTING_OVERRIDE)) {
+                    itemOptions.put(match, 1);
+                }
+
                 // Look through each recipe to return a list of stacks that match the output
                 // item
                 craftingContainer.fillInventory(output);

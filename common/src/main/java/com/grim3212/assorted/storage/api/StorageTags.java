@@ -137,6 +137,7 @@ public class StorageTags {
         public static final TagKey<Item> CRATES_QUADRUPLE = storageTag("crates/quadruple");
         public static final TagKey<Item> UPGRADES = storageTag("upgrades");
         public static final TagKey<Item> CRAFTING_OVERRIDE = storageTag("crafting_override");
+        public static final TagKey<Item> ONE_TO_ONE_CRAFTING_OVERRIDE = storageTag("one_to_one_crafting_override");
 
         public static final TagKey<Item> DEEPSLATE = commonTag("deepslate");
         public static final TagKey<Item> PISTONS = commonTag("pistons");

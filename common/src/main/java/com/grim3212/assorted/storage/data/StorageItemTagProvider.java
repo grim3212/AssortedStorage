@@ -183,6 +183,10 @@ public class StorageItemTagProvider extends LibItemTagProvider {
                 .add(Items.NETHER_WART_BLOCK, Items.NETHER_WART)
                 .add(Items.SANDSTONE, Items.SAND)
                 .add(Items.RED_SANDSTONE, Items.RED_SAND);
+
+        tagger.apply(StorageTags.Items.ONE_TO_ONE_CRAFTING_OVERRIDE)
+                .add(Items.CUT_SANDSTONE)
+                .add(Items.CUT_RED_SANDSTONE);
         //@formatter:on
 
         copier.accept(StorageTags.Blocks.CRATES, StorageTags.Items.CRATES);

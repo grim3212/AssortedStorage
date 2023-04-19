@@ -362,15 +362,18 @@ public class CompactingCrateInventory extends CrateSidedInv {
             // Converted one tier down
             int middleRemaining = middleAmount - topAmount * middleMultiplier;
 
-            stacks.addAll(new LargeItemStack(middleTier.getStack().copyWithCount(1), middleRemaining).asItemStacks());
+            if (middleRemaining > 0) {
+                stacks.addAll(new LargeItemStack(middleTier.getStack().copyWithCount(1), middleRemaining).asItemStacks());
+            }
 
             // Finally check if we have a lower tier
             if (!matches.get(2).getItem().isEmpty()) {
                 LargeItemStack lowerTier = this.getLargeItemStack(2);
                 int lowerAmount = lowerTier.getAmount();
-                int lowerRemaining = lowerAmount - (middleRemaining * middleConversion) - (topTier.getAmount() * matches.get(0).getNumRequired());
-                stacks.addAll(new LargeItemStack(lowerTier.getStack().copyWithCount(1), lowerRemaining).asItemStacks());
-
+                int lowerRemaining = middleRemaining > 0 ? lowerAmount - (middleRemaining * middleConversion) - (topTier.getAmount() * matches.get(0).getNumRequired()) : lowerAmount - (topTier.getAmount() * matches.get(0).getNumRequired());
+                if (lowerRemaining > 0) {
+                    stacks.addAll(new LargeItemStack(lowerTier.getStack().copyWithCount(1), lowerRemaining).asItemStacks());
+                }
             }
         }
 
