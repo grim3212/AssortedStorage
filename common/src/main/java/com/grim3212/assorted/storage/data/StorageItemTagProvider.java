@@ -5,7 +5,7 @@ import com.grim3212.assorted.lib.registry.IRegistryObject;
 import com.grim3212.assorted.lib.util.LibCommonTags;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.api.StorageTags;
-import com.grim3212.assorted.storage.common.block.StorageBlocks;
+import com.grim3212.assorted.storage.common.block.*;
 import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.item.upgrades.LevelUpgradeItem;
@@ -25,8 +25,8 @@ import java.util.function.Function;
 public class StorageItemTagProvider extends LibItemTagProvider {
 
 
-    public StorageItemTagProvider(PackOutput output, CompletableFuture<Provider> lookup, CompletableFuture<TagLookup<Block>> blockTags) {
-        super(output, lookup, blockTags);
+    public StorageItemTagProvider(PackOutput output, CompletableFuture<Provider> lookup, CompletableFuture<TagLookup<Block>> blockTagsProvider) {
+        super(output, lookup, blockTagsProvider);
     }
 
     @Override
@@ -40,65 +40,131 @@ public class StorageItemTagProvider extends LibItemTagProvider {
         tagger.apply(LibCommonTags.Items.CHESTS_WOODEN).add(StorageBlocks.LOCKED_CHEST.get().asItem());
         tagger.apply(LibCommonTags.Items.BARRELS_WOODEN).add(StorageBlocks.LOCKED_BARREL.get().asItem());
 
-        copier.accept(LibCommonTags.Blocks.CHESTS, LibCommonTags.Items.CHESTS);
-        copier.accept(StorageTags.Blocks.CHESTS_LEVEL_0, StorageTags.Items.CHESTS_LEVEL_0);
-        copier.accept(StorageTags.Blocks.CHESTS_LEVEL_1, StorageTags.Items.CHESTS_LEVEL_1);
-        copier.accept(StorageTags.Blocks.CHESTS_LEVEL_2, StorageTags.Items.CHESTS_LEVEL_2);
-        copier.accept(StorageTags.Blocks.CHESTS_LEVEL_3, StorageTags.Items.CHESTS_LEVEL_3);
-        copier.accept(StorageTags.Blocks.CHESTS_LEVEL_4, StorageTags.Items.CHESTS_LEVEL_4);
-        copier.accept(StorageTags.Blocks.CHESTS_LEVEL_5, StorageTags.Items.CHESTS_LEVEL_5);
-
         tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_0).addTag(LibCommonTags.Items.CHESTS_WOODEN);
-        copier.accept(StorageTags.Blocks.CHESTS_LEVEL_0, StorageTags.Items.CAN_UPGRADE_LEVEL_1);
-        copier.accept(StorageTags.Blocks.CHESTS_LEVEL_1, StorageTags.Items.CAN_UPGRADE_LEVEL_2);
-        copier.accept(StorageTags.Blocks.CHESTS_LEVEL_2, StorageTags.Items.CAN_UPGRADE_LEVEL_3);
-        copier.accept(StorageTags.Blocks.CHESTS_LEVEL_3, StorageTags.Items.CAN_UPGRADE_LEVEL_4);
-        copier.accept(StorageTags.Blocks.CHESTS_LEVEL_4, StorageTags.Items.CAN_UPGRADE_LEVEL_5);
+        for (Entry<StorageMaterial, IRegistryObject<LockedChestBlock>> chest : StorageBlocks.CHESTS.entrySet()) {
+            Item item = chest.getValue().get().asItem();
 
-        copier.accept(LibCommonTags.Blocks.BARRELS, LibCommonTags.Items.BARRELS);
-        copier.accept(StorageTags.Blocks.BARRELS_LEVEL_0, StorageTags.Items.BARRELS_LEVEL_0);
-        copier.accept(StorageTags.Blocks.BARRELS_LEVEL_1, StorageTags.Items.BARRELS_LEVEL_1);
-        copier.accept(StorageTags.Blocks.BARRELS_LEVEL_2, StorageTags.Items.BARRELS_LEVEL_2);
-        copier.accept(StorageTags.Blocks.BARRELS_LEVEL_3, StorageTags.Items.BARRELS_LEVEL_3);
-        copier.accept(StorageTags.Blocks.BARRELS_LEVEL_4, StorageTags.Items.BARRELS_LEVEL_4);
-        copier.accept(StorageTags.Blocks.BARRELS_LEVEL_5, StorageTags.Items.BARRELS_LEVEL_5);
+            switch (chest.getKey().getStorageLevel()) {
+                case 1:
+                    tagger.apply(StorageTags.Items.CHESTS_LEVEL_1).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_2).add(item);
+                    break;
+                case 2:
+                    tagger.apply(StorageTags.Items.CHESTS_LEVEL_2).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_3).add(item);
+                    break;
+                case 3:
+                    tagger.apply(StorageTags.Items.CHESTS_LEVEL_3).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_4).add(item);
+                    break;
+                case 4:
+                    tagger.apply(StorageTags.Items.CHESTS_LEVEL_4).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_5).add(item);
+                    break;
+                case 5:
+                    tagger.apply(StorageTags.Items.CHESTS_LEVEL_5).add(item);
+                    break;
+                default:
+                    tagger.apply(StorageTags.Items.CHESTS_LEVEL_0).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_1).add(item);
+                    break;
+            }
+        }
 
         tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_0).addTag(LibCommonTags.Items.BARRELS_WOODEN);
-        copier.accept(StorageTags.Blocks.BARRELS_LEVEL_0, StorageTags.Items.CAN_UPGRADE_LEVEL_1);
-        copier.accept(StorageTags.Blocks.BARRELS_LEVEL_1, StorageTags.Items.CAN_UPGRADE_LEVEL_2);
-        copier.accept(StorageTags.Blocks.BARRELS_LEVEL_2, StorageTags.Items.CAN_UPGRADE_LEVEL_3);
-        copier.accept(StorageTags.Blocks.BARRELS_LEVEL_3, StorageTags.Items.CAN_UPGRADE_LEVEL_4);
-        copier.accept(StorageTags.Blocks.BARRELS_LEVEL_4, StorageTags.Items.CAN_UPGRADE_LEVEL_5);
+        for (Entry<StorageMaterial, IRegistryObject<LockedBarrelBlock>> barrel : StorageBlocks.BARRELS.entrySet()) {
+            Item item = barrel.getValue().get().asItem();
+
+            switch (barrel.getKey().getStorageLevel()) {
+                case 1:
+                    tagger.apply(StorageTags.Items.BARRELS_LEVEL_1).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_2).add(item);
+                    break;
+                case 2:
+                    tagger.apply(StorageTags.Items.BARRELS_LEVEL_2).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_3).add(item);
+                    break;
+                case 3:
+                    tagger.apply(StorageTags.Items.BARRELS_LEVEL_3).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_4).add(item);
+                    break;
+                case 4:
+                    tagger.apply(StorageTags.Items.BARRELS_LEVEL_4).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_5).add(item);
+                    break;
+                case 5:
+                    tagger.apply(StorageTags.Items.BARRELS_LEVEL_5).add(item);
+                    break;
+                default:
+                    tagger.apply(StorageTags.Items.BARRELS_LEVEL_0).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_1).add(item);
+                    break;
+            }
+        }
 
         copier.accept(StorageTags.Blocks.HOPPERS, StorageTags.Items.HOPPERS);
-        copier.accept(StorageTags.Blocks.HOPPERS_LEVEL_0, StorageTags.Items.HOPPERS_LEVEL_0);
-        copier.accept(StorageTags.Blocks.HOPPERS_LEVEL_1, StorageTags.Items.HOPPERS_LEVEL_1);
-        copier.accept(StorageTags.Blocks.HOPPERS_LEVEL_2, StorageTags.Items.HOPPERS_LEVEL_2);
-        copier.accept(StorageTags.Blocks.HOPPERS_LEVEL_3, StorageTags.Items.HOPPERS_LEVEL_3);
-        copier.accept(StorageTags.Blocks.HOPPERS_LEVEL_4, StorageTags.Items.HOPPERS_LEVEL_4);
-        copier.accept(StorageTags.Blocks.HOPPERS_LEVEL_5, StorageTags.Items.HOPPERS_LEVEL_5);
-
         tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_0).addTag(StorageTags.Items.HOPPERS);
-        copier.accept(StorageTags.Blocks.HOPPERS_LEVEL_0, StorageTags.Items.CAN_UPGRADE_LEVEL_1);
-        copier.accept(StorageTags.Blocks.HOPPERS_LEVEL_1, StorageTags.Items.CAN_UPGRADE_LEVEL_2);
-        copier.accept(StorageTags.Blocks.HOPPERS_LEVEL_2, StorageTags.Items.CAN_UPGRADE_LEVEL_3);
-        copier.accept(StorageTags.Blocks.HOPPERS_LEVEL_3, StorageTags.Items.CAN_UPGRADE_LEVEL_4);
-        copier.accept(StorageTags.Blocks.HOPPERS_LEVEL_4, StorageTags.Items.CAN_UPGRADE_LEVEL_5);
+        for (Entry<StorageMaterial, IRegistryObject<LockedHopperBlock>> hopper : StorageBlocks.HOPPERS.entrySet()) {
+            Item item = hopper.getValue().get().asItem();
+
+            switch (hopper.getKey().getStorageLevel()) {
+                case 1:
+                    tagger.apply(StorageTags.Items.HOPPERS_LEVEL_1).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_2).add(item);
+                    break;
+                case 2:
+                    tagger.apply(StorageTags.Items.HOPPERS_LEVEL_2).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_3).add(item);
+                    break;
+                case 3:
+                    tagger.apply(StorageTags.Items.HOPPERS_LEVEL_3).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_4).add(item);
+                    break;
+                case 4:
+                    tagger.apply(StorageTags.Items.HOPPERS_LEVEL_4).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_5).add(item);
+                    break;
+                case 5:
+                    tagger.apply(StorageTags.Items.HOPPERS_LEVEL_5).add(item);
+                    break;
+                default:
+                    tagger.apply(StorageTags.Items.HOPPERS_LEVEL_0).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_1).add(item);
+                    break;
+            }
+        }
 
         copier.accept(StorageTags.Blocks.SHULKERS_NORMAL, StorageTags.Items.SHULKERS_NORMAL);
-        copier.accept(StorageTags.Blocks.SHULKERS_LEVEL_0, StorageTags.Items.SHULKERS_LEVEL_0);
-        copier.accept(StorageTags.Blocks.SHULKERS_LEVEL_1, StorageTags.Items.SHULKERS_LEVEL_1);
-        copier.accept(StorageTags.Blocks.SHULKERS_LEVEL_2, StorageTags.Items.SHULKERS_LEVEL_2);
-        copier.accept(StorageTags.Blocks.SHULKERS_LEVEL_3, StorageTags.Items.SHULKERS_LEVEL_3);
-        copier.accept(StorageTags.Blocks.SHULKERS_LEVEL_4, StorageTags.Items.SHULKERS_LEVEL_4);
-        copier.accept(StorageTags.Blocks.SHULKERS_LEVEL_5, StorageTags.Items.SHULKERS_LEVEL_5);
-
         tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_0).addTag(StorageTags.Items.SHULKERS_NORMAL);
-        copier.accept(StorageTags.Blocks.SHULKERS_LEVEL_0, StorageTags.Items.CAN_UPGRADE_LEVEL_1);
-        copier.accept(StorageTags.Blocks.SHULKERS_LEVEL_1, StorageTags.Items.CAN_UPGRADE_LEVEL_2);
-        copier.accept(StorageTags.Blocks.SHULKERS_LEVEL_2, StorageTags.Items.CAN_UPGRADE_LEVEL_3);
-        copier.accept(StorageTags.Blocks.SHULKERS_LEVEL_3, StorageTags.Items.CAN_UPGRADE_LEVEL_4);
-        copier.accept(StorageTags.Blocks.SHULKERS_LEVEL_4, StorageTags.Items.CAN_UPGRADE_LEVEL_5);
+        for (Entry<StorageMaterial, IRegistryObject<LockedShulkerBoxBlock>> shulker : StorageBlocks.SHULKERS.entrySet()) {
+            Item item = shulker.getValue().get().asItem();
+
+            switch (shulker.getKey().getStorageLevel()) {
+                case 1:
+                    tagger.apply(StorageTags.Items.SHULKERS_LEVEL_1).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_2).add(item);
+                    break;
+                case 2:
+                    tagger.apply(StorageTags.Items.SHULKERS_LEVEL_2).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_3).add(item);
+                    break;
+                case 3:
+                    tagger.apply(StorageTags.Items.SHULKERS_LEVEL_3).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_4).add(item);
+                    break;
+                case 4:
+                    tagger.apply(StorageTags.Items.SHULKERS_LEVEL_4).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_5).add(item);
+                    break;
+                case 5:
+                    tagger.apply(StorageTags.Items.SHULKERS_LEVEL_5).add(item);
+                    break;
+                default:
+                    tagger.apply(StorageTags.Items.SHULKERS_LEVEL_0).add(item);
+                    tagger.apply(StorageTags.Items.CAN_UPGRADE_LEVEL_1).add(item);
+                    break;
+            }
+        }
 
         tagger.apply(StorageTags.Items.PAPER).add(Items.PAPER);
 

@@ -1,9 +1,9 @@
 {
   "replace": false,
   "values": [
+    "assortedstorage:bag_electrum",
     "assortedstorage:bag_steel",
     "assortedstorage:bag_invar",
-    "assortedstorage:bag_electrum",
     "assortedstorage:bag_diamond"
   ]
 }

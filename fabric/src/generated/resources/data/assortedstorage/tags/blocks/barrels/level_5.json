@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "assortedstorage:barrel_netherite",
-    "assortedstorage:barrel_platinum"
+    "assortedstorage:barrel_platinum",
+    "assortedstorage:barrel_netherite"
   ]
 }
