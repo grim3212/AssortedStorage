@@ -28,5 +28,6 @@
     "recipes": [
       "assortedstorage:wood_cabinet"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

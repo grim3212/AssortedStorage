@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:crate_compacting_steel"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

@@ -20,7 +20,7 @@ public class KeyRingContainer extends AbstractContainerMenu {
     public KeyRingItemHandler handler;
 
     public KeyRingContainer(final int windowId, final Inventory playerInventory, FriendlyByteBuf extra) {
-        this(windowId, playerInventory.player.level, playerInventory.player.blockPosition(), playerInventory, playerInventory.player);
+        this(windowId, playerInventory.player.level(), playerInventory.player.blockPosition(), playerInventory, playerInventory.player);
     }
 
     public KeyRingContainer(int openType, int windowId, Level world, BlockPos pos, Inventory playerInventory, Player playerEntity) {

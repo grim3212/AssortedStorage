@@ -47,5 +47,6 @@
     "recipes": [
       "assortedstorage:hopper_diamond_chest"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

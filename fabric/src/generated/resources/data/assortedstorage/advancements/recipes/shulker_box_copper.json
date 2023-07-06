@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:shulker_box_copper"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

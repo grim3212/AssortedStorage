@@ -15,6 +15,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.renderer.LightTexture;
@@ -44,14 +45,13 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
         this.imageHeight = 188;
         this.imageWidth = 176;
 
-        this.passEvents = true;
         this.renderStack = new ItemStack(container.getCrateBlockEntity().getBlockState().getBlock());
     }
 
     @Override
-    protected void renderTooltip(PoseStack stack, int mouseX, int mouseY) {
+    protected void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (this.menu.getCarried().isEmpty() && this.hoveredSlot != null && this.hoveredSlot.hasItem()) {
-            List<Component> tooltip = this.getTooltipFromItem(this.hoveredSlot.getItem());
+            List<Component> tooltip = getTooltipFromContainerItem(this.hoveredSlot.getItem());
             Optional<TooltipComponent> tooltipComponents = this.hoveredSlot.getItem().getTooltipImage();
             if (this.hoveredSlot instanceof LargeItemStackSlot slot) {
                 int curSlot = slot.getContainerSlot();
@@ -59,19 +59,19 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
                 int maxStackSize = this.getCrateInventory().getMaxStackSizeForSlot(curSlot);
                 tooltip.add(Component.translatable(Constants.MOD_ID + ".info.amount", Component.literal(String.valueOf(stackInSlot.getAmount() + "/" + maxStackSize)).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
                 tooltip.add(Component.translatable(Constants.MOD_ID + ".info.upgrade_redstone.mode.slot", Component.literal(String.valueOf(curSlot)).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
-                this.renderTooltip(stack, tooltip, tooltipComponents, mouseX, mouseY);
+                guiGraphics.renderTooltip(this.font, tooltip, tooltipComponents, mouseX, mouseY);
                 return;
             } else if (this.hoveredSlot.getItem().getItem() instanceof ICrateUpgrade upgrade) {
                 if (upgrade.getStorageModifier() <= 0) {
-                    this.renderTooltip(stack, tooltip, tooltipComponents, mouseX, mouseY);
+                    guiGraphics.renderTooltip(this.font, tooltip, tooltipComponents, mouseX, mouseY);
                     return;
                 }
 
                 tooltip.add(Component.translatable(Constants.MOD_ID + ".info.storage_multiplier", Component.literal(String.valueOf(upgrade.getStorageModifier())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
-                this.renderTooltip(stack, tooltip, tooltipComponents, mouseX, mouseY);
+                guiGraphics.renderTooltip(this.font, tooltip, tooltipComponents, mouseX, mouseY);
                 return;
             } else {
-                this.renderTooltip(stack, tooltip, tooltipComponents, mouseX, mouseY);
+                guiGraphics.renderTooltip(this.font, tooltip, tooltipComponents, mouseX, mouseY);
             }
         }
     }
@@ -138,27 +138,28 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
         }
     }
 
-    private void drawAmount(PoseStack matrixStack, int slot, float x, float y) {
+    private void drawAmount(GuiGraphics guiGraphics, int slot, int x, int y) {
         ItemStack stack = this.getStack(slot).getStack();
         if (stack != ItemStack.EMPTY) {
             int slotAmount = getSlotAmount(slot);
             String displayAmount = String.valueOf(slotAmount);
-            this.font.drawShadow(matrixStack, displayAmount, x - this.font.width(displayAmount), y, slotAmount <= 0 ? DyeColor.RED.getTextColor() : DyeColor.WHITE.getTextColor());
+            guiGraphics.drawString(this.font, displayAmount, x - this.font.width(displayAmount), y, slotAmount <= 0 ? DyeColor.RED.getTextColor() : DyeColor.WHITE.getTextColor(), true);
         }
     }
 
     @Override
-    protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
-        this.font.draw(matrixStack, this.title, (this.imageWidth - this.font.width(this.title)) / 2, 6.0F, 4210752);
-        this.font.draw(matrixStack, this.playerInventoryTitle, 8.0F, this.imageHeight - 93, 4210752);
-        this.font.draw(matrixStack, Component.translatable("assortedstorage.container.storage_crate.upgrades"), 8.0F, this.imageHeight - 124, 4210752);
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        guiGraphics.drawString(this.font, this.title, (this.imageWidth - this.font.width(this.title)) / 2, 6, 4210752, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, 8, this.imageHeight - 93, 4210752, false);
+        guiGraphics.drawString(this.font, Component.translatable("assortedstorage.container.storage_crate.upgrades"), 8, this.imageHeight - 124, 4210752, false);
 
         int mod = this.getCrateInventory().getStorageModifier();
         if (mod > 0) {
             String s = "X " + mod;
-            this.font.draw(matrixStack, s, 160F - this.font.width(s), this.imageHeight - 93, DyeColor.GRAY.getTextColor());
+            guiGraphics.drawString(this.font, s, 160 - this.font.width(s), this.imageHeight - 93, DyeColor.GRAY.getTextColor(), false);
         }
 
+        PoseStack matrixStack = guiGraphics.pose();
         matrixStack.pushPose();
         matrixStack.translate(0F, 0F, 300F);
         matrixStack.scale(0.5F, 0.5F, 0.5F);
@@ -167,43 +168,44 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
 
         switch (layout) {
             case SINGLE:
-                this.drawAmount(matrixStack, 0, 191.0F, 91.0F);
+                this.drawAmount(guiGraphics, 0, 191, 91);
                 break;
             case DOUBLE:
-                this.drawAmount(matrixStack, 0, 191.0F, 69.0F);
-                this.drawAmount(matrixStack, 1, 191.0F, 113.0F);
+                this.drawAmount(guiGraphics, 0, 191, 69);
+                this.drawAmount(guiGraphics, 1, 191, 113);
                 break;
             case TRIPLE:
-                this.drawAmount(matrixStack, 0, 191.0F, 69.0F);
-                this.drawAmount(matrixStack, 1, 169.0F, 113.0F);
-                this.drawAmount(matrixStack, 2, 213.0F, 113.0F);
+                this.drawAmount(guiGraphics, 0, 191, 69);
+                this.drawAmount(guiGraphics, 1, 169, 113);
+                this.drawAmount(guiGraphics, 2, 213, 113);
                 break;
             case QUADRUPLE:
-                this.drawAmount(matrixStack, 0, 169.0F, 69.0F);
-                this.drawAmount(matrixStack, 1, 213.0F, 69.0F);
-                this.drawAmount(matrixStack, 2, 169.0F, 113.0F);
-                this.drawAmount(matrixStack, 3, 213.0F, 113.0F);
+                this.drawAmount(guiGraphics, 0, 169, 69);
+                this.drawAmount(guiGraphics, 1, 213, 69);
+                this.drawAmount(guiGraphics, 2, 169, 113);
+                this.drawAmount(guiGraphics, 3, 213, 113);
                 break;
         }
         matrixStack.popPose();
     }
 
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderTooltip(matrixStack, mouseX, mouseY);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
     @Override
-    protected void renderBg(PoseStack matrixStack, float partialTicks, int x, int y) {
+    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int x, int y) {
         RenderSystem.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
 
-        this.blit(matrixStack, i, j, 0, 0, this.imageWidth + 26, this.imageHeight);
+        guiGraphics.blit(TEXTURE, i, j, 0, 0, this.imageWidth + 26, this.imageHeight);
 
+        PoseStack matrixStack = guiGraphics.pose();
         matrixStack.pushPose();
         Lighting.setupForFlatItems();
         MultiBufferSource.BufferSource buffer = this.minecraft.renderBuffers().bufferSource();

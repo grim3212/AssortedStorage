@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:bag_netherite"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

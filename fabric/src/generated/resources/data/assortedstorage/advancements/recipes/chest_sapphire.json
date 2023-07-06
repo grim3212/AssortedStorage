@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:chest_sapphire"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

@@ -54,5 +54,6 @@
     "recipes": [
       "assortedstorage:hopper_emerald"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

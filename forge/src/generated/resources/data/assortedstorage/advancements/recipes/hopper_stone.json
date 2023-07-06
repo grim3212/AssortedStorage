@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:hopper_stone"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

@@ -13,8 +13,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 
 public class EnderSavedData extends SavedData implements IEnderData {
@@ -34,14 +34,14 @@ public class EnderSavedData extends SavedData implements IEnderData {
 
     private static EnderSavedData DUMMY_SAVE = new EnderSavedData() {
         private final LockedEnderChestInventory inv = new LockedEnderChestInventory(this, "", 27) {
-            @Nonnull
+            @NotNull
             @Override
-            public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+            public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
                 return stack;
             }
 
             @Override
-            public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+            public boolean isItemValid(int slot, @NotNull ItemStack stack) {
                 return false;
             }
         };

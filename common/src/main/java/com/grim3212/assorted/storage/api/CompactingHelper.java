@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
@@ -106,7 +107,7 @@ public class CompactingHelper {
                 // Reset the inventory and fill with the current item we are checking
                 craftingContainer.fillInventory(match);
                 for (ItemStack reverseMatch : findMatchingStacks(craftingContainer)) {
-                    if (reverseMatch.getCount() != sizeCheck || !ItemStack.isSame(reverseMatch, stack)) {
+                    if (reverseMatch.getCount() != sizeCheck || !ItemStack.isSameItemSameTags(reverseMatch, stack)) {
                         continue;
                     }
                     outputs.add(match);
@@ -141,7 +142,7 @@ public class CompactingHelper {
         for (CraftingRecipe craftingRecipe : level.getRecipeManager().getAllRecipesFor(RecipeType.CRAFTING)) {
             ItemStack output = craftingRecipe.getResultItem(level.registryAccess());
             // If the output is not this item check the next recipe
-            if (!ItemStack.isSame(stack, output))
+            if (!ItemStack.isSameItemSameTags(stack, output))
                 continue;
 
             // Look for a match
@@ -157,7 +158,7 @@ public class CompactingHelper {
                 craftingContainer.fillInventory(output);
                 List<ItemStack> matchStacks = findMatchingStacks(craftingContainer);
                 for (ItemStack matchStack : matchStacks) {
-                    if (ItemStack.isSame(match, matchStack) && matchStack.getCount() == recipeSize) {
+                    if (ItemStack.isSameItemSameTags(match, matchStack) && matchStack.getCount() == recipeSize) {
                         itemOptions.put(match, recipeSize);
                         break;
                     }
@@ -222,7 +223,7 @@ public class CompactingHelper {
         return match.isEmpty() ? refMatchingStacks[0] : match;
     }
 
-    private static class ComparisonCraftingContainer extends CraftingContainer {
+    private static class ComparisonCraftingContainer extends TransientCraftingContainer {
 
         public ComparisonCraftingContainer(int size) {
             this(size, ItemStack.EMPTY);

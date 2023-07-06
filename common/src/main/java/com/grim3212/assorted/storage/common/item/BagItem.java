@@ -25,8 +25,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class BagItem extends Item implements IInventoryItem {
@@ -77,7 +77,7 @@ public class BagItem extends Item implements IInventoryItem {
                 Services.PLATFORM.openMenu((ServerPlayer) playerIn, new MenuProvider() {
                     @Override
                     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
-                        return new BagContainer(id, player.level, player.blockPosition(), inv, player);
+                        return new BagContainer(id, player.level(), player.blockPosition(), inv, player);
                     }
 
                     @Override

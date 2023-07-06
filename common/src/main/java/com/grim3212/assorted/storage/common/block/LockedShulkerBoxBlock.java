@@ -50,17 +50,17 @@ import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity.AnimationSta
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorageMaterial, IBlockMapColor {
@@ -74,16 +74,16 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
     }
 
     public LockedShulkerBoxBlock(StorageMaterial material, Block.Properties props) {
-        super(props.dynamicShape().noOcclusion().isSuffocating(Predicates.isShulkerBlock).isViewBlocking(Predicates.isShulkerBlock));
+        super(props.dynamicShape().noOcclusion().isSuffocating(Predicates.isShulkerBlock).isViewBlocking(Predicates.isShulkerBlock).pushReaction(PushReaction.DESTROY));
         this.material = material;
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.UP));
     }
 
     @Override
-    public MaterialColor getMapColor(BlockState state, BlockGetter level, BlockPos pos, MaterialColor defaultColor) {
+    public MapColor getMapColor(BlockState state, BlockGetter level, BlockPos pos, MapColor defaultColor) {
         BlockEntity te = level.getBlockEntity(pos);
         if (te instanceof LockedShulkerBoxBlockEntity shulkerBE) {
-            return shulkerBE.getColor().getMaterialColor();
+            return shulkerBE.getColor().getMapColor();
         }
 
         return state.getMapColor(level, pos);
@@ -248,11 +248,6 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
     }
 
     @Override
-    public PushReaction getPistonPushReaction(BlockState state) {
-        return PushReaction.DESTROY;
-    }
-
-    @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState neighborState, boolean p_56238_) {
         if (!state.is(neighborState.getBlock())) {
             BlockEntity blockentity = level.getBlockEntity(pos);
@@ -302,10 +297,10 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
     }
 
     @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         BlockEntity tileentity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (tileentity instanceof LockedShulkerBoxBlockEntity shulkerBE) {
-            builder = builder.withDynamicDrop(CONTENTS, (context, stackConsumer) -> {
+            builder = builder.withDynamicDrop(CONTENTS, (stackConsumer) -> {
                 for (int i = 0; i < shulkerBE.getItemStackStorageHandler().getSlots(); ++i) {
                     stackConsumer.accept(shulkerBE.getItemStackStorageHandler().getStackInSlot(i).copy());
                 }

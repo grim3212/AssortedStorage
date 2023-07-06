@@ -54,5 +54,6 @@
     "recipes": [
       "assortedstorage:barrel_aluminum"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

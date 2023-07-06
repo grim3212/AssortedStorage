@@ -27,7 +27,7 @@ public class EnderBagContainer extends AbstractContainerMenu {
     private final LockedEnderChestInventory lockedEnderChestInv;
 
     public EnderBagContainer(final int windowId, final Inventory playerInventory, FriendlyByteBuf extra) {
-        this(windowId, playerInventory.player.level, playerInventory.player.blockPosition(), playerInventory, playerInventory.player);
+        this(windowId, playerInventory.player.level(), playerInventory.player.blockPosition(), playerInventory, playerInventory.player);
     }
 
     public EnderBagContainer(int openType, int windowId, Level world, BlockPos pos, Inventory playerInventory, Player playerEntity) {

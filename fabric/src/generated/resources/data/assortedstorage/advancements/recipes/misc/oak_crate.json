@@ -45,5 +45,6 @@
     "recipes": [
       "assortedstorage:oak_crate"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

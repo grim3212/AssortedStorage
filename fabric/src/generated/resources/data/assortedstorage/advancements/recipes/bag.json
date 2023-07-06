@@ -45,5 +45,6 @@
     "recipes": [
       "assortedstorage:bag"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

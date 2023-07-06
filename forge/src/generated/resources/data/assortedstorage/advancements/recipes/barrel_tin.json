@@ -54,5 +54,6 @@
     "recipes": [
       "assortedstorage:barrel_tin"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

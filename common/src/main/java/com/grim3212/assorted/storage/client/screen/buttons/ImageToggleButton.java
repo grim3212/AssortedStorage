@@ -2,6 +2,7 @@ package com.grim3212.assorted.storage.client.screen.buttons;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.GameRenderer;
@@ -55,7 +56,7 @@ public class ImageToggleButton extends Button {
     }
 
     @Override
-    public void renderWidget(PoseStack stack, int mouseX, int mouseY, float partialTick) {
+    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, this.resourceLocation);
         int i = this.yTexStart;
@@ -66,9 +67,10 @@ public class ImageToggleButton extends Button {
         }
 
         RenderSystem.enableDepthTest();
+        PoseStack stack = guiGraphics.pose();
         stack.pushPose();
         stack.translate(0.0F, 0.0F, 50.0F);
-        blit(stack, this.getX(), this.getY(), (float) this.xTexStart, (float) i, this.width, this.height, this.textureWidth, this.textureHeight);
+        guiGraphics.blit(this.resourceLocation, this.getX(), this.getY(), (float) this.xTexStart, (float) i, this.width, this.height, this.textureWidth, this.textureHeight);
         stack.popPose();
     }
 }

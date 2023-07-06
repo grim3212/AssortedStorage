@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:glow_upgrade_glowstone"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

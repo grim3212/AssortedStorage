@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:chest_gold"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

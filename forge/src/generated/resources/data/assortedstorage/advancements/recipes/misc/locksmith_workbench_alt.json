@@ -30,5 +30,6 @@
     "recipes": [
       "assortedstorage:locksmith_workbench_alt"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

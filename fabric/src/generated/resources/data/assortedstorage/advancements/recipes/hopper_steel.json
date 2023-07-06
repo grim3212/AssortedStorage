@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:hopper_steel"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

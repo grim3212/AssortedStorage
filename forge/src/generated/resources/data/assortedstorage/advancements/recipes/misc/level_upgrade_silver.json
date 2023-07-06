@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:level_upgrade_silver"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

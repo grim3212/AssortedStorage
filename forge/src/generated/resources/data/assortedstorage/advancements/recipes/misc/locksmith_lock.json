@@ -28,5 +28,6 @@
     "recipes": [
       "assortedstorage:locksmith_lock"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

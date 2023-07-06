@@ -13,8 +13,8 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.function.Supplier;
 
 public class ShulkerBoxBEWLR extends BlockEntityWithoutLevelRenderer {
@@ -30,7 +30,7 @@ public class ShulkerBoxBEWLR extends BlockEntityWithoutLevelRenderer {
     }
 
     @Override
-    public void renderByItem(@Nonnull ItemStack stack, @Nonnull ItemDisplayContext transformType, @Nonnull PoseStack matrix, @Nonnull MultiBufferSource renderer, int light, int overlayLight) {
+    public void renderByItem(@NotNull ItemStack stack, @NotNull ItemDisplayContext transformType, @NotNull PoseStack matrix, @NotNull MultiBufferSource renderer, int light, int overlayLight) {
         if (this.blockEntity != null) {
             if (NBTHelper.hasTag(stack, "Color")) {
                 int savedColor = NBTHelper.getInt(stack, "Color");

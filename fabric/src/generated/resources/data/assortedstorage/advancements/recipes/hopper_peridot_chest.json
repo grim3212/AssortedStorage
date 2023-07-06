@@ -47,5 +47,6 @@
     "recipes": [
       "assortedstorage:hopper_peridot_chest"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

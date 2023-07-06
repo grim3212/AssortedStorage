@@ -47,5 +47,6 @@
     "recipes": [
       "assortedstorage:bag_amethyst_chest"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

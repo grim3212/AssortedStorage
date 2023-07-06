@@ -54,5 +54,6 @@
     "recipes": [
       "assortedstorage:hopper_amethyst"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

@@ -47,5 +47,6 @@
     "recipes": [
       "assortedstorage:hopper_silver_chest"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

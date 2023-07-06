@@ -47,5 +47,6 @@
     "recipes": [
       "assortedstorage:bag_ruby_chest"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

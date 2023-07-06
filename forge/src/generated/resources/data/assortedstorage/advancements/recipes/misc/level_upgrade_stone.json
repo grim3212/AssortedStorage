@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:level_upgrade_stone"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

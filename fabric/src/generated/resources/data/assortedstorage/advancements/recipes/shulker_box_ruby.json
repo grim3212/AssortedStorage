@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:shulker_box_ruby"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

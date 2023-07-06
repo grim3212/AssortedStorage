@@ -54,5 +54,6 @@
     "recipes": [
       "assortedstorage:barrel_topaz"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

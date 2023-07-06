@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:chest_platinum"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

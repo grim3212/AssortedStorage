@@ -28,5 +28,6 @@
     "recipes": [
       "assortedstorage:locker"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

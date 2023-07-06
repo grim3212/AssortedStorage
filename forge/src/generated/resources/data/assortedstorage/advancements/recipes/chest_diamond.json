@@ -54,5 +54,6 @@
     "recipes": [
       "assortedstorage:chest_diamond"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

@@ -38,8 +38,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -546,7 +546,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements I
         } else if (p_59345_.getCount() > p_59345_.getMaxStackSize()) {
             return false;
         } else {
-            return ItemStack.tagMatches(p_59345_, p_59346_);
+            return ItemStack.isSameItemSameTags(p_59345_, p_59346_);
         }
     }
 

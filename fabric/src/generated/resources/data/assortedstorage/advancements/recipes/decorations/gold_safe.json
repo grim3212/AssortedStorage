@@ -41,5 +41,6 @@
     "recipes": [
       "assortedstorage:gold_safe"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

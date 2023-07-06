@@ -47,5 +47,6 @@
     "recipes": [
       "assortedstorage:bag_tin_chest"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

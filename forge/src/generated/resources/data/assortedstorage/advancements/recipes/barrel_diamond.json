@@ -54,5 +54,6 @@
     "recipes": [
       "assortedstorage:barrel_diamond"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

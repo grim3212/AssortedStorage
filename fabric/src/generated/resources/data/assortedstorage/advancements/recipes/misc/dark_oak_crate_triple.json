@@ -45,5 +45,6 @@
     "recipes": [
       "assortedstorage:dark_oak_crate_triple"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

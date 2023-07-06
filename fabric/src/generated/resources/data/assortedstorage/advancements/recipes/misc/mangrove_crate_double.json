@@ -45,5 +45,6 @@
     "recipes": [
       "assortedstorage:mangrove_crate_double"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

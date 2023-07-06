@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:chest_lead"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

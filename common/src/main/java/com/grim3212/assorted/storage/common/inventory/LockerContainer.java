@@ -60,7 +60,7 @@ public class LockerContainer extends AbstractContainerMenu {
             this.addSlot(new Slot(playerInventory, hotbarSlot, leftCol + hotbarSlot * 18, heighOffset - 24));
         }
 
-        if (playerInventory.player.level.isClientSide)
+        if (playerInventory.player.level().isClientSide)
             setDisplayRow(0);
     }
 

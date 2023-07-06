@@ -47,5 +47,6 @@
     "recipes": [
       "assortedstorage:hopper_netherite_chest"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

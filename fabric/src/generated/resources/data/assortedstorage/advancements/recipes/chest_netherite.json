@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:chest_netherite"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

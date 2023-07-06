@@ -24,9 +24,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -82,15 +81,15 @@ public class LockedBakedModel implements IDataAwareBakedModel {
     public ItemTransforms getTransforms() {
         return this.context.getTransforms();
     }
-    
+
     @Override
     public ItemOverrides getOverrides() {
         return this.itemOverrideList;
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull RandomSource rand) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand) {
         return getQuads(state, side, rand, IBlockModelData.empty(), RenderType.solid());
     }
 

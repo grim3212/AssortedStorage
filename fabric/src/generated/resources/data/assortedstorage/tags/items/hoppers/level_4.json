@@ -1,9 +1,9 @@
 {
   "replace": false,
   "values": [
-    "assortedstorage:hopper_electrum",
     "assortedstorage:hopper_steel",
     "assortedstorage:hopper_invar",
+    "assortedstorage:hopper_electrum",
     "assortedstorage:hopper_diamond"
   ]
 }

@@ -58,5 +58,6 @@
     "recipes": [
       "assortedstorage:level_upgrade_iron"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

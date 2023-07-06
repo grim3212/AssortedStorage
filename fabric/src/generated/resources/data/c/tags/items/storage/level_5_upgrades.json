@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "assortedstorage:level_upgrade_platinum",
-    "assortedstorage:level_upgrade_netherite"
+    "assortedstorage:level_upgrade_netherite",
+    "assortedstorage:level_upgrade_platinum"
   ]
 }

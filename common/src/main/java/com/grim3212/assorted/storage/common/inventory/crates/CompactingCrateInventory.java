@@ -65,7 +65,7 @@ public class CompactingCrateInventory extends CrateSidedInv {
         // Do we have a match
         // Are both the last checked and input the same
         // Does the last matches actually contain the stack
-        return !matches.isEmpty() && matches.stream().anyMatch(m -> ItemStack.isSame(m.getItem(), stack));
+        return !matches.isEmpty() && matches.stream().anyMatch(m -> ItemStack.isSameItemSameTags(m.getItem(), stack));
     }
 
     @Override
@@ -88,7 +88,7 @@ public class CompactingCrateInventory extends CrateSidedInv {
                 // If we have already setup a match list that includes this item let's try to
                 // use that and adjust the slot to be in the correct order
 
-                int slotIdx = IntStream.range(0, matches.size()).filter(i -> ItemStack.isSame(matches.get(i).getItem(), stack)).findFirst().orElse(-1);
+                int slotIdx = IntStream.range(0, matches.size()).filter(i -> ItemStack.isSameItemSameTags(matches.get(i).getItem(), stack)).findFirst().orElse(-1);
                 if (slotIdx == -1) {
                     return -1;
                 }
@@ -112,7 +112,7 @@ public class CompactingCrateInventory extends CrateSidedInv {
                 this.findResults(stack.copyWithCount(1));
 
                 // Find where this stack should be in the slot assortment
-                int slotIdx = IntStream.range(0, matches.size()).filter(i -> ItemStack.isSame(matches.get(i).getItem(), stack)).findFirst().orElse(-1);
+                int slotIdx = IntStream.range(0, matches.size()).filter(i -> ItemStack.isSameItemSameTags(matches.get(i).getItem(), stack)).findFirst().orElse(-1);
                 if (slotIdx == -1) {
                     return -1;
                 }
@@ -154,7 +154,7 @@ public class CompactingCrateInventory extends CrateSidedInv {
             return;
         }
 
-        int checkStackIndex = IntStream.range(0, matches.size()).filter(i -> ItemStack.isSame(matches.get(i).getItem(), checkStack)).findFirst().orElse(-1);
+        int checkStackIndex = IntStream.range(0, matches.size()).filter(i -> ItemStack.isSameItemSameTags(matches.get(i).getItem(), checkStack)).findFirst().orElse(-1);
         if (checkStackIndex > -1) {
             // Possible indexes should be 0, 1, 2
             // 0 - slot 0 or highest tier

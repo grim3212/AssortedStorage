@@ -16,9 +16,9 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,13 +33,13 @@ public class StorageBlocks {
     public static final RegistryProvider<Block> BLOCKS = RegistryProvider.create(Registries.BLOCK, Constants.MOD_ID);
     public static final RegistryProvider<Item> ITEMS = RegistryProvider.create(Registries.ITEM, Constants.MOD_ID);
 
-    public static final IRegistryObject<LocksmithWorkbenchBlock> LOCKSMITH_WORKBENCH = register("locksmith_workbench", () -> new LocksmithWorkbenchBlock(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD).strength(3.0f, 5.0f)));
-    public static final IRegistryObject<WoodCabinetBlock> WOOD_CABINET = registerStorageItem("wood_cabinet", () -> new WoodCabinetBlock(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD)));
-    public static final IRegistryObject<GlassCabinetBlock> GLASS_CABINET = registerStorageItem("glass_cabinet", () -> new GlassCabinetBlock(Block.Properties.of(Material.WOOD).sound(SoundType.WOOD)));
-    public static final IRegistryObject<GoldSafeBlock> GOLD_SAFE = registerStorageItem("gold_safe", () -> new GoldSafeBlock(Block.Properties.of(Material.METAL).sound(SoundType.METAL)));
-    public static final IRegistryObject<ObsidianSafeBlock> OBSIDIAN_SAFE = registerStorageItem("obsidian_safe", () -> new ObsidianSafeBlock(Block.Properties.of(Material.STONE).sound(SoundType.STONE)));
-    public static final IRegistryObject<LockerBlock> LOCKER = registerLocker("locker", () -> new LockerBlock(Block.Properties.of(Material.METAL).sound(SoundType.METAL)));
-    public static final IRegistryObject<ItemTowerBlock> ITEM_TOWER = registerStorageItem("item_tower", () -> new ItemTowerBlock(Block.Properties.of(Material.METAL).sound(SoundType.METAL)));
+    public static final IRegistryObject<LocksmithWorkbenchBlock> LOCKSMITH_WORKBENCH = register("locksmith_workbench", () -> new LocksmithWorkbenchBlock(Block.Properties.of().mapColor(MapColor.WOOD).ignitedByLava().instrument(NoteBlockInstrument.BASS).sound(SoundType.WOOD).strength(3.0f, 5.0f)));
+    public static final IRegistryObject<WoodCabinetBlock> WOOD_CABINET = registerStorageItem("wood_cabinet", () -> new WoodCabinetBlock(Block.Properties.of().mapColor(MapColor.WOOD).ignitedByLava().instrument(NoteBlockInstrument.BASS).sound(SoundType.WOOD)));
+    public static final IRegistryObject<GlassCabinetBlock> GLASS_CABINET = registerStorageItem("glass_cabinet", () -> new GlassCabinetBlock(Block.Properties.of().mapColor(MapColor.WOOD).ignitedByLava().instrument(NoteBlockInstrument.BASS).sound(SoundType.WOOD)));
+    public static final IRegistryObject<GoldSafeBlock> GOLD_SAFE = registerStorageItem("gold_safe", () -> new GoldSafeBlock(Block.Properties.of().mapColor(MapColor.METAL).sound(SoundType.METAL)));
+    public static final IRegistryObject<ObsidianSafeBlock> OBSIDIAN_SAFE = registerStorageItem("obsidian_safe", () -> new ObsidianSafeBlock(Block.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).sound(SoundType.STONE)));
+    public static final IRegistryObject<LockerBlock> LOCKER = registerLocker("locker", () -> new LockerBlock(Block.Properties.of().mapColor(MapColor.METAL).sound(SoundType.METAL)));
+    public static final IRegistryObject<ItemTowerBlock> ITEM_TOWER = registerStorageItem("item_tower", () -> new ItemTowerBlock(Block.Properties.of().mapColor(MapColor.METAL).sound(SoundType.METAL)));
     public static final IRegistryObject<WarehouseCrateBlock> OAK_WAREHOUSE_CRATE = registerCrate("oak_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.OAK));
     public static final IRegistryObject<WarehouseCrateBlock> BIRCH_WAREHOUSE_CRATE = registerCrate("birch_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.BIRCH));
     public static final IRegistryObject<WarehouseCrateBlock> SPRUCE_WAREHOUSE_CRATE = registerCrate("spruce_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.SPRUCE));
@@ -50,34 +50,34 @@ public class StorageBlocks {
     public static final IRegistryObject<WarehouseCrateBlock> CRIMSON_WAREHOUSE_CRATE = registerCrate("crimson_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.CRIMSON));
     public static final IRegistryObject<WarehouseCrateBlock> MANGROVE_WAREHOUSE_CRATE = registerCrate("mangrove_warehouse_crate", () -> new WarehouseCrateBlock(WoodType.MANGROVE));
 
-    public static final IRegistryObject<LockedEnderChestBlock> LOCKED_ENDER_CHEST = registerStorageItem("locked_ender_chest", () -> new LockedEnderChestBlock(Block.Properties.of(Material.STONE).requiresCorrectToolForDrops().strength(22.5F, 600.0F).lightLevel((state) -> {
+    public static final IRegistryObject<LockedEnderChestBlock> LOCKED_ENDER_CHEST = registerStorageItem("locked_ender_chest", () -> new LockedEnderChestBlock(Block.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(22.5F, 600.0F).lightLevel((state) -> {
         return 7;
     })));
 
-    public static final IRegistryObject<LockedChestBlock> LOCKED_CHEST = registerChest("locked_chest", () -> new LockedChestBlock(null, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)), new Item.Properties());
-    public static final IRegistryObject<LockedShulkerBoxBlock> LOCKED_SHULKER_BOX = registerShulker("locked_shulker_box", () -> new LockedShulkerBoxBlock(null, BlockBehaviour.Properties.of(Material.SHULKER_SHELL)), new Item.Properties());
-    public static final IRegistryObject<LockedBarrelBlock> LOCKED_BARREL = register("locked_barrel", () -> new LockedBarrelBlock(null, BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
-    public static final IRegistryObject<LockedHopperBlock> LOCKED_HOPPER = register("locked_hopper", () -> new LockedHopperBlock(null, BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE).requiresCorrectToolForDrops().strength(3.0F, 4.8F).sound(SoundType.METAL).noOcclusion()));
+    public static final IRegistryObject<LockedChestBlock> LOCKED_CHEST = registerChest("locked_chest", () -> new LockedChestBlock(null, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).ignitedByLava().instrument(NoteBlockInstrument.BASS).strength(2.5F).sound(SoundType.WOOD)), new Item.Properties());
+    public static final IRegistryObject<LockedShulkerBoxBlock> LOCKED_SHULKER_BOX = registerShulker("locked_shulker_box", () -> new LockedShulkerBoxBlock(null, BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE)), new Item.Properties());
+    public static final IRegistryObject<LockedBarrelBlock> LOCKED_BARREL = register("locked_barrel", () -> new LockedBarrelBlock(null, BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).ignitedByLava().instrument(NoteBlockInstrument.BASS).strength(2.5F).sound(SoundType.WOOD)));
+    public static final IRegistryObject<LockedHopperBlock> LOCKED_HOPPER = register("locked_hopper", () -> new LockedHopperBlock(null, BlockBehaviour.Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().strength(3.0F, 4.8F).sound(SoundType.METAL).noOcclusion()));
 
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_OAK_DOOR = registerNoItem("locked_oak_door", () -> new LockedDoorBlock((DoorBlock) Blocks.OAK_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.WOOD).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_SPRUCE_DOOR = registerNoItem("locked_spruce_door", () -> new LockedDoorBlock((DoorBlock) Blocks.SPRUCE_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.PODZOL).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_BIRCH_DOOR = registerNoItem("locked_birch_door", () -> new LockedDoorBlock((DoorBlock) Blocks.BIRCH_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.SAND).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_JUNGLE_DOOR = registerNoItem("locked_jungle_door", () -> new LockedDoorBlock((DoorBlock) Blocks.JUNGLE_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.DIRT).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_ACACIA_DOOR = registerNoItem("locked_acacia_door", () -> new LockedDoorBlock((DoorBlock) Blocks.ACACIA_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.COLOR_ORANGE).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_DARK_OAK_DOOR = registerNoItem("locked_dark_oak_door", () -> new LockedDoorBlock((DoorBlock) Blocks.DARK_OAK_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.COLOR_BROWN).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_CRIMSON_DOOR = registerNoItem("locked_crimson_door", () -> new LockedDoorBlock((DoorBlock) Blocks.CRIMSON_DOOR, Block.Properties.of(Material.NETHER_WOOD, MaterialColor.CRIMSON_STEM).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_WARPED_DOOR = registerNoItem("locked_warped_door", () -> new LockedDoorBlock((DoorBlock) Blocks.WARPED_DOOR, Block.Properties.of(Material.NETHER_WOOD, MaterialColor.WARPED_STEM).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_MANGROVE_DOOR = registerNoItem("locked_mangrove_door", () -> new LockedDoorBlock((DoorBlock) Blocks.MANGROVE_DOOR, Block.Properties.of(Material.WOOD, MaterialColor.COLOR_RED).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_IRON_DOOR = registerNoItem("locked_iron_door", () -> new LockedDoorBlock((DoorBlock) Blocks.IRON_DOOR, Block.Properties.of(Material.METAL, MaterialColor.METAL).requiresCorrectToolForDrops().strength(5.0F).sound(SoundType.METAL).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_OAK_DOOR = registerNoItem("locked_oak_door", () -> new LockedDoorBlock((DoorBlock) Blocks.OAK_DOOR, Block.Properties.of().mapColor(MapColor.WOOD).ignitedByLava().instrument(NoteBlockInstrument.BASS).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_SPRUCE_DOOR = registerNoItem("locked_spruce_door", () -> new LockedDoorBlock((DoorBlock) Blocks.SPRUCE_DOOR, Block.Properties.of().mapColor(MapColor.PODZOL).ignitedByLava().instrument(NoteBlockInstrument.BASS).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_BIRCH_DOOR = registerNoItem("locked_birch_door", () -> new LockedDoorBlock((DoorBlock) Blocks.BIRCH_DOOR, Block.Properties.of().mapColor(MapColor.SAND).ignitedByLava().instrument(NoteBlockInstrument.BASS).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_JUNGLE_DOOR = registerNoItem("locked_jungle_door", () -> new LockedDoorBlock((DoorBlock) Blocks.JUNGLE_DOOR, Block.Properties.of().mapColor(MapColor.DIRT).ignitedByLava().instrument(NoteBlockInstrument.BASS).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_ACACIA_DOOR = registerNoItem("locked_acacia_door", () -> new LockedDoorBlock((DoorBlock) Blocks.ACACIA_DOOR, Block.Properties.of().mapColor(MapColor.COLOR_ORANGE).ignitedByLava().instrument(NoteBlockInstrument.BASS).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_DARK_OAK_DOOR = registerNoItem("locked_dark_oak_door", () -> new LockedDoorBlock((DoorBlock) Blocks.DARK_OAK_DOOR, Block.Properties.of().mapColor(MapColor.COLOR_BROWN).ignitedByLava().instrument(NoteBlockInstrument.BASS).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_CRIMSON_DOOR = registerNoItem("locked_crimson_door", () -> new LockedDoorBlock((DoorBlock) Blocks.CRIMSON_DOOR, Block.Properties.of().mapColor(MapColor.CRIMSON_STEM).ignitedByLava().instrument(NoteBlockInstrument.BASS).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_WARPED_DOOR = registerNoItem("locked_warped_door", () -> new LockedDoorBlock((DoorBlock) Blocks.WARPED_DOOR, Block.Properties.of().mapColor(MapColor.WARPED_STEM).ignitedByLava().instrument(NoteBlockInstrument.BASS).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_MANGROVE_DOOR = registerNoItem("locked_mangrove_door", () -> new LockedDoorBlock((DoorBlock) Blocks.MANGROVE_DOOR, Block.Properties.of().mapColor(MapColor.COLOR_RED).ignitedByLava().instrument(NoteBlockInstrument.BASS).strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_IRON_DOOR = registerNoItem("locked_iron_door", () -> new LockedDoorBlock((DoorBlock) Blocks.IRON_DOOR, Block.Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().strength(5.0F).sound(SoundType.METAL).noOcclusion()));
 
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_QUARTZ_DOOR = registerNoItem("locked_quartz_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:quartz_door"), BlockSetType.IRON, Block.Properties.of(Material.METAL, MaterialColor.QUARTZ).requiresCorrectToolForDrops().strength(5.0F).sound(SoundType.METAL).noOcclusion()));
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_GLASS_DOOR = registerNoItem("locked_glass_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:glass_door"), BlockSetType.IRON, Block.Properties.of(Material.GLASS, Blocks.GLASS.defaultMaterialColor()).strength(0.75F, 7.5F).sound(SoundType.GLASS).noOcclusion()));
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_STEEL_DOOR = registerNoItem("locked_steel_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:steel_door"), BlockSetType.IRON, Block.Properties.of(Material.METAL).strength(1.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
-    public static final IRegistryObject<LockedDoorBlock> LOCKED_CHAIN_LINK_DOOR = registerNoItem("locked_chain_link_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:chain_link_door"), BlockSetType.IRON, Block.Properties.of(Material.DECORATION).strength(0.5F, 5.0F).sound(SoundType.METAL).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_QUARTZ_DOOR = registerNoItem("locked_quartz_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:quartz_door"), BlockSetType.IRON, Block.Properties.of().mapColor(MapColor.QUARTZ).requiresCorrectToolForDrops().strength(5.0F).sound(SoundType.METAL).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_GLASS_DOOR = registerNoItem("locked_glass_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:glass_door"), BlockSetType.IRON, Block.Properties.of().mapColor(Blocks.GLASS.defaultMapColor()).instrument(NoteBlockInstrument.HAT).strength(0.75F, 7.5F).sound(SoundType.GLASS).noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_STEEL_DOOR = registerNoItem("locked_steel_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:steel_door"), BlockSetType.IRON, Block.Properties.of().mapColor(MapColor.METAL).strength(1.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
+    public static final IRegistryObject<LockedDoorBlock> LOCKED_CHAIN_LINK_DOOR = registerNoItem("locked_chain_link_door", () -> new LockedDoorBlock(new ResourceLocation("assorteddecor:chain_link_door"), BlockSetType.IRON, Block.Properties.of().mapColor(MapColor.METAL).strength(0.5F, 5.0F).sound(SoundType.METAL).noOcclusion()));
 
-    public static final IRegistryObject<CrateCompactingBlock> CRATE_COMPACTING = register("crate_compacting", () -> new CrateCompactingBlock(CrateLayout.TRIPLE, BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY).strength(1.5F, 6.0F).sound(SoundType.STONE)));
-    public static final IRegistryObject<CrateControllerBlock> CRATE_CONTROLLER = register("crate_controller", () -> new CrateControllerBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY).strength(1.5F, 6.0F).sound(SoundType.STONE)));
-    public static final IRegistryObject<CrateBridgeBlock> CRATE_BRIDGE = register("crate_bridge", () -> new CrateBridgeBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY).strength(1.5F, 6.0F).sound(SoundType.STONE)));
+    public static final IRegistryObject<CrateCompactingBlock> CRATE_COMPACTING = register("crate_compacting", () -> new CrateCompactingBlock(CrateLayout.TRIPLE, BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).sound(SoundType.STONE)));
+    public static final IRegistryObject<CrateControllerBlock> CRATE_CONTROLLER = register("crate_controller", () -> new CrateControllerBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).sound(SoundType.STONE)));
+    public static final IRegistryObject<CrateBridgeBlock> CRATE_BRIDGE = register("crate_bridge", () -> new CrateBridgeBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).sound(SoundType.STONE)));
 
     public static final Map<StorageMaterial, IRegistryObject<LockedChestBlock>> CHESTS = new HashMap<>();
     public static final Map<StorageMaterial, IRegistryObject<LockedBarrelBlock>> BARRELS = new HashMap<>();
@@ -181,14 +181,13 @@ public class StorageBlocks {
         public CrateGroup(Wood type) {
             this.type = type;
             BlockState woodState = type.getLog().defaultBlockState();
-            Material material = woodState.getMaterial();
-            MaterialColor color = woodState.getBlock().defaultMaterialColor();
+            MapColor color = woodState.getBlock().defaultMapColor();
             SoundType sound = woodState.getSoundType();
 
-            this.SINGLE = register(type.toString() + "_crate", () -> new CrateBlock(type, CrateLayout.SINGLE, BlockBehaviour.Properties.of(material, color).strength(2.5F).sound(sound)));
-            this.DOUBLE = register(type.toString() + "_crate_double", () -> new CrateBlock(type, CrateLayout.DOUBLE, BlockBehaviour.Properties.of(material, color).strength(2.5F).sound(sound)));
-            this.TRIPLE = register(type.toString() + "_crate_triple", () -> new CrateBlock(type, CrateLayout.TRIPLE, BlockBehaviour.Properties.of(material, color).strength(2.5F).sound(sound)));
-            this.QUADRUPLE = register(type.toString() + "_crate_quadruple", () -> new CrateBlock(type, CrateLayout.QUADRUPLE, BlockBehaviour.Properties.of(material, color).strength(2.5F).sound(sound)));
+            this.SINGLE = register(type.toString() + "_crate", () -> new CrateBlock(type, CrateLayout.SINGLE, BlockBehaviour.Properties.of().mapColor(color).instrument(NoteBlockInstrument.BASS).strength(2.5F).sound(sound)));
+            this.DOUBLE = register(type.toString() + "_crate_double", () -> new CrateBlock(type, CrateLayout.DOUBLE, BlockBehaviour.Properties.of().mapColor(color).instrument(NoteBlockInstrument.BASS).strength(2.5F).sound(sound)));
+            this.TRIPLE = register(type.toString() + "_crate_triple", () -> new CrateBlock(type, CrateLayout.TRIPLE, BlockBehaviour.Properties.of().mapColor(color).instrument(NoteBlockInstrument.BASS).strength(2.5F).sound(sound)));
+            this.QUADRUPLE = register(type.toString() + "_crate_quadruple", () -> new CrateBlock(type, CrateLayout.QUADRUPLE, BlockBehaviour.Properties.of().mapColor(color).instrument(NoteBlockInstrument.BASS).strength(2.5F).sound(sound)));
         }
 
         public Wood getType() {

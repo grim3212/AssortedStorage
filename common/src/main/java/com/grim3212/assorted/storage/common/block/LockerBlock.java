@@ -134,28 +134,32 @@ public class LockerBlock extends BaseStorageBlock {
 
         super.setPlacedBy(worldIn, pos, state, placer, stack);
 
-        BlockEntity tileentitytop = worldIn.getBlockEntity(pos.above());
-        if (state.getValue(HALF) == LockerHalf.BOTTOM && tileentitytop != null && tileentitytop instanceof LockerBlockEntity topLocker) {
-            LockerBlockEntity tileentitythis = (LockerBlockEntity) worldIn.getBlockEntity(pos);
-
-            tileentitythis.refreshStorageHandler();
-            topLocker.refreshStorageHandler();
-
-            if (topLocker.isLocked()) {
-                tileentitythis.setLockCode(topLocker.getLockCode());
-            }
+        LockerBlockEntity tileentitythis = (LockerBlockEntity) worldIn.getBlockEntity(pos);
+        if (tileentitythis == null) {
             return;
         }
 
-        BlockEntity tileEntityBelow = worldIn.getBlockEntity(pos.below());
-        if (state.getValue(HALF) == LockerHalf.TOP && tileEntityBelow != null && tileEntityBelow instanceof LockerBlockEntity belowLocker) {
-            LockerBlockEntity tileentitythis = (LockerBlockEntity) worldIn.getBlockEntity(pos);
+        if (state.getValue(HALF) == LockerHalf.BOTTOM) {
+            BlockEntity tileentitytop = worldIn.getBlockEntity(pos.above());
+            if (tileentitytop != null && tileentitytop instanceof LockerBlockEntity topLocker) {
 
-            tileentitythis.refreshStorageHandler();
-            belowLocker.refreshStorageHandler();
+                tileentitythis.refreshStorageHandler();
+                topLocker.refreshStorageHandler();
 
-            if (belowLocker.isLocked()) {
-                tileentitythis.setLockCode(belowLocker.getLockCode());
+                if (topLocker.isLocked()) {
+                    tileentitythis.setLockCode(topLocker.getLockCode());
+                }
+            }
+        } else if (state.getValue(HALF) == LockerHalf.TOP) {
+            BlockEntity tileEntityBelow = worldIn.getBlockEntity(pos.below());
+            if (tileEntityBelow != null && tileEntityBelow instanceof LockerBlockEntity belowLocker) {
+
+                tileentitythis.refreshStorageHandler();
+                belowLocker.refreshStorageHandler();
+
+                if (belowLocker.isLocked()) {
+                    tileentitythis.setLockCode(belowLocker.getLockCode());
+                }
             }
         }
     }

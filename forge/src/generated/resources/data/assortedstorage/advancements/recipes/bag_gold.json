@@ -54,5 +54,6 @@
     "recipes": [
       "assortedstorage:bag_gold"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

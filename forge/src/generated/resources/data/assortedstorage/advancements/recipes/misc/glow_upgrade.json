@@ -58,5 +58,6 @@
     "recipes": [
       "assortedstorage:glow_upgrade"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

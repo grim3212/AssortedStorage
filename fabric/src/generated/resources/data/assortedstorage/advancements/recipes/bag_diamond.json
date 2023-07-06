@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:bag_diamond"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:bag_steel"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

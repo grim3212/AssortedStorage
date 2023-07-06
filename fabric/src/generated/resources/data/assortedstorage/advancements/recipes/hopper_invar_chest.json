@@ -47,5 +47,6 @@
     "recipes": [
       "assortedstorage:hopper_invar_chest"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

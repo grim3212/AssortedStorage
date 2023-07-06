@@ -6,7 +6,11 @@
     },
     {
       "type": "minecraft:single",
-      "resource": "assortedstorage:model/chests/invar"
+      "resource": "assortedstorage:model/chests/diamond"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/chests/sapphire"
     },
     {
       "type": "minecraft:single",
@@ -14,51 +18,11 @@
     },
     {
       "type": "minecraft:single",
-      "resource": "assortedstorage:model/chests/electrum"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/chests/stone"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/chests/tin"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/chests/topaz"
-    },
-    {
-      "type": "minecraft:single",
       "resource": "assortedstorage:model/chests/silver"
     },
     {
       "type": "minecraft:single",
-      "resource": "assortedstorage:model/chests/copper"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/chests/diamond"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/chests/aluminum"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/chests/steel"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/chests/amethyst"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/chests/netherite"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/chests/nickel"
+      "resource": "assortedstorage:model/chests/electrum"
     },
     {
       "type": "minecraft:single",
@@ -66,15 +30,31 @@
     },
     {
       "type": "minecraft:single",
-      "resource": "assortedstorage:model/chests/peridot"
+      "resource": "assortedstorage:model/chests/stone"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/chests/copper"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/chests/topaz"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/chests/invar"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/chests/gold"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/chests/amethyst"
     },
     {
       "type": "minecraft:single",
       "resource": "assortedstorage:model/chests/lead"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "assortedstorage:model/chests/sapphire"
     },
     {
       "type": "minecraft:single",
@@ -86,11 +66,31 @@
     },
     {
       "type": "minecraft:single",
+      "resource": "assortedstorage:model/chests/nickel"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/chests/steel"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/chests/netherite"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/chests/peridot"
+    },
+    {
+      "type": "minecraft:single",
       "resource": "assortedstorage:model/chests/ruby"
     },
     {
       "type": "minecraft:single",
-      "resource": "assortedstorage:model/chests/gold"
+      "resource": "assortedstorage:model/chests/aluminum"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "assortedstorage:model/chests/tin"
     }
   ]
 }

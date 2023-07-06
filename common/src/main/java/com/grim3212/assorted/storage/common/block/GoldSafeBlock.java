@@ -23,7 +23,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -108,10 +108,10 @@ public class GoldSafeBlock extends BaseStorageBlock {
     }
 
     @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         BlockEntity tileentity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (tileentity instanceof GoldSafeBlockEntity goldSafeBlockEntity) {
-            builder = builder.withDynamicDrop(CONTENTS, (context, stackConsumer) -> {
+            builder = builder.withDynamicDrop(CONTENTS, (stackConsumer) -> {
                 for (int i = 0; i < goldSafeBlockEntity.getItemStackStorageHandler().getSlots(); ++i) {
                     stackConsumer.accept(goldSafeBlockEntity.getItemStackStorageHandler().getStackInSlot(i).copy());
                 }

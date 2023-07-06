@@ -45,5 +45,6 @@
     "recipes": [
       "assortedstorage:ender_bag"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

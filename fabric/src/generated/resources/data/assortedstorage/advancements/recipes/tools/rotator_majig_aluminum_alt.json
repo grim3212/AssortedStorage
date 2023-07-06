@@ -36,5 +36,6 @@
     "recipes": [
       "assortedstorage:rotator_majig_aluminum_alt"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

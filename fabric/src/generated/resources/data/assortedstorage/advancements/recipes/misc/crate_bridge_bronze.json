@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:crate_bridge_bronze"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

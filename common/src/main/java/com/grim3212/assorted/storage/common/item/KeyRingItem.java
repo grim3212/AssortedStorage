@@ -45,7 +45,7 @@ public class KeyRingItem extends Item implements IInventoryItem {
             Services.PLATFORM.openMenu((ServerPlayer) playerIn, new MenuProvider() {
                 @Override
                 public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
-                    return new KeyRingContainer(id, player.level, player.blockPosition(), inv, player);
+                    return new KeyRingContainer(id, player.level(), player.blockPosition(), inv, player);
                 }
 
                 @Override

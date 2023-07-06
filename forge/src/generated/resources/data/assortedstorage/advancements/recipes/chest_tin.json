@@ -54,5 +54,6 @@
     "recipes": [
       "assortedstorage:chest_tin"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

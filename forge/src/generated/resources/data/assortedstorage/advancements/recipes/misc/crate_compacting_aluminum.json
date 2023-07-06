@@ -54,5 +54,6 @@
     "recipes": [
       "assortedstorage:crate_compacting_aluminum"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

@@ -45,5 +45,6 @@
     "recipes": [
       "assortedstorage:crate_bridge_copper"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

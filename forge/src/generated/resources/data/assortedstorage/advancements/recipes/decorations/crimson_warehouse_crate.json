@@ -30,5 +30,6 @@
     "recipes": [
       "assortedstorage:crimson_warehouse_crate"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

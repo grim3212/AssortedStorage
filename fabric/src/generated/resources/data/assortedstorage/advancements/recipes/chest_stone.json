@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:chest_stone"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

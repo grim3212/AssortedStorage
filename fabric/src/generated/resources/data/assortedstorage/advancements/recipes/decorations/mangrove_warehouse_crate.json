@@ -30,5 +30,6 @@
     "recipes": [
       "assortedstorage:mangrove_warehouse_crate"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

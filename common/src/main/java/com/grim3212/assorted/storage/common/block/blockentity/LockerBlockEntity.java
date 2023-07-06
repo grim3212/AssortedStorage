@@ -39,6 +39,17 @@ public class LockerBlockEntity extends BaseStorageBlockEntity {
             return Services.INVENTORY.createStorageInventoryHandler(new DualLockerInventory(this, lockerDown.getItemStackStorageHandler(), this.getItemStackStorageHandler()));
         }
 
+        if (this.getBlockState().getValue(LockerBlock.HALF) == LockerHalf.SINGLE) {
+            // Sometimes the single (already existing) locker has not updated yet so we should try and account for that too
+            if (level.getBlockEntity(worldPosition.above()) instanceof LockerBlockEntity lockerUp && level.getBlockState(worldPosition.above()).getValue(LockerBlock.HALF) == LockerHalf.TOP) {
+                return Services.INVENTORY.createStorageInventoryHandler(new DualLockerInventory(this, this.getItemStackStorageHandler(), lockerUp.getItemStackStorageHandler()));
+            }
+
+            if (level.getBlockEntity(worldPosition.below()) instanceof LockerBlockEntity lockerDown && level.getBlockState(worldPosition.below()).getValue(LockerBlock.HALF) == LockerHalf.BOTTOM) {
+                return Services.INVENTORY.createStorageInventoryHandler(new DualLockerInventory(this, lockerDown.getItemStackStorageHandler(), this.getItemStackStorageHandler()));
+            }
+        }
+
         return super.createStorageHandler();
     }
 

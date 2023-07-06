@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:barrel_bronze"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

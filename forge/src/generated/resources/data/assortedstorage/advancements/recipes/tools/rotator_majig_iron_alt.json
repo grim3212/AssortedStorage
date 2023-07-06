@@ -28,5 +28,6 @@
     "recipes": [
       "assortedstorage:rotator_majig_iron_alt"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

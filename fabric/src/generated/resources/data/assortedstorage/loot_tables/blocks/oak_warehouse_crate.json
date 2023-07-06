@@ -16,5 +16,6 @@
       ],
       "rolls": 1.0
     }
-  ]
+  ],
+  "random_sequence": "assortedstorage:blocks/oak_warehouse_crate"
 }

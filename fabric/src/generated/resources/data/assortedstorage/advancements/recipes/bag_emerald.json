@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:bag_emerald"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

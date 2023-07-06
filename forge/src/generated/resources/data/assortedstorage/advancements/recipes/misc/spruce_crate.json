@@ -45,5 +45,6 @@
     "recipes": [
       "assortedstorage:spruce_crate"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

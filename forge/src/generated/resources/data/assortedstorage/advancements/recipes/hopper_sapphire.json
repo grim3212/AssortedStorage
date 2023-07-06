@@ -54,5 +54,6 @@
     "recipes": [
       "assortedstorage:hopper_sapphire"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

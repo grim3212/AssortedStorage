@@ -45,5 +45,6 @@
     "recipes": [
       "assortedstorage:crimson_crate_double"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

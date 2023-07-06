@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:shulker_box_aluminum"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

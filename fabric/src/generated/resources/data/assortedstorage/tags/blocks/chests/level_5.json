@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "assortedstorage:chest_platinum",
-    "assortedstorage:chest_netherite"
+    "assortedstorage:chest_netherite",
+    "assortedstorage:chest_platinum"
   ]
 }

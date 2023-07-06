@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:barrel_lead"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

@@ -40,7 +40,7 @@ public abstract class ModeCrateUpgradeItem extends BasicCrateUpgradeItem {
     }
 
     protected void sendMessage(Player player, Component message) {
-        if (!player.level.isClientSide) {
+        if (!player.level().isClientSide) {
             player.sendSystemMessage(message);
         }
     }

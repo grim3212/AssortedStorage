@@ -29,5 +29,6 @@
       ],
       "rolls": 1.0
     }
-  ]
+  ],
+  "random_sequence": "assortedstorage:blocks/locked_chain_link_door"
 }

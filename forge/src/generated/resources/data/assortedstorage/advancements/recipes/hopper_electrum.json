@@ -54,5 +54,6 @@
     "recipes": [
       "assortedstorage:hopper_electrum"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

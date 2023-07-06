@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:barrel_sapphire"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

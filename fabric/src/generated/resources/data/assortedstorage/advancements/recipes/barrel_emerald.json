@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:barrel_emerald"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

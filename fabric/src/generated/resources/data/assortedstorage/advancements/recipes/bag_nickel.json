@@ -56,5 +56,6 @@
     "recipes": [
       "assortedstorage:bag_nickel"
     ]
-  }
+  },
+  "sends_telemetry_event": true
 }

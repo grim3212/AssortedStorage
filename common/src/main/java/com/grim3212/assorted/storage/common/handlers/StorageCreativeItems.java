@@ -2,7 +2,8 @@ package com.grim3212.assorted.storage.common.handlers;
 
 import com.grim3212.assorted.lib.core.creative.CreativeTabItems;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
-import com.grim3212.assorted.lib.platform.Services;
+import com.grim3212.assorted.lib.registry.IRegistryObject;
+import com.grim3212.assorted.lib.registry.RegistryProvider;
 import com.grim3212.assorted.lib.util.NBTHelper;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.StorageCommonMod;
@@ -11,8 +12,9 @@ import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
@@ -20,6 +22,13 @@ import net.minecraft.world.level.ItemLike;
 import java.util.List;
 
 public class StorageCreativeItems {
+
+    public static final RegistryProvider<CreativeModeTab> CREATIVE_TABS = RegistryProvider.create(Registries.CREATIVE_MODE_TAB, Constants.MOD_ID);
+
+    public static final IRegistryObject CREATIVE_TAB = CREATIVE_TABS.register("tab", () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
+            .title(Component.translatable("itemGroup." + Constants.MOD_ID))
+            .icon(() -> new ItemStack(StorageBlocks.WOOD_CABINET.get()))
+            .displayItems((props, output) -> output.acceptAll(StorageCreativeItems.getCreativeItems())).build());
 
     private static List<ItemStack> getCreativeItems() {
         CreativeTabItems items = new CreativeTabItems();
@@ -171,6 +180,5 @@ public class StorageCreativeItems {
     }
 
     public static void init() {
-        Services.PLATFORM.registerCreativeTab(new ResourceLocation(Constants.MOD_ID, "tab"), Component.translatable("itemGroup." + Constants.MOD_ID), () -> new ItemStack(StorageBlocks.WOOD_CABINET.get()), StorageCreativeItems::getCreativeItems);
     }
 }

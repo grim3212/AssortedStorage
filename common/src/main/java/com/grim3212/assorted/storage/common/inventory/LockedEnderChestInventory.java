@@ -58,9 +58,6 @@ public class LockedEnderChestInventory extends LockedItemStackStorageHandler {
 
     @Override
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-        if (lockedEnderChests.size() <= 0) {
-            return false;
-        }
         return true;
     }
 
