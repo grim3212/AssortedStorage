@@ -1,8 +1,8 @@
 {
   "values": [
     "assortedstorage:hopper_diamond",
+    "assortedstorage:hopper_electrum",
     "assortedstorage:hopper_steel",
-    "assortedstorage:hopper_invar",
-    "assortedstorage:hopper_electrum"
+    "assortedstorage:hopper_invar"
   ]
 }
