@@ -5,6 +5,17 @@ plugins {
     id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
+repositories {
+    maven {
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/"
+    }
+    maven {
+        name = "Ladysnake Libs"
+        url = 'https://maven.ladysnake.org/releases'
+    }
+}
+
 archivesBaseName = "${mod_id}-fabric-${minecraft_version}"
 
 dependencies {
@@ -16,6 +27,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
+    modImplementation "dev.emi:trinkets:${trinkets_version}"
     modImplementation("com.grim3212.assorted.lib:assortedlib-fabric:$assortedlib_version+$minecraft_version")
 
     implementation project(":common")

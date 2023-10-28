@@ -158,7 +158,6 @@ public class StorageLanguageProvider extends LanguageProvider {
                 this.add("block.assortedstorage.shulker_box_" + materialName + "_" + colorName, colorPrintName + " " + capitalizedMaterialName + " Shulker Box");
             }
         }
-
     }
 
     private String dyeColorToName(DyeColor color) {

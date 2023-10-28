@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "assortedstorage:locksmith_key",
+    "assortedstorage:key_ring"
+  ]
+}
