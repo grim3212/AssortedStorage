@@ -13,7 +13,7 @@ public class WoodCabinetBlockEntityRenderer<T extends BlockEntity & IStorage> ex
     protected static final Identifier CABINET_TEXTURE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/model/cabinet.png");
 
     public WoodCabinetBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-        super(context, new CabinetModel(context.getModelSet().bakeLayer(StorageModelLayers.CABINET)), CABINET_TEXTURE);
+        super(context, new CabinetModel(context.bakeLayer(StorageModelLayers.CABINET)), CABINET_TEXTURE);
     }
 
 }

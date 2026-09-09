@@ -3,9 +3,6 @@ package com.grim3212.assorted.storage.client.model;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -13,12 +10,29 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 
-public class ItemTowerModel extends Model {
+public class ItemTowerModel extends Model<ItemTowerModel.State> {
 
-	public boolean topBlock = false;
-	public boolean bottomBlock = false;
+	/**
+	 * Which neighbours the tower has, and whether this is the flat inventory rendering.
+	 * <p>
+	 * These were mutable fields on the model in 1.20.1. Submission is deferred in 26.2 -
+	 * {@code SubmitNodeCollector#submitModel} records the model and calls {@code setupAnim} later -
+	 * so anything that varies per tower has to travel in the state instead. The scroll animation
+	 * counter below deliberately stays on the model: it is per tower already, because
+	 * {@code ItemTowerBlockEntity} keeps its own {@code ItemTowerModel} instance for it.
+	 */
+	public record State(boolean topBlock, boolean bottomBlock, boolean inventory) {
+
+		/** The flat, neighbourless rendering used for the block item. */
+		public static final State INVENTORY = new State(false, false, true);
+
+		public State(boolean topBlock, boolean bottomBlock) {
+			this(topBlock, bottomBlock, false);
+		}
+	}
+
 	public double nextRender = 0.0D;
 
 	public int frame = 0;
@@ -33,7 +47,6 @@ public class ItemTowerModel extends Model {
 	public float[] BottomSectionFramesZ = new float[100];
 
 	private final ModelPart main;
-	private final ModelPart posts;
 	private final ModelPart cap1;
 	private final ModelPart cap2;
 	private final ModelPart shelf1;
@@ -44,10 +57,9 @@ public class ItemTowerModel extends Model {
 	private final ModelPart[] midbars;
 
 	public ItemTowerModel(ModelPart root) {
-		super(RenderType::entityCutout);
+		super(root, RenderTypes::entityCutoutCull);
 
 		this.main = root.getChild("main");
-		this.posts = root.getChild("posts");
 		this.cap1 = root.getChild("cap1");
 		this.cap2 = root.getChild("cap2");
 
@@ -197,60 +209,96 @@ public class ItemTowerModel extends Model {
 		shelf.addOrReplaceChild("shelf_part5", CubeListBuilder.create().texOffs(0, 72).addBox(2.0F, 1.0F, 2.0F, 12, 1, 1), PartPose.ZERO);
 	}
 
-	public void renderModelInventory(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		this.main.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.posts.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.cap1.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.cap2.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.midbars[0].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.midbars[4].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+	@Override
+	public void setupAnim(ItemTowerModel.State state) {
+		super.setupAnim(state);
+
+		if (state.inventory()) {
+			setupInventoryAnim();
+			return;
+		}
+
+		boolean top = state.topBlock();
+		boolean bottom = state.bottomBlock();
+
+		// The body is only drawn where the tower is either a lone block or a middle section; the
+		// open ends are made of side bars instead.
+		this.main.visible = top == bottom;
+		this.cap1.visible = !bottom;
+		this.cap2.visible = !top;
+
+		for (int i = 0; i < this.sidebars.length; i++) {
+			boolean lower = i < 4;
+			this.sidebars[i].visible = (top && bottom) || (bottom && !top && lower) || (top && !bottom && !lower);
+		}
+
+		this.midbars[0].visible = top == bottom;
+		this.midbars[1].visible = bottom && !top;
+		this.midbars[2].visible = top && bottom;
+		this.midbars[3].visible = top && !bottom;
+		this.midbars[4].visible = !top && !bottom;
+
+		advanceFrame(top, bottom);
+
+		float[] yTable = getFrameYTable(top, bottom);
+		float[] zTable = getFrameZTable(top, bottom);
+		poseShelf(this.shelf1, 5, yTable, zTable);
+		poseShelf(this.shelf2, 30, yTable, zTable);
+		poseShelf(this.shelf3, 55, yTable, zTable);
+		poseShelf(this.shelf4, 80, yTable, zTable);
 	}
 
-	@Override
-	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		if (this.bottomBlock && this.topBlock) {
-			this.main.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.midbars[0].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.midbars[2].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+	/**
+	 * The block item rendering: a lone, capped tower with nothing on its shelves.
+	 */
+	private void setupInventoryAnim() {
+		this.main.visible = true;
+		this.cap1.visible = true;
+		this.cap2.visible = true;
+
+		for (ModelPart sidebar : this.sidebars) {
+			sidebar.visible = false;
 		}
 
-		if (!this.bottomBlock && !this.topBlock) {
-			this.main.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.midbars[0].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.midbars[4].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		for (int i = 0; i < this.midbars.length; i++) {
+			this.midbars[i].visible = i == 0 || i == 4;
 		}
 
-		if (this.bottomBlock && this.topBlock) {
-			for (ModelPart model : this.sidebars) {
-				model.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		this.shelf1.visible = false;
+		this.shelf2.visible = false;
+		this.shelf3.visible = false;
+		this.shelf4.visible = false;
+	}
+
+	private void advanceFrame(boolean top, boolean bottom) {
+		if (System.currentTimeMillis() > this.nextRender && (top || bottom)) {
+			if (this.framedir) {
+				if (this.frame < 25) {
+					this.frame += 1;
+				}
+			} else if (this.frame > 0) {
+				this.frame -= 1;
 			}
-
 		}
 
-		if (this.bottomBlock && !this.topBlock) {
-			this.sidebars[0].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.sidebars[1].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.sidebars[2].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.sidebars[3].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.midbars[1].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		}
+		this.nextRender = (System.currentTimeMillis() + 1.0D);
+	}
 
-		if (!this.bottomBlock && this.topBlock) {
-			this.sidebars[4].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.sidebars[5].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.sidebars[6].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.sidebars[7].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			this.midbars[3].render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		}
+	/**
+	 * Offsets a shelf along the animation curve. This used to translate the {@code PoseStack} by
+	 * {@code y / 16} block units around the part's own render call; a {@link ModelPart}'s position is
+	 * in those same sixteenths, so setting it directly is the identical displacement and survives the
+	 * deferred submit, which no longer lets a model interleave its own transforms.
+	 */
+	private void poseShelf(ModelPart shelf, int offset, float[] yTable, float[] zTable) {
+		int index = this.frame + offset;
+		while (index > 100)
+			index -= 100;
+		if (index > 0)
+			index--;
 
-		this.posts.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-
-		if (!this.bottomBlock)
-			this.cap1.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		if (!this.topBlock)
-			this.cap2.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-
-		processFrame(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		shelf.visible = true;
+		shelf.setPos(0.0F, yTable[index], zTable[index]);
 	}
 
 	public void setAnimation(int animation) {
@@ -265,71 +313,27 @@ public class ItemTowerModel extends Model {
 		}
 	}
 
-	public void processFrame(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		if (System.currentTimeMillis() > this.nextRender && (this.topBlock || this.bottomBlock)) {
-			if (this.framedir) {
-				if (this.frame < 25) {
-					this.frame += 1;
-				}
-			} else if (this.frame > 0) {
-				this.frame -= 1;
-			}
-
-		}
-
-		renderFramePosition(this.shelf1, this.frame, 5, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		renderFramePosition(this.shelf2, this.frame, 30, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		renderFramePosition(this.shelf3, this.frame, 55, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		renderFramePosition(this.shelf4, this.frame, 80, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.nextRender = (System.currentTimeMillis() + 1.0D);
-	}
-
-	public void renderFramePosition(ModelPart model, int frame, int i, PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		int i2 = frame;
-		i2 += i;
-		while (i2 > 100)
-			i2 -= 100;
-		if (i2 > 0)
-			i2--;
-
-		float x = 0.0F;
-		float y = getFrameYTable()[i2] / 16.0F;
-		float z = getFrameZTable()[i2] / 16.0F;
-
-		matrixStackIn.translate(x, y, z);
-		model.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		matrixStackIn.translate(-x, -y, -z);
-	}
-
-	public float[] getFrameYTable() {
-		if (this.topBlock && !this.bottomBlock) {
+	public float[] getFrameYTable(boolean top, boolean bottom) {
+		if (top && !bottom) {
 			return this.BottomSectionFramesY;
 		}
 
-		if (!this.topBlock && this.bottomBlock) {
+		if (!top && bottom) {
 			return this.TopSectionFramesY;
 		}
 
-		if ((this.topBlock && this.bottomBlock) || (!this.topBlock && !this.bottomBlock)) {
-			return this.MidSectionFramesY;
-		}
-
-		return this.BlankFrames;
+		return this.MidSectionFramesY;
 	}
 
-	public float[] getFrameZTable() {
-		if (this.topBlock && !this.bottomBlock) {
+	public float[] getFrameZTable(boolean top, boolean bottom) {
+		if (top && !bottom) {
 			return this.BottomSectionFramesZ;
 		}
 
-		if (!this.topBlock && this.bottomBlock) {
+		if (!top && bottom) {
 			return this.TopSectionFramesZ;
 		}
 
-		if ((this.topBlock && this.bottomBlock) || (!this.topBlock && !this.bottomBlock)) {
-			return this.MidSectionFramesZ;
-		}
-
-		return this.BlankFrames;
+		return this.MidSectionFramesZ;
 	}
 }

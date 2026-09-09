@@ -10,69 +10,62 @@ import com.grim3212.assorted.storage.common.inventory.crates.CrateContainer;
 import com.grim3212.assorted.storage.common.inventory.crates.CrateSidedInv;
 import com.grim3212.assorted.storage.common.inventory.crates.LargeItemStackSlot;
 import com.grim3212.assorted.storage.common.network.SetSlotLockPacket;
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.MenuAccess;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Optional;
 
-
-public class CrateScreen extends AbstractContainerScreen<CrateContainer> implements MenuAccess<CrateContainer> {
+/**
+ * See {@link BaseStorageScreen} for the retained-mode GUI change. Two more things had to move here:
+ * <ul>
+ * <li>{@code renderTooltip} is {@code extractTooltip}, and a tooltip is <em>recorded</em> with
+ * {@code setTooltipForNextFrame} rather than drawn on the spot;</li>
+ * <li>the pose is a 2D {@code Matrix3x2fStack} with no z, so the {@code translate(0, 0, 300)} that
+ * lifted the slot amounts over the item stacks is a {@code nextStratum()} call after the contents
+ * instead.</li>
+ * </ul>
+ */
+public class CrateScreen extends AbstractContainerScreen<CrateContainer> {
 
     protected static final Identifier CHECKBOX_LOCATION = Identifier.parse("textures/gui/checkbox.png");
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/crate.png");
-    private ItemStack renderStack;
+    private static final int LABEL_COLOR = -12566464;
+
+    private final ItemStack renderStack;
 
     public CrateScreen(CrateContainer container, Inventory playerInventory, Component title) {
-        super(container, playerInventory, title);
-
-        this.imageHeight = 188;
-        this.imageWidth = 176;
+        super(container, playerInventory, title, DEFAULT_IMAGE_WIDTH, 188);
 
         this.renderStack = new ItemStack(container.getCrateBlockEntity().getBlockState().getBlock());
     }
 
     @Override
-    protected void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    protected void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (this.menu.getCarried().isEmpty() && this.hoveredSlot != null && this.hoveredSlot.hasItem()) {
             List<Component> tooltip = getTooltipFromContainerItem(this.hoveredSlot.getItem());
             Optional<TooltipComponent> tooltipComponents = this.hoveredSlot.getItem().getTooltipImage();
+
             if (this.hoveredSlot instanceof LargeItemStackSlot slot) {
                 int curSlot = slot.getContainerSlot();
                 LargeItemStack stackInSlot = this.getStack(curSlot);
                 int maxStackSize = this.getCrateInventory().getMaxStackSizeForSlot(curSlot);
                 tooltip.add(Component.translatable(Constants.MOD_ID + ".info.amount", Component.literal(String.valueOf(stackInSlot.getAmount() + "/" + maxStackSize)).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
                 tooltip.add(Component.translatable(Constants.MOD_ID + ".info.upgrade_redstone.mode.slot", Component.literal(String.valueOf(curSlot)).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
-                guiGraphics.renderTooltip(this.font, tooltip, tooltipComponents, mouseX, mouseY);
-                return;
-            } else if (this.hoveredSlot.getItem().getItem() instanceof ICrateUpgrade upgrade) {
-                if (upgrade.getStorageModifier() <= 0) {
-                    guiGraphics.renderTooltip(this.font, tooltip, tooltipComponents, mouseX, mouseY);
-                    return;
-                }
-
+            } else if (this.hoveredSlot.getItem().getItem() instanceof ICrateUpgrade upgrade && upgrade.getStorageModifier() > 0) {
                 tooltip.add(Component.translatable(Constants.MOD_ID + ".info.storage_multiplier", Component.literal(String.valueOf(upgrade.getStorageModifier())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
-                guiGraphics.renderTooltip(this.font, tooltip, tooltipComponents, mouseX, mouseY);
-                return;
-            } else {
-                guiGraphics.renderTooltip(this.font, tooltip, tooltipComponents, mouseX, mouseY);
             }
+
+            graphics.setTooltipForNextFrame(this.font, tooltip, tooltipComponents, mouseX, mouseY);
         }
     }
 
@@ -138,89 +131,80 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> impleme
         }
     }
 
-    private void drawAmount(GuiGraphics guiGraphics, int slot, int x, int y) {
+    private void extractAmount(GuiGraphicsExtractor graphics, int slot, int x, int y) {
         ItemStack stack = this.getStack(slot).getStack();
-        if (stack != ItemStack.EMPTY) {
+        if (!stack.isEmpty()) {
             int slotAmount = getSlotAmount(slot);
             String displayAmount = String.valueOf(slotAmount);
-            guiGraphics.drawString(this.font, displayAmount, x - this.font.width(displayAmount), y, slotAmount <= 0 ? DyeColor.RED.getTextColor() : DyeColor.WHITE.getTextColor(), true);
+            int color = ARGB.opaque(slotAmount <= 0 ? DyeColor.RED.getTextColor() : DyeColor.WHITE.getTextColor());
+            graphics.text(this.font, displayAmount, x - this.font.width(displayAmount), y, color, true);
         }
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        guiGraphics.drawString(this.font, this.title, (this.imageWidth - this.font.width(this.title)) / 2, 6, 4210752, false);
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, 8, this.imageHeight - 93, 4210752, false);
-        guiGraphics.drawString(this.font, Component.translatable("assortedstorage.container.storage_crate.upgrades"), 8, this.imageHeight - 124, 4210752, false);
+    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        graphics.text(this.font, this.title, (this.imageWidth - this.font.width(this.title)) / 2, 6, LABEL_COLOR, false);
+        graphics.text(this.font, this.playerInventoryTitle, 8, this.imageHeight - 93, LABEL_COLOR, false);
+        graphics.text(this.font, Component.translatable("assortedstorage.container.storage_crate.upgrades"), 8, this.imageHeight - 124, LABEL_COLOR, false);
 
         int mod = this.getCrateInventory().getStorageModifier();
         if (mod > 0) {
             String s = "X " + mod;
-            guiGraphics.drawString(this.font, s, 160 - this.font.width(s), this.imageHeight - 93, DyeColor.GRAY.getTextColor(), false);
+            graphics.text(this.font, s, 160 - this.font.width(s), this.imageHeight - 93, ARGB.opaque(DyeColor.GRAY.getTextColor()), false);
         }
+    }
 
-        PoseStack matrixStack = guiGraphics.pose();
-        matrixStack.pushPose();
-        matrixStack.translate(0F, 0F, 300F);
-        matrixStack.scale(0.5F, 0.5F, 0.5F);
+    @Override
+    public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+        super.extractContents(graphics, mouseX, mouseY, partialTicks);
 
-        CrateLayout layout = this.menu.getCrateBlockEntity().getLayout();
+        // The slot amounts sit on top of the item stacks; a new stratum is what replaces the old
+        // "translate 300 along z" trick now that the GUI pose is two dimensional.
+        graphics.nextStratum();
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(this.leftPos, this.topPos);
+        graphics.pose().scale(0.5F, 0.5F);
 
-        switch (layout) {
+        switch (this.menu.getCrateBlockEntity().getLayout()) {
             case SINGLE:
-                this.drawAmount(guiGraphics, 0, 191, 91);
+                this.extractAmount(graphics, 0, 191, 91);
                 break;
             case DOUBLE:
-                this.drawAmount(guiGraphics, 0, 191, 69);
-                this.drawAmount(guiGraphics, 1, 191, 113);
+                this.extractAmount(graphics, 0, 191, 69);
+                this.extractAmount(graphics, 1, 191, 113);
                 break;
             case TRIPLE:
-                this.drawAmount(guiGraphics, 0, 191, 69);
-                this.drawAmount(guiGraphics, 1, 169, 113);
-                this.drawAmount(guiGraphics, 2, 213, 113);
+                this.extractAmount(graphics, 0, 191, 69);
+                this.extractAmount(graphics, 1, 169, 113);
+                this.extractAmount(graphics, 2, 213, 113);
                 break;
             case QUADRUPLE:
-                this.drawAmount(guiGraphics, 0, 169, 69);
-                this.drawAmount(guiGraphics, 1, 213, 69);
-                this.drawAmount(guiGraphics, 2, 169, 113);
-                this.drawAmount(guiGraphics, 3, 213, 113);
+                this.extractAmount(graphics, 0, 169, 69);
+                this.extractAmount(graphics, 1, 213, 69);
+                this.extractAmount(graphics, 2, 169, 113);
+                this.extractAmount(graphics, 3, 213, 113);
                 break;
         }
-        matrixStack.popPose();
+
+        graphics.pose().popMatrix();
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(guiGraphics);
-        super.render(guiGraphics, mouseX, mouseY, partialTicks);
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
-    }
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+        super.extractBackground(graphics, mouseX, mouseY, partialTicks);
 
-    @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int x, int y) {
-        RenderSystem.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, TEXTURE);
-        int i = (this.width - this.imageWidth) / 2;
-        int j = (this.height - this.imageHeight) / 2;
+        int i = this.leftPos;
+        int j = this.topPos;
 
-        guiGraphics.blit(TEXTURE, i, j, 0, 0, this.imageWidth + 26, this.imageHeight);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, i, j, 0.0F, 0.0F, this.imageWidth + 26, this.imageHeight, 256, 256);
 
-        PoseStack matrixStack = guiGraphics.pose();
-        matrixStack.pushPose();
-        Lighting.setupForFlatItems();
-        MultiBufferSource.BufferSource buffer = this.minecraft.renderBuffers().bufferSource();
-
-        matrixStack.translate(i + 80, j + 34, 0);
-        matrixStack.translate(8.0F, 8.0F, 0.0F);
-        matrixStack.scale(1.0F, -1.0F, 1.0F);
-        matrixStack.scale(16.0F, 16.0F, 16.0F);
-        matrixStack.mulPose(Axis.YP.rotationDegrees(180));
-        matrixStack.scale(3.2F, 3.2F, 3.2F);
-
-        this.minecraft.getItemRenderer().renderStatic(this.renderStack, ItemDisplayContext.NONE, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, matrixStack, buffer, this.menu.getCrateBlockEntity().getLevel(), 0);
-
-        buffer.endBatch();
-        Lighting.setupFor3DItems();
-        matrixStack.popPose();
+        // The crate preview used to be an ItemRenderer#renderStatic call with a hand built model
+        // transform. The retained GUI only draws items through GuiGraphicsExtractor#item, which
+        // applies the standard GUI display context; scaling the 2D pose keeps the same 51px footprint.
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(i + 88, j + 42);
+        graphics.pose().scale(3.2F, 3.2F);
+        graphics.item(this.renderStack, -8, -8);
+        graphics.pose().popMatrix();
     }
 }

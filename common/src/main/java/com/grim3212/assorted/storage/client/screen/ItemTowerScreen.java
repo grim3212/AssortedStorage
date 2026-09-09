@@ -4,68 +4,59 @@ import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.common.inventory.ItemTowerContainer;
 import com.grim3212.assorted.storage.common.inventory.ItemTowerInventory;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.MenuAccess;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 
-
-public class ItemTowerScreen extends AbstractContainerScreen<ItemTowerContainer> implements MenuAccess<ItemTowerContainer> {
+/**
+ * See {@link BaseStorageScreen} for the retained-mode GUI change; {@code renderLabels} is
+ * {@code extractLabels} and the label colour is a full ARGB int now, so the old {@code 0x404040}
+ * would draw fully transparent.
+ */
+public class ItemTowerScreen extends AbstractContainerScreen<ItemTowerContainer> {
 
     private static final Identifier ITEM_TOWER_TEXTURE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/item_tower.png");
+    private static final int LABEL_COLOR = -12566464;
+
     private int rowId = 0;
-    private IItemStorageHandler towerInventory;
+    private final IItemStorageHandler towerInventory;
 
     public ItemTowerScreen(ItemTowerContainer container, Inventory playerInventory, Component title) {
-        super(container, playerInventory, title);
+        super(container, playerInventory, title, DEFAULT_IMAGE_WIDTH, 150);
 
         this.towerInventory = this.menu.getItemTowerInventory();
-
-        this.imageWidth = 176;
-        this.imageHeight = 150;
-        this.inventoryLabelY = this.imageHeight - 94;
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(guiGraphics);
-        super.render(guiGraphics, mouseX, mouseY, partialTicks);
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
-    }
-
-    @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         MutableComponent title = Component.literal(this.title.getString());
         if (this.towerInventory.getSlots() > 18) {
             title.append(Component.translatable(Constants.MOD_ID + ".container.item_tower.row", this.rowId + 1));
             title.append(" " + this.towerInventory.getSlots() / 9);
         }
 
-        guiGraphics.drawString(this.font, title, 8, 6, 4210752, false);
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, 8, this.imageHeight - 96 + 2, 4210752, false);
+        graphics.text(this.font, title, this.titleLabelX, this.titleLabelY, LABEL_COLOR, false);
+        graphics.text(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, LABEL_COLOR, false);
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int x, int y) {
-        RenderSystem.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, ITEM_TOWER_TEXTURE);
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+        super.extractBackground(graphics, mouseX, mouseY, partialTicks);
 
-        int i = (this.width - this.imageWidth) / 2;
-        int j = (this.height - this.imageHeight) / 2;
+        int i = this.leftPos;
+        int j = this.topPos;
 
-        guiGraphics.blit(ITEM_TOWER_TEXTURE, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, ITEM_TOWER_TEXTURE, i, j, 0.0F, 0.0F, this.imageWidth, this.imageHeight, 256, 256);
 
         if (this.towerInventory != null && this.towerInventory.getSlots() > 18) {
-            RenderSystem.enableBlend();
-            guiGraphics.blit(ITEM_TOWER_TEXTURE, i + this.imageWidth - 3, j, this.imageWidth, 0, 20, 57);
-            RenderSystem.disableBlend();
+            graphics.blit(RenderPipelines.GUI_TEXTURED, ITEM_TOWER_TEXTURE, i + this.imageWidth - 3, j, this.imageWidth, 0.0F, 20, 57, 256, 256);
         }
-
     }
 
     public void scrollInventory(boolean directionDown, boolean playSound) {
@@ -103,9 +94,9 @@ public class ItemTowerScreen extends AbstractContainerScreen<ItemTowerContainer>
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int p_231044_5_) {
-        double modx = mouseX - (this.width - this.imageWidth) / 2;
-        double mody = mouseY - (this.height - this.imageHeight) / 2;
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        double modx = event.x() - (this.width - this.imageWidth) / 2;
+        double mody = event.y() - (this.height - this.imageHeight) / 2;
 
         if (modx >= 173 && modx < 186 && mody >= 22 && mody < 35)
             scrollInventory(false, true);
@@ -113,17 +104,17 @@ public class ItemTowerScreen extends AbstractContainerScreen<ItemTowerContainer>
         if (modx >= 173 && modx < 186 && mody >= 35 && mody < 48)
             scrollInventory(true, true);
 
-        return super.mouseClicked(mouseX, mouseY, p_231044_5_);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scroll) {
-        if (scroll >= 1.0f) {
+    public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+        if (scrollY >= 1.0D) {
             scrollInventory(false, true);
         } else {
             scrollInventory(true, true);
         }
 
-        return super.mouseScrolled(mouseX, mouseY, scroll);
+        return super.mouseScrolled(x, y, scrollX, scrollY);
     }
 }

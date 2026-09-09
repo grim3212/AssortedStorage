@@ -1,25 +1,20 @@
 package com.grim3212.assorted.storage.client.model;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 public class WarehouseCrateModel extends BaseStorageModel {
 
-	private final ModelPart main;
 	private final ModelPart lid;
 	private final ModelPart lock;
 
 	public WarehouseCrateModel(ModelPart root) {
-		super(RenderType::entityCutout);
-		this.main = root.getChild("main");
+		super(root, RenderTypes::entityCutoutCull);
 
 		this.lid = root.getChild("lid");
 		this.lock = root.getChild("lock");
@@ -53,16 +48,14 @@ public class WarehouseCrateModel extends BaseStorageModel {
 	}
 
 	@Override
-	public void renderToBuffer(PoseStack stack, VertexConsumer buffer, int p_225598_3_, int p_225598_4_, float p_225598_5_, float p_225598_6_, float p_225598_7_, float p_225598_8_) {
-		this.main.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
-		this.lid.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
-		if (!this.renderHandle)
-			this.lock.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
-	}
+	public void setupAnim(StorageModelState state) {
+		super.setupAnim(state);
 
-	@Override
-	public void handleRotations() {
-		this.lid.xRot = ((float) Math.toRadians(this.doorAngle / -3.0F));
-		this.lock.xRot = ((float) Math.toRadians(this.doorAngle / -3.0F));
+		float xRot = (float) Math.toRadians(state.doorAngle() / -3.0F);
+		this.lid.xRot = xRot;
+		this.lock.xRot = xRot;
+
+		// The warehouse crate has no handle; the padlock simply disappears when it is unlocked.
+		this.lock.visible = !state.renderHandle();
 	}
 }

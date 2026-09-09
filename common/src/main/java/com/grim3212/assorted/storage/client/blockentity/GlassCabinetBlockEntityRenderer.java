@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 public class GlassCabinetBlockEntityRenderer<T extends BlockEntity & IStorage> extends StorageBlockEntityRenderer<T> {
 
     public GlassCabinetBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-        super(context, new CabinetModel(context.getModelSet().bakeLayer(StorageModelLayers.GLASS_CABINET)), WoodCabinetBlockEntityRenderer.CABINET_TEXTURE);
+        super(context, new CabinetModel(context.bakeLayer(StorageModelLayers.GLASS_CABINET)), WoodCabinetBlockEntityRenderer.CABINET_TEXTURE);
     }
 
 }

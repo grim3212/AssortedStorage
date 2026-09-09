@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 public class ObsidianSafeBlockEntityRenderer<T extends BlockEntity & IStorage> extends StorageBlockEntityRenderer<T> {
 
     public ObsidianSafeBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-        super(context, new SafeModel(context.getModelSet().bakeLayer(StorageModelLayers.SAFE)), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/model/obsidian_safe.png"));
+        super(context, new SafeModel(context.bakeLayer(StorageModelLayers.SAFE)), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/model/obsidian_safe.png"));
     }
 
 }

@@ -3,17 +3,17 @@ package com.grim3212.assorted.storage.client.screen;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.common.inventory.LockedHopperContainer;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.MenuAccess;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
-
-public class LockedHopperScreen extends AbstractContainerScreen<LockedHopperContainer> implements MenuAccess<LockedHopperContainer> {
+/**
+ * See {@link BaseStorageScreen} for the retained-mode GUI change.
+ */
+public class LockedHopperScreen extends AbstractContainerScreen<LockedHopperContainer> {
 
     private static final Identifier CHEST_GUI_TEXTURE_4_COLS = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/generic_9x4.png");
     private static final Identifier CHEST_GUI_TEXTURE_5_COLS = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/generic_9x5.png");
@@ -21,79 +21,58 @@ public class LockedHopperScreen extends AbstractContainerScreen<LockedHopperCont
     private static final Identifier CHEST_GUI_TEXTURE_7_COLS = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/generic_9x7.png");
     private static final Identifier CHEST_GUI_TEXTURE_8_COLS = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/generic_9x8.png");
     private static final Identifier CHEST_GUI_TEXTURE_9_COLS = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/generic_9x9.png");
-    private final StorageMaterial storageMaterial;
 
-    private final int textureXSize;
-    private final int textureYSize;
+    private static final int TEXTURE_X_SIZE = 256;
+    private static final int TEXTURE_Y_SIZE = 276;
+    private static final int START_OF_PLAYER_INVENTORY_Y = 180;
+    private static final int HEIGHT_OF_PLAYER_INVENTORY = 96;
+
+    private final int xRows;
     private final Identifier inventoryTexture;
-    private final int startOfPlayerInventoryY = 180;
-    private final int heightOfPlayerInvetory = 96;
 
     public LockedHopperScreen(LockedHopperContainer container, Inventory playerInventory, Component title) {
-        super(container, playerInventory, title);
-        this.storageMaterial = container.getStorageMaterial();
+        super(container, playerInventory, title, DEFAULT_IMAGE_WIDTH, imageHeight(container.getStorageMaterial()));
 
-        int xRows = 1;
-        int yCols = 5;
+        StorageMaterial storageMaterial = container.getStorageMaterial();
+        this.xRows = storageMaterial == null ? 1 : storageMaterial.hopperXRows();
 
-        if (storageMaterial != null) {
-            xRows = storageMaterial.hopperXRows();
-            yCols = storageMaterial.hopperYCols();
-        }
-
-        this.imageHeight = 114 + xRows * 18;
-        this.imageWidth = 176;
-        this.inventoryLabelY = this.imageHeight - 94;
-
-        this.textureXSize = 256;
-        this.textureYSize = 276;
-
+        int yCols = storageMaterial == null ? 5 : storageMaterial.hopperYCols();
         switch (yCols) {
             case (4):
-                inventoryTexture = CHEST_GUI_TEXTURE_4_COLS;
+                this.inventoryTexture = CHEST_GUI_TEXTURE_4_COLS;
                 break;
             case (5):
-                inventoryTexture = CHEST_GUI_TEXTURE_5_COLS;
+                this.inventoryTexture = CHEST_GUI_TEXTURE_5_COLS;
                 break;
             case (6):
-                inventoryTexture = CHEST_GUI_TEXTURE_6_COLS;
+                this.inventoryTexture = CHEST_GUI_TEXTURE_6_COLS;
                 break;
             case (7):
-                inventoryTexture = CHEST_GUI_TEXTURE_7_COLS;
+                this.inventoryTexture = CHEST_GUI_TEXTURE_7_COLS;
                 break;
             case (8):
-                inventoryTexture = CHEST_GUI_TEXTURE_8_COLS;
+                this.inventoryTexture = CHEST_GUI_TEXTURE_8_COLS;
                 break;
             default:
-                inventoryTexture = CHEST_GUI_TEXTURE_9_COLS;
+                this.inventoryTexture = CHEST_GUI_TEXTURE_9_COLS;
                 break;
         }
     }
 
-    @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(guiGraphics);
-        super.render(guiGraphics, mouseX, mouseY, partialTicks);
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
+    // imageHeight is final on AbstractContainerScreen now, so it has to be worked out before the
+    // super call rather than assigned afterwards.
+    private static int imageHeight(StorageMaterial storageMaterial) {
+        return 114 + (storageMaterial == null ? 1 : storageMaterial.hopperXRows()) * 18;
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        guiGraphics.drawString(this.font, this.title, 8, 6, 4210752, false);
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, 8, this.imageHeight - 96 + 2, 4210752, false);
-    }
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+        super.extractBackground(graphics, mouseX, mouseY, partialTicks);
 
-    @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int x, int y) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, this.inventoryTexture);
-        int i = (this.width - this.imageWidth) / 2;
-        int j = (this.height - this.imageHeight) / 2;
+        int i = this.leftPos;
+        int j = this.topPos;
 
-        int xRows = storageMaterial == null ? 1 : storageMaterial.hopperXRows();
-
-        guiGraphics.blit(this.inventoryTexture, i, j, 0, 0, this.imageWidth, xRows * 18 + 17, this.textureXSize, this.textureYSize);
-        guiGraphics.blit(this.inventoryTexture, i, j + xRows * 18 + 17, 0, startOfPlayerInventoryY, this.imageWidth, heightOfPlayerInvetory, this.textureXSize, this.textureYSize);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, this.inventoryTexture, i, j, 0.0F, 0.0F, this.imageWidth, this.xRows * 18 + 17, TEXTURE_X_SIZE, TEXTURE_Y_SIZE);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, this.inventoryTexture, i, j + this.xRows * 18 + 17, 0.0F, START_OF_PLAYER_INVENTORY_Y, this.imageWidth, HEIGHT_OF_PLAYER_INVENTORY, TEXTURE_X_SIZE, TEXTURE_Y_SIZE);
     }
 }

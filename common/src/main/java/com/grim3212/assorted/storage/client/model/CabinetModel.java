@@ -1,19 +1,15 @@
 package com.grim3212.assorted.storage.client.model;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 public class CabinetModel extends BaseStorageModel {
 
-	private final ModelPart main;
 	private final ModelPart door1;
 	private final ModelPart door2;
 	private final ModelPart handle1;
@@ -21,8 +17,7 @@ public class CabinetModel extends BaseStorageModel {
 	private final ModelPart lock;
 
 	public CabinetModel(ModelPart root) {
-		super(RenderType::entityCutout);
-		this.main = root.getChild("main");
+		super(root, RenderTypes::entityCutoutCull);
 
 		this.door1 = root.getChild("door1");
 		this.door2 = root.getChild("door2");
@@ -50,25 +45,18 @@ public class CabinetModel extends BaseStorageModel {
 	}
 
 	@Override
-	public void renderToBuffer(PoseStack stack, VertexConsumer buffer, int p_225598_3_, int p_225598_4_, float p_225598_5_, float p_225598_6_, float p_225598_7_, float p_225598_8_) {
-		this.main.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
-		this.door1.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
-		this.door2.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
+	public void setupAnim(StorageModelState state) {
+		super.setupAnim(state);
 
-		if (this.renderHandle) {
-			this.handle1.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
-			this.handle2.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
-		} else {
-			this.lock.render(stack, buffer, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
-		}
-	}
+		float angle = state.doorAngle();
+		this.door1.yRot = (angle / 90.0F * -1.25F);
+		this.door2.yRot = (angle / 90.0F * 1.25F);
+		this.handle1.yRot = (angle / 90.0F * -1.25F);
+		this.handle2.yRot = (angle / 90.0F * 1.25F);
+		this.lock.yRot = (angle / 90.0F * -1.25F);
 
-	@Override
-	public void handleRotations() {
-		this.door1.yRot = (this.doorAngle / 90.0F * -1.25F);
-		this.door2.yRot = (this.doorAngle / 90.0F * 1.25F);
-		this.handle1.yRot = (this.doorAngle / 90.0F * -1.25F);
-		this.handle2.yRot = (this.doorAngle / 90.0F * 1.25F);
-		this.lock.yRot = (this.doorAngle / 90.0F * -1.25F);
+		this.handle1.visible = state.renderHandle();
+		this.handle2.visible = state.renderHandle();
+		this.lock.visible = !state.renderHandle();
 	}
 }

@@ -1,16 +1,15 @@
 package com.grim3212.assorted.storage.client.screen;
 
+import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.common.inventory.LocksmithWorkbenchContainer;
 import com.grim3212.assorted.storage.common.network.SetLockPacket;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.MenuAccess;
-import net.minecraft.core.NonNullList;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,8 +17,13 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.item.ItemStack;
 
-
-public class LocksmithWorkbenchScreen extends AbstractContainerScreen<LocksmithWorkbenchContainer> implements MenuAccess<LocksmithWorkbenchContainer>, ContainerListener {
+/**
+ * See {@link BaseStorageScreen} for the retained-mode GUI change. The edit box is a renderable widget,
+ * so the hand written {@code render} override that drew it after {@code super.render} is gone - the
+ * base screen extracts every widget it was given. {@code keyPressed} takes a {@code KeyEvent} record
+ * and {@code ContainerListener} lost {@code refreshContainer}.
+ */
+public class LocksmithWorkbenchScreen extends AbstractContainerScreen<LocksmithWorkbenchContainer> implements ContainerListener {
 
     private static final Identifier GUI_TEXTURE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/locksmith_workbench.png");
     private EditBox lockField;
@@ -44,67 +48,47 @@ public class LocksmithWorkbenchScreen extends AbstractContainerScreen<LocksmithW
     }
 
     private void onNameChanged(String lock) {
-        String s = lock;
-        this.menu.updateLock(s);
-        Services.NETWORK.sendToServer(new SetLockPacket(s));
+        this.menu.updateLock(lock);
+        Services.NETWORK.sendToServer(new SetLockPacket(lock));
     }
 
     /**
      * Sends the contents of an inventory slot to the client-side Container. This
      * doesn't have to match the actual contents of that slot.
      */
+    @Override
     public void slotChanged(AbstractContainerMenu containerToSend, int slotInd, ItemStack stack) {
         if (slotInd == 0) {
-            String code = stack.getTag().contains("Storage_Lock", 8) ? stack.getTag().getString("Storage_Lock") : "";
-
-            this.lockField.setValue(stack.isEmpty() ? "" : code);
+            // Stacks have no free-form tag any more; the lock code lives in the CUSTOM_DATA component,
+            // which StorageUtil already reads.
+            this.lockField.setValue(stack.isEmpty() ? "" : StorageUtil.getCode(stack));
             this.lockField.setEditable(!stack.isEmpty());
             this.setFocused(this.lockField);
         }
-
-    }
-
-    public void refreshContainer(AbstractContainerMenu containerToSend, NonNullList<ItemStack> itemsList) {
-        this.slotChanged(containerToSend, 0, containerToSend.getSlot(0).getItem());
     }
 
     @Override
-    public void resize(Minecraft minecraft, int width, int height) {
+    public void resize(int width, int height) {
         String s = this.lockField.getValue();
-        this.init(minecraft, width, height);
+        this.init(width, height);
         this.lockField.setValue(s);
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 256) {
+    public boolean keyPressed(KeyEvent event) {
+        if (event.isEscape()) {
             this.minecraft.player.closeContainer();
+            return true;
         }
 
-        return !this.lockField.keyPressed(keyCode, scanCode, modifiers) && !this.lockField.canConsumeInput() ? super.keyPressed(keyCode, scanCode, modifiers) : true;
+        return !this.lockField.keyPressed(event) && !this.lockField.canConsumeInput() ? super.keyPressed(event) : true;
     }
 
     @Override
-    public void removed() {
-        super.removed();
-    }
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+        super.extractBackground(graphics, mouseX, mouseY, partialTicks);
 
-    @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(guiGraphics);
-        super.render(guiGraphics, mouseX, mouseY, partialTicks);
-        RenderSystem.disableBlend();
-        this.lockField.render(guiGraphics, mouseX, mouseY, partialTicks);
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
-    }
-
-    @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int x, int y) {
-        RenderSystem.clearColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, GUI_TEXTURE);
-        int i = this.leftPos;
-        int j = (this.height - this.imageHeight) / 2;
-        guiGraphics.blit(GUI_TEXTURE, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, GUI_TEXTURE, this.leftPos, this.topPos, 0.0F, 0.0F, this.imageWidth, this.imageHeight, 256, 256);
     }
 
     @Override

@@ -1,140 +1,63 @@
 package com.grim3212.assorted.storage.client.model.baked;
 
-import com.google.common.collect.ImmutableList;
-import com.grim3212.assorted.lib.client.model.ItemOverridesExtension;
 import com.grim3212.assorted.lib.client.model.baked.IDataAwareBakedModel;
 import com.grim3212.assorted.lib.client.model.data.IBlockModelData;
-import com.grim3212.assorted.lib.client.model.loaders.context.IModelBakingContext;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.storage.common.properties.StorageModelProperties;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.resources.model.cuboid.ItemTransforms;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.sprite.Material;
-import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.renderer.block.dispatch.ModelState;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
+/**
+ * Picks the locked or unlocked geometry from the model data the block entity publishes for its
+ * position.
+ * <p>
+ * {@code BakedModel} became {@code BlockStateModel} in 26.2: geometry is handed out as
+ * {@link BlockStateModelPart}s appended to a list rather than returned per {@code Direction}, there is
+ * no {@code getQuads(BlockState, ...)} because a model is already baked per block state, and a model
+ * no longer chooses a {@code RenderType} - each quad carries its own {@code BakedQuad.MaterialInfo}
+ * and the section compiler buckets them by its layer.
+ */
 public class LockedBakedModel implements IDataAwareBakedModel {
 
-    protected final ModelBaker bakery;
-    protected final ModelState transform;
-    protected final Identifier name;
-    protected final IModelBakingContext context;
-    private final BakedModel unlockedModel;
-    private final BakedModel lockedModel;
-    private final LockedItemOverrideList itemOverrideList;
-    private final TextureAtlasSprite particle;
+    private final BlockStateModelPart unlockedModel;
+    private final BlockStateModelPart lockedModel;
 
-    public LockedBakedModel(IModelBakingContext context, BakedModel unlockedModel, BakedModel lockedModel, ModelBaker bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, Identifier name) {
+    // TODO(26.2): the item side of this model is gone. It used to carry an ItemOverrides list whose
+    //  resolve() swapped in the locked model for a stack with a lock code, which is how a locked
+    //  barrel/hopper item showed its padlock in inventories. ItemOverrides was deleted outright:
+    //  item variation is chosen before baking, by an ItemModel named in the item's own model json -
+    //  here that would be a "minecraft:condition" ItemModel over a registered ConditionalItemModel
+    //  property that reports whether the stack has a lock code, with the locked and unlocked models as
+    //  its branches. That needs a client-side property registration plus a change to the generated
+    //  item models, so it is deliberately left undone rather than faked: the block still swaps
+    //  correctly in the world, only the item form does not.
+
+    public LockedBakedModel(BlockStateModelPart unlockedModel, BlockStateModelPart lockedModel) {
         this.unlockedModel = unlockedModel;
         this.lockedModel = lockedModel;
-        this.bakery = bakery;
-        this.transform = transform;
-        this.name = name;
-        this.context = context;
-        this.itemOverrideList = new LockedItemOverrideList(context, this);
-        this.particle = unlockedModel.getParticleIcon();
     }
 
     @Override
-    public boolean useAmbientOcclusion() {
-        return this.context.useAmbientOcclusion();
+    public void collectParts(@NotNull RandomSource random, @NotNull IBlockModelData extraData, @NotNull List<BlockStateModelPart> output) {
+        Boolean locked = extraData.getData(StorageModelProperties.IS_LOCKED);
+        output.add(Boolean.TRUE.equals(locked) ? this.lockedModel : this.unlockedModel);
     }
 
+    // Deprecated by NeoForge in favour of level/pos aware overloads that only exist in its patched
+    // jar; vanilla still declares these abstract, so they have to be implemented here.
+    @SuppressWarnings("deprecation")
     @Override
-    public boolean isGui3d() {
-        return this.context.isGui3d();
+    public Material.Baked particleMaterial() {
+        return this.unlockedModel.particleMaterial();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public boolean usesBlockLight() {
-        return this.context.useBlockLight();
-    }
-
-    @Override
-    public boolean isCustomRenderer() {
-        return false;
-    }
-
-    @Override
-    public TextureAtlasSprite getParticleIcon() {
-        return this.particle;
-    }
-
-    @Override
-    public ItemTransforms getTransforms() {
-        return this.context.getTransforms();
-    }
-
-    @Override
-    public ItemOverrides getOverrides() {
-        return this.itemOverrideList;
-    }
-
-    @NotNull
-    @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand) {
-        return getQuads(state, side, rand, IBlockModelData.empty(), RenderType.solid());
-    }
-
-    @Override
-    public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand, @NotNull IBlockModelData extraData, @Nullable RenderType renderType) {
-        if (extraData.hasProperty(StorageModelProperties.IS_LOCKED)) {
-            if (extraData.getData(StorageModelProperties.IS_LOCKED)) {
-                return this.lockedModel.getQuads(state, side, rand);
-            }
-        }
-
-        return this.unlockedModel.getQuads(state, side, rand);
-    }
-
-    @Override
-    public @NotNull List<BakedQuad> getQuads(ItemStack stack, boolean fabulous, @NotNull RandomSource rand, @Nullable RenderType renderType) {
-        return getQuads(null, null, rand, IBlockModelData.empty(), renderType);
-    }
-
-    @Override
-    public @NotNull Collection<RenderType> getSupportedRenderTypes(BlockState state, RandomSource rand, IBlockModelData data) {
-        return ImmutableList.of(RenderType.solid());
-    }
-
-    @Override
-    public @NotNull Collection<RenderType> getSupportedRenderTypes(ItemStack stack, boolean fabulous) {
-        return ImmutableList.of(RenderType.solid());
-    }
-
-    public static final class LockedItemOverrideList extends ItemOverridesExtension {
-
-        private final LockedBakedModel self;
-
-        protected LockedItemOverrideList(IModelBakingContext context, LockedBakedModel self) {
-            super(context);
-            this.self = self;
-        }
-
-        @Override
-        public BakedModel resolve(BakedModel originalModel, ItemStack stack, @Nullable ClientLevel world, @Nullable LivingEntity entity, int field) {
-            if (StorageUtil.hasCode(stack)) {
-                return this.self.lockedModel;
-            }
-
-            return this.self.unlockedModel;
-        }
+    public @BakedQuad.MaterialFlags int materialFlags() {
+        return this.unlockedModel.materialFlags() | this.lockedModel.materialFlags();
     }
 }

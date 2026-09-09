@@ -1,36 +1,18 @@
 package com.grim3212.assorted.storage.client;
 
-import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.ClientServices;
-import com.grim3212.assorted.lib.registry.IRegistryObject;
-import com.grim3212.assorted.storage.Constants;
-import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.client.blockentity.*;
-import com.grim3212.assorted.storage.client.blockentity.item.*;
+import com.grim3212.assorted.storage.client.blockentity.item.ItemTowerSpecialRenderer;
+import com.grim3212.assorted.storage.client.blockentity.item.LockedChestSpecialRenderer;
+import com.grim3212.assorted.storage.client.blockentity.item.LockedShulkerBoxSpecialRenderer;
+import com.grim3212.assorted.storage.client.blockentity.item.StorageSpecialRenderer;
+import com.grim3212.assorted.storage.client.color.BagTintSource;
 import com.grim3212.assorted.storage.client.model.*;
 import com.grim3212.assorted.storage.client.model.baked.LockedModel;
 import com.grim3212.assorted.storage.client.screen.*;
-import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
-import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
-import com.grim3212.assorted.storage.common.item.BagItem;
-import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.config.StorageClientConfig;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
-import net.minecraft.nbt.Tag;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class StorageClient {
 
@@ -69,20 +51,11 @@ public class StorageClient {
         ClientServices.CLIENT.registerScreen(StorageContainerTypes.LOCKED_SHULKER_BOX::get, LockedMaterialScreen::new);
         ClientServices.CLIENT.registerScreen(StorageContainerTypes.LOCKED_HOPPER::get, LockedHopperScreen::new);
 
-        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_OAK_DOOR::get, RenderType.cutout());
-        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_SPRUCE_DOOR::get, RenderType.cutout());
-        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_BIRCH_DOOR::get, RenderType.cutout());
-        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_JUNGLE_DOOR::get, RenderType.cutout());
-        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_ACACIA_DOOR::get, RenderType.cutout());
-        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_DARK_OAK_DOOR::get, RenderType.cutout());
-        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_CRIMSON_DOOR::get, RenderType.cutout());
-        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_WARPED_DOOR::get, RenderType.cutout());
-        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_MANGROVE_DOOR::get, RenderType.cutout());
-        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_IRON_DOOR::get, RenderType.cutout());
-        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_QUARTZ_DOOR::get, RenderType.cutout());
-        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_GLASS_DOOR::get, RenderType.cutout());
-        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_STEEL_DOOR::get, RenderType.cutout());
-        ClientServices.CLIENT.registerRenderType(StorageBlocks.LOCKED_CHAIN_LINK_DOOR::get, RenderType.cutout());
+        // TODO(26.2): the fourteen locked doors used to be registered as RenderType.cutout() here.
+        //  ItemBlockRenderTypes is gone and a block's chunk layer is now derived per quad from the
+        //  sprite's transparency or from "render_type" in the block model json, so those calls have
+        //  no runtime equivalent - the generated door models must carry
+        //  "render_type": "minecraft:cutout" instead. That is a datagen change, outside this package.
 
         ClientServices.CLIENT.registerBlockEntityRenderer(StorageBlockEntityTypes.WOOD_CABINET, WoodCabinetBlockEntityRenderer::new);
         ClientServices.CLIENT.registerBlockEntityRenderer(StorageBlockEntityTypes.GLASS_CABINET, GlassCabinetBlockEntityRenderer::new);
@@ -97,68 +70,27 @@ public class StorageClient {
         ClientServices.CLIENT.registerBlockEntityRenderer(StorageBlockEntityTypes.CRATE, CrateBlockEntityRenderer::new);
         ClientServices.CLIENT.registerBlockEntityRenderer(StorageBlockEntityTypes.CRATE_COMPACTING, CrateBlockEntityRenderer::new);
 
-        ClampedItemPropertyFunction colorOverride = (stack, world, entity, seed) -> stack.hasTag() && stack.getTag().contains(BagItem.TAG_PRIMARY_COLOR) && stack.getTag().getInt(BagItem.TAG_PRIMARY_COLOR) >= 0 ? 1.0F : 0.0F;
-        ClampedItemPropertyFunction lockOverride = (stack, world, entity, seed) -> StorageUtil.getCode(stack).isEmpty() ? 0.0F : 1.0F;
+        // TODO(26.2): registerItemProperty is gone and has no runtime replacement. The bag's "color"
+        //  and "locked" properties and the shulker box's "color" property used to select an item model
+        //  through ItemProperties; 26.2 chooses item models before baking, from the item's own model
+        //  json, using a "minecraft:select" / "minecraft:condition" ItemModel over a codec-registered
+        //  property under client.renderer.item.properties.**. Restoring those three needs a property
+        //  type registered on each loader plus regenerated item models, both outside this package.
 
-        ClientServices.CLIENT.registerItemProperty(() -> StorageItems.BAG.get(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "color"), colorOverride);
-        ClientServices.CLIENT.registerItemProperty(() -> StorageItems.BAG.get(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "locked"), lockOverride);
-        ClientServices.CLIENT.registerItemProperty(() -> StorageItems.ENDER_BAG.get(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "locked"), lockOverride);
+        // An item's tints live in its model json now; all that is registered from code is the source
+        // type. Bag models need a "tints" entry naming this id once per dyed layer, with "tag" set to
+        // BagItem.TAG_PRIMARY_COLOR / TAG_SECONDARY_COLOR.
+        ClientServices.CLIENT.registerItemTintSource(BagTintSource.ID, BagTintSource.MAP_CODEC);
 
-        for (Map.Entry<StorageMaterial, IRegistryObject<BagItem>> bag : StorageItems.BAGS.entrySet()) {
-            ClientServices.CLIENT.registerItemProperty(() -> bag.getValue().get(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "color"), colorOverride);
-            ClientServices.CLIENT.registerItemProperty(() -> bag.getValue().get(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "locked"), lockOverride);
-        }
-
-        ClampedItemPropertyFunction shulkerColorOverride = (stack, world, entity, seed) -> Optional.ofNullable(stack.getTag())
-                .map(tag -> tag.contains("Color", Tag.TAG_INT) ? tag.getInt("Color") : null)
-                .orElse(-1);
-
-        ClientServices.CLIENT.registerItemProperty(() -> StorageBlocks.LOCKED_SHULKER_BOX.get().asItem(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "color"), shulkerColorOverride);
-        for (Map.Entry<StorageMaterial, IRegistryObject<LockedShulkerBoxBlock>> entry : StorageBlocks.SHULKERS.entrySet()) {
-            ClientServices.CLIENT.registerItemProperty(() -> entry.getValue().get().asItem(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "color"), shulkerColorOverride);
-        }
-
-        ClientServices.CLIENT.registerItemColor((stack, layer) -> {
-            if (stack.getItem() instanceof BagItem && stack.hasTag()) {
-                if (layer == 0 && stack.getTag().contains(BagItem.TAG_PRIMARY_COLOR)) {
-                    int dyeColor = stack.getTag().getInt(BagItem.TAG_PRIMARY_COLOR);
-                    return dyeColor == -1 ? 16777215 : DyeColor.byId(dyeColor).getFireworkColor();
-                }
-
-                if (layer == 1 && stack.getTag().contains(BagItem.TAG_SECONDARY_COLOR)) {
-                    int dyeColor = stack.getTag().getInt(BagItem.TAG_SECONDARY_COLOR);
-                    return dyeColor == -1 ? 16777215 : DyeColor.byId(dyeColor).getFireworkColor();
-                }
-            }
-            return 16777215;
-        }, () -> {
-            List<Item> items = new ArrayList<>();
-            items.add(StorageItems.BAG.get());
-            items.addAll(StorageItems.BAGS.values().stream().map(x -> x.get()).collect(Collectors.toList()));
-            return items;
-        });
-
+        // BlockEntityWithoutLevelRenderer is gone: a special item renderer is selected by the item's
+        // own model json ("minecraft:special" naming one of these ids), so code only registers the id
+        // to codec pairs. The generated item models for the cabinets, safes, lockers, warehouse
+        // crates, item towers, locked chests and locked shulker boxes have to point at them.
         ClientServices.CLIENT.registerBEWLR((register) -> {
-            for (Block warehouseCrate : StorageBlockEntityTypes.getWarehouseCrates()) {
-                register.registerBlockEntityWithoutLevelRenderer(warehouseCrate.asItem(), WarehouseCrateBEWLR.WAREHOUSE_CRATE_ITEM_RENDERER);
-            }
-
-            register.registerBlockEntityWithoutLevelRenderer(StorageBlocks.WOOD_CABINET.get().asItem(), StorageBEWLR.STORAGE_ITEM_RENDERER);
-            register.registerBlockEntityWithoutLevelRenderer(StorageBlocks.GLASS_CABINET.get().asItem(), StorageBEWLR.STORAGE_ITEM_RENDERER);
-            register.registerBlockEntityWithoutLevelRenderer(StorageBlocks.GOLD_SAFE.get().asItem(), StorageBEWLR.STORAGE_ITEM_RENDERER);
-            register.registerBlockEntityWithoutLevelRenderer(StorageBlocks.OBSIDIAN_SAFE.get().asItem(), StorageBEWLR.STORAGE_ITEM_RENDERER);
-            register.registerBlockEntityWithoutLevelRenderer(StorageBlocks.ITEM_TOWER.get().asItem(), StorageBEWLR.STORAGE_ITEM_RENDERER);
-            register.registerBlockEntityWithoutLevelRenderer(StorageBlocks.LOCKED_ENDER_CHEST.get().asItem(), StorageBEWLR.STORAGE_ITEM_RENDERER);
-            register.registerBlockEntityWithoutLevelRenderer(StorageBlocks.LOCKER.get().asItem(), LockerBEWLR.LOCKER_ITEM_RENDERER);
-
-            for (Block shulker : StorageBlockEntityTypes.getShulkers()) {
-                register.registerBlockEntityWithoutLevelRenderer(shulker.asItem(), new ShulkerBoxBEWLR(() -> Minecraft.getInstance().getBlockEntityRenderDispatcher(), () -> Minecraft.getInstance().getEntityModels(), shulker.defaultBlockState()));
-            }
-
-            register.registerBlockEntityWithoutLevelRenderer(StorageBlocks.LOCKED_CHEST.get().asItem(), new ChestBEWLR(() -> Minecraft.getInstance().getBlockEntityRenderDispatcher(), () -> Minecraft.getInstance().getEntityModels(), StorageBlocks.LOCKED_CHEST.get().defaultBlockState()));
-            StorageBlocks.CHESTS.forEach((mat, r) -> {
-                register.registerBlockEntityWithoutLevelRenderer(r.get().asItem(), new ChestBEWLR(() -> Minecraft.getInstance().getBlockEntityRenderDispatcher(), () -> Minecraft.getInstance().getEntityModels(), r.get().defaultBlockState()));
-            });
+            register.registerSpecialModelRenderer(StorageSpecialRenderer.ID, StorageSpecialRenderer.Unbaked.MAP_CODEC);
+            register.registerSpecialModelRenderer(ItemTowerSpecialRenderer.ID, ItemTowerSpecialRenderer.Unbaked.MAP_CODEC);
+            register.registerSpecialModelRenderer(LockedChestSpecialRenderer.ID, LockedChestSpecialRenderer.Unbaked.MAP_CODEC);
+            register.registerSpecialModelRenderer(LockedShulkerBoxSpecialRenderer.ID, LockedShulkerBoxSpecialRenderer.Unbaked.MAP_CODEC);
         });
     }
 
