@@ -21,4 +21,11 @@ plugins {
 }
 
 rootProject.name = "${mod_name}"
-include("common", "fabric", "neoforge")
+// The loader modules cannot resolve their AssortedLib artifact until it is published, so
+// `-PcommonOnly` builds just the common module. This exists so nobody has to edit this file to do
+// that: concurrent edit-and-restore races corrupt it.
+if (startParameter.projectProperties.containsKey('commonOnly')) {
+    include("common")
+} else {
+    include("common", "fabric", "neoforge")
+}
