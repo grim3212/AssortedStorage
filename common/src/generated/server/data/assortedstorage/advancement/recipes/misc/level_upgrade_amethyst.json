@@ -1,0 +1,58 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "upgrades"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "c:gems/amethyst"
+        }
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_material": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:gems/amethyst"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "assortedstorage:level_upgrade_amethyst"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_upgrade": {
+      "conditions": {
+        "items": [
+          {
+            "items": "assortedstorage:blank_upgrade"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_upgrade",
+      "has_material"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "assortedstorage:level_upgrade_amethyst"
+    ]
+  }
+}

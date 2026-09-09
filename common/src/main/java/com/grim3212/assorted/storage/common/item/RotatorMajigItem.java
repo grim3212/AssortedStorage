@@ -13,8 +13,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class RotatorMajigItem extends Item {
 
-    public RotatorMajigItem() {
-        super(new Item.Properties().stacksTo(1));
+    public RotatorMajigItem(Properties props) {
+        super(props.stacksTo(1));
     }
 
     @Override

@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "#c:chests/wooden",
+    "X": "#minecraft:planks"
+  },
+  "pattern": [
+    " X ",
+    "XCX",
+    " X "
+  ],
+  "result": {
+    "id": "assortedstorage:wood_cabinet"
+  }
+}

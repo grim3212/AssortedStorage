@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "shulkers"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "c:ingots/silver"
+        }
+      ]
+    }
+  ],
+  "type": "assortedstorage:locked_upgrading",
+  "key": {
+    "C": "#assortedstorage:shulkers/level_2",
+    "M": "#c:ingots/silver"
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "id": "assortedstorage:shulker_box_silver"
+  }
+}

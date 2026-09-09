@@ -1,0 +1,58 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "chests"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "c:gems/emerald"
+        }
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_chest": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#assortedstorage:chests/level_1"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_material": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:gems/emerald"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "assortedstorage:chest_emerald"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_chest",
+      "has_material"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "assortedstorage:chest_emerald"
+    ]
+  }
+}

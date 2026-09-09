@@ -1,0 +1,11 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "assortedstorage:item/wood_cabinet",
+    "model": {
+      "type": "assortedstorage:storage",
+      "model": "cabinet",
+      "texture": "assortedstorage:textures/model/cabinet.png"
+    }
+  }
+}

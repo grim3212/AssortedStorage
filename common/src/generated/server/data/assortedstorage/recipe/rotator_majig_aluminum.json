@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "assortedlib:item_tag_populated",
+      "tag": "c:ingots/aluminum"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": "#c:rods/blaze",
+    "I": "#c:ingots/aluminum",
+    "S": "#c:rods/wooden"
+  },
+  "pattern": [
+    "I I",
+    " B ",
+    " S "
+  ],
+  "result": {
+    "id": "assortedstorage:rotator_majig"
+  }
+}

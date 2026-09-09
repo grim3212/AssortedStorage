@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "shulkers"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "c:gems/topaz"
+        }
+      ]
+    }
+  ],
+  "type": "assortedstorage:locked_upgrading",
+  "key": {
+    "C": "#assortedstorage:shulkers/level_0",
+    "M": "#c:gems/topaz"
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "id": "assortedstorage:shulker_box_topaz"
+  }
+}

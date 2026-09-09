@@ -1,0 +1,11 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "assortedstorage:item/gold_safe",
+    "model": {
+      "type": "assortedstorage:storage",
+      "model": "safe",
+      "texture": "assortedstorage:textures/model/gold_safe.png"
+    }
+  }
+}

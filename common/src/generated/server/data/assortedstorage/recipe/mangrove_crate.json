@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "assortedlib:part_enabled",
+      "part": "crates"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "#c:chests/wooden",
+    "D": "#c:deepslate",
+    "L": "#minecraft:mangrove_logs"
+  },
+  "pattern": [
+    " D ",
+    "LCL",
+    " D "
+  ],
+  "result": {
+    "id": "assortedstorage:mangrove_crate"
+  }
+}

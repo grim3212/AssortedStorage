@@ -1,0 +1,5 @@
+{
+  "loader": "assortedstorage:locked",
+  "locked": "assortedstorage:block/hopper_gold_locked",
+  "unlocked": "assortedstorage:block/hopper_gold_unlocked"
+}

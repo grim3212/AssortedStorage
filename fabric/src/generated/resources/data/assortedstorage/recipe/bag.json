@@ -1,0 +1,16 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "key": {
+    "C": "#c:chests/wooden",
+    "L": "#c:leather",
+    "S": "#c:string"
+  },
+  "pattern": [
+    "SLS",
+    "LCL",
+    "LLL"
+  ],
+  "result": {
+    "id": "assortedstorage:bag"
+  }
+}

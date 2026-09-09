@@ -1,0 +1,15 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "key": {
+    "C": "minecraft:hopper",
+    "M": "#c:stone"
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "id": "assortedstorage:hopper_stone"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "upgrades"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "c:ingots/aluminum"
+        }
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "#assortedstorage:crates/triple",
+    "D": "#c:deepslate",
+    "I": "#c:ingots/aluminum",
+    "P": "#c:pistons"
+  },
+  "pattern": [
+    "DDD",
+    "PCP",
+    "DID"
+  ],
+  "result": {
+    "id": "assortedstorage:crate_compacting"
+  }
+}

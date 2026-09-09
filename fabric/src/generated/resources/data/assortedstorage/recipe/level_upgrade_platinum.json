@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "B": "assortedstorage:blank_upgrade",
+    "M": "#c:ingots/platinum"
+  },
+  "pattern": [
+    "MMM",
+    "MBM",
+    "MMM"
+  ],
+  "result": {
+    "id": "assortedstorage:level_upgrade_platinum"
+  }
+}

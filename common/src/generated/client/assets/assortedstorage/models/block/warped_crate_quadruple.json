@@ -1,0 +1,8 @@
+{
+  "parent": "assortedstorage:block/base_crate_quadruple",
+  "textures": {
+    "facing": "assortedstorage:block/crates/warped_facing",
+    "facing_columns": "minecraft:block/warped_stem",
+    "sides": "minecraft:block/warped_stem"
+  }
+}

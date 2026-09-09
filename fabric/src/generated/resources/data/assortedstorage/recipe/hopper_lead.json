@@ -1,0 +1,15 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "key": {
+    "C": "#assortedstorage:hoppers/level_1",
+    "M": "#c:ingots/lead"
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "id": "assortedstorage:hopper_lead"
+  }
+}

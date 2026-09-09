@@ -1,0 +1,15 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "key": {
+    "C": "#assortedstorage:barrels/level_4",
+    "M": "#c:ingots/platinum"
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "id": "assortedstorage:barrel_platinum"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "key": {
+    "C": "#assortedstorage:chests/level_0",
+    "M": "#c:gems/topaz"
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "id": "assortedstorage:chest_topaz"
+  }
+}

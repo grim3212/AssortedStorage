@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "chests"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "c:gems/peridot"
+        }
+      ]
+    }
+  ],
+  "type": "assortedstorage:locked_upgrading",
+  "key": {
+    "C": "#assortedstorage:chests/level_1",
+    "M": "#c:gems/peridot"
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "id": "assortedstorage:chest_peridot"
+  }
+}

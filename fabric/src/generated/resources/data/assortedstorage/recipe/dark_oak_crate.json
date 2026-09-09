@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "#c:chests/wooden",
+    "D": "#c:deepslate",
+    "L": "#minecraft:dark_oak_logs"
+  },
+  "pattern": [
+    " D ",
+    "LCL",
+    " D "
+  ],
+  "result": {
+    "id": "assortedstorage:dark_oak_crate"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "hoppers"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "c:gems/ruby"
+        }
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_hopper": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#assortedstorage:hoppers/level_2"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_material": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:gems/ruby"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "assortedstorage:hopper_ruby"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_hopper",
+      "has_material"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "assortedstorage:hopper_ruby"
+    ]
+  }
+}

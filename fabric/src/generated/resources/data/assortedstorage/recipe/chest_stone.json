@@ -1,0 +1,15 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "key": {
+    "C": "#c:chests/wooden",
+    "M": "#c:stone"
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "id": "assortedstorage:chest_stone"
+  }
+}

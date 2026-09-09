@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "assortedlib:part_enabled",
+      "part": "hoppers"
+    }
+  ],
+  "type": "assortedstorage:locked_upgrading",
+  "key": {
+    "C": "assortedstorage:chest_electrum",
+    "M": "#c:ingots/iron"
+  },
+  "pattern": [
+    "M M",
+    "MCM",
+    " M "
+  ],
+  "result": {
+    "id": "assortedstorage:hopper_electrum"
+  }
+}

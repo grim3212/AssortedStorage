@@ -1,0 +1,5 @@
+{
+  "loader": "assortedstorage:locked",
+  "locked": "assortedstorage:block/locked_hopper_locked",
+  "unlocked": "minecraft:block/hopper"
+}

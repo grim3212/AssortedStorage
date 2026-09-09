@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "minecraft:comparator",
+    "D": "#c:dusts/redstone",
+    "R": "minecraft:repeater",
+    "U": "assortedstorage:blank_upgrade"
+  },
+  "pattern": [
+    "DCD",
+    "RUR",
+    "DCD"
+  ],
+  "result": {
+    "count": 2,
+    "id": "assortedstorage:redstone_upgrade"
+  }
+}

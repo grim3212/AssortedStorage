@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "barrels"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "c:ingots/invar"
+        }
+      ]
+    }
+  ],
+  "type": "assortedstorage:locked_upgrading",
+  "key": {
+    "C": "#assortedstorage:barrels/level_3",
+    "M": "#c:ingots/invar"
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "id": "assortedstorage:barrel_invar"
+  }
+}

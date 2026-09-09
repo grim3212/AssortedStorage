@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "assortedlib:part_enabled",
+      "part": "upgrades"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "P": "#minecraft:planks",
+    "W": "#c:paper"
+  },
+  "pattern": [
+    "PPP",
+    "PWP",
+    "PPP"
+  ],
+  "result": {
+    "id": "assortedstorage:blank_upgrade"
+  }
+}

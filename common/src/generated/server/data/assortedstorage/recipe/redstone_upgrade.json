@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "crates"
+        },
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "upgrades"
+        }
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "minecraft:comparator",
+    "D": "#c:dusts/redstone",
+    "R": "minecraft:repeater",
+    "U": "assortedstorage:blank_upgrade"
+  },
+  "pattern": [
+    "DCD",
+    "RUR",
+    "DCD"
+  ],
+  "result": {
+    "count": 2,
+    "id": "assortedstorage:redstone_upgrade"
+  }
+}

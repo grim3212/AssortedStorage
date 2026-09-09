@@ -73,6 +73,13 @@ dependencies {
     compileOnly project(":common")
 
     implementation "com.grim3212.assorted.lib:assortedlib-neoforge-${minecraft_version}:${assortedlib_version}"
+
+    // Curios' optional integration, restored: 16.0.0+26.2 is published and resolves from ModMaven,
+    // which is already declared. The api classifier is a classes+sources jar; transitive = false
+    // keeps Curios' own net.neoforged dependencies out of the graph, which the content-filtered
+    // repos would refuse anyway. compileOnly only - the integration is guarded by isModLoaded, so
+    // nothing needs Curios present at dev runtime.
+    compileOnly("top.theillusivec4.curios:curios-neoforge:${curios_version}:api") { transitive = false }
 }
 
 tasks.withType(JavaCompile).configureEach {

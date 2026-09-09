@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:copy_components",
+              "include": [
+                "minecraft:custom_name",
+                "minecraft:container",
+                "minecraft:custom_data"
+              ],
+              "source": "block_entity"
+            }
+          ],
+          "name": "assortedstorage:shulker_box_silver"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "assortedstorage:blocks/shulker_box_silver"
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "#c:chests/wooden",
+    "D": "#c:deepslate",
+    "L": "#minecraft:spruce_logs"
+  },
+  "pattern": [
+    "CDC",
+    "L L",
+    "CDC"
+  ],
+  "result": {
+    "id": "assortedstorage:spruce_crate_quadruple"
+  }
+}

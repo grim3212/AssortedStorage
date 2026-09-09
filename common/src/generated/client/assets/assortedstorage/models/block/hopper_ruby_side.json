@@ -1,0 +1,5 @@
+{
+  "loader": "assortedstorage:locked",
+  "locked": "assortedstorage:block/hopper_ruby_locked_side",
+  "unlocked": "assortedstorage:block/hopper_ruby_unlocked_side"
+}

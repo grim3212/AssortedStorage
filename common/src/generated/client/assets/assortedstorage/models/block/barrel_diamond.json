@@ -1,0 +1,5 @@
+{
+  "loader": "assortedstorage:locked",
+  "locked": "assortedstorage:block/barrel_diamond_locked",
+  "unlocked": "assortedstorage:block/barrel_diamond_unlocked"
+}

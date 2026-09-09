@@ -13,8 +13,11 @@ description = '''
 ${mod_description}
 '''
 
+# The common mixin config. The neoforge-only one is gone: both of its mixins added capabilities to
+# an Item / BlockEntity, which no longer answer capability lookups themselves, and were replaced by
+# RegisterCapabilitiesEvent registrations in AssortedStorageNeoForge.
 [[mixins]]
-config = "${mod_id}_neoforge.mixins.json"
+config = "${mod_id}.mixins.json"
 
 [[dependencies.${mod_id}]]
 modId = "neoforge"

@@ -18,9 +18,11 @@ public class AssortedStorageFabricDatagen implements DataGeneratorEntrypoint {
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
         FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
-        pack.addProvider((output, registriesFuture) -> new StorageRecipes(output));
+
+        // Recipe providers are not data providers any more - the Runner owns the output.
+        pack.addProvider((output, registriesFuture) -> new StorageRecipes.Runner(output, registriesFuture));
         FabricBlockTagProvider provider = pack.addProvider((output, registriesFuture) -> new FabricBlockTagProvider(output, registriesFuture, new StorageBlockTagProvider(output, registriesFuture)));
         pack.addProvider((output, registriesFuture) -> new FabricItemTagProvider(output, registriesFuture, provider.contentsGetter(), new StorageItemTagProvider(output, registriesFuture, provider.contentsGetter())));
-        pack.addProvider((output, registriesFuture) -> new LootTableProvider(output, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(StorageBlockLoot::new, LootContextParamSets.BLOCK))));
+        pack.addProvider((output, registriesFuture) -> new LootTableProvider(output, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(StorageBlockLoot::new, LootContextParamSets.BLOCK)), registriesFuture));
     }
 }

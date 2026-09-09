@@ -1,0 +1,11 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "assortedstorage:item/obsidian_safe",
+    "model": {
+      "type": "assortedstorage:storage",
+      "model": "safe",
+      "texture": "assortedstorage:textures/model/obsidian_safe.png"
+    }
+  }
+}

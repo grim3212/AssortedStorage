@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "#assortedstorage:crates",
+    "D": "#c:deepslate",
+    "E": "#c:ender_pearls",
+    "R": "minecraft:comparator"
+  },
+  "pattern": [
+    "DDD",
+    "CRC",
+    "DED"
+  ],
+  "result": {
+    "id": "assortedstorage:crate_controller"
+  }
+}

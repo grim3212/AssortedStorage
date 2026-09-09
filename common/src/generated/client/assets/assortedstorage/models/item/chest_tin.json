@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/template_chest",
+  "textures": {
+    "particle": "assortedstorage:block/particle/tin_block"
+  }
+}

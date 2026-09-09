@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "assortedstorage:item/shulker_box_invar",
+    "model": {
+      "type": "assortedstorage:locked_shulker_box",
+      "texture": "assortedstorage:model/shulkers/invar"
+    }
+  }
+}

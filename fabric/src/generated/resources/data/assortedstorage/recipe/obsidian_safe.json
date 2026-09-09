@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "G": "#c:chests/wooden",
+    "X": "#c:obsidian"
+  },
+  "pattern": [
+    " X ",
+    "XGX",
+    " X "
+  ],
+  "result": {
+    "id": "assortedstorage:obsidian_safe"
+  }
+}

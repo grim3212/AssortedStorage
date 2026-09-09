@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "assortedlib:part_enabled",
+      "part": "bags"
+    }
+  ],
+  "type": "assortedstorage:locked_upgrading",
+  "key": {
+    "C": "assortedstorage:chest_diamond",
+    "L": "#c:leather",
+    "S": "#c:string"
+  },
+  "pattern": [
+    "SLS",
+    "LCL",
+    "LLL"
+  ],
+  "result": {
+    "id": "assortedstorage:bag_diamond"
+  }
+}

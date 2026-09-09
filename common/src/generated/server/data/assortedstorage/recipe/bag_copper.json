@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "bags"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "c:ingots/copper"
+        }
+      ]
+    }
+  ],
+  "type": "assortedstorage:locked_upgrading",
+  "key": {
+    "C": "#assortedstorage:bags/level_0",
+    "M": "#c:ingots/copper"
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "id": "assortedstorage:bag_copper"
+  }
+}

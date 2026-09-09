@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "assortedstorage:item/chest_peridot",
+    "model": {
+      "type": "assortedstorage:locked_chest",
+      "texture": "assortedstorage:model/chests/peridot"
+    }
+  }
+}

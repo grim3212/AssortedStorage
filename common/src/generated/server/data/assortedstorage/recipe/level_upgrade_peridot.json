@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "upgrades"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "c:gems/peridot"
+        }
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "B": "assortedstorage:blank_upgrade",
+    "M": "#c:gems/peridot"
+  },
+  "pattern": [
+    "MMM",
+    "MBM",
+    "MMM"
+  ],
+  "result": {
+    "id": "assortedstorage:level_upgrade_peridot"
+  }
+}

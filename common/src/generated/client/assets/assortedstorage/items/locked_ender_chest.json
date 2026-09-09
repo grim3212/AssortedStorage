@@ -1,0 +1,11 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "assortedstorage:item/locked_ender_chest",
+    "model": {
+      "type": "assortedstorage:storage",
+      "model": "chest",
+      "texture": "assortedstorage:textures/model/locked_ender_chest.png"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "upgrades"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "c:ingots/tin"
+        }
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "B": "assortedstorage:blank_upgrade",
+    "M": "#c:ingots/tin"
+  },
+  "pattern": [
+    "MMM",
+    "MBM",
+    "MMM"
+  ],
+  "result": {
+    "id": "assortedstorage:level_upgrade_tin"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "loader": "assortedstorage:locked",
+  "locked": "assortedstorage:block/crate_controller_locked",
+  "unlocked": "assortedstorage:block/crate_controller_unlocked"
+}

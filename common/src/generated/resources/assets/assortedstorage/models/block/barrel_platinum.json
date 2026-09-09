@@ -1,9 +1,0 @@
-{
-  "loader": "assortedstorage:locked",
-  "locked": {
-    "parent": "assortedstorage:block/barrel_platinum_locked"
-  },
-  "unlocked": {
-    "parent": "assortedstorage:block/barrel_platinum_unlocked"
-  }
-}

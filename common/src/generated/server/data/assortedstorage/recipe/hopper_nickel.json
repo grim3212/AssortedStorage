@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "hoppers"
+        },
+        {
+          "type": "assortedlib:item_tag_populated",
+          "tag": "c:ingots/nickel"
+        }
+      ]
+    }
+  ],
+  "type": "assortedstorage:locked_upgrading",
+  "key": {
+    "C": "#assortedstorage:hoppers/level_1",
+    "M": "#c:ingots/nickel"
+  },
+  "pattern": [
+    "MMM",
+    "MCM",
+    "MMM"
+  ],
+  "result": {
+    "id": "assortedstorage:hopper_nickel"
+  }
+}

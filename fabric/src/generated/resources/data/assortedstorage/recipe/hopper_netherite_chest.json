@@ -1,0 +1,15 @@
+{
+  "type": "assortedstorage:locked_upgrading",
+  "key": {
+    "C": "assortedstorage:chest_netherite",
+    "M": "#c:ingots/iron"
+  },
+  "pattern": [
+    "M M",
+    "MCM",
+    " M "
+  ],
+  "result": {
+    "id": "assortedstorage:hopper_netherite"
+  }
+}

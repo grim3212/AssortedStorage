@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "#assortedstorage:crates/triple",
+    "D": "#c:deepslate",
+    "I": "#c:ingots/aluminum",
+    "P": "#c:pistons"
+  },
+  "pattern": [
+    "DDD",
+    "PCP",
+    "DID"
+  ],
+  "result": {
+    "id": "assortedstorage:crate_compacting"
+  }
+}

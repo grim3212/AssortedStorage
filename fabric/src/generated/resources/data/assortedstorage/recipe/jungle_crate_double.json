@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "#c:chests/wooden",
+    "D": "#c:deepslate",
+    "L": "#minecraft:jungle_logs"
+  },
+  "pattern": [
+    "DCD",
+    "L L",
+    "DCD"
+  ],
+  "result": {
+    "id": "assortedstorage:jungle_crate_double"
+  }
+}
