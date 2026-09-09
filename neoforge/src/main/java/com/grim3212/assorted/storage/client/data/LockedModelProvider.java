@@ -2,7 +2,7 @@ package com.grim3212.assorted.storage.client.data;
 
 import com.grim3212.assorted.storage.Constants;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.model.generators.ModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class LockedModelProvider extends ModelProvider<LockedModelBuilder> {
 
-    final Map<ResourceLocation, LockedModelBuilder> previousModels = new HashMap<>();
+    final Map<Identifier, LockedModelBuilder> previousModels = new HashMap<>();
 
     public LockedModelProvider(PackOutput output, ExistingFileHelper exHelper) {
         super(output, Constants.MOD_ID, "block", LockedModelBuilder::new, exHelper);

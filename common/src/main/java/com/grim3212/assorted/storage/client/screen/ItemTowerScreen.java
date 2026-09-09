@@ -10,14 +10,14 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 
 
 public class ItemTowerScreen extends AbstractContainerScreen<ItemTowerContainer> implements MenuAccess<ItemTowerContainer> {
 
-    private static final ResourceLocation ITEM_TOWER_TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/container/item_tower.png");
+    private static final Identifier ITEM_TOWER_TEXTURE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/item_tower.png");
     private int rowId = 0;
     private IItemStorageHandler towerInventory;
 

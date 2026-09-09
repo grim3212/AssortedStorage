@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -20,9 +20,9 @@ import net.minecraft.world.level.block.state.BlockState;
 public class StorageBlockEntityRenderer<T extends BlockEntity & IStorage> implements BlockEntityRenderer<T> {
 
     private final BaseStorageModel model;
-    private final ResourceLocation textureLocation;
+    private final Identifier textureLocation;
 
-    public StorageBlockEntityRenderer(BlockEntityRendererProvider.Context context, BaseStorageModel model, ResourceLocation textureLocation) {
+    public StorageBlockEntityRenderer(BlockEntityRendererProvider.Context context, BaseStorageModel model, Identifier textureLocation) {
         this.model = model;
         this.textureLocation = textureLocation;
     }

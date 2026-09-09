@@ -11,7 +11,7 @@ import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.item.upgrades.LevelUpgradeItem;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
@@ -95,8 +95,8 @@ public class StorageItemModelProvider extends ItemModelProvider {
         }
     }
 
-    private static final ResourceLocation COLOR_OVERRIDE = new ResourceLocation(Constants.MOD_ID, "color");
-    private static final ResourceLocation LOCK_OVERRIDE = new ResourceLocation(Constants.MOD_ID, "locked");
+    private static final Identifier COLOR_OVERRIDE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "color");
+    private static final Identifier LOCK_OVERRIDE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "locked");
 
     private ItemModelBuilder generateBag(String name) {
         ModelFile coloredBag = withExistingParent(name + "_colored", "item/generated").texture("layer0", resource("item/" + name + "_colored")).texture("layer1", resource("item/" + "bag_strap"));
@@ -147,8 +147,8 @@ public class StorageItemModelProvider extends ItemModelProvider {
         return ForgeRegistries.ITEMS.getKey(i).getPath();
     }
 
-    private ResourceLocation resource(String name) {
-        return new ResourceLocation(Constants.MOD_ID, name);
+    private Identifier resource(String name) {
+        return Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
     }
 
     private void builtinEntity(Item i) {

@@ -5,13 +5,13 @@ import com.grim3212.assorted.storage.api.blockentity.IStorage;
 import com.grim3212.assorted.storage.client.model.ChestModel;
 import com.grim3212.assorted.storage.client.model.StorageModelLayers;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class LockedEnderChestBlockEntityRenderer<T extends BlockEntity & IStorage> extends StorageBlockEntityRenderer<T> {
 
     public LockedEnderChestBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-        super(context, new ChestModel(context.getModelSet().bakeLayer(StorageModelLayers.LOCKED_CHEST)), new ResourceLocation(Constants.MOD_ID, "textures/model/locked_ender_chest.png"));
+        super(context, new ChestModel(context.getModelSet().bakeLayer(StorageModelLayers.LOCKED_CHEST)), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/model/locked_ender_chest.png"));
     }
 
     @Override

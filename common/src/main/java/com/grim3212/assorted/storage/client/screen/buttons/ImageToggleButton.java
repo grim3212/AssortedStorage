@@ -8,10 +8,10 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ImageToggleButton extends Button {
-    private final ResourceLocation resourceLocation;
+    private final Identifier resourceLocation;
     private final int xTexStart;
     private final int yTexStart;
     private final int yDiffTex;
@@ -20,11 +20,11 @@ public class ImageToggleButton extends Button {
 
     private boolean buttonClicked = false;
 
-    public ImageToggleButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, ResourceLocation location, int textureWidth, int textureHeight, OnPress onPress, boolean clicked, Component tooltip) {
+    public ImageToggleButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, Identifier location, int textureWidth, int textureHeight, OnPress onPress, boolean clicked, Component tooltip) {
         this(x, y, width, height, xTexStart, yTexStart, yDiffTex, location, textureWidth, textureHeight, onPress, clicked, CommonComponents.EMPTY, tooltip);
     }
 
-    public ImageToggleButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, ResourceLocation location, int textureWidth, int textureHeight, Button.OnPress onPress, boolean clicked, Component message, Component tooltip) {
+    public ImageToggleButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, Identifier location, int textureWidth, int textureHeight, Button.OnPress onPress, boolean clicked, Component message, Component tooltip) {
         super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;

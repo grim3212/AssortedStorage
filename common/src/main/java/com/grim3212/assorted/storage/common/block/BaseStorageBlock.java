@@ -10,7 +10,7 @@ import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -203,7 +203,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
     }
 
     // TODO: Create custom stat for this
-    protected Stat<ResourceLocation> getOpenStat() {
+    protected Stat<Identifier> getOpenStat() {
         return Stats.CUSTOM.get(Stats.OPEN_CHEST);
     }
 

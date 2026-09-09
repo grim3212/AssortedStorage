@@ -15,7 +15,7 @@ import com.grim3212.assorted.storage.common.inventory.crates.CrateContainer;
 import com.grim3212.assorted.storage.common.inventory.crates.CrateSidedInv;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.network.SyncCrate;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;

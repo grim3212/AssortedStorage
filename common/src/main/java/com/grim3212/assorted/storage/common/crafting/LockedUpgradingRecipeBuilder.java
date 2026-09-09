@@ -9,11 +9,11 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.RequirementsStrategy;
-import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+import net.minecraft.advancements.triggers.RecipeUnlockedTrigger;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -90,13 +90,13 @@ public class LockedUpgradingRecipeBuilder implements RecipeBuilder {
         return this.result;
     }
 
-    public void save(Consumer<FinishedRecipe> p_126141_, ResourceLocation p_126142_) {
+    public void save(Consumer<FinishedRecipe> p_126141_, Identifier p_126142_) {
         this.ensureValid(p_126142_);
         this.advancement.parent(ROOT_RECIPE_ADVANCEMENT).addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(p_126142_)).rewards(AdvancementRewards.Builder.recipe(p_126142_)).requirements(RequirementsStrategy.OR);
-        p_126141_.accept(new LockedUpgradingRecipeBuilder.Result(p_126142_, this.result, this.count, this.group == null ? "" : this.group, this.rows, this.key, this.advancement, new ResourceLocation(p_126142_.getNamespace(), "recipes/" + p_126142_.getPath())));
+        p_126141_.accept(new LockedUpgradingRecipeBuilder.Result(p_126142_, this.result, this.count, this.group == null ? "" : this.group, this.rows, this.key, this.advancement, Identifier.fromNamespaceAndPath(p_126142_.getNamespace(), "recipes/" + p_126142_.getPath())));
     }
 
-    private void ensureValid(ResourceLocation p_126144_) {
+    private void ensureValid(Identifier p_126144_) {
         if (this.rows.isEmpty()) {
             throw new IllegalStateException("No pattern is defined for shaped recipe " + p_126144_ + "!");
         } else {
@@ -125,16 +125,16 @@ public class LockedUpgradingRecipeBuilder implements RecipeBuilder {
     }
 
     public static class Result implements FinishedRecipe {
-        private final ResourceLocation id;
+        private final Identifier id;
         private final Item result;
         private final int count;
         private final String group;
         private final List<String> pattern;
         private final Map<Character, Ingredient> key;
         private final Advancement.Builder advancement;
-        private final ResourceLocation advancementId;
+        private final Identifier advancementId;
 
-        public Result(ResourceLocation p_176754_, Item p_176755_, int p_176756_, String p_176757_, List<String> p_176758_, Map<Character, Ingredient> p_176759_, Advancement.Builder p_176760_, ResourceLocation p_176761_) {
+        public Result(Identifier p_176754_, Item p_176755_, int p_176756_, String p_176757_, List<String> p_176758_, Map<Character, Ingredient> p_176759_, Advancement.Builder p_176760_, Identifier p_176761_) {
             this.id = p_176754_;
             this.result = p_176755_;
             this.count = p_176756_;
@@ -177,7 +177,7 @@ public class LockedUpgradingRecipeBuilder implements RecipeBuilder {
             return StorageRecipeSerializers.LOCKED_UPGRADING.get();
         }
 
-        public ResourceLocation getId() {
+        public Identifier getId() {
             return this.id;
         }
 
@@ -187,7 +187,7 @@ public class LockedUpgradingRecipeBuilder implements RecipeBuilder {
         }
 
         @Nullable
-        public ResourceLocation getAdvancementId() {
+        public Identifier getAdvancementId() {
             return this.advancementId;
         }
     }

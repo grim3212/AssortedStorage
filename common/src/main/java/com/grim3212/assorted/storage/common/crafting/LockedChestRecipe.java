@@ -5,7 +5,7 @@ import com.grim3212.assorted.lib.util.LibCommonTags;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.AirItem;
 import net.minecraft.world.item.Item;
@@ -20,7 +20,7 @@ public class LockedChestRecipe extends CustomRecipe {
 
     public static final SimpleCraftingRecipeSerializer<LockedChestRecipe> SERIALIZER = new SimpleCraftingRecipeSerializer<>(LockedChestRecipe::new);
 
-    public LockedChestRecipe(ResourceLocation id, CraftingBookCategory category) {
+    public LockedChestRecipe(Identifier id, CraftingBookCategory category) {
         super(id, category);
     }
 

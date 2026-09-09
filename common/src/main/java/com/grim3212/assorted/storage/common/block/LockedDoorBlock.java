@@ -11,7 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
@@ -46,7 +46,7 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockClo
         this.parent = parent;
     }
 
-    public LockedDoorBlock(ResourceLocation parent, BlockSetType type, Properties builder) {
+    public LockedDoorBlock(Identifier parent, BlockSetType type, Properties builder) {
         super(builder, type);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(OPEN, false).setValue(HINGE, DoorHingeSide.LEFT).setValue(POWERED, false).setValue(HALF, DoubleBlockHalf.LOWER));
         this.parent = Services.PLATFORM.getRegistry(Registries.BLOCK).getValue(parent).orElse(Blocks.AIR);

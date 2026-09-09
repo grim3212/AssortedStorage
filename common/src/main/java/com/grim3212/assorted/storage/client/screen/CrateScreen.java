@@ -22,7 +22,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.DyeColor;
@@ -35,8 +35,8 @@ import java.util.Optional;
 
 public class CrateScreen extends AbstractContainerScreen<CrateContainer> implements MenuAccess<CrateContainer> {
 
-    protected static final ResourceLocation CHECKBOX_LOCATION = new ResourceLocation("textures/gui/checkbox.png");
-    private static final ResourceLocation TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/container/crate.png");
+    protected static final Identifier CHECKBOX_LOCATION = Identifier.parse("textures/gui/checkbox.png");
+    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/crate.png");
     private ItemStack renderStack;
 
     public CrateScreen(CrateContainer container, Inventory playerInventory, Component title) {

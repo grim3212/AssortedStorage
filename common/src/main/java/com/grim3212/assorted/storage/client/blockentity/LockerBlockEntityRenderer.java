@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -26,7 +26,7 @@ public class LockerBlockEntityRenderer<T extends BlockEntity & IStorage> impleme
 
     private final LockerModel model;
     private final DualLockerModel dualModel;
-    private static final ResourceLocation LOCKER_TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/model/locker.png");
+    private static final Identifier LOCKER_TEXTURE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/model/locker.png");
 
     public LockerBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
         this.model = new LockerModel(context.getModelSet().bakeLayer(StorageModelLayers.LOCKER));

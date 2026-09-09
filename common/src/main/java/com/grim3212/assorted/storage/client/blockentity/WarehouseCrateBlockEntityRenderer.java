@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -24,15 +24,15 @@ import net.minecraft.world.level.block.state.properties.WoodType;
 public class WarehouseCrateBlockEntityRenderer<T extends BlockEntity & IStorage> implements BlockEntityRenderer<T> {
 
     private final WarehouseCrateModel model;
-    private static final ResourceLocation OAK = new ResourceLocation(Constants.MOD_ID, "textures/model/warehouse_crate/oak.png");
-    private static final ResourceLocation BIRCH = new ResourceLocation(Constants.MOD_ID, "textures/model/warehouse_crate/birch.png");
-    private static final ResourceLocation SPRUCE = new ResourceLocation(Constants.MOD_ID, "textures/model/warehouse_crate/spruce.png");
-    private static final ResourceLocation ACACIA = new ResourceLocation(Constants.MOD_ID, "textures/model/warehouse_crate/acacia.png");
-    private static final ResourceLocation DARK_OAK = new ResourceLocation(Constants.MOD_ID, "textures/model/warehouse_crate/dark_oak.png");
-    private static final ResourceLocation JUNGLE = new ResourceLocation(Constants.MOD_ID, "textures/model/warehouse_crate/jungle.png");
-    private static final ResourceLocation WARPED = new ResourceLocation(Constants.MOD_ID, "textures/model/warehouse_crate/warped.png");
-    private static final ResourceLocation CRIMSON = new ResourceLocation(Constants.MOD_ID, "textures/model/warehouse_crate/crimson.png");
-    private static final ResourceLocation MANGROVE = new ResourceLocation(Constants.MOD_ID, "textures/model/warehouse_crate/mangrove.png");
+    private static final Identifier OAK = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/model/warehouse_crate/oak.png");
+    private static final Identifier BIRCH = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/model/warehouse_crate/birch.png");
+    private static final Identifier SPRUCE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/model/warehouse_crate/spruce.png");
+    private static final Identifier ACACIA = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/model/warehouse_crate/acacia.png");
+    private static final Identifier DARK_OAK = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/model/warehouse_crate/dark_oak.png");
+    private static final Identifier JUNGLE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/model/warehouse_crate/jungle.png");
+    private static final Identifier WARPED = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/model/warehouse_crate/warped.png");
+    private static final Identifier CRIMSON = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/model/warehouse_crate/crimson.png");
+    private static final Identifier MANGROVE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/model/warehouse_crate/mangrove.png");
 
     public WarehouseCrateBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
         this.model = new WarehouseCrateModel(context.getModelSet().bakeLayer(StorageModelLayers.WAREHOUSE_CRATE));
@@ -72,7 +72,7 @@ public class WarehouseCrateBlockEntityRenderer<T extends BlockEntity & IStorage>
         }
     }
 
-    private ResourceLocation getTexture(WoodType wood) {
+    private Identifier getTexture(WoodType wood) {
         switch (wood.name()) {
             case "oak":
                 return OAK;

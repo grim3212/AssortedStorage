@@ -16,7 +16,7 @@ import com.grim3212.assorted.storage.api.crates.CrateConnection;
 import com.grim3212.assorted.storage.api.crates.ICrateSystem;
 import com.grim3212.assorted.storage.common.inventory.crates.CrateControllerInvWrapper;
 import com.grim3212.assorted.storage.common.properties.StorageModelProperties;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;

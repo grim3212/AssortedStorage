@@ -9,22 +9,22 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 public class BagScreen extends AbstractContainerScreen<BagContainer> implements MenuAccess<BagContainer> {
 
-    private static final ResourceLocation CHEST_GUI_TEXTURE_9_COLS = new ResourceLocation(Constants.MOD_ID, "textures/gui/container/generic_9x9.png");
-    private static final ResourceLocation CHEST_GUI_TEXTURE_10_COLS = new ResourceLocation(Constants.MOD_ID, "textures/gui/container/generic_9x10.png");
-    private static final ResourceLocation CHEST_GUI_TEXTURE_11_COLS = new ResourceLocation(Constants.MOD_ID, "textures/gui/container/generic_9x11.png");
-    private static final ResourceLocation CHEST_GUI_TEXTURE_12_COLS = new ResourceLocation(Constants.MOD_ID, "textures/gui/container/generic_9x12.png");
-    private static final ResourceLocation CHEST_GUI_TEXTURE_13_COLS = new ResourceLocation(Constants.MOD_ID, "textures/gui/container/generic_9x13.png");
-    private static final ResourceLocation CHEST_GUI_TEXTURE_14_COLS = new ResourceLocation(Constants.MOD_ID, "textures/gui/container/generic_9x14.png");
+    private static final Identifier CHEST_GUI_TEXTURE_9_COLS = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/generic_9x9.png");
+    private static final Identifier CHEST_GUI_TEXTURE_10_COLS = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/generic_9x10.png");
+    private static final Identifier CHEST_GUI_TEXTURE_11_COLS = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/generic_9x11.png");
+    private static final Identifier CHEST_GUI_TEXTURE_12_COLS = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/generic_9x12.png");
+    private static final Identifier CHEST_GUI_TEXTURE_13_COLS = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/generic_9x13.png");
+    private static final Identifier CHEST_GUI_TEXTURE_14_COLS = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/generic_9x14.png");
     private final StorageMaterial storageMaterial;
 
     private final int textureXSize;
     private final int textureYSize;
-    private final ResourceLocation inventoryTexture;
+    private final Identifier inventoryTexture;
     private final int startOfPlayerInventoryY = 180;
     private final int heightOfPlayerInvetory = 96;
 

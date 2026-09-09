@@ -12,7 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -32,7 +32,7 @@ import java.util.List;
 
 public class GoldSafeBlock extends BaseStorageBlock {
 
-    public static final ResourceLocation CONTENTS = new ResourceLocation(Constants.MOD_ID, "contents");
+    public static final Identifier CONTENTS = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "contents");
 
     public GoldSafeBlock(Properties properties) {
         super(properties.requiresCorrectToolForDrops().strength(50.0F, 1200.0F));

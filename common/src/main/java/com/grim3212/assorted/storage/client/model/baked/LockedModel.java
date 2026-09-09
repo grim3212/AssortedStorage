@@ -9,16 +9,16 @@ import com.grim3212.assorted.storage.Constants;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Function;
 
 public class LockedModel implements IModelSpecification<LockedModel> {
 
-    public static final ResourceLocation LOADER_NAME = new ResourceLocation(Constants.MOD_ID, "locked");
+    public static final Identifier LOADER_NAME = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "locked");
 
     private final BlockModel unbakedUnlockedModel;
     private final BlockModel unbakedLockedModel;
@@ -29,7 +29,7 @@ public class LockedModel implements IModelSpecification<LockedModel> {
     }
 
     @Override
-    public BakedModel bake(IModelBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ResourceLocation modelLocation) {
+    public BakedModel bake(IModelBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, Identifier modelLocation) {
         this.unbakedUnlockedModel.resolveParents(baker::getModel);
         this.unbakedLockedModel.resolveParents(baker::getModel);
 

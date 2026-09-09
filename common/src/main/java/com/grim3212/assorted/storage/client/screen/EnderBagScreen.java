@@ -8,16 +8,16 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 public class EnderBagScreen extends AbstractContainerScreen<EnderBagContainer> implements MenuAccess<EnderBagContainer> {
 
-    private static final ResourceLocation CHEST_GUI_TEXTURE_9_COLS = new ResourceLocation(Constants.MOD_ID, "textures/gui/container/generic_9x9.png");
+    private static final Identifier CHEST_GUI_TEXTURE_9_COLS = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/generic_9x9.png");
 
     private final int textureXSize;
     private final int textureYSize;
-    private final ResourceLocation inventoryTexture;
+    private final Identifier inventoryTexture;
     private final int startOfPlayerInventoryY = 180;
     private final int heightOfPlayerInvetory = 96;
 

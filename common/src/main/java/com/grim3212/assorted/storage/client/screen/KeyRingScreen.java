@@ -7,12 +7,12 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 public class KeyRingScreen extends AbstractContainerScreen<KeyRingContainer> implements MenuAccess<KeyRingContainer> {
 
-    private static final ResourceLocation KEY_RING_GUI_TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/container/key_ring.png");
+    private static final Identifier KEY_RING_GUI_TEXTURE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/key_ring.png");
 
     public KeyRingScreen(KeyRingContainer container, Inventory playerInventory, Component title) {
         super(container, playerInventory, title);

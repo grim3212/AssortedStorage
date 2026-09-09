@@ -2,25 +2,25 @@ package com.grim3212.assorted.storage.client.data;
 
 import com.google.gson.JsonObject;
 import com.grim3212.assorted.storage.client.model.baked.LockedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class LockedModelBuilder extends ModelBuilder<LockedModelBuilder> {
 
-    private ResourceLocation unlockedModel;
-    private ResourceLocation lockedModel;
+    private Identifier unlockedModel;
+    private Identifier lockedModel;
 
-    protected LockedModelBuilder(ResourceLocation outputLocation, ExistingFileHelper existingFileHelper) {
+    protected LockedModelBuilder(Identifier outputLocation, ExistingFileHelper existingFileHelper) {
         super(outputLocation, existingFileHelper);
     }
 
-    public LockedModelBuilder unlockedModel(ResourceLocation unlockedModel) {
+    public LockedModelBuilder unlockedModel(Identifier unlockedModel) {
         this.unlockedModel = unlockedModel;
         return this;
     }
 
-    public LockedModelBuilder lockedModel(ResourceLocation lockedModel) {
+    public LockedModelBuilder lockedModel(Identifier lockedModel) {
         this.lockedModel = lockedModel;
         return this;
     }

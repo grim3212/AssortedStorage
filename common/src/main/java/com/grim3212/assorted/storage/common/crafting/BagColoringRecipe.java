@@ -5,7 +5,7 @@ import com.grim3212.assorted.lib.util.LibCommonTags;
 import com.grim3212.assorted.lib.util.NBTHelper;
 import com.grim3212.assorted.storage.common.item.BagItem;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -20,7 +20,7 @@ public class BagColoringRecipe extends CustomRecipe {
 
     public static final SimpleCraftingRecipeSerializer<BagColoringRecipe> SERIALIZER = new SimpleCraftingRecipeSerializer<>(BagColoringRecipe::new);
 
-    public BagColoringRecipe(ResourceLocation location, CraftingBookCategory category) {
+    public BagColoringRecipe(Identifier location, CraftingBookCategory category) {
         super(location, category);
     }
 

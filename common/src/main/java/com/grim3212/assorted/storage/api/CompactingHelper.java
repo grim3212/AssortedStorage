@@ -5,7 +5,7 @@ import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.lib.registry.ILoaderRegistry;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -190,10 +190,10 @@ public class CompactingHelper {
 
     private ItemStack findSameItems(ItemStack stack, List<ItemStack> ingredientItems) {
         ILoaderRegistry<Item> itemRegistry = Services.PLATFORM.getRegistry(Registries.ITEM);
-        ResourceLocation stackKey = itemRegistry.getRegistryName(stack.getItem());
+        Identifier stackKey = itemRegistry.getRegistryName(stack.getItem());
         if (stackKey != null) {
             ItemStack firstMatch = ingredientItems.stream().filter(x -> {
-                ResourceLocation optionKey = itemRegistry.getRegistryName(x.getItem());
+                Identifier optionKey = itemRegistry.getRegistryName(x.getItem());
                 return optionKey != null && stackKey.getNamespace().equals(optionKey.getNamespace());
             }).findFirst().orElse(ItemStack.EMPTY);
 

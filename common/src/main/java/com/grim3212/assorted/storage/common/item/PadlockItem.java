@@ -12,7 +12,7 @@ import com.grim3212.assorted.storage.common.block.blockentity.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -73,22 +73,22 @@ public class PadlockItem extends CombinationItem {
 
         ILoaderRegistry<Block> blockRegistry = Services.PLATFORM.getRegistry(Registries.BLOCK);
 
-        Block quartzDoor = blockRegistry.getValue(new ResourceLocation("assorteddecor:quartz_door")).orElse(Blocks.AIR);
+        Block quartzDoor = blockRegistry.getValue(Identifier.parse("assorteddecor:quartz_door")).orElse(Blocks.AIR);
         if (quartzDoor != Blocks.AIR) {
             lockMappings.put(quartzDoor, StorageBlocks.LOCKED_QUARTZ_DOOR.get());
         }
 
-        Block glassDoor = blockRegistry.getValue(new ResourceLocation("assorteddecor:glass_door")).orElse(Blocks.AIR);
+        Block glassDoor = blockRegistry.getValue(Identifier.parse("assorteddecor:glass_door")).orElse(Blocks.AIR);
         if (glassDoor != Blocks.AIR) {
             lockMappings.put(glassDoor, StorageBlocks.LOCKED_GLASS_DOOR.get());
         }
 
-        Block steelDoor = blockRegistry.getValue(new ResourceLocation("assorteddecor:steel_door")).orElse(Blocks.AIR);
+        Block steelDoor = blockRegistry.getValue(Identifier.parse("assorteddecor:steel_door")).orElse(Blocks.AIR);
         if (steelDoor != Blocks.AIR) {
             lockMappings.put(steelDoor, StorageBlocks.LOCKED_STEEL_DOOR.get());
         }
 
-        Block chainLinkDoor = blockRegistry.getValue(new ResourceLocation("assorteddecor:chain_link_door")).orElse(Blocks.AIR);
+        Block chainLinkDoor = blockRegistry.getValue(Identifier.parse("assorteddecor:chain_link_door")).orElse(Blocks.AIR);
         if (chainLinkDoor != Blocks.AIR) {
             lockMappings.put(chainLinkDoor, StorageBlocks.LOCKED_CHAIN_LINK_DOOR.get());
         }

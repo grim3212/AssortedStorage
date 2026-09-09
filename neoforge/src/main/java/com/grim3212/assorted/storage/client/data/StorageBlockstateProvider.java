@@ -8,7 +8,7 @@ import com.grim3212.assorted.storage.common.block.*;
 import com.grim3212.assorted.storage.common.block.StorageBlocks.CrateGroup;
 import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -26,9 +26,9 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 
     private final LockedModelProvider loaderModels;
 
-    private final Map<Block, ResourceLocation> blocks;
+    private final Map<Block, Identifier> blocks;
 
-    private static final ResourceLocation CUTOUT_RENDER_TYPE = new ResourceLocation("minecraft:cutout");
+    private static final Identifier CUTOUT_RENDER_TYPE = Identifier.parse("minecraft:cutout");
 
     public StorageBlockstateProvider(PackOutput output, ExistingFileHelper exFileHelper, LockedModelProvider loader) {
         super(output, Constants.MOD_ID, exFileHelper);
@@ -36,24 +36,24 @@ public class StorageBlockstateProvider extends BlockStateProvider {
 
         this.blocks = new HashMap<>();
 
-        blocks.put(StorageBlocks.WOOD_CABINET.get(), new ResourceLocation(Constants.MOD_ID, "block/cabinet_break"));
-        blocks.put(StorageBlocks.GLASS_CABINET.get(), new ResourceLocation(Constants.MOD_ID, "block/cabinet_break"));
-        blocks.put(StorageBlocks.GOLD_SAFE.get(), new ResourceLocation("block/gold_block"));
-        blocks.put(StorageBlocks.LOCKED_ENDER_CHEST.get(), new ResourceLocation("block/obsidian"));
-        blocks.put(StorageBlocks.OBSIDIAN_SAFE.get(), new ResourceLocation("block/obsidian"));
-        blocks.put(StorageBlocks.LOCKER.get(), new ResourceLocation("block/iron_block"));
-        blocks.put(StorageBlocks.ITEM_TOWER.get(), new ResourceLocation("block/iron_block"));
-        blocks.put(StorageBlocks.OAK_WAREHOUSE_CRATE.get(), new ResourceLocation("block/oak_log_top"));
-        blocks.put(StorageBlocks.BIRCH_WAREHOUSE_CRATE.get(), new ResourceLocation("block/birch_log_top"));
-        blocks.put(StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get(), new ResourceLocation("block/spruce_log_top"));
-        blocks.put(StorageBlocks.ACACIA_WAREHOUSE_CRATE.get(), new ResourceLocation("block/acacia_log_top"));
-        blocks.put(StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get(), new ResourceLocation("block/dark_oak_log_top"));
-        blocks.put(StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get(), new ResourceLocation("block/jungle_log_top"));
-        blocks.put(StorageBlocks.WARPED_WAREHOUSE_CRATE.get(), new ResourceLocation("block/warped_stem_top"));
-        blocks.put(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get(), new ResourceLocation("block/crimson_stem_top"));
-        blocks.put(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get(), new ResourceLocation("block/mangrove_log_top"));
-        blocks.put(StorageBlocks.LOCKED_CHEST.get(), new ResourceLocation("block/oak_planks"));
-        blocks.put(StorageBlocks.LOCKED_SHULKER_BOX.get(), new ResourceLocation("block/shulker_box"));
+        blocks.put(StorageBlocks.WOOD_CABINET.get(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "block/cabinet_break"));
+        blocks.put(StorageBlocks.GLASS_CABINET.get(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "block/cabinet_break"));
+        blocks.put(StorageBlocks.GOLD_SAFE.get(), Identifier.parse("block/gold_block"));
+        blocks.put(StorageBlocks.LOCKED_ENDER_CHEST.get(), Identifier.parse("block/obsidian"));
+        blocks.put(StorageBlocks.OBSIDIAN_SAFE.get(), Identifier.parse("block/obsidian"));
+        blocks.put(StorageBlocks.LOCKER.get(), Identifier.parse("block/iron_block"));
+        blocks.put(StorageBlocks.ITEM_TOWER.get(), Identifier.parse("block/iron_block"));
+        blocks.put(StorageBlocks.OAK_WAREHOUSE_CRATE.get(), Identifier.parse("block/oak_log_top"));
+        blocks.put(StorageBlocks.BIRCH_WAREHOUSE_CRATE.get(), Identifier.parse("block/birch_log_top"));
+        blocks.put(StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get(), Identifier.parse("block/spruce_log_top"));
+        blocks.put(StorageBlocks.ACACIA_WAREHOUSE_CRATE.get(), Identifier.parse("block/acacia_log_top"));
+        blocks.put(StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get(), Identifier.parse("block/dark_oak_log_top"));
+        blocks.put(StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get(), Identifier.parse("block/jungle_log_top"));
+        blocks.put(StorageBlocks.WARPED_WAREHOUSE_CRATE.get(), Identifier.parse("block/warped_stem_top"));
+        blocks.put(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get(), Identifier.parse("block/crimson_stem_top"));
+        blocks.put(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get(), Identifier.parse("block/mangrove_log_top"));
+        blocks.put(StorageBlocks.LOCKED_CHEST.get(), Identifier.parse("block/oak_planks"));
+        blocks.put(StorageBlocks.LOCKED_SHULKER_BOX.get(), Identifier.parse("block/shulker_box"));
 
         for (IRegistryObject<LockedChestBlock> b : StorageBlocks.CHESTS.values()) {
             blocks.put(b.get(), b.get().getStorageMaterial().getParticle());
@@ -73,7 +73,7 @@ public class StorageBlockstateProvider extends BlockStateProvider {
     protected void registerStatesAndModels() {
         blocks.forEach((block, tex) -> particleOnly(block, tex));
 
-        ModelFile model = models().cube(prefix("locksmith_workbench"), new ResourceLocation("block/oak_planks"), new ResourceLocation(prefix("block/locksmith_top")), new ResourceLocation(prefix("block/locksmith_front")), new ResourceLocation(prefix("block/locksmith_side")), new ResourceLocation(prefix("block/locksmith_side")), new ResourceLocation(prefix("block/locksmith_front"))).texture("particle", prefix("block/locksmith_front"));
+        ModelFile model = models().cube(prefix("locksmith_workbench"), Identifier.parse("block/oak_planks"), Identifier.parse(prefix("block/locksmith_top")), Identifier.parse(prefix("block/locksmith_front")), Identifier.parse(prefix("block/locksmith_side")), Identifier.parse(prefix("block/locksmith_side")), Identifier.parse(prefix("block/locksmith_front"))).texture("particle", prefix("block/locksmith_front"));
         simpleBlock(StorageBlocks.LOCKSMITH_WORKBENCH.get(), model);
         genericBlock(StorageBlocks.LOCKSMITH_WORKBENCH.get());
 
@@ -121,11 +121,11 @@ public class StorageBlockstateProvider extends BlockStateProvider {
         this.loaderModels.previousModels();
     }
 
-    private void door(DoorBlock block, ResourceLocation bottom, ResourceLocation top) {
+    private void door(DoorBlock block, Identifier bottom, Identifier top) {
         doorBlockCutoutInternal(block, ForgeRegistries.BLOCKS.getKey(block).toString(), bottom, top);
     }
 
-    private void doorBlockCutoutInternal(DoorBlock block, String baseName, ResourceLocation bottom, ResourceLocation top) {
+    private void doorBlockCutoutInternal(DoorBlock block, String baseName, Identifier bottom, Identifier top) {
         ModelFile bottomLeft = models().doorBottomLeft(baseName + "_bottom_left", bottom, top).renderType(CUTOUT_RENDER_TYPE);
         ModelFile bottomLeftOpen = models().doorBottomLeftOpen(baseName + "_bottom_left_open", bottom, top).renderType(CUTOUT_RENDER_TYPE);
         ModelFile bottomRight = models().doorBottomRight(baseName + "_bottom_right", bottom, top).renderType(CUTOUT_RENDER_TYPE);
@@ -140,10 +140,10 @@ public class StorageBlockstateProvider extends BlockStateProvider {
     private void createCrateController() {
         Block b = StorageBlocks.CRATE_CONTROLLER.get();
         String controllerName = name(b);
-        ResourceLocation controllerTop = resource("block/crates/crate_top");
-        ResourceLocation controllerSide = resource("block/crates/crate_controller_side");
-        ResourceLocation controllerFront = resource("block/crates/crate_controller_front");
-        ResourceLocation controllerFrontLocked = resource("block/crates/crate_controller_front_locked");
+        Identifier controllerTop = resource("block/crates/crate_top");
+        Identifier controllerSide = resource("block/crates/crate_controller_side");
+        Identifier controllerFront = resource("block/crates/crate_controller_front");
+        Identifier controllerFrontLocked = resource("block/crates/crate_controller_front_locked");
         ModelFile controllerUnlockedModel = models().orientable(controllerName + "_unlocked", controllerSide, controllerFront, controllerTop);
         ModelFile controllerLockedModel = models().orientable(controllerName + "_locked", controllerSide, controllerFrontLocked, controllerTop);
 
@@ -187,7 +187,7 @@ public class StorageBlockstateProvider extends BlockStateProvider {
     private void createStorageCrate(CrateBlock b) {
         CrateLayout layout = b.getLayout();
         String name = b.getWoodType() != null ? b.getWoodType().toString() : name(b);
-        ResourceLocation sideTexture = b.getWoodType() != null ? new ResourceLocation("block/" + b.getWoodType().getLogTextureName()) : resource("block/crates/" + name + "_sides");
+        Identifier sideTexture = b.getWoodType() != null ? Identifier.parse("block/" + b.getWoodType().getLogTextureName()) : resource("block/crates/" + name + "_sides");
 
         //@formatter:off
         BlockModelBuilder storageCrateModel = models().withExistingParent(name(b), prefix("block/base_crate_" + layout.getName()))
@@ -634,10 +634,10 @@ public class StorageBlockstateProvider extends BlockStateProvider {
     }
 
     private void createNormalHopper(LockedHopperBlock b) {
-        ModelFile unlocked = models().getExistingFile(new ResourceLocation("block/hopper"));
-        ModelFile locked = models().withExistingParent(name(b) + "_locked", new ResourceLocation(prefix("block/template_hopper")));
-        ModelFile unlockedSide = models().getExistingFile(new ResourceLocation("block/hopper_side"));
-        ModelFile lockedSide = models().withExistingParent(name(b) + "_locked_side", new ResourceLocation(prefix("block/template_hopper_side")));
+        ModelFile unlocked = models().getExistingFile(Identifier.parse("block/hopper"));
+        ModelFile locked = models().withExistingParent(name(b) + "_locked", Identifier.parse(prefix("block/template_hopper")));
+        ModelFile unlockedSide = models().getExistingFile(Identifier.parse("block/hopper_side"));
+        ModelFile lockedSide = models().withExistingParent(name(b) + "_locked_side", Identifier.parse(prefix("block/template_hopper_side")));
 
         LockedModelBuilder hopperModel = this.loaderModels.getBuilder(name(b)).unlockedModel(unlocked.getLocation()).lockedModel(locked.getLocation());
         LockedModelBuilder hopperSideModel = this.loaderModels.getBuilder(name(b) + "_side").unlockedModel(unlockedSide.getLocation()).lockedModel(lockedSide.getLocation());
@@ -666,14 +666,14 @@ public class StorageBlockstateProvider extends BlockStateProvider {
     private void createMaterialHopper(LockedHopperBlock b) {
         StorageMaterial material = b.getStorageMaterial();
 
-        ModelFile unlocked = models().withExistingParent(name(b) + "_unlocked", new ResourceLocation("block/hopper")).texture("particle", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("top", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_top"))).texture("side", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("inside",
-                new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_inside")));
-        ModelFile locked = models().withExistingParent(name(b) + "_locked", new ResourceLocation(prefix("block/template_hopper"))).texture("particle", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("top", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_top"))).texture("side", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside")))
-                .texture("inside", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_inside"))).texture("topsides", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/locked_hopper_outside")));
-        ModelFile unlockedSide = models().withExistingParent(name(b) + "_unlocked_side", new ResourceLocation("block/hopper_side")).texture("particle", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("top", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_top"))).texture("side", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("inside",
-                new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_inside")));
-        ModelFile lockedSide = models().withExistingParent(name(b) + "_locked_side", new ResourceLocation(prefix("block/template_hopper_side"))).texture("particle", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("top", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_top"))).texture("side", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_outside")))
-                .texture("inside", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/hopper_inside"))).texture("topsides", new ResourceLocation(prefix("block/hoppers/" + material.toString() + "/locked_hopper_outside")));
+        ModelFile unlocked = models().withExistingParent(name(b) + "_unlocked", Identifier.parse("block/hopper")).texture("particle", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("top", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_top"))).texture("side", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("inside",
+                Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_inside")));
+        ModelFile locked = models().withExistingParent(name(b) + "_locked", Identifier.parse(prefix("block/template_hopper"))).texture("particle", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("top", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_top"))).texture("side", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_outside")))
+                .texture("inside", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_inside"))).texture("topsides", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/locked_hopper_outside")));
+        ModelFile unlockedSide = models().withExistingParent(name(b) + "_unlocked_side", Identifier.parse("block/hopper_side")).texture("particle", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("top", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_top"))).texture("side", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("inside",
+                Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_inside")));
+        ModelFile lockedSide = models().withExistingParent(name(b) + "_locked_side", Identifier.parse(prefix("block/template_hopper_side"))).texture("particle", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_outside"))).texture("top", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_top"))).texture("side", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_outside")))
+                .texture("inside", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/hopper_inside"))).texture("topsides", Identifier.parse(prefix("block/hoppers/" + material.toString() + "/locked_hopper_outside")));
 
         LockedModelBuilder hopperModel = this.loaderModels.getBuilder(name(b)).unlockedModel(unlocked.getLocation()).lockedModel(locked.getLocation());
         LockedModelBuilder hopperSideModel = this.loaderModels.getBuilder(name(b) + "_side").unlockedModel(unlockedSide.getLocation()).lockedModel(lockedSide.getLocation());
@@ -700,9 +700,9 @@ public class StorageBlockstateProvider extends BlockStateProvider {
     }
 
     private void createNormalBarrel(LockedBarrelBlock b) {
-        ModelFile unlocked = models().cubeBottomTop(name(b) + "_unlocked", new ResourceLocation("block/barrel_side"), new ResourceLocation("block/barrel_bottom"), new ResourceLocation("block/barrel_top"));
-        ModelFile locked = models().cubeBottomTop(name(b) + "_locked", new ResourceLocation("block/barrel_side"), new ResourceLocation("block/barrel_bottom"), new ResourceLocation(prefix("block/barrels/locked_barrel_top")));
-        ModelFile open = models().cubeBottomTop(name(b) + "_open", new ResourceLocation("block/barrel_side"), new ResourceLocation("block/barrel_bottom"), new ResourceLocation("block/barrel_top_open"));
+        ModelFile unlocked = models().cubeBottomTop(name(b) + "_unlocked", Identifier.parse("block/barrel_side"), Identifier.parse("block/barrel_bottom"), Identifier.parse("block/barrel_top"));
+        ModelFile locked = models().cubeBottomTop(name(b) + "_locked", Identifier.parse("block/barrel_side"), Identifier.parse("block/barrel_bottom"), Identifier.parse(prefix("block/barrels/locked_barrel_top")));
+        ModelFile open = models().cubeBottomTop(name(b) + "_open", Identifier.parse("block/barrel_side"), Identifier.parse("block/barrel_bottom"), Identifier.parse("block/barrel_top_open"));
 
         LockedModelBuilder barrelModel = this.loaderModels.getBuilder(name(b)).unlockedModel(unlocked.getLocation()).lockedModel(locked.getLocation());
 
@@ -716,9 +716,9 @@ public class StorageBlockstateProvider extends BlockStateProvider {
     private void createMaterialBarrel(LockedBarrelBlock b) {
         StorageMaterial material = b.getStorageMaterial();
 
-        ModelFile unlocked = models().cubeBottomTop(name(b) + "_unlocked", new ResourceLocation(prefix("block/barrels/" + material.toString() + "/barrel_side")), new ResourceLocation(prefix("block/barrels/" + material.toString() + "/barrel_bottom")), new ResourceLocation(prefix("block/barrels/" + material.toString() + "/barrel_top")));
-        ModelFile locked = models().cubeBottomTop(name(b) + "_locked", new ResourceLocation(prefix("block/barrels/" + material.toString() + "/barrel_side")), new ResourceLocation(prefix("block/barrels/" + material.toString() + "/barrel_bottom")), new ResourceLocation(prefix("block/barrels/" + material.toString() + "/locked_barrel_top")));
-        ModelFile open = models().cubeBottomTop(name(b) + "_open", new ResourceLocation(prefix("block/barrels/" + material.toString() + "/barrel_side")), new ResourceLocation(prefix("block/barrels/" + material.toString() + "/barrel_bottom")), new ResourceLocation(prefix("block/barrels/" + material.toString() + "/barrel_top_open")));
+        ModelFile unlocked = models().cubeBottomTop(name(b) + "_unlocked", Identifier.parse(prefix("block/barrels/" + material.toString() + "/barrel_side")), Identifier.parse(prefix("block/barrels/" + material.toString() + "/barrel_bottom")), Identifier.parse(prefix("block/barrels/" + material.toString() + "/barrel_top")));
+        ModelFile locked = models().cubeBottomTop(name(b) + "_locked", Identifier.parse(prefix("block/barrels/" + material.toString() + "/barrel_side")), Identifier.parse(prefix("block/barrels/" + material.toString() + "/barrel_bottom")), Identifier.parse(prefix("block/barrels/" + material.toString() + "/locked_barrel_top")));
+        ModelFile open = models().cubeBottomTop(name(b) + "_open", Identifier.parse(prefix("block/barrels/" + material.toString() + "/barrel_side")), Identifier.parse(prefix("block/barrels/" + material.toString() + "/barrel_bottom")), Identifier.parse(prefix("block/barrels/" + material.toString() + "/barrel_top_open")));
 
         LockedModelBuilder barrelModel = this.loaderModels.getBuilder(name(b)).unlockedModel(unlocked.getLocation()).lockedModel(locked.getLocation());
 
@@ -734,7 +734,7 @@ public class StorageBlockstateProvider extends BlockStateProvider {
         return itemModels().withExistingParent(name, prefix("block/" + name));
     }
 
-    private void particleOnly(Block b, ResourceLocation particle) {
+    private void particleOnly(Block b, Identifier particle) {
         String name = name(b);
         ModelFile f = models().getBuilder(name).texture("particle", particle);
         simpleBlock(b, f);
@@ -748,7 +748,7 @@ public class StorageBlockstateProvider extends BlockStateProvider {
         return resource(name).toString();
     }
 
-    private ResourceLocation resource(String name) {
-        return new ResourceLocation(Constants.MOD_ID, name);
+    private Identifier resource(String name) {
+        return Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
     }
 }

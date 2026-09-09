@@ -7,7 +7,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +21,7 @@ public class StorageCraftingUtil {
     private static Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     public static Item getItem(String itemName, boolean disallowsAirInRecipe) {
-        ResourceLocation itemKey = new ResourceLocation(itemName);
+        Identifier itemKey = Identifier.parse(itemName);
         if (!Services.PLATFORM.getRegistry(Registries.ITEM).containsKey(itemKey))
             throw new JsonSyntaxException("Unknown item '" + itemName + "'");
 

@@ -14,7 +14,7 @@ import com.grim3212.assorted.storage.common.item.BagItem;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.DyeColor;
@@ -54,10 +54,10 @@ public class LockedUpgradingRecipe implements CraftingRecipe {
     final int height;
     final NonNullList<Ingredient> recipeItems;
     final ItemStack result;
-    private final ResourceLocation id;
+    private final Identifier id;
     final String group;
 
-    public LockedUpgradingRecipe(ResourceLocation p_44153_, String p_44154_, int p_44155_, int p_44156_, NonNullList<Ingredient> p_44157_, ItemStack p_44158_) {
+    public LockedUpgradingRecipe(Identifier p_44153_, String p_44154_, int p_44155_, int p_44156_, NonNullList<Ingredient> p_44157_, ItemStack p_44158_) {
         this.id = p_44153_;
         this.group = p_44154_;
         this.width = p_44155_;
@@ -67,7 +67,7 @@ public class LockedUpgradingRecipe implements CraftingRecipe {
     }
 
     @Override
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return this.id;
     }
 
@@ -309,7 +309,7 @@ public class LockedUpgradingRecipe implements CraftingRecipe {
     }
 
     public static class Serializer implements RecipeSerializer<LockedUpgradingRecipe> {
-        public LockedUpgradingRecipe fromJson(ResourceLocation p_44236_, JsonObject p_44237_) {
+        public LockedUpgradingRecipe fromJson(Identifier p_44236_, JsonObject p_44237_) {
             String s = GsonHelper.getAsString(p_44237_, "group", "");
             Map<String, Ingredient> map = LockedUpgradingRecipe.keyFromJson(GsonHelper.getAsJsonObject(p_44237_, "key"));
             String[] astring = LockedUpgradingRecipe.shrink(LockedUpgradingRecipe.patternFromJson(GsonHelper.getAsJsonArray(p_44237_, "pattern")));
@@ -320,7 +320,7 @@ public class LockedUpgradingRecipe implements CraftingRecipe {
             return new LockedUpgradingRecipe(p_44236_, s, i, j, nonnulllist, itemstack);
         }
 
-        public LockedUpgradingRecipe fromNetwork(ResourceLocation p_44239_, FriendlyByteBuf p_44240_) {
+        public LockedUpgradingRecipe fromNetwork(Identifier p_44239_, FriendlyByteBuf p_44240_) {
             int i = p_44240_.readVarInt();
             int j = p_44240_.readVarInt();
             String s = p_44240_.readUtf();

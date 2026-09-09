@@ -12,7 +12,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
@@ -21,7 +21,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class LocksmithWorkbenchScreen extends AbstractContainerScreen<LocksmithWorkbenchContainer> implements MenuAccess<LocksmithWorkbenchContainer>, ContainerListener {
 
-    private static final ResourceLocation GUI_TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/gui/container/locksmith_workbench.png");
+    private static final Identifier GUI_TEXTURE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/locksmith_workbench.png");
     private EditBox lockField;
 
     public LocksmithWorkbenchScreen(LocksmithWorkbenchContainer container, Inventory playerInventory, Component title) {

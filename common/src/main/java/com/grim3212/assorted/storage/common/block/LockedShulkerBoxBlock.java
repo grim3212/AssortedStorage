@@ -21,7 +21,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -66,7 +66,7 @@ import java.util.List;
 public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorageMaterial, IBlockMapColor {
 
     public static final EnumProperty<Direction> FACING = DirectionalBlock.FACING;
-    public static final ResourceLocation CONTENTS = new ResourceLocation(Constants.MOD_ID, "contents");
+    public static final Identifier CONTENTS = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "contents");
     private final StorageMaterial material;
 
     public LockedShulkerBoxBlock(StorageMaterial material) {

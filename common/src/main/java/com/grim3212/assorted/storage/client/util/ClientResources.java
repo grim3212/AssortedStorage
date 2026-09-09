@@ -2,10 +2,10 @@ package com.grim3212.assorted.storage.client.util;
 
 
 import com.grim3212.assorted.storage.Constants;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ClientResources {
 
-    public static ResourceLocation CRATE_ICONS_LOCATION = new ResourceLocation(Constants.MOD_ID, "textures/block/crates/icons.png");
+    public static Identifier CRATE_ICONS_LOCATION = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/block/crates/icons.png");
 
 }

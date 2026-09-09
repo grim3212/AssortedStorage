@@ -7,7 +7,7 @@ import com.grim3212.assorted.storage.common.inventory.LockedEnderChestInventory;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class EnderSavedData extends SavedData implements IEnderData {
 
-    private static final String OLD_ID = new ResourceLocation(Constants.MOD_ID, "ender_saved_data").toString();
+    private static final String OLD_ID = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "ender_saved_data").toString();
     private static final String ID = "locked_ender_saved_data";
     private static final String LOCKED_ENDER_TAG = "LockedEnderChests";
 

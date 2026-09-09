@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class ItemTowerBlockEntityRenderer<T extends BlockEntity & IStorage> implements BlockEntityRenderer<T> {
 
     private final ItemTowerModel model;
-    private static final ResourceLocation ITEM_TOWER_TEXTURE = new ResourceLocation(Constants.MOD_ID, "textures/model/item_tower.png");
+    private static final Identifier ITEM_TOWER_TEXTURE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/model/item_tower.png");
 
     public ItemTowerBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
         this.model = new ItemTowerModel(context.getModelSet().bakeLayer(StorageModelLayers.ITEM_TOWER));

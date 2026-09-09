@@ -6,8 +6,8 @@ import com.grim3212.assorted.storage.common.block.*;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import com.grim3212.assorted.storage.common.loot.ModLoadedLootCondition;
 import com.grim3212.assorted.storage.common.loot.OptionalLootItem;
-import net.minecraft.advancements.critereon.StatePropertiesPredicate;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.advancements.predicates.StatePropertiesPredicate;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
@@ -105,17 +105,17 @@ public class StorageBlockLoot extends LibBlockLootProvider {
         this.add(StorageBlocks.LOCKED_MANGROVE_DOOR.get(), createLockedDoorTable(StorageBlocks.LOCKED_MANGROVE_DOOR.get(), Blocks.MANGROVE_DOOR));
         this.add(StorageBlocks.LOCKED_WARPED_DOOR.get(), createLockedDoorTable(StorageBlocks.LOCKED_WARPED_DOOR.get(), Blocks.WARPED_DOOR));
 
-        this.add(StorageBlocks.LOCKED_STEEL_DOOR.get(), createDecorTable(StorageBlocks.LOCKED_STEEL_DOOR.get(), new ResourceLocation("assorteddecor:steel_door")));
-        this.add(StorageBlocks.LOCKED_CHAIN_LINK_DOOR.get(), createDecorTable(StorageBlocks.LOCKED_CHAIN_LINK_DOOR.get(), new ResourceLocation("assorteddecor:chain_link_door")));
-        this.add(StorageBlocks.LOCKED_QUARTZ_DOOR.get(), createDecorTable(StorageBlocks.LOCKED_QUARTZ_DOOR.get(), new ResourceLocation("assorteddecor:quartz_door")));
-        this.add(StorageBlocks.LOCKED_GLASS_DOOR.get(), createDecorTable(StorageBlocks.LOCKED_GLASS_DOOR.get(), new ResourceLocation("assorteddecor:glass_door")));
+        this.add(StorageBlocks.LOCKED_STEEL_DOOR.get(), createDecorTable(StorageBlocks.LOCKED_STEEL_DOOR.get(), Identifier.parse("assorteddecor:steel_door")));
+        this.add(StorageBlocks.LOCKED_CHAIN_LINK_DOOR.get(), createDecorTable(StorageBlocks.LOCKED_CHAIN_LINK_DOOR.get(), Identifier.parse("assorteddecor:chain_link_door")));
+        this.add(StorageBlocks.LOCKED_QUARTZ_DOOR.get(), createDecorTable(StorageBlocks.LOCKED_QUARTZ_DOOR.get(), Identifier.parse("assorteddecor:quartz_door")));
+        this.add(StorageBlocks.LOCKED_GLASS_DOOR.get(), createDecorTable(StorageBlocks.LOCKED_GLASS_DOOR.get(), Identifier.parse("assorteddecor:glass_door")));
     }
 
     private LootTable.Builder createLockedDoorTable(Block b, Block out) {
         return LootTable.lootTable().withPool(applyExplosionCondition(b, LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F)).add(LootItem.lootTableItem(out).when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(b).setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(DoorBlock.HALF, DoubleBlockHalf.LOWER))))));
     }
 
-    private LootTable.Builder createDecorTable(Block b, ResourceLocation decorBlockLoc) {
+    private LootTable.Builder createDecorTable(Block b, Identifier decorBlockLoc) {
         return LootTable.lootTable().withPool(applyExplosionCondition(b, LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F)).when(ModLoadedLootCondition.isModLoaded("assorteddecor")).add(OptionalLootItem.optionalLootTableItem(decorBlockLoc).when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(b).setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(DoorBlock.HALF, DoubleBlockHalf.LOWER))))));
     }
 

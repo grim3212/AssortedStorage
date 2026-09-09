@@ -6,7 +6,7 @@ import com.grim3212.assorted.storage.api.StorageTags;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.AirItem;
 import net.minecraft.world.item.DyeColor;
@@ -23,7 +23,7 @@ public class LockedShulkerBoxRecipe extends CustomRecipe {
 
     public static final SimpleCraftingRecipeSerializer<LockedShulkerBoxRecipe> SERIALIZER = new SimpleCraftingRecipeSerializer<>(LockedShulkerBoxRecipe::new);
 
-    public LockedShulkerBoxRecipe(ResourceLocation id, CraftingBookCategory category) {
+    public LockedShulkerBoxRecipe(Identifier id, CraftingBookCategory category) {
         super(id, category);
     }
 

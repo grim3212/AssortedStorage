@@ -18,10 +18,10 @@ import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.config.StorageClientConfig;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -100,22 +100,22 @@ public class StorageClient {
         ClampedItemPropertyFunction colorOverride = (stack, world, entity, seed) -> stack.hasTag() && stack.getTag().contains(BagItem.TAG_PRIMARY_COLOR) && stack.getTag().getInt(BagItem.TAG_PRIMARY_COLOR) >= 0 ? 1.0F : 0.0F;
         ClampedItemPropertyFunction lockOverride = (stack, world, entity, seed) -> StorageUtil.getCode(stack).isEmpty() ? 0.0F : 1.0F;
 
-        ClientServices.CLIENT.registerItemProperty(() -> StorageItems.BAG.get(), new ResourceLocation(Constants.MOD_ID, "color"), colorOverride);
-        ClientServices.CLIENT.registerItemProperty(() -> StorageItems.BAG.get(), new ResourceLocation(Constants.MOD_ID, "locked"), lockOverride);
-        ClientServices.CLIENT.registerItemProperty(() -> StorageItems.ENDER_BAG.get(), new ResourceLocation(Constants.MOD_ID, "locked"), lockOverride);
+        ClientServices.CLIENT.registerItemProperty(() -> StorageItems.BAG.get(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "color"), colorOverride);
+        ClientServices.CLIENT.registerItemProperty(() -> StorageItems.BAG.get(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "locked"), lockOverride);
+        ClientServices.CLIENT.registerItemProperty(() -> StorageItems.ENDER_BAG.get(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "locked"), lockOverride);
 
         for (Map.Entry<StorageMaterial, IRegistryObject<BagItem>> bag : StorageItems.BAGS.entrySet()) {
-            ClientServices.CLIENT.registerItemProperty(() -> bag.getValue().get(), new ResourceLocation(Constants.MOD_ID, "color"), colorOverride);
-            ClientServices.CLIENT.registerItemProperty(() -> bag.getValue().get(), new ResourceLocation(Constants.MOD_ID, "locked"), lockOverride);
+            ClientServices.CLIENT.registerItemProperty(() -> bag.getValue().get(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "color"), colorOverride);
+            ClientServices.CLIENT.registerItemProperty(() -> bag.getValue().get(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "locked"), lockOverride);
         }
 
         ClampedItemPropertyFunction shulkerColorOverride = (stack, world, entity, seed) -> Optional.ofNullable(stack.getTag())
                 .map(tag -> tag.contains("Color", Tag.TAG_INT) ? tag.getInt("Color") : null)
                 .orElse(-1);
 
-        ClientServices.CLIENT.registerItemProperty(() -> StorageBlocks.LOCKED_SHULKER_BOX.get().asItem(), new ResourceLocation(Constants.MOD_ID, "color"), shulkerColorOverride);
+        ClientServices.CLIENT.registerItemProperty(() -> StorageBlocks.LOCKED_SHULKER_BOX.get().asItem(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "color"), shulkerColorOverride);
         for (Map.Entry<StorageMaterial, IRegistryObject<LockedShulkerBoxBlock>> entry : StorageBlocks.SHULKERS.entrySet()) {
-            ClientServices.CLIENT.registerItemProperty(() -> entry.getValue().get().asItem(), new ResourceLocation(Constants.MOD_ID, "color"), shulkerColorOverride);
+            ClientServices.CLIENT.registerItemProperty(() -> entry.getValue().get().asItem(), Identifier.fromNamespaceAndPath(Constants.MOD_ID, "color"), shulkerColorOverride);
         }
 
         ClientServices.CLIENT.registerItemColor((stack, layer) -> {
