@@ -8,10 +8,11 @@ import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.item.BagItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -36,7 +37,10 @@ public class BagContainer extends AbstractContainerMenu {
         ItemStack stack = findBag(playerEntity);
 
         if (stack == null || stack.isEmpty()) {
-            playerEntity.closeContainer();
+            // closeContainer() is protected on Player now; only the server side can close a menu.
+            if (playerEntity instanceof ServerPlayer serverPlayer) {
+                serverPlayer.closeContainer();
+            }
             return;
         }
 
@@ -80,7 +84,10 @@ public class BagContainer extends AbstractContainerMenu {
             }
 
         } else {
-            playerEntity.closeContainer();
+            // closeContainer() is protected on Player now; only the server side can close a menu.
+            if (playerEntity instanceof ServerPlayer serverPlayer) {
+                serverPlayer.closeContainer();
+            }
         }
     }
 
@@ -96,12 +103,12 @@ public class BagContainer extends AbstractContainerMenu {
     }
 
     @Override
-    public void clicked(int slot, int dragType, ClickType clickTypeIn, Player player) {
+    public void clicked(int slot, int dragType, ContainerInput clickTypeIn, Player player) {
         if (slot >= 0) {
             if (getSlot(slot).getItem().getItem() instanceof BagItem)
                 return;
         }
-        if (clickTypeIn == ClickType.SWAP)
+        if (clickTypeIn == ContainerInput.SWAP)
             return;
 
         super.clicked(slot, dragType, clickTypeIn, player);
@@ -116,7 +123,7 @@ public class BagContainer extends AbstractContainerMenu {
         if (slot != null && slot.hasItem()) {
             // -1 to account for the lock slot we don't want to put items in
             int totalSlotSize = slots.size() - 1;
-            int bagSlotCount = totalSlotSize - playerIn.getInventory().items.size();
+            int bagSlotCount = totalSlotSize - playerIn.getInventory().getNonEquipmentItems().size();
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
             if (index < bagSlotCount) {

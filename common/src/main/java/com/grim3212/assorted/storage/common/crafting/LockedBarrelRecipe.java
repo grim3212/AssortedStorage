@@ -1,35 +1,33 @@
 package com.grim3212.assorted.storage.common.crafting;
 
+import com.mojang.serialization.MapCodec;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.util.LibCommonTags;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.StorageItems;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.AirItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.Level;
 
 public class LockedBarrelRecipe extends CustomRecipe {
 
-    public static final SimpleCraftingRecipeSerializer<LockedBarrelRecipe> SERIALIZER = new SimpleCraftingRecipeSerializer<>(LockedBarrelRecipe::new);
-
-    public LockedBarrelRecipe(Identifier id, CraftingBookCategory category) {
-        super(id, category);
-    }
+    public static final LockedBarrelRecipe INSTANCE = new LockedBarrelRecipe();
+    public static final MapCodec<LockedBarrelRecipe> MAP_CODEC = MapCodec.unit(INSTANCE);
+    public static final StreamCodec<RegistryFriendlyByteBuf, LockedBarrelRecipe> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+    public static final RecipeSerializer<LockedBarrelRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
 
     @Override
-    public boolean matches(CraftingContainer inv, Level worldIn) {
+    public boolean matches(CraftingInput inv, Level worldIn) {
         ItemStack barrel = ItemStack.EMPTY;
         ItemStack lock = ItemStack.EMPTY;
 
-        for (int i = 0; i < inv.getContainerSize(); i++) {
+        for (int i = 0; i < inv.size(); i++) {
             ItemStack stack = inv.getItem(i);
             if (stack.isEmpty())
                 continue;
@@ -47,11 +45,11 @@ public class LockedBarrelRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, RegistryAccess registryAccess) {
+    public ItemStack assemble(CraftingInput inv) {
         ItemStack barrel = ItemStack.EMPTY;
         ItemStack lock = ItemStack.EMPTY;
 
-        for (int i = 0; i < inv.getContainerSize(); i++) {
+        for (int i = 0; i < inv.size(); i++) {
             ItemStack stack = inv.getItem(i);
             Item item = stack.getItem();
             if (stack.is(LibCommonTags.Items.BARRELS_WOODEN) && barrel.isEmpty())
@@ -67,13 +65,9 @@ public class LockedBarrelRecipe extends CustomRecipe {
         return StorageUtil.setCodeOnStack(lockCode, new ItemStack(StorageBlocks.LOCKED_BARREL.get()));
     }
 
-    @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return width * height >= 2;
-    }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<LockedBarrelRecipe> getSerializer() {
         return SERIALIZER;
     }
 

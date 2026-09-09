@@ -23,6 +23,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity.AnimationStatus;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -55,11 +57,8 @@ public class LockedShulkerBoxBlockEntity extends BaseStorageBlockEntity {
         return this.color == null ? -1 : this.color.getId();
     }
 
-    public DyeColor colorFromCompound(CompoundTag tag) {
-        if (!tag.contains("Color"))
-            return null;
-
-        int color = tag.getInt("Color");
+    public DyeColor colorFromInput(ValueInput input) {
+        int color = input.getIntOr("Color", -1);
         return color == -1 ? null : DyeColor.byId(color);
     }
 
@@ -114,7 +113,7 @@ public class LockedShulkerBoxBlockEntity extends BaseStorageBlockEntity {
     private void moveCollidedEntities(Level level, BlockPos pos, BlockState state) {
         if (state.getBlock() instanceof LockedShulkerBoxBlock) {
             Direction direction = state.getValue(LockedShulkerBoxBlock.FACING);
-            AABB aabb = Shulker.getProgressDeltaAabb(direction, this.progressOld, this.progress).move(pos);
+            AABB aabb = Shulker.getProgressDeltaAabb(1.0F, direction, this.progressOld, this.progress, Vec3.atBottomCenterOf(pos));
             List<Entity> list = level.getEntities((Entity) null, aabb);
             if (!list.isEmpty()) {
                 for (int i = 0; i < list.size(); ++i) {
@@ -162,19 +161,19 @@ public class LockedShulkerBoxBlockEntity extends BaseStorageBlockEntity {
     }
 
     public AABB getBoundingBox(BlockState state) {
-        return Shulker.getProgressAabb(state.getValue(LockedShulkerBoxBlock.FACING), 0.5F * this.getProgress(1.0F));
+        return Shulker.getProgressAabb(1.0F, state.getValue(LockedShulkerBoxBlock.FACING), 0.5F * this.getProgress(1.0F), new Vec3(0.5D, 0.0D, 0.5D));
     }
 
     @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
-        this.color = colorFromCompound(compound);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        this.color = colorFromInput(input);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound) {
-        super.saveAdditional(compound);
-        compound.putInt("Color", this.colorToSave());
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("Color", this.colorToSave());
     }
 
     public float getProgress(float p_59658_) {
@@ -190,4 +189,36 @@ public class LockedShulkerBoxBlockEntity extends BaseStorageBlockEntity {
         return new LockedMaterialContainer(StorageContainerTypes.LOCKED_SHULKER_BOX.get(), windowId, player, this.getItemStackStorageHandler(), storageMaterial, true);
     }
 
+
+    /**
+     * The colour rides along with the lock in the item's custom data, which is what the item's own
+     * name and the block's setPlacedBy read back.
+     */
+    @Override
+    protected void writeCustomData(CompoundTag tag) {
+        super.writeCustomData(tag);
+        tag.putInt("Color", this.colorToSave());
+    }
+
+    @Override
+    protected void readCustomData(CompoundTag tag) {
+        super.readCustomData(tag);
+        int savedColor = tag.getIntOr("Color", -1);
+        this.color = savedColor == -1 ? null : DyeColor.byId(savedColor);
+    }
+
+    /**
+     * A locked shulker box keeps its contents and its lock in the dropped item, both through the
+     * loot table's dynamic CONTENTS drop and the data components the item carries, so nothing is
+     * dropped loose on removal.
+     */
+    @Override
+    protected boolean shouldDropContents() {
+        return false;
+    }
+
+    @Override
+    protected boolean shouldDropLock(BlockPos pos, BlockState state) {
+        return false;
+    }
 }

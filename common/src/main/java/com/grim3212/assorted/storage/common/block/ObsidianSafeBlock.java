@@ -30,7 +30,7 @@ public class ObsidianSafeBlock extends BaseStorageBlock {
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+	protected VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return SAFE_SHAPE;
 	}
 

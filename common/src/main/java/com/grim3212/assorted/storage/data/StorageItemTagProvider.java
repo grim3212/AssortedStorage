@@ -10,11 +10,15 @@ import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.item.upgrades.LevelUpgradeItem;
 import net.minecraft.core.HolderLookup.Provider;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
+import net.minecraft.data.tags.TagAppender;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 
 import java.util.Map.Entry;
@@ -30,7 +34,11 @@ public class StorageItemTagProvider extends LibItemTagProvider {
     }
 
     @Override
-    public void addCommonTags(Function<TagKey<Item>, IntrinsicTagAppender<Item>> tagger, BiConsumer<TagKey<Block>, TagKey<Item>> copier) {
+    public void addCommonTags(Function<TagKey<Item>, TagAppender<Item>> rawTagger, BiConsumer<TagKey<Block>, TagKey<Item>> copier) {
+        // A TagAppender takes ResourceKeys rather than the objects themselves now, so the appenders
+        // are wrapped to keep the call sites reading in terms of Items.
+        Function<TagKey<Item>, ItemTagAppender> tagger = (tag) -> new ItemTagAppender(rawTagger.apply(tag));
+
         tagger.apply(ItemTags.PIGLIN_LOVED).add(StorageBlocks.GOLD_SAFE.get().asItem(), StorageBlocks.CHESTS.get(StorageMaterial.GOLD).get().asItem(), StorageBlocks.BARRELS.get(StorageMaterial.GOLD).get().asItem(), StorageBlocks.HOPPERS.get(StorageMaterial.GOLD).get().asItem(), StorageBlocks.SHULKERS.get(StorageMaterial.GOLD).get().asItem(), StorageItems.LEVEL_UPGRADES.get(StorageMaterial.GOLD).get().asItem());
 
         copier.accept(StorageTags.Blocks.DEEPSLATE, StorageTags.Items.DEEPSLATE);
@@ -251,5 +259,36 @@ public class StorageItemTagProvider extends LibItemTagProvider {
         tagger.apply(StorageTags.Items.BAGS).add(StorageItems.ENDER_BAG.get());
         tagger.apply(StorageTags.Items.BAGS).addTag(StorageTags.Items.BAGS_LEVEL_0).addTag(StorageTags.Items.BAGS_LEVEL_1).addTag(StorageTags.Items.BAGS_LEVEL_2).addTag(StorageTags.Items.BAGS_LEVEL_3).addTag(StorageTags.Items.BAGS_LEVEL_4).addTag(StorageTags.Items.BAGS_LEVEL_5);
 
+    }
+
+    /**
+     * Adapts the vanilla {@link TagAppender}, which is keyed by {@link ResourceKey}, back to the
+     * ItemLike based calls this provider is written in terms of.
+     */
+    private record ItemTagAppender(TagAppender<Item> delegate) {
+
+        ItemTagAppender add(ItemLike item) {
+            this.delegate.add(BuiltInRegistries.ITEM.getResourceKey(item.asItem()).orElseThrow());
+            return this;
+        }
+
+        ItemTagAppender add(ItemLike... items) {
+            for (ItemLike item : items) {
+                this.add(item);
+            }
+            return this;
+        }
+
+        ItemTagAppender addAll(Iterable<Item> items) {
+            for (Item item : items) {
+                this.add(item);
+            }
+            return this;
+        }
+
+        ItemTagAppender addTag(TagKey<Item> tag) {
+            this.delegate.addTag(tag);
+            return this;
+        }
     }
 }

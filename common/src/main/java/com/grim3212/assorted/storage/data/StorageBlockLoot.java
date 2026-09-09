@@ -3,10 +3,11 @@ package com.grim3212.assorted.storage.data;
 import com.grim3212.assorted.lib.data.LibBlockLootProvider;
 import com.grim3212.assorted.lib.registry.IRegistryObject;
 import com.grim3212.assorted.storage.common.block.*;
-import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import com.grim3212.assorted.storage.common.loot.ModLoadedLootCondition;
 import com.grim3212.assorted.storage.common.loot.OptionalLootItem;
 import net.minecraft.advancements.predicates.StatePropertiesPredicate;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -14,15 +15,12 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.entries.DynamicLoot;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
-import net.minecraft.world.level.storage.loot.functions.CopyNameFunction;
-import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
-import net.minecraft.world.level.storage.loot.functions.SetContainerContents;
+import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
-import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 import java.util.ArrayList;
@@ -34,8 +32,8 @@ public class StorageBlockLoot extends LibBlockLootProvider {
 
     private final List<Block> blocks = new ArrayList<>();
 
-    public StorageBlockLoot() {
-        super(() -> StorageBlocks.BLOCKS.getEntries().stream().map(Supplier::get).collect(Collectors.toList()));
+    public StorageBlockLoot(HolderLookup.Provider registries) {
+        super(registries, () -> StorageBlocks.BLOCKS.getEntries().stream().map(Supplier::get).collect(Collectors.toList()));
 
         blocks.add(StorageBlocks.WOOD_CABINET.get());
         blocks.add(StorageBlocks.GLASS_CABINET.get());
@@ -119,24 +117,37 @@ public class StorageBlockLoot extends LibBlockLootProvider {
         return LootTable.lootTable().withPool(applyExplosionCondition(b, LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F)).when(ModLoadedLootCondition.isModLoaded("assorteddecor")).add(OptionalLootItem.optionalLootTableItem(decorBlockLoc).when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(b).setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(DoorBlock.HALF, DoubleBlockHalf.LOWER))))));
     }
 
+    /**
+     * Carrying the block entity's state into the dropped item is one function now.
+     * <p>
+     * {@code CopyNbtFunction} and {@code SetContainerContents} pointed at a block entity type are
+     * gone - {@code ContextNbtProvider.BLOCK_ENTITY} has no public factory any more - and the
+     * contents, name and lock are all data components the block entity exposes. This is what
+     * vanilla's own shulker box drop does.
+     */
+    private LootTable.Builder createContentsTable(Block b) {
+        LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b).apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY).include(DataComponents.CUSTOM_NAME).include(DataComponents.CONTAINER).include(DataComponents.CUSTOM_DATA));
+        LootPool.Builder pool = LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(entry).when(ExplosionCondition.survivesExplosion());
+        return LootTable.lootTable().withPool(pool);
+    }
+
+    /**
+     * The safe drops its padlock separately (the block entity does that on removal), so the item
+     * itself only carries the name and the contents, not the lock.
+     */
     private LootTable.Builder createGoldSafeTable(Block b) {
-        LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b).apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY)).apply(SetContainerContents.setContents(StorageBlockEntityTypes.GOLD_SAFE.get()).withEntry(DynamicLoot.dynamicEntry(GoldSafeBlock.CONTENTS)));
+        LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b).apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY).include(DataComponents.CUSTOM_NAME).include(DataComponents.CONTAINER));
         LootPool.Builder pool = LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(entry).when(ExplosionCondition.survivesExplosion());
         return LootTable.lootTable().withPool(pool);
     }
 
     private LootTable.Builder createLockedShulkerTable(Block b) {
-        CopyNbtFunction.Builder colorFunc = CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Color", "Color");
-        CopyNbtFunction.Builder func = CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Storage_Lock", "Storage_Lock");
-        LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b).apply(func).apply(colorFunc).apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY)).apply(SetContainerContents.setContents(StorageBlockEntityTypes.LOCKED_SHULKER_BOX.get()).withEntry(DynamicLoot.dynamicEntry(LockedShulkerBoxBlock.CONTENTS)));
-        LootPool.Builder pool = LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(entry).when(ExplosionCondition.survivesExplosion());
-        return LootTable.lootTable().withPool(pool);
+        return createContentsTable(b);
     }
 
     private LootTable.Builder createInventoryCodeTable(Block b) {
-        LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b);
-        CopyNbtFunction.Builder func = CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY).copy("Storage_Lock", "Storage_Lock");
-        LootPool.Builder pool = LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(entry).when(ExplosionCondition.survivesExplosion()).apply(func);
+        LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b).apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY).include(DataComponents.CUSTOM_DATA));
+        LootPool.Builder pool = LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(entry).when(ExplosionCondition.survivesExplosion());
         return LootTable.lootTable().withPool(pool);
     }
 }

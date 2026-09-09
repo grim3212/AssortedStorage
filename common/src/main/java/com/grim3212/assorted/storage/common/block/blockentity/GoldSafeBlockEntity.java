@@ -24,4 +24,13 @@ public class GoldSafeBlockEntity extends BaseStorageBlockEntity {
     protected Component getDefaultName() {
         return Component.translatable(Constants.MOD_ID + ".container.gold_safe");
     }
+
+    /**
+     * The safe's contents come out of its loot table through the dynamic CONTENTS drop, so the
+     * block entity must not drop them a second time on removal.
+     */
+    @Override
+    protected boolean shouldDropContents() {
+        return false;
+    }
 }

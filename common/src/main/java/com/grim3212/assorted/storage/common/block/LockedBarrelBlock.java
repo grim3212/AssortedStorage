@@ -4,24 +4,21 @@ import com.grim3212.assorted.lib.core.inventory.INamed;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
-import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.StorageAccessUtil;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.api.block.IStorageMaterial;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedBarrelBlockEntity;
 import com.grim3212.assorted.storage.common.item.StorageItems;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -30,10 +27,10 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BarrelBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -42,23 +39,18 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
 public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMaterial {
 
-    public static final DirectionProperty FACING = BlockStateProperties.FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
     public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
 
     private final StorageMaterial material;
-
-    public LockedBarrelBlock(StorageMaterial material) {
-        this(material, material.getProps());
-    }
 
     public LockedBarrelBlock(StorageMaterial material, Block.Properties props) {
         super(props);
@@ -72,7 +64,7 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
     }
 
     @Override
-    public RenderShape getRenderShape(BlockState state) {
+    protected RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 
@@ -82,13 +74,13 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockGetter worldIn, BlockPos pos, BlockState state) {
+    protected ItemStack getCloneItemStack(LevelReader worldIn, BlockPos pos, BlockState state, boolean includeData) {
         if (this.getStorageMaterial() == null) {
             String lockCode = StorageUtil.getCode(worldIn.getBlockEntity(pos));
             ItemStack output = new ItemStack(StorageBlocks.LOCKED_BARREL.get());
             return StorageUtil.setCodeOnStack(lockCode, output);
         }
-        return super.getCloneItemStack(worldIn, pos, state);
+        return super.getCloneItemStack(worldIn, pos, state, includeData);
     }
 
     @Override
@@ -97,7 +89,7 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
     }
 
     @Override
-    public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
+    protected float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
         BlockEntity te = worldIn.getBlockEntity(pos);
 
         if (te instanceof ILockable) {
@@ -115,7 +107,7 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
         BlockEntity tileentity = worldIn.getBlockEntity(pos);
 
         if (tileentity instanceof INamed) {
-            if (stack.hasCustomHoverName()) {
+            if (stack.has(DataComponents.CUSTOM_NAME)) {
                 ((INamed) tileentity).setCustomName(stack.getHoverName());
             }
         }
@@ -126,31 +118,18 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
         }
     }
 
+    /**
+     * {@code onRemove} split in two: this only fires for a real removal, and the block entity is
+     * already gone by now - anything that needed it moved onto the block entity's
+     * {@code preRemoveSideEffects}.
+     */
     @Override
-    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            BlockEntity tileentity = worldIn.getBlockEntity(pos);
-
-            if (tileentity instanceof BaseStorageBlockEntity storageBlockEntity) {
-
-                if (storageBlockEntity.isLocked()) {
-                    ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
-                    CompoundTag tag = new CompoundTag();
-                    StorageUtil.writeLock(tag, storageBlockEntity.getLockCode());
-                    lockStack.setTag(tag);
-                    Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
-                }
-
-                StorageUtil.dropContents(worldIn, pos, storageBlockEntity.getItemStackStorageHandler());
-                worldIn.updateNeighbourForOutputSignal(pos, this);
-            }
-
-            super.onRemove(state, worldIn, pos, newState, isMoving);
-        }
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel worldIn, BlockPos pos, boolean movedByPiston) {
+        worldIn.updateNeighbourForOutputSignal(pos, this);
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+    protected InteractionResult useItemOn(ItemStack heldStack, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
         if (this.canBeLocked(worldIn, pos) && player.getItemInHand(handIn).getItem() == StorageItems.LOCKSMITH_LOCK.get()) {
             if (BaseStorageBlock.tryPlaceLock(worldIn, pos, player, handIn))
                 return InteractionResult.SUCCESS;
@@ -162,14 +141,11 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
                 ILockable teStorage = (ILockable) tileentity;
 
                 if (teStorage.isLocked()) {
-                    ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
-                    CompoundTag tag = new CompoundTag();
-                    StorageUtil.writeLock(tag, teStorage.getLockCode());
-                    lockStack.setTag(tag);
+                    ItemStack lockStack = StorageUtil.setCodeOnStack(teStorage.getLockCode(), new ItemStack(StorageItems.LOCKSMITH_LOCK.get()));
 
                     if (removeLock(worldIn, pos, player)) {
                         ItemEntity blockDropped = new ItemEntity(worldIn, (double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), lockStack);
-                        if (!worldIn.isClientSide) {
+                        if (!worldIn.isClientSide()) {
                             worldIn.addFreshEntity(blockDropped);
                             if (!Services.PLATFORM.isFakePlayer(player)) {
                                 blockDropped.playerTouch(player);
@@ -182,7 +158,7 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
         }
 
         if (StorageAccessUtil.canAccess(worldIn, pos, player)) {
-            if (!worldIn.isClientSide) {
+            if (!worldIn.isClientSide()) {
                 MenuProvider inamedcontainerprovider = this.getMenuProvider(state, worldIn, pos);
                 if (inamedcontainerprovider != null) {
                     Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> {
@@ -190,7 +166,9 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
                         byteBuf.writeBlockPos(pos);
                     });
                     player.awardStat(Stats.OPEN_BARREL);
-                    PiglinAi.angerNearbyPiglins(player, true);
+                    if (worldIn instanceof ServerLevel serverLevel) {
+                        PiglinAi.angerNearbyPiglins(serverLevel, player, true);
+                    }
                 }
             }
         }
@@ -199,7 +177,7 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
 
     @Override
     @Nullable
-    public MenuProvider getMenuProvider(BlockState state, Level world, BlockPos pos) {
+    protected MenuProvider getMenuProvider(BlockState state, Level world, BlockPos pos) {
         BlockEntity tileentity = world.getBlockEntity(pos);
         return tileentity instanceof MenuProvider ? (MenuProvider) tileentity : null;
     }
@@ -214,33 +192,33 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
     }
 
     @Override
-    public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
+    protected boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
         super.triggerEvent(state, worldIn, pos, id, param);
         BlockEntity tileentity = worldIn.getBlockEntity(pos);
         return tileentity == null ? false : tileentity.triggerEvent(id, param);
     }
 
     @Override
-    public boolean hasAnalogOutputSignal(BlockState state) {
+    protected boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos, Direction direction) {
         if (worldIn.getBlockEntity(pos) instanceof BaseStorageBlockEntity storageBlockEntity) {
             return StorageUtil.getRedstoneSignalFromContainer(storageBlockEntity.getItemStackStorageHandler());
         }
 
-        return super.getAnalogOutputSignal(blockState, worldIn, pos);
+        return super.getAnalogOutputSignal(blockState, worldIn, pos, direction);
     }
 
     @Override
-    public BlockState rotate(BlockState state, Rotation rot) {
+    protected BlockState rotate(BlockState state, Rotation rot) {
         return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState state, Mirror mirrorIn) {
+    protected BlockState mirror(BlockState state, Mirror mirrorIn) {
         return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
     }
 
@@ -248,23 +226,12 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
         return !((ILockable) worldIn.getBlockEntity(pos)).isLocked();
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
-        String code = StorageUtil.getCode(stack);
-
-        if (!code.isEmpty()) {
-            tooltip.add(Component.translatable(Constants.MOD_ID + ".info.combo", Component.literal(code).withStyle(ChatFormatting.AQUA)));
-        }
-
-        tooltip.add(Component.translatable(Constants.MOD_ID + ".info.level_upgrade_level", Component.literal("" + (material == null ? 0 : material.getStorageLevel())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
-    }
-
     protected boolean removeLock(Level worldIn, BlockPos pos, Player entityplayer) {
         if (this.getStorageMaterial() != null) {
             return BaseStorageBlock.tryRemoveLock(worldIn, pos, entityplayer);
         }
 
-        worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+        worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.getRandom().nextFloat() * 0.1F + 0.9F);
 
         BlockState state = worldIn.getBlockState(pos);
         if (state.getBlock() instanceof LockedBarrelBlock && worldIn.getBlockEntity(pos) instanceof LockedBarrelBlockEntity barrelBE) {

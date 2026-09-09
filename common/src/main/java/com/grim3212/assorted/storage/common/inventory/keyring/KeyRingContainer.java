@@ -6,10 +6,11 @@ import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.item.KeyRingItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -33,7 +34,10 @@ public class KeyRingContainer extends AbstractContainerMenu {
         ItemStack stack = findKeyRing(playerEntity);
 
         if (stack == null || stack.isEmpty()) {
-            playerEntity.closeContainer();
+            // closeContainer() is protected on Player now; only the server side can close a menu.
+            if (playerEntity instanceof ServerPlayer serverPlayer) {
+                serverPlayer.closeContainer();
+            }
             return;
         }
 
@@ -65,7 +69,10 @@ public class KeyRingContainer extends AbstractContainerMenu {
             }
 
         } else {
-            playerEntity.closeContainer();
+            // closeContainer() is protected on Player now; only the server side can close a menu.
+            if (playerEntity instanceof ServerPlayer serverPlayer) {
+                serverPlayer.closeContainer();
+            }
         }
     }
 
@@ -77,12 +84,12 @@ public class KeyRingContainer extends AbstractContainerMenu {
     }
 
     @Override
-    public void clicked(int slot, int dragType, ClickType clickTypeIn, Player player) {
+    public void clicked(int slot, int dragType, ContainerInput clickTypeIn, Player player) {
         if (slot >= 0) {
             if (getSlot(slot).getItem().getItem() instanceof KeyRingItem)
                 return;
         }
-        if (clickTypeIn == ClickType.SWAP)
+        if (clickTypeIn == ContainerInput.SWAP)
             return;
 
         super.clicked(slot, dragType, clickTypeIn, player);
@@ -94,7 +101,7 @@ public class KeyRingContainer extends AbstractContainerMenu {
         Slot slot = this.getSlot(index);
 
         if (slot != null && slot.hasItem()) {
-            int keyringSlotCount = slots.size() - playerIn.getInventory().items.size();
+            int keyringSlotCount = slots.size() - playerIn.getInventory().getNonEquipmentItems().size();
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
             if (index < keyringSlotCount) {

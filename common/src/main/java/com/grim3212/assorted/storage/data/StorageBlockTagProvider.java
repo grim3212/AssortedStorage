@@ -8,7 +8,10 @@ import com.grim3212.assorted.storage.api.StorageTags;
 import com.grim3212.assorted.storage.common.block.*;
 import com.grim3212.assorted.storage.common.block.StorageBlocks.CrateGroup;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
+import net.minecraft.data.tags.TagAppender;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
@@ -25,8 +28,12 @@ public class StorageBlockTagProvider extends LibBlockTagProvider {
     }
 
     @Override
-    public void addCommonTags(Function<TagKey<Block>, IntrinsicTagAppender<Block>> tagger) {
-        IntrinsicTagAppender<Block> piglinBuilder = tagger.apply(BlockTags.GUARDED_BY_PIGLINS);
+    public void addCommonTags(Function<TagKey<Block>, TagAppender<Block>> rawTagger) {
+        // A TagAppender takes ResourceKeys rather than the objects themselves now, so the appenders
+        // are wrapped to keep the call sites reading in terms of Blocks.
+        Function<TagKey<Block>, BlockTagAppender> tagger = (tag) -> new BlockTagAppender(rawTagger.apply(tag));
+
+        BlockTagAppender piglinBuilder = tagger.apply(BlockTags.GUARDED_BY_PIGLINS);
         piglinBuilder.add(StorageBlocks.ACACIA_WAREHOUSE_CRATE.get());
         piglinBuilder.add(StorageBlocks.BIRCH_WAREHOUSE_CRATE.get());
         piglinBuilder.add(StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get());
@@ -192,12 +199,11 @@ public class StorageBlockTagProvider extends LibBlockTagProvider {
         tagger.apply(StorageTags.Blocks.HOPPERS_LEVEL_0).add(Blocks.HOPPER, StorageBlocks.LOCKED_HOPPER.get());
 
         tagger.apply(BlockTags.SHULKER_BOXES).add(StorageBlocks.LOCKED_SHULKER_BOX.get());
-        tagger.apply(StorageTags.Blocks.SHULKERS_LEVEL_0).add(Blocks.SHULKER_BOX, Blocks.BLACK_SHULKER_BOX, Blocks.BLUE_SHULKER_BOX, Blocks.BROWN_SHULKER_BOX, Blocks.CYAN_SHULKER_BOX, Blocks.GRAY_SHULKER_BOX, Blocks.GREEN_SHULKER_BOX, Blocks.LIGHT_BLUE_SHULKER_BOX, Blocks.LIGHT_GRAY_SHULKER_BOX, Blocks.LIME_SHULKER_BOX, Blocks.MAGENTA_SHULKER_BOX, Blocks.ORANGE_SHULKER_BOX, Blocks.PINK_SHULKER_BOX, Blocks.PURPLE_SHULKER_BOX, Blocks.RED_SHULKER_BOX, Blocks.WHITE_SHULKER_BOX,
-                Blocks.YELLOW_SHULKER_BOX);
-        tagger.apply(StorageTags.Blocks.SHULKERS_NORMAL).add(Blocks.SHULKER_BOX, Blocks.BLACK_SHULKER_BOX, Blocks.BLUE_SHULKER_BOX, Blocks.BROWN_SHULKER_BOX, Blocks.CYAN_SHULKER_BOX, Blocks.GRAY_SHULKER_BOX, Blocks.GREEN_SHULKER_BOX, Blocks.LIGHT_BLUE_SHULKER_BOX, Blocks.LIGHT_GRAY_SHULKER_BOX, Blocks.LIME_SHULKER_BOX, Blocks.MAGENTA_SHULKER_BOX, Blocks.ORANGE_SHULKER_BOX, Blocks.PINK_SHULKER_BOX, Blocks.PURPLE_SHULKER_BOX, Blocks.RED_SHULKER_BOX, Blocks.WHITE_SHULKER_BOX,
-                Blocks.YELLOW_SHULKER_BOX);
+        // The per colour shulker boxes are a ColorCollection now rather than 16 separate fields.
+        tagger.apply(StorageTags.Blocks.SHULKERS_LEVEL_0).add(Blocks.SHULKER_BOX).addAll(Blocks.DYED_SHULKER_BOX.asList());
+        tagger.apply(StorageTags.Blocks.SHULKERS_NORMAL).add(Blocks.SHULKER_BOX).addAll(Blocks.DYED_SHULKER_BOX.asList());
 
-        IntrinsicTagAppender<Block> doorBuilder = tagger.apply(BlockTags.DOORS);
+        BlockTagAppender doorBuilder = tagger.apply(BlockTags.DOORS);
         for (Block b : StorageBlocks.lockedDoors()) {
             doorBuilder.add(b);
         }
@@ -208,5 +214,36 @@ public class StorageBlockTagProvider extends LibBlockTagProvider {
 
         tagger.apply(StorageTags.Blocks.DEEPSLATE).add(Blocks.DEEPSLATE, Blocks.COBBLED_DEEPSLATE, Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_BRICKS, Blocks.CRACKED_DEEPSLATE_BRICKS, Blocks.DEEPSLATE_TILES, Blocks.CRACKED_DEEPSLATE_TILES, Blocks.CHISELED_DEEPSLATE, Blocks.REINFORCED_DEEPSLATE);
         tagger.apply(StorageTags.Blocks.PISTONS).add(Blocks.PISTON, Blocks.STICKY_PISTON);
+    }
+
+    /**
+     * Adapts the vanilla {@link TagAppender}, which is keyed by {@link ResourceKey}, back to the
+     * Block based calls this provider is written in terms of.
+     */
+    private record BlockTagAppender(TagAppender<Block> delegate) {
+
+        BlockTagAppender add(Block block) {
+            this.delegate.add(BuiltInRegistries.BLOCK.getResourceKey(block).orElseThrow());
+            return this;
+        }
+
+        BlockTagAppender add(Block... blocks) {
+            for (Block block : blocks) {
+                this.add(block);
+            }
+            return this;
+        }
+
+        BlockTagAppender addAll(Iterable<Block> blocks) {
+            for (Block block : blocks) {
+                this.add(block);
+            }
+            return this;
+        }
+
+        BlockTagAppender addTag(TagKey<Block> tag) {
+            this.delegate.addTag(tag);
+            return this;
+        }
     }
 }

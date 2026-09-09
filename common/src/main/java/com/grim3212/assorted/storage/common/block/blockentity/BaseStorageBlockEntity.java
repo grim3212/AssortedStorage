@@ -5,7 +5,6 @@ import com.grim3212.assorted.lib.core.inventory.INamed;
 import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.impl.LockedItemStackStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.ClientServices;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.blockentity.IStorage;
@@ -13,22 +12,36 @@ import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.inventory.StorageContainer;
 import com.grim3212.assorted.storage.common.inventory.StorageItemStackStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
+import com.grim3212.assorted.storage.api.StorageLockIO;
+import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,8 +51,8 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
     private int ticksSinceSync;
     protected float rotation;
     protected float prevRotation;
-    private String lockCode = "";
-    private Component customName;
+    protected String lockCode = "";
+    protected Component customName;
     protected IPlatformInventoryStorageHandler platformInventoryStorageHandler;
     private LockedItemStackStorageHandler storageHandler;
 
@@ -97,44 +110,33 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
 
     protected void modelDataUpdate() {
         Level level = this.getLevel();
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             ClientServices.MODELS.requestModelDataRefresh(this);
             this.level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
         }
     }
 
     @Override
-    public void load(CompoundTag nbt) {
-        super.load(nbt);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
 
         if (this.selfInventory()) {
-            if (nbt.contains("Inventory")) {
-                this.storageHandler.deserializeNBT(nbt.getCompound("Inventory"));
-            } else if (nbt.contains("Items")) {
-                // Backwards compatible, will not be saved again like this
-                this.storageHandler.deserializeNBT(nbt);
-            }
+            input.child("Inventory").ifPresent(this.storageHandler::deserialize);
         }
 
-        if (nbt.contains("CustomName", 8)) {
-            this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"));
-        }
-
-        this.lockCode = StorageUtil.readLock(nbt);
+        this.customName = parseCustomNameSafe(input, "CustomName");
+        this.lockCode = StorageLockIO.readLock(input);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound) {
-        super.saveAdditional(compound);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
         if (this.selfInventory()) {
-            compound.put("Inventory", this.storageHandler.serializeNBT());
+            this.storageHandler.serialize(output.child("Inventory"));
         }
 
-        if (this.customName != null) {
-            compound.putString("CustomName", Component.Serializer.toJson(this.customName));
-        }
-
-        StorageUtil.writeLock(compound, this.lockCode);
+        output.storeNullable("CustomName", ComponentSerialization.CODEC, this.customName);
+        StorageLockIO.writeLock(output, this.lockCode);
     }
 
     @Override
@@ -143,12 +145,83 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return this.saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return this.saveWithoutMetadata(registries);
     }
 
     protected boolean selfInventory() {
         return true;
+    }
+
+    /**
+     * Drops the lock and the contents when the block is removed.
+     * <p>
+     * The block used to do this from {@code onRemove}, but that split in two in 26.x: by the time
+     * the block's {@code affectNeighborsAfterRemoval} runs the block entity is already gone, so
+     * anything that needs the block entity has to happen here instead.
+     */
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+
+        if (this.level == null) {
+            return;
+        }
+
+        if (this.shouldDropLock(pos, state)) {
+            Containers.dropItemStack(this.level, pos.getX(), pos.getY(), pos.getZ(), StorageUtil.setCodeOnStack(this.lockCode, new ItemStack(StorageItems.LOCKSMITH_LOCK.get())));
+        }
+
+        if (this.shouldDropContents()) {
+            StorageUtil.dropContents(this.level, pos, this.getItemStackStorageHandler());
+        }
+    }
+
+    protected boolean shouldDropLock(BlockPos pos, BlockState state) {
+        return this.isLocked();
+    }
+
+    protected boolean shouldDropContents() {
+        return this.selfInventory();
+    }
+
+    /**
+     * Hands the stack the block entity's contents, name and lock so a picked or creative-dropped
+     * item keeps them. Replaces the old {@code saveToItem} / {@code BlockEntityTag} round trip.
+     */
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        components.set(DataComponents.CUSTOM_NAME, this.customName);
+        if (this.selfInventory()) {
+            components.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(this.getItemStackStorageHandler().getStacks()));
+        }
+        CustomData customData = CustomData.EMPTY.update(this::writeCustomData);
+        if (!customData.isEmpty()) {
+            components.set(DataComponents.CUSTOM_DATA, customData);
+        }
+    }
+
+    /**
+     * The free form data that rides along on the dropped or picked item. This is the lock code for
+     * every storage block; subclasses add to it.
+     */
+    protected void writeCustomData(CompoundTag tag) {
+        StorageUtil.writeLock(tag, this.lockCode);
+    }
+
+    protected void readCustomData(CompoundTag tag) {
+        this.lockCode = StorageUtil.readLock(tag);
+    }
+
+    @Override
+    protected void applyImplicitComponents(DataComponentGetter components) {
+        super.applyImplicitComponents(components);
+        this.customName = components.get(DataComponents.CUSTOM_NAME);
+        if (this.selfInventory()) {
+            components.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(this.getItemStackStorageHandler().getStacks());
+        }
+        this.readCustomData(components.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag());
     }
 
     protected abstract Component getDefaultName();
@@ -200,7 +273,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
     }
 
     public int getNumberOfPlayersUsing(Level worldIn, BaseStorageBlockEntity lockableTileEntity, int ticksSinceSync, int x, int y, int z, int numPlayersUsing) {
-        if (!worldIn.isClientSide && numPlayersUsing != 0 && (ticksSinceSync + x + y + z) % 200 == 0) {
+        if (!worldIn.isClientSide() && numPlayersUsing != 0 && (ticksSinceSync + x + y + z) % 200 == 0) {
             numPlayersUsing = getNumberOfPlayersUsing(worldIn, lockableTileEntity, x, y, z);
         }
 
@@ -232,7 +305,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
         double d1 = (double) this.worldPosition.getY() + 0.5D;
         double d2 = (double) this.worldPosition.getZ() + 0.5D;
 
-        this.level.playSound((Player) null, d0, d1, d2, soundIn, SoundSource.BLOCKS, 0.5F, this.level.random.nextFloat() * 0.1F + 0.9F);
+        this.level.playSound((Player) null, d0, d1, d2, soundIn, SoundSource.BLOCKS, 0.5F, this.level.getRandom().nextFloat() * 0.1F + 0.9F);
     }
 
     @Override

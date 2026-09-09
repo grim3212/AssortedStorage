@@ -74,4 +74,12 @@ public class LockerBlockEntity extends BaseStorageBlockEntity {
     protected Component getDefaultName() {
         return Component.translatable(Constants.MOD_ID + ".container.locker");
     }
+
+    /**
+     * A double locker shares one lock, so it is only dropped once, when the other half is gone.
+     */
+    @Override
+    protected boolean shouldDropLock(BlockPos pos, BlockState state) {
+        return super.shouldDropLock(pos, state) && this.level.getBlockState(pos.above()) != state && this.level.getBlockState(pos.below()) != state;
+    }
 }

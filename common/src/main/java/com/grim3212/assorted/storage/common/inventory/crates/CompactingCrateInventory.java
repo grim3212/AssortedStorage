@@ -6,9 +6,10 @@ import com.grim3212.assorted.storage.api.CompactingHelper;
 import com.grim3212.assorted.storage.api.LargeItemStack;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -23,32 +24,26 @@ public class CompactingCrateInventory extends CrateSidedInv {
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        CompoundTag tag = super.serializeNBT();
+    public void serialize(ValueOutput output) {
+        super.serialize(output);
 
         if (!this.matches.isEmpty()) {
-            ListTag matchList = new ListTag();
+            ValueOutput.ValueOutputList matchList = output.childrenList("Matches");
             this.matches.forEach(m -> {
-                CompoundTag match = new CompoundTag();
-                m.getItem().save(match);
+                ValueOutput match = matchList.addChild();
+                match.store("Item", ItemStack.CODEC, m.getItem());
                 match.putInt("MatchRequired", m.getNumRequired());
-                matchList.add(match);
             });
-            tag.put("Matches", matchList);
         }
-
-        return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag nbt) {
-        super.deserializeNBT(nbt);
+    public void deserialize(ValueInput input) {
+        super.deserialize(input);
 
-        ListTag matchList = nbt.getList("Matches", 10);
         this.matches = Lists.newArrayList();
-        for (int i = 0; i < matchList.size(); i++) {
-            CompoundTag match = matchList.getCompound(i);
-            this.matches.add(new CompactingHelper.Match(ItemStack.of(match), match.getInt("MatchRequired")));
+        for (ValueInput match : input.childrenListOrEmpty("Matches")) {
+            this.matches.add(new CompactingHelper.Match(match.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY), match.getIntOr("MatchRequired", 1)));
         }
     }
 
@@ -57,7 +52,13 @@ public class CompactingCrateInventory extends CrateSidedInv {
             return;
         }
 
-        CompactingHelper helper = new CompactingHelper(this.inv.getLevel());
+        // The recipe manager is server side only in 26.x, so a compactor can only work out its
+        // tiers on the server; the client is told the result through the crate sync packet.
+        if (!(this.inv.getLevel() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        CompactingHelper helper = new CompactingHelper(serverLevel);
         matches = helper.findMatches(stack, 3);
     }
 
@@ -65,7 +66,7 @@ public class CompactingCrateInventory extends CrateSidedInv {
         // Do we have a match
         // Are both the last checked and input the same
         // Does the last matches actually contain the stack
-        return !matches.isEmpty() && matches.stream().anyMatch(m -> ItemStack.isSameItemSameTags(m.getItem(), stack));
+        return !matches.isEmpty() && matches.stream().anyMatch(m -> ItemStack.isSameItemSameComponents(m.getItem(), stack));
     }
 
     @Override
@@ -88,7 +89,7 @@ public class CompactingCrateInventory extends CrateSidedInv {
                 // If we have already setup a match list that includes this item let's try to
                 // use that and adjust the slot to be in the correct order
 
-                int slotIdx = IntStream.range(0, matches.size()).filter(i -> ItemStack.isSameItemSameTags(matches.get(i).getItem(), stack)).findFirst().orElse(-1);
+                int slotIdx = IntStream.range(0, matches.size()).filter(i -> ItemStack.isSameItemSameComponents(matches.get(i).getItem(), stack)).findFirst().orElse(-1);
                 if (slotIdx == -1) {
                     return -1;
                 }
@@ -112,7 +113,7 @@ public class CompactingCrateInventory extends CrateSidedInv {
                 this.findResults(stack.copyWithCount(1));
 
                 // Find where this stack should be in the slot assortment
-                int slotIdx = IntStream.range(0, matches.size()).filter(i -> ItemStack.isSameItemSameTags(matches.get(i).getItem(), stack)).findFirst().orElse(-1);
+                int slotIdx = IntStream.range(0, matches.size()).filter(i -> ItemStack.isSameItemSameComponents(matches.get(i).getItem(), stack)).findFirst().orElse(-1);
                 if (slotIdx == -1) {
                     return -1;
                 }
@@ -154,7 +155,7 @@ public class CompactingCrateInventory extends CrateSidedInv {
             return;
         }
 
-        int checkStackIndex = IntStream.range(0, matches.size()).filter(i -> ItemStack.isSameItemSameTags(matches.get(i).getItem(), checkStack)).findFirst().orElse(-1);
+        int checkStackIndex = IntStream.range(0, matches.size()).filter(i -> ItemStack.isSameItemSameComponents(matches.get(i).getItem(), checkStack)).findFirst().orElse(-1);
         if (checkStackIndex > -1) {
             // Possible indexes should be 0, 1, 2
             // 0 - slot 0 or highest tier

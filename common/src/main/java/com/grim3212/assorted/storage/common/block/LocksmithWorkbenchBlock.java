@@ -13,6 +13,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,8 +28,8 @@ public class LocksmithWorkbenchBlock extends Block {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
-        if (worldIn.isClientSide) {
+    protected InteractionResult useItemOn(ItemStack heldStack, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+        if (worldIn.isClientSide()) {
             return InteractionResult.SUCCESS;
         } else {
             Services.PLATFORM.openMenu((ServerPlayer) player, state.getMenuProvider(worldIn, pos), buf -> buf.writeBlockPos(pos));
@@ -37,7 +38,7 @@ public class LocksmithWorkbenchBlock extends Block {
         }
     }
 
-    public MenuProvider getMenuProvider(BlockState state, Level worldIn, BlockPos pos) {
+    protected MenuProvider getMenuProvider(BlockState state, Level worldIn, BlockPos pos) {
         return new SimpleMenuProvider((id, inventory, player) -> {
             return new LocksmithWorkbenchContainer(id, inventory, ContainerLevelAccess.create(worldIn, pos));
         }, CONTAINER_NAME);

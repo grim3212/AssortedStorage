@@ -1,39 +1,56 @@
 package com.grim3212.assorted.storage.common.save;
 
 import com.google.common.collect.Maps;
-import com.grim3212.assorted.lib.util.ITagSerializable;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.common.inventory.LockedEnderChestInventory;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.saveddata.SavedDataType;
+import net.minecraft.world.level.storage.SavedDataStorage;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Map;
 
+/**
+ * The locked ender chest inventories, one per lock code.
+ * <p>
+ * {@link SavedData} is codec driven in 26.x - it no longer round trips a {@code CompoundTag}
+ * itself, it is described by a {@link SavedDataType} holding a {@link Codec} and the storage layer
+ * does the reading and writing. Each inventory is stored as its plain list of stacks.
+ */
 public class EnderSavedData extends SavedData implements IEnderData {
 
-    private static final String OLD_ID = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "ender_saved_data").toString();
-    private static final String ID = "locked_ender_saved_data";
-    private static final String LOCKED_ENDER_TAG = "LockedEnderChests";
+    private static final int INVENTORY_SIZE = 27;
 
-    private EnderData enderData = new EnderData();
+    public static final Codec<EnderSavedData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.unboundedMap(Codec.STRING, ItemStack.OPTIONAL_CODEC.listOf()).optionalFieldOf("locked_ender_chests", Map.of()).forGetter(EnderSavedData::writeChests)
+    ).apply(instance, EnderSavedData::new));
+
+    public static final SavedDataType<EnderSavedData> TYPE = new SavedDataType<>(Identifier.fromNamespaceAndPath(Constants.MOD_ID, "locked_ender_saved_data"), EnderSavedData::new, CODEC, DataFixTypes.LEVEL);
+
+    private final EnderData enderData = new EnderData();
 
     public EnderSavedData() {
     }
 
-    public EnderSavedData(CompoundTag nbt) {
-        enderData.deserializeNBT(nbt);
+    private EnderSavedData(Map<String, List<ItemStack>> chests) {
+        chests.forEach((code, items) -> {
+            LockedEnderChestInventory inventory = this.enderData.getInventory(code);
+            for (int slot = 0; slot < Math.min(items.size(), inventory.getSlots()); slot++) {
+                inventory.getStacks().set(slot, items.get(slot));
+            }
+        });
     }
 
-    private static EnderSavedData DUMMY_SAVE = new EnderSavedData() {
-        private final LockedEnderChestInventory inv = new LockedEnderChestInventory(this, "", 27) {
+    private static final EnderSavedData DUMMY_SAVE = new EnderSavedData() {
+        private final LockedEnderChestInventory inv = new LockedEnderChestInventory(this, "", INVENTORY_SIZE) {
             @NotNull
             @Override
             public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
@@ -56,17 +73,9 @@ public class EnderSavedData extends SavedData implements IEnderData {
         if (!(world instanceof ServerLevel)) {
             return DUMMY_SAVE;
         }
-        ServerLevel overworld = world.getServer().overworld();
 
-        DimensionDataStorage storage = overworld.getDataStorage();
-        EnderSavedData oldData = storage.get(EnderSavedData::new, OLD_ID);
-        EnderSavedData newData = storage.get(EnderSavedData::new, ID);
-
-        if (oldData != null && newData == null) {
-            return storage.computeIfAbsent(EnderSavedData::new, () -> oldData, ID);
-        }
-
-        return storage.computeIfAbsent(EnderSavedData::new, EnderSavedData::new, ID);
+        SavedDataStorage storage = world.getServer().overworld().getDataStorage();
+        return storage.computeIfAbsent(TYPE);
     }
 
     @Override
@@ -79,58 +88,25 @@ public class EnderSavedData extends SavedData implements IEnderData {
         return enderData.getInventory(code);
     }
 
-    @Override
-    public CompoundTag save(CompoundTag nbt) {
-        CompoundTag data = enderData.serializeNBT();
-
-        nbt.put(LOCKED_ENDER_TAG, data.get(LOCKED_ENDER_TAG));
-        return nbt;
+    private Map<String, List<ItemStack>> writeChests() {
+        Map<String, List<ItemStack>> chests = Maps.newHashMap();
+        this.enderData.enderChests.forEach((code, inventory) -> chests.put(code, List.copyOf(inventory.getStacks())));
+        return chests;
     }
 
-    private class EnderData implements IEnderData, ITagSerializable<CompoundTag> {
-        private Map<String, LockedEnderChestInventory> enderChests = Maps.newHashMap();
+    private class EnderData implements IEnderData {
+        private final Map<String, LockedEnderChestInventory> enderChests = Maps.newHashMap();
 
         @Override
         public LockedEnderChestInventory getInventory(String code) {
             LockedEnderChestInventory inventory = enderChests.get(code);
 
             if (inventory == null) {
-                inventory = new LockedEnderChestInventory(this, code, 27);
+                inventory = new LockedEnderChestInventory(this, code, INVENTORY_SIZE);
                 enderChests.put(code, inventory);
             }
 
             return inventory;
-        }
-
-        public CompoundTag serializeNBT() {
-            CompoundTag tag = new CompoundTag();
-            ListTag inventories = new ListTag();
-
-            for (Map.Entry<String, LockedEnderChestInventory> entry : this.enderChests.entrySet()) {
-                LockedEnderChestInventory inventory = entry.getValue();
-
-                CompoundTag chest = new CompoundTag();
-                chest.putString("Code", entry.getKey());
-                chest.put("Inventory", inventory.serializeNBT());
-                inventories.add(chest);
-            }
-
-            tag.put(LOCKED_ENDER_TAG, inventories);
-            return tag;
-        }
-
-        public void deserializeNBT(CompoundTag nbt) {
-            ListTag enderChestsNBT = nbt.getList(LOCKED_ENDER_TAG, Tag.TAG_COMPOUND);
-
-            this.enderChests.clear();
-
-            for (int i = 0; i < enderChestsNBT.size(); ++i) {
-                CompoundTag chest = enderChestsNBT.getCompound(i);
-                String lockCode = chest.getString("Code");
-                LockedEnderChestInventory inventory = new LockedEnderChestInventory(this, lockCode, 27);
-                inventory.deserializeNBT(chest.getCompound("Inventory"));
-                this.enderChests.put(lockCode, inventory);
-            }
         }
 
         @Override

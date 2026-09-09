@@ -2,10 +2,8 @@ package com.grim3212.assorted.storage.common.block;
 
 import com.grim3212.assorted.storage.api.crates.CrateLayout;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateCompactingBlockEntity;
-import com.grim3212.assorted.storage.common.inventory.crates.CompactingCrateInventory;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.Containers;
-import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -21,20 +19,13 @@ public class CrateCompactingBlock extends CrateBlock {
         return new CrateCompactingBlockEntity(pos, state);
     }
 
+    /**
+     * {@code onRemove} split in two: this only fires for a real removal, and the block entity is
+     * already gone by now - anything that needed it moved onto the block entity's
+     * {@code preRemoveSideEffects}.
+     */
     @Override
-    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            BlockEntity tileentity = worldIn.getBlockEntity(pos);
-
-            if (tileentity instanceof CrateCompactingBlockEntity crate) {
-                Containers.dropContents(worldIn, pos, ((CompactingCrateInventory) crate.getItemStackStorageHandler()).asItemStacks());
-                Containers.dropContents(worldIn, pos, crate.getItemStackStorageHandler().getEnhancements());
-                worldIn.updateNeighbourForOutputSignal(pos, this);
-            }
-
-            if (state.hasBlockEntity() && (!state.is(newState.getBlock()) || !newState.hasBlockEntity())) {
-                worldIn.removeBlockEntity(pos);
-            }
-        }
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel worldIn, BlockPos pos, boolean movedByPiston) {
+        worldIn.updateNeighbourForOutputSignal(pos, this);
     }
 }

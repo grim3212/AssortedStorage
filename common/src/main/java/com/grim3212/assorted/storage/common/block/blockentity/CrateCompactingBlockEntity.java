@@ -5,6 +5,7 @@ import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.inventory.crates.CompactingCrateInventory;
 import com.grim3212.assorted.storage.common.inventory.crates.CrateCompactingContainer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.Containers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -28,6 +29,15 @@ public class CrateCompactingBlockEntity extends CrateBlockEntity {
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory player, Player playerEntity) {
         return new CrateCompactingContainer(StorageContainerTypes.CRATE_COMPACTING.get(), windowId, player, this);
+    }
+
+    /**
+     * A compactor's slots are different tiers of the same item, so it drops the flattened stack
+     * list rather than every slot.
+     */
+    @Override
+    protected void dropContents(BlockPos pos) {
+        Containers.dropContents(this.level, pos, ((CompactingCrateInventory) this.getItemStackStorageHandler()).asItemStacks());
     }
 
 }

@@ -13,20 +13,14 @@ import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEn
 import com.grim3212.assorted.storage.common.block.blockentity.LockedShulkerBoxBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import com.grim3212.assorted.storage.common.item.StorageItems;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -37,10 +31,10 @@ import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -55,6 +49,7 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -68,10 +63,6 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
     public static final EnumProperty<Direction> FACING = DirectionalBlock.FACING;
     public static final Identifier CONTENTS = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "contents");
     private final StorageMaterial material;
-
-    public LockedShulkerBoxBlock(StorageMaterial material) {
-        this(material, material.getProps());
-    }
 
     public LockedShulkerBoxBlock(StorageMaterial material, Block.Properties props) {
         super(props.dynamicShape().noOcclusion().isSuffocating(Predicates.isShulkerBlock).isViewBlocking(Predicates.isShulkerBlock).pushReaction(PushReaction.DESTROY));
@@ -94,7 +85,7 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
     }
 
     @Override
-    public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
+    protected float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
         BlockEntity te = worldIn.getBlockEntity(pos);
 
         if (te instanceof ILockable) {
@@ -112,12 +103,12 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
             return BaseStorageBlock.tryRemoveLock(level, pos, player);
         }
 
-        level.playSound(player, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, level.random.nextFloat() * 0.1F + 0.9F);
+        level.playSound(player, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, level.getRandom().nextFloat() * 0.1F + 0.9F);
 
         BlockState state = level.getBlockState(pos);
         if (state.getBlock() instanceof LockedShulkerBoxBlock && level.getBlockEntity(pos) instanceof LockedShulkerBoxBlockEntity shulkerBE) {
             DyeColor color = shulkerBE.getColor();
-            level.setBlock(pos, ShulkerBoxBlock.getBlockByColor(color).defaultBlockState().setValue(ShulkerBoxBlock.FACING, state.getValue(LockedShulkerBoxBlock.FACING)), 3);
+            level.setBlock(pos, (color == null ? Blocks.SHULKER_BOX : Blocks.DYED_SHULKER_BOX.pick(color)).defaultBlockState().setValue(ShulkerBoxBlock.FACING, state.getValue(LockedShulkerBoxBlock.FACING)), 3);
             if (level.getBlockEntity(pos) instanceof ShulkerBoxBlockEntity newShulkerBE) {
                 for (int i = 0; i < shulkerBE.getItemStackStorageHandler().getSlots(); i++) {
                     newShulkerBE.setItem(i, shulkerBE.getItemStackStorageHandler().getStackInSlot(i).copy());
@@ -129,7 +120,7 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack heldStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (this.canBeLocked(level, pos) && player.getItemInHand(hand).getItem() == StorageItems.LOCKSMITH_LOCK.get()) {
             if (BaseStorageBlock.tryPlaceLock(level, pos, player, hand))
                 return InteractionResult.SUCCESS;
@@ -141,14 +132,11 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
                 ILockable teStorage = (ILockable) tileentity;
 
                 if (teStorage.isLocked()) {
-                    ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
-                    CompoundTag tag = new CompoundTag();
-                    StorageUtil.writeLock(tag, teStorage.getLockCode());
-                    lockStack.setTag(tag);
+                    ItemStack lockStack = StorageUtil.setCodeOnStack(teStorage.getLockCode(), new ItemStack(StorageItems.LOCKSMITH_LOCK.get()));
 
                     if (removeLock(level, pos, player)) {
                         ItemEntity blockDropped = new ItemEntity(level, (double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), lockStack);
-                        if (!level.isClientSide) {
+                        if (!level.isClientSide()) {
                             level.addFreshEntity(blockDropped);
                             if (!Services.PLATFORM.isFakePlayer(player)) {
                                 blockDropped.playerTouch(player);
@@ -163,7 +151,7 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
         BlockEntity blockentity = level.getBlockEntity(pos);
         if (blockentity instanceof LockedShulkerBoxBlockEntity shulkerBE) {
             if (canOpen(state, level, pos, shulkerBE) && StorageAccessUtil.canAccess(level, pos, player)) {
-                if (!level.isClientSide) {
+                if (!level.isClientSide()) {
                     MenuProvider inamedcontainerprovider = this.getMenuProvider(state, level, pos);
                     if (inamedcontainerprovider != null) {
                         Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> {
@@ -171,7 +159,9 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
                             byteBuf.writeBlockPos(pos);
                         });
                         player.awardStat(Stats.OPEN_SHULKER_BOX);
-                        PiglinAi.angerNearbyPiglins(player, true);
+                        if (level instanceof ServerLevel serverLevel) {
+                            PiglinAi.angerNearbyPiglins(serverLevel, player, true);
+                        }
                     }
                 }
             }
@@ -188,11 +178,9 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         if (level.getBlockEntity(pos) instanceof LockedShulkerBoxBlockEntity shulkerBE) {
-            boolean hasColor = stack.hasTag() && stack.getTag().contains("Color");
-            if (hasColor) {
-                int savedColor = NBTHelper.getInt(stack, "Color");
-                shulkerBE.setColor(savedColor == -1 ? null : DyeColor.byId(savedColor));
-            }
+            // The colour rides along in the stack's CUSTOM_DATA component now.
+            int savedColor = NBTHelper.getInt(stack, "Color", -1);
+            shulkerBE.setColor(savedColor == -1 ? null : DyeColor.byId(savedColor));
 
             ILockable lockeable = (ILockable) level.getBlockEntity(pos);
             if (lockeable != null) {
@@ -208,12 +196,12 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
     }
 
     @Override
-    public BlockState rotate(BlockState state, Rotation rotation) {
+    protected BlockState rotate(BlockState state, Rotation rotation) {
         return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState state, Mirror mirror) {
+    protected BlockState mirror(BlockState state, Mirror mirror) {
         return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
@@ -228,7 +216,7 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         BlockEntity blockentity = worldIn.getBlockEntity(pos);
         return blockentity instanceof LockedShulkerBoxBlockEntity ? Shapes.create(((LockedShulkerBoxBlockEntity) blockentity).getBoundingBox(state)) : Shapes.block();
     }
@@ -237,33 +225,31 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
         if (shulker.getAnimationStatus() != AnimationStatus.CLOSED) {
             return true;
         } else {
-            AABB aabb = Shulker.getProgressDeltaAabb(state.getValue(FACING), 0.0F, 0.5F).move(pos).deflate(1.0E-6D);
+            AABB aabb = Shulker.getProgressDeltaAabb(1.0F, state.getValue(FACING), 0.0F, 0.5F, Vec3.atBottomCenterOf(pos)).deflate(1.0E-6D);
             return level.noCollision(aabb);
         }
     }
 
     @Override
-    public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+    protected RenderShape getRenderShape(BlockState state) {
+        return RenderShape.INVISIBLE;
+    }
+
+    /**
+     * {@code onRemove} split in two: this only fires for a real removal, and the block entity is
+     * already gone by now - anything that needed it moved onto the block entity's
+     * {@code preRemoveSideEffects}.
+     */
+    @Override
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel worldIn, BlockPos pos, boolean movedByPiston) {
+        worldIn.updateNeighbourForOutputSignal(pos, this);
     }
 
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState neighborState, boolean p_56238_) {
-        if (!state.is(neighborState.getBlock())) {
-            BlockEntity blockentity = level.getBlockEntity(pos);
-            if (blockentity instanceof LockedShulkerBoxBlockEntity shulkerBE) {
-                level.updateNeighbourForOutputSignal(pos, state.getBlock());
-            }
-
-            super.onRemove(state, level, pos, neighborState, p_56238_);
-        }
-    }
-
-    @Override
-    public ItemStack getCloneItemStack(BlockGetter worldIn, BlockPos pos, BlockState state) {
-        ItemStack itemstack = super.getCloneItemStack(worldIn, pos, state);
+    protected ItemStack getCloneItemStack(LevelReader worldIn, BlockPos pos, BlockState state, boolean includeData) {
+        ItemStack itemstack = super.getCloneItemStack(worldIn, pos, state, includeData);
         worldIn.getBlockEntity(pos, StorageBlockEntityTypes.LOCKED_SHULKER_BOX.get()).ifPresent((shulkerBE) -> {
-            shulkerBE.saveToItem(itemstack);
+            itemstack.applyComponents(shulkerBE.collectComponents());
             NBTHelper.putInt(itemstack, "Color", shulkerBE.colorToSave());
             String lockCode = StorageUtil.getCode(shulkerBE);
             StorageUtil.writeCodeToStack(lockCode, itemstack);
@@ -272,17 +258,13 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
     }
 
     @Override
-    public void playerWillDestroy(Level worldIn, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level worldIn, BlockPos pos, BlockState state, Player player) {
         BlockEntity tileentity = worldIn.getBlockEntity(pos);
         if (tileentity instanceof LockedShulkerBoxBlockEntity shulkerBE) {
-            if (!worldIn.isClientSide && player.isCreative() && (!shulkerBE.getItemStackStorageHandler().isEmpty() || shulkerBE.isLocked())) {
+            if (!worldIn.isClientSide() && player.isCreative() && (!shulkerBE.getItemStackStorageHandler().isEmpty() || shulkerBE.isLocked())) {
                 ItemStack itemstack = new ItemStack(this);
-                tileentity.saveToItem(itemstack);
+                itemstack.applyComponents(tileentity.collectComponents());
                 NBTHelper.putInt(itemstack, "Color", shulkerBE.colorToSave());
-
-                if (shulkerBE.hasCustomName()) {
-                    itemstack.setHoverName(shulkerBE.getCustomName());
-                }
 
                 String lockCode = StorageUtil.getCode(shulkerBE);
                 StorageUtil.writeCodeToStack(lockCode, itemstack);
@@ -293,11 +275,11 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
             }
         }
 
-        super.playerWillDestroy(worldIn, pos, state, player);
+        return super.playerWillDestroy(worldIn, pos, state, player);
     }
 
     @Override
-    public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+    protected List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         BlockEntity tileentity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (tileentity instanceof LockedShulkerBoxBlockEntity shulkerBE) {
             builder = builder.withDynamicDrop(CONTENTS, (stackConsumer) -> {
@@ -311,70 +293,31 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        super.appendHoverText(stack, worldIn, tooltip, flagIn);
-        String code = StorageUtil.getCode(stack);
-
-        if (!code.isEmpty()) {
-            tooltip.add(Component.translatable(Constants.MOD_ID + ".info.combo", Component.literal(code).withStyle(ChatFormatting.AQUA)));
-        }
-
-        tooltip.add(Component.translatable(Constants.MOD_ID + ".info.level_upgrade_level", Component.literal("" + (material == null ? 0 : material.getStorageLevel())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
-
-        CompoundTag compoundnbt = stack.getTagElement("BlockEntityTag");
-        if (compoundnbt != null && compoundnbt.contains("Inventory", Tag.TAG_COMPOUND)) {
-            CompoundTag inventory = compoundnbt.getCompound("Inventory");
-            if (inventory.contains("Items", Tag.TAG_LIST)) {
-                NonNullList<ItemStack> nonnulllist = NonNullList.withSize(27, ItemStack.EMPTY);
-                ContainerHelper.loadAllItems(inventory, nonnulllist);
-                int i = 0;
-                int j = 0;
-
-                for (ItemStack itemstack : nonnulllist) {
-                    if (!itemstack.isEmpty()) {
-                        ++j;
-                        if (i <= 4) {
-                            ++i;
-                            MutableComponent iformattabletextcomponent = itemstack.getHoverName().copy();
-                            iformattabletextcomponent.append(" x").append(String.valueOf(itemstack.getCount()));
-                            tooltip.add(iformattabletextcomponent);
-                        }
-                    }
-                }
-
-                if (j - i > 0) {
-                    tooltip.add((Component.translatable("container.shulkerBox.more", j - i)).withStyle(ChatFormatting.ITALIC));
-                }
-            }
-        }
-    }
-
-    @Override
     @Nullable
-    public MenuProvider getMenuProvider(BlockState state, Level world, BlockPos pos) {
+    protected MenuProvider getMenuProvider(BlockState state, Level world, BlockPos pos) {
         BlockEntity tileentity = world.getBlockEntity(pos);
         return tileentity instanceof MenuProvider ? (MenuProvider) tileentity : null;
     }
 
     @Override
-    public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
+    protected boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
         super.triggerEvent(state, worldIn, pos, id, param);
         BlockEntity tileentity = worldIn.getBlockEntity(pos);
         return tileentity == null ? false : tileentity.triggerEvent(id, param);
     }
 
     @Override
-    public boolean hasAnalogOutputSignal(BlockState state) {
+    protected boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
         if (level.getBlockEntity(pos) instanceof BaseStorageBlockEntity storageBlockEntity) {
             return StorageUtil.getRedstoneSignalFromContainer(storageBlockEntity.getItemStackStorageHandler());
         }
 
-        return super.getAnalogOutputSignal(state, level, pos);
+        return super.getAnalogOutputSignal(state, level, pos, direction);
     }
 
     @Override

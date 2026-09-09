@@ -2,12 +2,21 @@ package com.grim3212.assorted.storage.common.block.blockentity;
 
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
+import com.grim3212.assorted.storage.api.StorageLockIO;
+import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class BaseLockedBlockEntity extends BlockEntity implements ILockable {
 
@@ -42,15 +51,28 @@ public class BaseLockedBlockEntity extends BlockEntity implements ILockable {
     }
 
     @Override
-    public void load(CompoundTag nbt) {
-        super.load(nbt);
-        this.lockCode = StorageUtil.readLock(nbt);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        this.lockCode = StorageLockIO.readLock(input);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag cmp) {
-        super.saveAdditional(cmp);
-        StorageUtil.writeLock(cmp, this.lockCode);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        StorageLockIO.writeLock(output, this.lockCode);
+    }
+
+    /**
+     * A door's two halves share one lock, so only the upper half drops it. This used to live in
+     * the block's {@code onRemove}, which no longer sees the block entity.
+     */
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+
+        if (this.level != null && this.isLocked() && state.getValue(DoorBlock.HALF) == DoubleBlockHalf.UPPER) {
+            Containers.dropItemStack(this.level, pos.getX(), pos.getY(), pos.getZ(), StorageUtil.setCodeOnStack(this.lockCode, new ItemStack(StorageItems.LOCKSMITH_LOCK.get())));
+        }
     }
 
     @Override
@@ -59,8 +81,8 @@ public class BaseLockedBlockEntity extends BlockEntity implements ILockable {
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return this.saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return this.saveWithoutMetadata(registries);
     }
 
 }

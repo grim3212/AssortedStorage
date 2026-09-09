@@ -1,31 +1,29 @@
 package com.grim3212.assorted.storage.common.crafting;
 
+import com.mojang.serialization.MapCodec;
 import com.grim3212.assorted.lib.util.DyeHelper;
 import com.grim3212.assorted.lib.util.LibCommonTags;
 import com.grim3212.assorted.lib.util.NBTHelper;
 import com.grim3212.assorted.storage.common.item.BagItem;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.Level;
 
 public class BagColoringRecipe extends CustomRecipe {
 
-    public static final SimpleCraftingRecipeSerializer<BagColoringRecipe> SERIALIZER = new SimpleCraftingRecipeSerializer<>(BagColoringRecipe::new);
-
-    public BagColoringRecipe(Identifier location, CraftingBookCategory category) {
-        super(location, category);
-    }
+    public static final BagColoringRecipe INSTANCE = new BagColoringRecipe();
+    public static final MapCodec<BagColoringRecipe> MAP_CODEC = MapCodec.unit(INSTANCE);
+    public static final StreamCodec<RegistryFriendlyByteBuf, BagColoringRecipe> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+    public static final RecipeSerializer<BagColoringRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
 
     @Override
-    public boolean matches(CraftingContainer container, Level level) {
+    public boolean matches(CraftingInput container, Level level) {
         int i = 0;
         int bagXSlot = -1;
 
@@ -33,9 +31,9 @@ public class BagColoringRecipe extends CustomRecipe {
         int firstDyeXSlot = -1;
         int secondDyeXSlot = -1;
 
-        for (int y = 0; y < container.getHeight(); y++) {
-            for (int x = 0; x < container.getWidth(); x++) {
-                ItemStack itemstack = container.getItem(x + y * container.getWidth());
+        for (int y = 0; y < container.height(); y++) {
+            for (int x = 0; x < container.width(); x++) {
+                ItemStack itemstack = container.getItem(x + y * container.width());
                 if (!itemstack.isEmpty()) {
                     if (itemstack.getItem() instanceof BagItem) {
                         ++i;
@@ -76,7 +74,7 @@ public class BagColoringRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer container, RegistryAccess registryAccess) {
+    public ItemStack assemble(CraftingInput container) {
         ItemStack itemstack = ItemStack.EMPTY;
         int bagXSlot = -1;
 
@@ -85,9 +83,9 @@ public class BagColoringRecipe extends CustomRecipe {
         DyeColor secondColor = null;
         int secondDyeXSlot = -1;
 
-        for (int y = 0; y < container.getHeight(); y++) {
-            for (int x = 0; x < container.getWidth(); x++) {
-                ItemStack itemstack1 = container.getItem(x + y * container.getWidth());
+        for (int y = 0; y < container.height(); y++) {
+            for (int x = 0; x < container.width(); x++) {
+                ItemStack itemstack1 = container.getItem(x + y * container.width());
                 if (!itemstack1.isEmpty()) {
                     Item item = itemstack1.getItem();
                     if (item instanceof BagItem) {
@@ -128,13 +126,9 @@ public class BagColoringRecipe extends CustomRecipe {
         return copy;
     }
 
-    @Override
-    public boolean canCraftInDimensions(int x, int y) {
-        return x * y >= 2;
-    }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<BagColoringRecipe> getSerializer() {
         return SERIALIZER;
     }
 

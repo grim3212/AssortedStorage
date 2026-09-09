@@ -36,12 +36,9 @@ public class StorageAccessUtil {
     }
 
     public static boolean canAccess(ItemStack stack, Player entityplayer) {
-        if (stack.hasTag() && stack.getTag().contains("Storage_Lock")) {
-            String currentLock = stack.getTag().getString("Storage_Lock");
-            if (currentLock == null || currentLock.isEmpty()) {
-                return true;
-            }
-
+        // Stack NBT is gone; the lock lives in the CUSTOM_DATA component, which StorageUtil reads.
+        String currentLock = StorageUtil.getCode(stack);
+        if (!currentLock.isEmpty()) {
             for (int slot = 0; slot < entityplayer.getInventory().getContainerSize(); slot++) {
                 ItemStack itemstack = entityplayer.getInventory().getItem(slot);
 

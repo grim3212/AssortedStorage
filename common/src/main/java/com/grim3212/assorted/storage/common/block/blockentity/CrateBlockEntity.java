@@ -7,7 +7,6 @@ import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
-import com.grim3212.assorted.storage.api.LargeItemStack;
 import com.grim3212.assorted.storage.api.crates.CrateLayout;
 import com.grim3212.assorted.storage.common.block.CrateBlock;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
@@ -17,9 +16,10 @@ import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.network.SyncCrate;
 import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
@@ -33,6 +33,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
@@ -108,54 +110,23 @@ public class CrateBlockEntity extends BlockEntity implements MenuProvider, IName
     }
 
     @Override
-    public void load(CompoundTag nbt) {
-        super.load(nbt);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
 
-        if (nbt.contains("Inventory")) {
-            this.getItemStackStorageHandler().deserializeNBT(nbt.getCompound("Inventory"));
-        } else if (nbt.contains("Items") || nbt.contains("Enhancements")) {
-            this.legacyLoad(nbt);
-        }
+        // The pre-"Inventory" flat layout is no longer read: ItemStack.of(CompoundTag) is gone and
+        // nothing needs to interoperate with a 1.20.1 world.
+        input.child("Inventory").ifPresent(this.getItemStackStorageHandler()::deserialize);
 
-        if (nbt.contains("CustomName", 8)) {
-            this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"));
-        }
-    }
-
-    // TODO: remove in future versions
-    private void legacyLoad(CompoundTag tag) {
-        ListTag items = tag.getList("Items", 10);
-        for (int i = 0; i < items.size(); i++) {
-            CompoundTag slot = items.getCompound(i);
-            int slotIdx = slot.getByte("Slot") & 255;
-            if (slotIdx >= 0 && slotIdx < this.getItemStackStorageHandler().getSlots()) {
-                int amount = slot.getInt("SlotAmount");
-                int rotation = slot.getInt("SlotRotation");
-                boolean locked = slot.getBoolean("SlotLocked");
-                ItemStack stack = ItemStack.of(slot);
-                this.getItemStackStorageHandler().getSlotContents().set(slotIdx, new LargeItemStack(stack, amount, rotation, locked));
-            }
-        }
-
-        ListTag enhancementItems = tag.getList("Enhancements", 10);
-        for (int i = 0; i < enhancementItems.size(); i++) {
-            CompoundTag slot = enhancementItems.getCompound(i);
-            int slotIdx = slot.getByte("Slot") & 255;
-            if (slotIdx >= 0 && slotIdx < this.getItemStackStorageHandler().getEnhancements().size()) {
-                this.getItemStackStorageHandler().getEnhancements().set(slotIdx, ItemStack.of(slot));
-            }
-        }
+        this.customName = parseCustomNameSafe(input, "CustomName");
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound) {
-        super.saveAdditional(compound);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
         // Save all the items
-        compound.put("Inventory", this.getItemStackStorageHandler().serializeNBT());
+        this.getItemStackStorageHandler().serialize(output.child("Inventory"));
 
-        if (this.customName != null) {
-            compound.putString("CustomName", Component.Serializer.toJson(this.customName));
-        }
+        output.storeNullable("CustomName", ComponentSerialization.CODEC, this.customName);
     }
 
     @Override
@@ -164,8 +135,30 @@ public class CrateBlockEntity extends BlockEntity implements MenuProvider, IName
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return this.saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return this.saveWithoutMetadata(registries);
+    }
+
+    /**
+     * Contents used to be dropped from the block's {@code onRemove}. The block entity is gone by
+     * the time 26.x runs the block's removal hook, so the drop has to happen here.
+     */
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+
+        if (this.level == null) {
+            return;
+        }
+
+        this.dropContents(pos);
+        Containers.dropContents(this.level, pos, this.getItemStackStorageHandler().getEnhancements());
+    }
+
+    protected void dropContents(BlockPos pos) {
+        for (int slot = 0; slot < this.getItemStackStorageHandler().getSlots(); slot++) {
+            Containers.dropContents(this.level, pos, this.getItemStackStorageHandler().getLargeItemStack(slot).asItemStacks());
+        }
     }
 
     public void modelUpdate() {
@@ -200,7 +193,7 @@ public class CrateBlockEntity extends BlockEntity implements MenuProvider, IName
 
     public void setSlotChanged(int slot) {
         this.setChanged();
-        this.level.blockUpdated(getBlockPos(), getBlockState().getBlock());
+        this.level.updateNeighborsAt(getBlockPos(), getBlockState().getBlock(), null);
 
         if (this.level != null && !this.level.isClientSide()) {
             Services.NETWORK.sendToNearby(level, getBlockPos(), new SyncCrate(getBlockPos(), slot, this.getItemStackStorageHandler().getLargeItemStack(slot)));

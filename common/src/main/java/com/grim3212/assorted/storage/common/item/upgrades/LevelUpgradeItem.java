@@ -20,6 +20,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BarrelBlock;
@@ -29,7 +30,7 @@ import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class LevelUpgradeItem extends Item implements ICrateUpgrade {
 
@@ -44,9 +45,19 @@ public class LevelUpgradeItem extends Item implements ICrateUpgrade {
         return storageMaterial;
     }
 
+    /**
+     * {@code Item.appendHoverText} is marked deprecated in 26.x - tooltips are meant to come from
+     * data components implementing {@code TooltipProvider} - but it is still the only per item
+     * hook, and vanilla's own items (DiscFragmentItem, HangingEntityItem, SmithingTemplateItem)
+     * still override it.
+     * <p>
+     * TODO(26.2): moving this text onto a component would mean giving the lock its own
+     * DataComponentType instead of the CUSTOM_DATA tag AssortedLib's StorageUtil writes.
+     */
+    @SuppressWarnings("deprecation")
     @Override
-    public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        tooltip.add(Component.translatable(Constants.MOD_ID + ".info.level_upgrade_level", Component.literal("" + storageMaterial.getStorageLevel()).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flagIn) {
+        tooltip.accept(Component.translatable(Constants.MOD_ID + ".info.level_upgrade_level", Component.literal("" + storageMaterial.getStorageLevel()).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
     }
 
     @Override
@@ -257,7 +268,7 @@ public class LevelUpgradeItem extends Item implements ICrateUpgrade {
 
                     newState = StorageBlocks.SHULKERS.get(storageMaterial).get().defaultBlockState().setValue(ShulkerBoxBlock.FACING, world.getBlockState(pos).getValue(ShulkerBoxBlock.FACING));
                     LockedShulkerBoxBlockEntity newShulkerEntity = new LockedShulkerBoxBlockEntity(pos, newState);
-                    newShulkerEntity.setColor(ShulkerBoxBlock.getColorFromBlock(shulkerToUpgrade));
+                    newShulkerEntity.setColor(shulkerToUpgrade.getColor());
                     newBlockEntity = newShulkerEntity;
                 }
             }
@@ -288,7 +299,7 @@ public class LevelUpgradeItem extends Item implements ICrateUpgrade {
             if (!player.isCreative())
                 itemstack.shrink(1);
 
-            world.playSound(player, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, world.random.nextFloat() * 0.1F + 0.9F);
+            world.playSound(player, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, world.getRandom().nextFloat() * 0.1F + 0.9F);
         }
         return InteractionResult.SUCCESS;
     }

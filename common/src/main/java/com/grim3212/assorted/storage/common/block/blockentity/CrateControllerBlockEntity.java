@@ -8,7 +8,6 @@ import com.grim3212.assorted.lib.core.inventory.IInventoryBlockEntity;
 import com.grim3212.assorted.lib.core.inventory.INamed;
 import com.grim3212.assorted.lib.core.inventory.IPlatformInventoryStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.ClientServices;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.StorageCommonMod;
@@ -17,10 +16,16 @@ import com.grim3212.assorted.storage.api.crates.ICrateSystem;
 import com.grim3212.assorted.storage.common.inventory.crates.CrateControllerInvWrapper;
 import com.grim3212.assorted.storage.common.properties.StorageModelProperties;
 import net.minecraft.util.Util;
+import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
+import com.grim3212.assorted.storage.api.StorageLockIO;
+import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -30,6 +35,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -104,31 +111,25 @@ public class CrateControllerBlockEntity extends BlockEntity implements INamed, I
 
     protected void modelDataUpdate() {
         Level level = this.getLevel();
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             ClientServices.MODELS.requestModelDataRefresh(this);
             this.level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
         }
     }
 
     @Override
-    public void load(CompoundTag nbt) {
-        super.load(nbt);
-        if (nbt.contains("CustomName", 8)) {
-            this.customName = Component.Serializer.fromJson(nbt.getString("CustomName"));
-        }
-
-        this.lockCode = StorageUtil.readLock(nbt);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        this.customName = parseCustomNameSafe(input, "CustomName");
+        this.lockCode = StorageLockIO.readLock(input);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound) {
-        super.saveAdditional(compound);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
 
-        if (this.customName != null) {
-            compound.putString("CustomName", Component.Serializer.toJson(this.customName));
-        }
-
-        StorageUtil.writeLock(compound, this.lockCode);
+        output.storeNullable("CustomName", ComponentSerialization.CODEC, this.customName);
+        StorageLockIO.writeLock(output, this.lockCode);
     }
 
     @Override
@@ -137,8 +138,21 @@ public class CrateControllerBlockEntity extends BlockEntity implements INamed, I
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return this.saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return this.saveWithoutMetadata(registries);
+    }
+
+    /**
+     * The block entity is already gone when the block's removal hook runs in 26.x, so the lock is
+     * dropped from here instead.
+     */
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+
+        if (this.level != null && this.isLocked()) {
+            Containers.dropItemStack(this.level, pos.getX(), pos.getY(), pos.getZ(), StorageUtil.setCodeOnStack(this.lockCode, new ItemStack(StorageItems.LOCKSMITH_LOCK.get())));
+        }
     }
 
     @Override

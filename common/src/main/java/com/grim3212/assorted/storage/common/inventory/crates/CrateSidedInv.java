@@ -1,9 +1,9 @@
 package com.grim3212.assorted.storage.common.inventory.crates;
 
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
+import com.grim3212.assorted.lib.core.inventory.IValueSerializable;
 import com.grim3212.assorted.lib.core.inventory.locking.LockedStorageHandler;
 import com.grim3212.assorted.lib.platform.Services;
-import com.grim3212.assorted.lib.util.ITagSerializable;
 import com.grim3212.assorted.lib.util.NBTHelper;
 import com.grim3212.assorted.storage.api.LargeItemStack;
 import com.grim3212.assorted.storage.api.crates.ICrateUpgrade;
@@ -12,16 +12,16 @@ import com.grim3212.assorted.storage.common.block.blockentity.CrateCompactingBlo
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.IntStream;
 
-public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler, ITagSerializable<CompoundTag> {
+public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler, IValueSerializable {
     protected final CrateBlockEntity inv;
 
     // One for each slots on the face of a Storage Crate
@@ -491,59 +491,48 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        CompoundTag tag = new CompoundTag();
-
-        ListTag items = new ListTag();
+    public void serialize(ValueOutput output) {
+        ValueOutput.ValueOutputList items = output.childrenList("Items");
         for (int i = 0; i < this.slotContents.size(); i++) {
             LargeItemStack stack = this.slotContents.get(i);
-            CompoundTag slot = new CompoundTag();
+            ValueOutput slot = items.addChild();
             slot.putByte("Slot", (byte) i);
             slot.putInt("SlotAmount", stack.getAmount());
             slot.putInt("SlotRotation", stack.getRotation());
             slot.putBoolean("SlotLocked", stack.isLocked());
-            stack.getStack().save(slot);
-            items.add(slot);
+            slot.store("Item", ItemStack.CODEC, stack.getStack());
         }
-        tag.put("Items", items);
 
-        ListTag enhancementItems = new ListTag();
+        ValueOutput.ValueOutputList enhancementItems = output.childrenList("Enhancements");
         for (int i = 0; i < this.enhancements.size(); ++i) {
             ItemStack itemstack = this.enhancements.get(i);
             if (!itemstack.isEmpty()) {
-                CompoundTag compoundtag = new CompoundTag();
-                compoundtag.putByte("Slot", (byte) i);
-                itemstack.save(compoundtag);
-                enhancementItems.add(compoundtag);
+                ValueOutput slot = enhancementItems.addChild();
+                slot.putByte("Slot", (byte) i);
+                slot.store("Item", ItemStack.CODEC, itemstack);
             }
         }
-        tag.put("Enhancements", enhancementItems);
-        return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag nbt) {
+    public void deserialize(ValueInput input) {
         this.slotContents = NonNullList.withSize(this.getSlots(), LargeItemStack.empty());
 
-        ListTag items = nbt.getList("Items", 10);
-        for (int i = 0; i < items.size(); i++) {
-            CompoundTag slot = items.getCompound(i);
-            int slotIdx = slot.getByte("Slot") & 255;
-            if (slotIdx >= 0 && slotIdx < this.slotContents.size()) {
-                int amount = slot.getInt("SlotAmount");
-                int rotation = slot.getInt("SlotRotation");
-                boolean locked = slot.getBoolean("SlotLocked");
-                ItemStack stack = ItemStack.of(slot);
+        for (ValueInput slot : input.childrenListOrEmpty("Items")) {
+            int slotIdx = slot.getByteOr("Slot", (byte) -1) & 255;
+            if (slotIdx < this.slotContents.size()) {
+                int amount = slot.getIntOr("SlotAmount", 0);
+                int rotation = slot.getIntOr("SlotRotation", 0);
+                boolean locked = slot.getBooleanOr("SlotLocked", false);
+                ItemStack stack = slot.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY);
                 this.slotContents.set(slotIdx, new LargeItemStack(stack, amount, rotation, locked));
             }
         }
 
-        ListTag enhancementItems = nbt.getList("Enhancements", 10);
-        for (int i = 0; i < enhancementItems.size(); i++) {
-            CompoundTag slot = enhancementItems.getCompound(i);
-            int slotIdx = slot.getByte("Slot") & 255;
-            if (slotIdx >= 0 && slotIdx < this.enhancements.size()) {
-                this.enhancements.set(slotIdx, ItemStack.of(slot));
+        for (ValueInput slot : input.childrenListOrEmpty("Enhancements")) {
+            int slotIdx = slot.getByteOr("Slot", (byte) -1) & 255;
+            if (slotIdx < this.enhancements.size()) {
+                this.enhancements.set(slotIdx, slot.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY));
             }
         }
     }

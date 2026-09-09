@@ -9,7 +9,7 @@ import com.grim3212.assorted.storage.common.inventory.keyring.KeyRingItemHandler
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -40,8 +40,8 @@ public class KeyRingItem extends Item implements IInventoryItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player playerIn, InteractionHand handIn) {
-        if (!level.isClientSide) {
+    public InteractionResult use(Level level, Player playerIn, InteractionHand handIn) {
+        if (!level.isClientSide()) {
             Services.PLATFORM.openMenu((ServerPlayer) playerIn, new MenuProvider() {
                 @Override
                 public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
@@ -54,6 +54,6 @@ public class KeyRingItem extends Item implements IInventoryItem {
                 }
             }, buf -> buf.writeBlockPos(playerIn.blockPosition()));
         }
-        return InteractionResultHolder.success(playerIn.getItemInHand(handIn));
+        return InteractionResult.SUCCESS;
     }
 }

@@ -15,7 +15,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -23,9 +23,10 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class EnderBagItem extends Item implements IInventoryItem {
 
@@ -48,19 +49,29 @@ public class EnderBagItem extends Item implements IInventoryItem {
         return false;
     }
 
+    /**
+     * {@code Item.appendHoverText} is marked deprecated in 26.x - tooltips are meant to come from
+     * data components implementing {@code TooltipProvider} - but it is still the only per item
+     * hook, and vanilla's own items (DiscFragmentItem, HangingEntityItem, SmithingTemplateItem)
+     * still override it.
+     * <p>
+     * TODO(26.2): moving this text onto a component would mean giving the lock its own
+     * DataComponentType instead of the CUSTOM_DATA tag AssortedLib's StorageUtil writes.
+     */
+    @SuppressWarnings("deprecation")
     @Override
-    public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flagIn) {
         String lockCode = StorageUtil.getCode(stack);
         if (!lockCode.isEmpty()) {
-            tooltip.add(Component.translatable(Constants.MOD_ID + ".info.locked").withStyle(ChatFormatting.AQUA));
+            tooltip.accept(Component.translatable(Constants.MOD_ID + ".info.locked").withStyle(ChatFormatting.AQUA));
         }
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player playerIn, InteractionHand handIn) {
+    public InteractionResult use(Level level, Player playerIn, InteractionHand handIn) {
         if (StorageAccessUtil.canAccess(playerIn.getItemInHand(handIn), playerIn)) {
             level.playSound(playerIn, playerIn.blockPosition(), SoundEvents.ENDER_CHEST_OPEN, SoundSource.PLAYERS);
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 Services.PLATFORM.openMenu((ServerPlayer) playerIn, new MenuProvider() {
                     @Override
                     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
@@ -74,7 +85,7 @@ public class EnderBagItem extends Item implements IInventoryItem {
                 }, buf -> buf.writeBlockPos(playerIn.blockPosition()));
             }
         }
-        return InteractionResultHolder.success(playerIn.getItemInHand(handIn));
+        return InteractionResult.SUCCESS;
     }
 
     @Override

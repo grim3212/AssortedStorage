@@ -24,7 +24,7 @@ public class CrateContainer extends AbstractContainerMenu {
     }
 
     protected static CrateBlockEntity getCrateBlockEntity(Inventory playerInv, BlockPos pos) {
-        Level level = playerInv.player.getCommandSenderWorld();
+        Level level = playerInv.player.level();
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof CrateBlockEntity crate) {
             return crate;

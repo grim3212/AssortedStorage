@@ -8,15 +8,16 @@ import com.grim3212.assorted.storage.api.StorageAccessUtil;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -28,6 +29,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -36,8 +39,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
@@ -49,7 +52,7 @@ import org.jetbrains.annotations.Nullable;
 public abstract class BaseStorageBlock extends Block implements EntityBlock, SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final VoxelShape FAKE_SIDES_AND_BOTTOM = Block.box(0.01D, 0.01D, 0.01D, 16.0D, 16.0D, 16.0D);
 
     public BaseStorageBlock(Properties properties) {
@@ -58,7 +61,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         if (context == CollisionContext.empty())
             return FAKE_SIDES_AND_BOTTOM;
 
@@ -66,7 +69,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
     }
 
     protected boolean isInvalidBlock(LevelAccessor world, BlockPos pos) {
-        return !world.isEmptyBlock(pos) && world.getBlockState(pos).isSolidRender(world, pos);
+        return !world.isEmptyBlock(pos) && world.getBlockState(pos).isSolidRender();
     }
 
     protected boolean isDoorBlocked(LevelAccessor world, BlockPos pos) {
@@ -74,17 +77,17 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
     }
 
     @Override
-    public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+    protected RenderShape getRenderShape(BlockState state) {
+        return RenderShape.INVISIBLE;
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction dir, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTickAccess, BlockPos pos, Direction dir, BlockPos neighborPos, BlockState neighborState, RandomSource randomSource) {
         if (state.getValue(WATERLOGGED)) {
-            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+            scheduledTickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
 
-        return super.updateShape(state, dir, neighborState, level, pos, neighborPos);
+        return super.updateShape(state, level, scheduledTickAccess, pos, dir, neighborPos, neighborState, randomSource);
     }
 
     @Override
@@ -96,7 +99,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
     }
 
     @Override
-    public FluidState getFluidState(BlockState state) {
+    protected FluidState getFluidState(BlockState state) {
         return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
@@ -106,7 +109,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
     }
 
     @Override
-    public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
+    protected float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
         BlockEntity te = worldIn.getBlockEntity(pos);
 
         if (te instanceof ILockable) {
@@ -124,37 +127,24 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
         BlockEntity tileentity = worldIn.getBlockEntity(pos);
 
         if (tileentity instanceof INamed) {
-            if (stack.hasCustomHoverName()) {
+            if (stack.has(DataComponents.CUSTOM_NAME)) {
                 ((INamed) tileentity).setCustomName(stack.getHoverName());
             }
         }
     }
 
+    /**
+     * {@code onRemove} split in two: this only fires for a real removal, and the block entity is
+     * already gone by now - anything that needed it moved onto the block entity's
+     * {@code preRemoveSideEffects}.
+     */
     @Override
-    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            BlockEntity tileentity = worldIn.getBlockEntity(pos);
-
-            if (tileentity instanceof BaseStorageBlockEntity storageBlockEntity) {
-
-                if (storageBlockEntity.isLocked()) {
-                    ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
-                    CompoundTag tag = new CompoundTag();
-                    StorageUtil.writeLock(tag, storageBlockEntity.getLockCode());
-                    lockStack.setTag(tag);
-                    Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
-                }
-
-                StorageUtil.dropContents(worldIn, pos, storageBlockEntity.getItemStackStorageHandler());
-                worldIn.updateNeighbourForOutputSignal(pos, this);
-            }
-
-            super.onRemove(state, worldIn, pos, newState, isMoving);
-        }
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel worldIn, BlockPos pos, boolean movedByPiston) {
+        worldIn.updateNeighbourForOutputSignal(pos, this);
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+    protected InteractionResult useItemOn(ItemStack heldStack, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
         if (this.canBeLocked(worldIn, pos) && player.getItemInHand(handIn).getItem() == StorageItems.LOCKSMITH_LOCK.get()) {
             if (this.placeLock(worldIn, pos, player, handIn))
                 return InteractionResult.SUCCESS;
@@ -166,14 +156,11 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
                 ILockable teStorage = (ILockable) tileentity;
 
                 if (teStorage.isLocked()) {
-                    ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
-                    CompoundTag tag = new CompoundTag();
-                    StorageUtil.writeLock(tag, teStorage.getLockCode());
-                    lockStack.setTag(tag);
+                    ItemStack lockStack = StorageUtil.setCodeOnStack(teStorage.getLockCode(), new ItemStack(StorageItems.LOCKSMITH_LOCK.get()));
 
                     if (removeLock(worldIn, pos, player)) {
                         ItemEntity blockDropped = new ItemEntity(worldIn, (double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), lockStack);
-                        if (!worldIn.isClientSide) {
+                        if (!worldIn.isClientSide()) {
                             worldIn.addFreshEntity(blockDropped);
                             if (!Services.PLATFORM.isFakePlayer(player)) {
                                 blockDropped.playerTouch(player);
@@ -186,12 +173,14 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
         }
 
         if (!isDoorBlocked(worldIn, pos) && StorageAccessUtil.canAccess(worldIn, pos, player)) {
-            if (!worldIn.isClientSide) {
+            if (!worldIn.isClientSide()) {
                 MenuProvider inamedcontainerprovider = this.getMenuProvider(state, worldIn, pos);
                 if (inamedcontainerprovider != null) {
                     this.openMenu(player, inamedcontainerprovider, pos);
                     player.awardStat(this.getOpenStat());
-                    PiglinAi.angerNearbyPiglins(player, true);
+                    if (worldIn instanceof ServerLevel serverLevel) {
+                        PiglinAi.angerNearbyPiglins(serverLevel, player, true);
+                    }
                 }
             }
         }
@@ -209,7 +198,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
 
     @Override
     @Nullable
-    public MenuProvider getMenuProvider(BlockState state, Level world, BlockPos pos) {
+    protected MenuProvider getMenuProvider(BlockState state, Level world, BlockPos pos) {
         BlockEntity tileentity = world.getBlockEntity(pos);
         return tileentity instanceof MenuProvider ? (MenuProvider) tileentity : null;
     }
@@ -224,38 +213,38 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
     }
 
     @Override
-    public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
+    protected boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
         super.triggerEvent(state, worldIn, pos, id, param);
         BlockEntity tileentity = worldIn.getBlockEntity(pos);
         return tileentity == null ? false : tileentity.triggerEvent(id, param);
     }
 
     @Override
-    public boolean hasAnalogOutputSignal(BlockState state) {
+    protected boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos, Direction direction) {
         if (worldIn.getBlockEntity(pos) instanceof BaseStorageBlockEntity storageBlockEntity) {
             return StorageUtil.getRedstoneSignalFromContainer(storageBlockEntity.getItemStackStorageHandler());
         }
 
-        return super.getAnalogOutputSignal(blockState, worldIn, pos);
+        return super.getAnalogOutputSignal(blockState, worldIn, pos, direction);
     }
 
     @Override
-    public BlockState rotate(BlockState state, Rotation rot) {
+    protected BlockState rotate(BlockState state, Rotation rot) {
         return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState state, Mirror mirrorIn) {
+    protected BlockState mirror(BlockState state, Mirror mirrorIn) {
         return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
     }
 
     @Override
-    public boolean isPathfindable(BlockState state, BlockGetter worldIn, BlockPos pos, PathComputationType type) {
+    protected boolean isPathfindable(BlockState state, PathComputationType type) {
         return false;
     }
 
@@ -270,7 +259,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
     public static boolean tryRemoveLock(Level worldIn, BlockPos pos, Player entityplayer) {
         ILockable tileentity = (ILockable) worldIn.getBlockEntity(pos);
         tileentity.setLockCode("");
-        worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+        worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.getRandom().nextFloat() * 0.1F + 0.9F);
         return true;
     }
 
@@ -291,7 +280,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
             if (!entityplayer.isCreative())
                 itemstack.shrink(1);
             lockable.setLockCode(code);
-            worldIn.playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+            worldIn.playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.getRandom().nextFloat() * 0.1F + 0.9F);
             return true;
         }
 

@@ -16,7 +16,6 @@ import com.grim3212.assorted.storage.common.inventory.StorageItemStackStorageHan
 import com.grim3212.assorted.storage.common.properties.StorageModelProperties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
@@ -32,9 +31,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.Hopper;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -100,16 +101,16 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements I
     }
 
     @Override
-    public void load(CompoundTag nbt) {
-        super.load(nbt);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
 
-        this.cooldownTime = nbt.getInt("TransferCooldown");
+        this.cooldownTime = input.getIntOr("TransferCooldown", 0);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag compound) {
-        super.saveAdditional(compound);
-        compound.putInt("TransferCooldown", this.cooldownTime);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("TransferCooldown", this.cooldownTime);
     }
 
     public static void pushItemsTick(Level level, BlockPos pos, BlockState state, LockedHopperBlockEntity hopperBE) {
@@ -124,7 +125,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements I
     }
 
     private static boolean tryMoveItems(Level level, BlockPos pos, BlockState state, LockedHopperBlockEntity hopperBE, BooleanSupplier supplier) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return false;
         } else {
             if (!hopperBE.isOnCooldown() && state.getValue(LockedHopperBlock.ENABLED)) {
@@ -516,7 +517,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements I
     }
 
     public static List<ItemEntity> getItemsAtAndAbove(Level p_155590_, LockedHopperBlockEntity p_155591_) {
-        return p_155591_.getSuckShape().toAabbs().stream().flatMap((p_155558_) -> {
+        return java.util.stream.Stream.of(p_155591_.getSuckAabb()).flatMap((p_155558_) -> {
             return p_155590_.getEntitiesOfClass(ItemEntity.class, p_155558_.move(p_155591_.getLevelX() - 0.5D, p_155591_.getLevelY() - 0.5D, p_155591_.getLevelZ() - 0.5D), EntitySelector.ENTITY_STILL_ALIVE).stream();
         }).collect(Collectors.toList());
     }
@@ -546,7 +547,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements I
         } else if (p_59345_.getCount() > p_59345_.getMaxStackSize()) {
             return false;
         } else {
-            return ItemStack.isSameItemSameTags(p_59345_, p_59346_);
+            return ItemStack.isSameItemSameComponents(p_59345_, p_59346_);
         }
     }
 
@@ -562,8 +563,12 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements I
         return (double) this.worldPosition.getZ() + 0.5D;
     }
 
-    public VoxelShape getSuckShape() {
-        return Hopper.SUCK;
+    /**
+     * Not an override: this block entity is not a vanilla {@code Hopper}, it only reuses its pickup
+     * box. {@code Hopper.SUCK} was replaced by an AABB constant.
+     */
+    public AABB getSuckAabb() {
+        return Hopper.SUCK_AABB;
     }
 
     public void setCooldown(int p_59396_) {
@@ -579,7 +584,7 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements I
     }
 
     public static void entityInside(Level level, BlockPos pos, BlockState state, Entity entity, LockedHopperBlockEntity hopperBE) {
-        if (entity instanceof ItemEntity && Shapes.joinIsNotEmpty(Shapes.create(entity.getBoundingBox().move((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()))), hopperBE.getSuckShape(), BooleanOp.AND)) {
+        if (entity instanceof ItemEntity && Shapes.joinIsNotEmpty(Shapes.create(entity.getBoundingBox().move((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()))), Shapes.create(hopperBE.getSuckAabb()), BooleanOp.AND)) {
             tryMoveItems(level, pos, state, hopperBE, () -> {
                 return addItem(hopperBE.getItemStackStorageHandler(), (ItemEntity) entity);
             });

@@ -5,19 +5,18 @@ import com.grim3212.assorted.lib.core.inventory.INamed;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
-import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.StorageAccessUtil;
 import com.grim3212.assorted.storage.api.Wood;
 import com.grim3212.assorted.storage.api.crates.CrateLayout;
 import com.grim3212.assorted.storage.api.crates.ICrateSystem;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -25,19 +24,19 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
@@ -47,12 +46,11 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 
 public class CrateBlock extends Block implements IBlockOnPlayerBreak, EntityBlock, ICrateSystem {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-    public static final DirectionProperty FACING = BlockStateProperties.FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 
     private final CrateLayout layout;
     private final Wood type;
@@ -92,12 +90,12 @@ public class CrateBlock extends Block implements IBlockOnPlayerBreak, EntityBloc
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return state.getValue(FACING).getAxis().isHorizontal() ? FINAL_SHAPE : FINAL_VERTICAL_SHAPE;
     }
 
     @Override
-    public RenderShape getRenderShape(BlockState state) {
+    protected RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 
@@ -107,12 +105,12 @@ public class CrateBlock extends Block implements IBlockOnPlayerBreak, EntityBloc
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction dir, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTickAccess, BlockPos pos, Direction dir, BlockPos neighborPos, BlockState neighborState, RandomSource randomSource) {
         if (state.getValue(WATERLOGGED)) {
-            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+            scheduledTickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
 
-        return super.updateShape(state, dir, neighborState, level, pos, neighborPos);
+        return super.updateShape(state, level, scheduledTickAccess, pos, dir, neighborPos, neighborState, randomSource);
     }
 
     @Override
@@ -123,12 +121,12 @@ public class CrateBlock extends Block implements IBlockOnPlayerBreak, EntityBloc
     }
 
     @Override
-    public FluidState getFluidState(BlockState state) {
+    protected FluidState getFluidState(BlockState state) {
         return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
-    public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
+    protected float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
         BlockEntity te = worldIn.getBlockEntity(pos);
 
         if (te instanceof ILockable) {
@@ -146,7 +144,7 @@ public class CrateBlock extends Block implements IBlockOnPlayerBreak, EntityBloc
         BlockEntity tileentity = worldIn.getBlockEntity(pos);
 
         if (tileentity instanceof INamed) {
-            if (stack.hasCustomHoverName()) {
+            if (stack.has(DataComponents.CUSTOM_NAME)) {
                 ((INamed) tileentity).setCustomName(stack.getHoverName());
             }
         }
@@ -157,22 +155,14 @@ public class CrateBlock extends Block implements IBlockOnPlayerBreak, EntityBloc
         }
     }
 
+    /**
+     * {@code onRemove} split in two: this only fires for a real removal, and the block entity is
+     * already gone by now - anything that needed it moved onto the block entity's
+     * {@code preRemoveSideEffects}.
+     */
     @Override
-    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            BlockEntity tileentity = worldIn.getBlockEntity(pos);
-
-            if (tileentity instanceof CrateBlockEntity crate) {
-                for (int slot = 0; slot < crate.getItemStackStorageHandler().getSlots(); slot++) {
-                    Containers.dropContents(worldIn, pos, crate.getItemStackStorageHandler().getLargeItemStack(slot).asItemStacks());
-                }
-                Containers.dropContents(worldIn, pos, crate.getItemStackStorageHandler().getEnhancements());
-
-                worldIn.updateNeighbourForOutputSignal(pos, this);
-            }
-
-            super.onRemove(state, worldIn, pos, newState, isMoving);
-        }
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel worldIn, BlockPos pos, boolean movedByPiston) {
+        worldIn.updateNeighbourForOutputSignal(pos, this);
     }
 
     // Copied from Item
@@ -208,11 +198,11 @@ public class CrateBlock extends Block implements IBlockOnPlayerBreak, EntityBloc
         }
 
         this.playerWillDestroy(level, pos, state, player);
-        return level.setBlock(pos, fluid.createLegacyBlock(), level.isClientSide ? Block.UPDATE_ALL_IMMEDIATE : Block.UPDATE_ALL);
+        return level.setBlock(pos, fluid.createLegacyBlock(), level.isClientSide() ? Block.UPDATE_ALL_IMMEDIATE : Block.UPDATE_ALL);
     }
 
     @Override
-    public void attack(BlockState state, Level level, BlockPos pos, Player player) {
+    protected void attack(BlockState state, Level level, BlockPos pos, Player player) {
         if (StorageAccessUtil.canAccess(level, pos, player)) {
             BlockHitResult result = getPlayerPOVHitResult(level, player);
             BlockEntity tileentity = level.getBlockEntity(pos);
@@ -223,7 +213,7 @@ public class CrateBlock extends Block implements IBlockOnPlayerBreak, EntityBloc
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+    protected InteractionResult useItemOn(ItemStack heldStack, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
         if (StorageAccessUtil.canAccess(worldIn, pos, player)) {
             if (!player.isShiftKeyDown()) {
                 BlockEntity tileentity = worldIn.getBlockEntity(pos);
@@ -232,11 +222,13 @@ public class CrateBlock extends Block implements IBlockOnPlayerBreak, EntityBloc
                 }
             }
 
-            if (!worldIn.isClientSide) {
+            if (!worldIn.isClientSide()) {
                 MenuProvider inamedcontainerprovider = this.getMenuProvider(state, worldIn, pos);
                 if (inamedcontainerprovider != null) {
                     Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> byteBuf.writeBlockPos(pos));
-                    PiglinAi.angerNearbyPiglins(player, true);
+                    if (worldIn instanceof ServerLevel serverLevel) {
+                        PiglinAi.angerNearbyPiglins(serverLevel, player, true);
+                    }
                 }
             }
         }
@@ -246,20 +238,20 @@ public class CrateBlock extends Block implements IBlockOnPlayerBreak, EntityBloc
 
     @Override
     @Nullable
-    public MenuProvider getMenuProvider(BlockState state, Level world, BlockPos pos) {
+    protected MenuProvider getMenuProvider(BlockState state, Level world, BlockPos pos) {
         BlockEntity tileentity = world.getBlockEntity(pos);
         return tileentity instanceof MenuProvider ? (MenuProvider) tileentity : null;
     }
 
     @Override
-    public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
+    protected boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
         super.triggerEvent(state, worldIn, pos, id, param);
         BlockEntity tileentity = worldIn.getBlockEntity(pos);
         return tileentity == null ? false : tileentity.triggerEvent(id, param);
     }
 
     @Override
-    public int getSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction dir) {
+    protected int getSignal(BlockState state, BlockGetter getter, BlockPos pos, Direction dir) {
         if (getter.getBlockEntity(pos) instanceof CrateBlockEntity crate) {
             return crate.getItemStackStorageHandler().getSignalStrength();
         }
@@ -268,17 +260,17 @@ public class CrateBlock extends Block implements IBlockOnPlayerBreak, EntityBloc
     }
 
     @Override
-    public boolean isSignalSource(BlockState state) {
+    protected boolean isSignalSource(BlockState state) {
         return true;
     }
 
     @Override
-    public boolean hasAnalogOutputSignal(BlockState state) {
+    protected boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos, Direction direction) {
         if (worldIn.getBlockEntity(pos) instanceof CrateBlockEntity crate) {
             return crate.getItemStackStorageHandler().getSignalStrength();
         }
@@ -287,26 +279,17 @@ public class CrateBlock extends Block implements IBlockOnPlayerBreak, EntityBloc
     }
 
     @Override
-    public BlockState rotate(BlockState state, Rotation rot) {
+    protected BlockState rotate(BlockState state, Rotation rot) {
         return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState state, Mirror mirrorIn) {
+    protected BlockState mirror(BlockState state, Mirror mirrorIn) {
         return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
     }
 
     protected boolean canBeLocked(Level worldIn, BlockPos pos) {
         return !((ILockable) worldIn.getBlockEntity(pos)).isLocked();
-    }
-
-    @Override
-    public void appendHoverText(ItemStack stack, BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
-        String code = StorageUtil.getCode(stack);
-
-        if (!code.isEmpty()) {
-            tooltip.add(Component.translatable(Constants.MOD_ID + ".info.combo", Component.literal(code).withStyle(ChatFormatting.AQUA)));
-        }
     }
 
     @Override

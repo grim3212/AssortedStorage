@@ -29,7 +29,7 @@ public class ShulkerItemStackStorageHandler extends StorageItemStackStorageHandl
             lockable.getLevel().blockEvent(lockable.getBlockPos(), lockable.getBlockState().getBlock(), 1, lockable.numPlayersUsing);
             if (lockable.numPlayersUsing == 1) {
                 lockable.getLevel().gameEvent(player, GameEvent.CONTAINER_OPEN, lockable.getBlockPos());
-                lockable.getLevel().playSound((Player) null, lockable.getBlockPos(), SoundEvents.SHULKER_BOX_OPEN, SoundSource.BLOCKS, 0.5F, lockable.getLevel().random.nextFloat() * 0.1F + 0.9F);
+                lockable.getLevel().playSound((Player) null, lockable.getBlockPos(), SoundEvents.SHULKER_BOX_OPEN, SoundSource.BLOCKS, 0.5F, lockable.getLevel().getRandom().nextFloat() * 0.1F + 0.9F);
             }
         }
     }
@@ -41,7 +41,7 @@ public class ShulkerItemStackStorageHandler extends StorageItemStackStorageHandl
             lockable.getLevel().blockEvent(lockable.getBlockPos(), lockable.getBlockState().getBlock(), 1, lockable.numPlayersUsing);
             if (lockable.numPlayersUsing <= 0) {
                 lockable.getLevel().gameEvent(player, GameEvent.CONTAINER_CLOSE, lockable.getBlockPos());
-                lockable.getLevel().playSound((Player) null, lockable.getBlockPos(), SoundEvents.SHULKER_BOX_CLOSE, SoundSource.BLOCKS, 0.5F, lockable.getLevel().random.nextFloat() * 0.1F + 0.9F);
+                lockable.getLevel().playSound((Player) null, lockable.getBlockPos(), SoundEvents.SHULKER_BOX_CLOSE, SoundSource.BLOCKS, 0.5F, lockable.getLevel().getRandom().nextFloat() * 0.1F + 0.9F);
             }
         }
     }

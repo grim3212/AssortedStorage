@@ -19,7 +19,7 @@ public class CrateCompactingContainer extends CrateContainer {
 	}
 
 	protected static CrateCompactingBlockEntity getCrateBlockEntity(Inventory playerInv, BlockPos pos) {
-		Level level = playerInv.player.getCommandSenderWorld();
+		Level level = playerInv.player.level();
 		BlockEntity blockEntity = level.getBlockEntity(pos);
 		if (blockEntity instanceof CrateCompactingBlockEntity crate) {
 			return crate;

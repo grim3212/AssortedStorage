@@ -90,4 +90,12 @@ public class LockedEnderChestBlockEntity extends BaseStorageBlockEntity {
     protected SoundEvent closeSound() {
         return SoundEvents.ENDER_CHEST_CLOSE;
     }
+
+    /**
+     * The lock is what turns the chest back into a vanilla ender chest, it is never dropped loose.
+     */
+    @Override
+    protected boolean shouldDropLock(BlockPos pos, BlockState state) {
+        return false;
+    }
 }

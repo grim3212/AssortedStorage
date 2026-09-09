@@ -1,35 +1,33 @@
 package com.grim3212.assorted.storage.common.crafting;
 
+import com.mojang.serialization.MapCodec;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.StorageItems;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.AirItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.Level;
 
 public class LockedHopperRecipe extends CustomRecipe {
 
-    public static final SimpleCraftingRecipeSerializer<LockedHopperRecipe> SERIALIZER = new SimpleCraftingRecipeSerializer<>(LockedHopperRecipe::new);
-
-    public LockedHopperRecipe(Identifier id, CraftingBookCategory category) {
-        super(id, category);
-    }
+    public static final LockedHopperRecipe INSTANCE = new LockedHopperRecipe();
+    public static final MapCodec<LockedHopperRecipe> MAP_CODEC = MapCodec.unit(INSTANCE);
+    public static final StreamCodec<RegistryFriendlyByteBuf, LockedHopperRecipe> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+    public static final RecipeSerializer<LockedHopperRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
 
     @Override
-    public boolean matches(CraftingContainer inv, Level worldIn) {
+    public boolean matches(CraftingInput inv, Level worldIn) {
         ItemStack hopper = ItemStack.EMPTY;
         ItemStack lock = ItemStack.EMPTY;
 
-        for (int i = 0; i < inv.getContainerSize(); i++) {
+        for (int i = 0; i < inv.size(); i++) {
             ItemStack stack = inv.getItem(i);
             if (stack.isEmpty())
                 continue;
@@ -47,11 +45,11 @@ public class LockedHopperRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv, RegistryAccess registryAccess) {
+    public ItemStack assemble(CraftingInput inv) {
         ItemStack hopper = ItemStack.EMPTY;
         ItemStack lock = ItemStack.EMPTY;
 
-        for (int i = 0; i < inv.getContainerSize(); i++) {
+        for (int i = 0; i < inv.size(); i++) {
             ItemStack stack = inv.getItem(i);
             Item item = stack.getItem();
             if (stack.getItem() == Items.HOPPER && hopper.isEmpty())
@@ -67,13 +65,9 @@ public class LockedHopperRecipe extends CustomRecipe {
         return StorageUtil.setCodeOnStack(lockCode, new ItemStack(StorageBlocks.LOCKED_HOPPER.get()));
     }
 
-    @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return width * height >= 2;
-    }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<LockedHopperRecipe> getSerializer() {
         return SERIALIZER;
     }
 

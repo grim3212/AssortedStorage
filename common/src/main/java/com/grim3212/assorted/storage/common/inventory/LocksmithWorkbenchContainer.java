@@ -116,8 +116,10 @@ public class LocksmithWorkbenchContainer extends AbstractContainerMenu {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
             if (index == 1) {
+                // onCraftedBy lost its Level parameter; the level side of it is onCraftedPostProcess.
                 this.worldPosCallable.execute((p_217067_2_, p_217067_3_) -> {
-                    itemstack1.getItem().onCraftedBy(itemstack1, p_217067_2_, playerIn);
+                    itemstack1.getItem().onCraftedBy(itemstack1, playerIn);
+                    itemstack1.getItem().onCraftedPostProcess(itemstack1, p_217067_2_);
                 });
                 if (!this.moveItemStackTo(itemstack1, 2, 38, true)) {
                     return ItemStack.EMPTY;

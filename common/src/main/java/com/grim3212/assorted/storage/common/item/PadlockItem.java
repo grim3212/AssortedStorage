@@ -1,6 +1,7 @@
 package com.grim3212.assorted.storage.common.item;
 
 import com.google.common.collect.Maps;
+import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.lib.registry.ILoaderRegistry;
 import com.grim3212.assorted.lib.util.LibCommonTags;
@@ -54,22 +55,8 @@ public class PadlockItem extends CombinationItem {
         lockMappings.put(Blocks.HOPPER, StorageBlocks.LOCKED_HOPPER.get());
 
         lockMappings.put(Blocks.SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.WHITE_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.ORANGE_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.MAGENTA_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.LIGHT_BLUE_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.YELLOW_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.LIME_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.PINK_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.GRAY_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.LIGHT_GRAY_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.CYAN_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.PURPLE_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.BLUE_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.BROWN_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.GREEN_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.RED_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
-        lockMappings.put(Blocks.BLACK_SHULKER_BOX, StorageBlocks.LOCKED_SHULKER_BOX.get());
+        // The per colour shulker boxes are a ColorCollection now instead of 16 separate fields.
+        Blocks.DYED_SHULKER_BOX.forEach((shulker) -> lockMappings.put(shulker, StorageBlocks.LOCKED_SHULKER_BOX.get()));
 
         ILoaderRegistry<Block> blockRegistry = Services.PLATFORM.getRegistry(Registries.BLOCK);
 
@@ -145,31 +132,29 @@ public class PadlockItem extends CombinationItem {
     private boolean tryPlaceLockOnEnderChest(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
         ItemStack itemstack = entityplayer.getItemInHand(hand);
 
-        if (itemstack.hasTag()) {
-            String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
-            if (!code.isEmpty()) {
-                BlockState currentBlockState = worldIn.getBlockState(pos);
+        // The lock is a CUSTOM_DATA component on the stack now rather than raw stack NBT.
+        String code = StorageUtil.getCode(itemstack);
+        if (!code.isEmpty()) {
+            BlockState currentBlockState = worldIn.getBlockState(pos);
 
-                Block newBlock = getMatchingBlock(currentBlockState.getBlock());
-                if (newBlock == Blocks.AIR) {
-                    return false;
-                }
-
-                if (worldIn.getBlockEntity(pos) instanceof EnderChestBlockEntity previousChestEntity) {
-
-                    if (!entityplayer.isCreative())
-                        itemstack.shrink(1);
-
-                    worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, currentBlockState.getValue(HorizontalDirectionalBlock.FACING)), 3);
-                    worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
-                    if (worldIn.getBlockEntity(pos) instanceof LockedEnderChestBlockEntity chestBE) {
-                        chestBE.setLockCode(code);
-                    }
-
-                    return true;
-                }
+            Block newBlock = getMatchingBlock(currentBlockState.getBlock());
+            if (newBlock == Blocks.AIR) {
+                return false;
             }
 
+            if (worldIn.getBlockEntity(pos) instanceof EnderChestBlockEntity previousChestEntity) {
+
+                if (!entityplayer.isCreative())
+                    itemstack.shrink(1);
+
+                worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, currentBlockState.getValue(HorizontalDirectionalBlock.FACING)), 3);
+                worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.getRandom().nextFloat() * 0.1F + 0.9F);
+                if (worldIn.getBlockEntity(pos) instanceof LockedEnderChestBlockEntity chestBE) {
+                    chestBE.setLockCode(code);
+                }
+
+                return true;
+            }
         }
 
         return false;
@@ -178,37 +163,35 @@ public class PadlockItem extends CombinationItem {
     private boolean tryPlaceLockOnShulker(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
         ItemStack itemstack = entityplayer.getItemInHand(hand);
 
-        if (itemstack.hasTag()) {
-            String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
-            if (!code.isEmpty()) {
-                BlockState currentBlockState = worldIn.getBlockState(pos);
+        // The lock is a CUSTOM_DATA component on the stack now rather than raw stack NBT.
+        String code = StorageUtil.getCode(itemstack);
+        if (!code.isEmpty()) {
+            BlockState currentBlockState = worldIn.getBlockState(pos);
 
-                Block newBlock = getMatchingBlock(currentBlockState.getBlock());
-                if (newBlock == Blocks.AIR) {
-                    return false;
-                }
-
-                if (worldIn.getBlockEntity(pos) instanceof ShulkerBoxBlockEntity previousShulkerEntity) {
-                    NonNullList<ItemStack> shulkerItems = NonNullList.withSize(previousShulkerEntity.getContainerSize(), ItemStack.EMPTY);
-                    for (int i = 0; i < previousShulkerEntity.getContainerSize(); i++) {
-                        shulkerItems.set(i, previousShulkerEntity.getItem(i).copy());
-                    }
-
-                    if (!entityplayer.isCreative())
-                        itemstack.shrink(1);
-
-                    worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(ShulkerBoxBlock.FACING, currentBlockState.getValue(ShulkerBoxBlock.FACING)), 3);
-                    worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
-                    if (worldIn.getBlockEntity(pos) instanceof LockedShulkerBoxBlockEntity shulkerBE) {
-                        shulkerBE.getItemStackStorageHandler().setStacks(shulkerItems);
-                        shulkerBE.setLockCode(code);
-                        shulkerBE.setColor(ShulkerBoxBlock.getColorFromBlock(currentBlockState.getBlock()));
-                    }
-
-                    return true;
-                }
+            Block newBlock = getMatchingBlock(currentBlockState.getBlock());
+            if (newBlock == Blocks.AIR) {
+                return false;
             }
 
+            if (worldIn.getBlockEntity(pos) instanceof ShulkerBoxBlockEntity previousShulkerEntity) {
+                NonNullList<ItemStack> shulkerItems = NonNullList.withSize(previousShulkerEntity.getContainerSize(), ItemStack.EMPTY);
+                for (int i = 0; i < previousShulkerEntity.getContainerSize(); i++) {
+                    shulkerItems.set(i, previousShulkerEntity.getItem(i).copy());
+                }
+
+                if (!entityplayer.isCreative())
+                    itemstack.shrink(1);
+
+                worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(ShulkerBoxBlock.FACING, currentBlockState.getValue(ShulkerBoxBlock.FACING)), 3);
+                worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.getRandom().nextFloat() * 0.1F + 0.9F);
+                if (worldIn.getBlockEntity(pos) instanceof LockedShulkerBoxBlockEntity shulkerBE) {
+                    shulkerBE.getItemStackStorageHandler().setStacks(shulkerItems);
+                    shulkerBE.setLockCode(code);
+                    shulkerBE.setColor(currentBlockState.getBlock() instanceof ShulkerBoxBlock shulkerBlock ? shulkerBlock.getColor() : null);
+                }
+
+                return true;
+            }
         }
 
         return false;
@@ -217,38 +200,36 @@ public class PadlockItem extends CombinationItem {
     private boolean tryPlaceLockOnChest(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
         ItemStack itemstack = entityplayer.getItemInHand(hand);
 
-        if (itemstack.hasTag()) {
-            String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
-            if (!code.isEmpty()) {
-                BlockState currentBlockState = worldIn.getBlockState(pos);
+        // The lock is a CUSTOM_DATA component on the stack now rather than raw stack NBT.
+        String code = StorageUtil.getCode(itemstack);
+        if (!code.isEmpty()) {
+            BlockState currentBlockState = worldIn.getBlockState(pos);
 
-                Block newBlock = getMatchingBlock(currentBlockState.getBlock());
-                if (newBlock == Blocks.AIR) {
-                    return false;
-                }
-
-                if (worldIn.getBlockEntity(pos) instanceof ChestBlockEntity previousChestEntity) {
-                    NonNullList<ItemStack> chestItems = NonNullList.withSize(previousChestEntity.getContainerSize(), ItemStack.EMPTY);
-                    for (int i = 0; i < previousChestEntity.getContainerSize(); i++) {
-                        chestItems.set(i, previousChestEntity.getItem(i).copy());
-                    }
-                    // This way the block doesn't drop items and dupe
-                    previousChestEntity.clearContent();
-
-                    if (!entityplayer.isCreative())
-                        itemstack.shrink(1);
-
-                    worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, currentBlockState.getValue(HorizontalDirectionalBlock.FACING)), 3);
-                    worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
-                    if (worldIn.getBlockEntity(pos) instanceof LockedChestBlockEntity chestBE) {
-                        chestBE.setLockCode(code);
-                        chestBE.getItemStackStorageHandler().setStacks(chestItems);
-                    }
-
-                    return true;
-                }
+            Block newBlock = getMatchingBlock(currentBlockState.getBlock());
+            if (newBlock == Blocks.AIR) {
+                return false;
             }
 
+            if (worldIn.getBlockEntity(pos) instanceof ChestBlockEntity previousChestEntity) {
+                NonNullList<ItemStack> chestItems = NonNullList.withSize(previousChestEntity.getContainerSize(), ItemStack.EMPTY);
+                for (int i = 0; i < previousChestEntity.getContainerSize(); i++) {
+                    chestItems.set(i, previousChestEntity.getItem(i).copy());
+                }
+                // This way the block doesn't drop items and dupe
+                previousChestEntity.clearContent();
+
+                if (!entityplayer.isCreative())
+                    itemstack.shrink(1);
+
+                worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, currentBlockState.getValue(HorizontalDirectionalBlock.FACING)), 3);
+                worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.getRandom().nextFloat() * 0.1F + 0.9F);
+                if (worldIn.getBlockEntity(pos) instanceof LockedChestBlockEntity chestBE) {
+                    chestBE.setLockCode(code);
+                    chestBE.getItemStackStorageHandler().setStacks(chestItems);
+                }
+
+                return true;
+            }
         }
 
         return false;
@@ -257,38 +238,36 @@ public class PadlockItem extends CombinationItem {
     private boolean tryPlaceLockOnBarrel(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
         ItemStack itemstack = entityplayer.getItemInHand(hand);
 
-        if (itemstack.hasTag()) {
-            String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
-            if (!code.isEmpty()) {
-                BlockState currentBlockState = worldIn.getBlockState(pos);
+        // The lock is a CUSTOM_DATA component on the stack now rather than raw stack NBT.
+        String code = StorageUtil.getCode(itemstack);
+        if (!code.isEmpty()) {
+            BlockState currentBlockState = worldIn.getBlockState(pos);
 
-                Block newBlock = getMatchingBlock(currentBlockState.getBlock());
-                if (newBlock == Blocks.AIR) {
-                    return false;
-                }
-
-                if (worldIn.getBlockEntity(pos) instanceof BarrelBlockEntity previousBarrelEntity) {
-                    NonNullList<ItemStack> chestItems = NonNullList.withSize(previousBarrelEntity.getContainerSize(), ItemStack.EMPTY);
-                    for (int i = 0; i < previousBarrelEntity.getContainerSize(); i++) {
-                        chestItems.set(i, previousBarrelEntity.getItem(i).copy());
-                    }
-                    // This way the block doesn't drop items and dupe
-                    previousBarrelEntity.clearContent();
-
-                    if (!entityplayer.isCreative())
-                        itemstack.shrink(1);
-
-                    worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(LockedBarrelBlock.FACING, currentBlockState.getValue(LockedBarrelBlock.FACING)), 3);
-                    worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
-                    if (worldIn.getBlockEntity(pos) instanceof LockedBarrelBlockEntity barrelBE) {
-                        barrelBE.setLockCode(code);
-                        barrelBE.getItemStackStorageHandler().setStacks(chestItems);
-                    }
-
-                    return true;
-                }
+            Block newBlock = getMatchingBlock(currentBlockState.getBlock());
+            if (newBlock == Blocks.AIR) {
+                return false;
             }
 
+            if (worldIn.getBlockEntity(pos) instanceof BarrelBlockEntity previousBarrelEntity) {
+                NonNullList<ItemStack> chestItems = NonNullList.withSize(previousBarrelEntity.getContainerSize(), ItemStack.EMPTY);
+                for (int i = 0; i < previousBarrelEntity.getContainerSize(); i++) {
+                    chestItems.set(i, previousBarrelEntity.getItem(i).copy());
+                }
+                // This way the block doesn't drop items and dupe
+                previousBarrelEntity.clearContent();
+
+                if (!entityplayer.isCreative())
+                    itemstack.shrink(1);
+
+                worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(LockedBarrelBlock.FACING, currentBlockState.getValue(LockedBarrelBlock.FACING)), 3);
+                worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.getRandom().nextFloat() * 0.1F + 0.9F);
+                if (worldIn.getBlockEntity(pos) instanceof LockedBarrelBlockEntity barrelBE) {
+                    barrelBE.setLockCode(code);
+                    barrelBE.getItemStackStorageHandler().setStacks(chestItems);
+                }
+
+                return true;
+            }
         }
 
         return false;
@@ -297,38 +276,36 @@ public class PadlockItem extends CombinationItem {
     private boolean tryPlaceLockOnHopper(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
         ItemStack itemstack = entityplayer.getItemInHand(hand);
 
-        if (itemstack.hasTag()) {
-            String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
-            if (!code.isEmpty()) {
-                BlockState currentBlockState = worldIn.getBlockState(pos);
+        // The lock is a CUSTOM_DATA component on the stack now rather than raw stack NBT.
+        String code = StorageUtil.getCode(itemstack);
+        if (!code.isEmpty()) {
+            BlockState currentBlockState = worldIn.getBlockState(pos);
 
-                Block newBlock = getMatchingBlock(currentBlockState.getBlock());
-                if (newBlock == Blocks.AIR) {
-                    return false;
-                }
-
-                if (worldIn.getBlockEntity(pos) instanceof HopperBlockEntity previousHopperBE) {
-                    NonNullList<ItemStack> chestItems = NonNullList.withSize(previousHopperBE.getContainerSize(), ItemStack.EMPTY);
-                    for (int i = 0; i < previousHopperBE.getContainerSize(); i++) {
-                        chestItems.set(i, previousHopperBE.getItem(i).copy());
-                    }
-                    // This way the block doesn't drop items and dupe
-                    previousHopperBE.clearContent();
-
-                    if (!entityplayer.isCreative())
-                        itemstack.shrink(1);
-
-                    worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(LockedHopperBlock.FACING, currentBlockState.getValue(LockedHopperBlock.FACING)), 3);
-                    worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
-                    if (worldIn.getBlockEntity(pos) instanceof LockedHopperBlockEntity hopperBE) {
-                        hopperBE.setLockCode(code);
-                        hopperBE.getItemStackStorageHandler().setStacks(chestItems);
-                    }
-
-                    return true;
-                }
+            Block newBlock = getMatchingBlock(currentBlockState.getBlock());
+            if (newBlock == Blocks.AIR) {
+                return false;
             }
 
+            if (worldIn.getBlockEntity(pos) instanceof HopperBlockEntity previousHopperBE) {
+                NonNullList<ItemStack> chestItems = NonNullList.withSize(previousHopperBE.getContainerSize(), ItemStack.EMPTY);
+                for (int i = 0; i < previousHopperBE.getContainerSize(); i++) {
+                    chestItems.set(i, previousHopperBE.getItem(i).copy());
+                }
+                // This way the block doesn't drop items and dupe
+                previousHopperBE.clearContent();
+
+                if (!entityplayer.isCreative())
+                    itemstack.shrink(1);
+
+                worldIn.setBlock(pos, newBlock.defaultBlockState().setValue(LockedHopperBlock.FACING, currentBlockState.getValue(LockedHopperBlock.FACING)), 3);
+                worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.getRandom().nextFloat() * 0.1F + 0.9F);
+                if (worldIn.getBlockEntity(pos) instanceof LockedHopperBlockEntity hopperBE) {
+                    hopperBE.setLockCode(code);
+                    hopperBE.getItemStackStorageHandler().setStacks(chestItems);
+                }
+
+                return true;
+            }
         }
 
         return false;
@@ -337,40 +314,38 @@ public class PadlockItem extends CombinationItem {
     private boolean tryPlaceLockOnDoor(Level worldIn, BlockPos pos, Player entityplayer, InteractionHand hand) {
         ItemStack itemstack = entityplayer.getItemInHand(hand);
 
-        if (itemstack.hasTag()) {
-            String code = itemstack.getTag().contains("Storage_Lock", 8) ? itemstack.getTag().getString("Storage_Lock") : "";
-            if (!code.isEmpty()) {
-                BlockState currentDoor = worldIn.getBlockState(pos);
+        // The lock is a CUSTOM_DATA component on the stack now rather than raw stack NBT.
+        String code = StorageUtil.getCode(itemstack);
+        if (!code.isEmpty()) {
+            BlockState currentDoor = worldIn.getBlockState(pos);
 
-                Block newDoor = getMatchingBlock(currentDoor.getBlock());
-                if (newDoor == Blocks.AIR || currentDoor.isAir()) {
-                    return false;
-                }
-
-                if (!entityplayer.isCreative())
-                    itemstack.shrink(1);
-
-                BlockState newState = newDoor.defaultBlockState().setValue(DoorBlock.FACING, currentDoor.getValue(DoorBlock.FACING)).setValue(DoorBlock.OPEN, currentDoor.getValue(DoorBlock.OPEN)).setValue(DoorBlock.HINGE, currentDoor.getValue(DoorBlock.HINGE));
-                DoubleBlockHalf currentHalf = currentDoor.getValue(DoorBlock.HALF);
-                worldIn.setBlock(pos, newState.setValue(DoorBlock.HALF, currentHalf), Block.UPDATE_KNOWN_SHAPE);
-                if (currentHalf == DoubleBlockHalf.UPPER) {
-                    worldIn.setBlock(pos.below(), newState.setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER), Block.UPDATE_ALL);
-                } else {
-                    worldIn.setBlock(pos.above(), newState.setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER), Block.UPDATE_ALL);
-                }
-
-                if (worldIn.getBlockEntity(pos) instanceof BaseLockedBlockEntity lockedDoor) {
-                    lockedDoor.setLockCode(code);
-                }
-
-                if (worldIn.getBlockEntity(currentHalf == DoubleBlockHalf.UPPER ? pos.below() : pos.above()) instanceof BaseLockedBlockEntity otherHalfLockedDoor) {
-                    otherHalfLockedDoor.setLockCode(code);
-                }
-
-                worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
-                return true;
+            Block newDoor = getMatchingBlock(currentDoor.getBlock());
+            if (newDoor == Blocks.AIR || currentDoor.isAir()) {
+                return false;
             }
 
+            if (!entityplayer.isCreative())
+                itemstack.shrink(1);
+
+            BlockState newState = newDoor.defaultBlockState().setValue(DoorBlock.FACING, currentDoor.getValue(DoorBlock.FACING)).setValue(DoorBlock.OPEN, currentDoor.getValue(DoorBlock.OPEN)).setValue(DoorBlock.HINGE, currentDoor.getValue(DoorBlock.HINGE));
+            DoubleBlockHalf currentHalf = currentDoor.getValue(DoorBlock.HALF);
+            worldIn.setBlock(pos, newState.setValue(DoorBlock.HALF, currentHalf), Block.UPDATE_KNOWN_SHAPE);
+            if (currentHalf == DoubleBlockHalf.UPPER) {
+                worldIn.setBlock(pos.below(), newState.setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER), Block.UPDATE_ALL);
+            } else {
+                worldIn.setBlock(pos.above(), newState.setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER), Block.UPDATE_ALL);
+            }
+
+            if (worldIn.getBlockEntity(pos) instanceof BaseLockedBlockEntity lockedDoor) {
+                lockedDoor.setLockCode(code);
+            }
+
+            if (worldIn.getBlockEntity(currentHalf == DoubleBlockHalf.UPPER ? pos.below() : pos.above()) instanceof BaseLockedBlockEntity otherHalfLockedDoor) {
+                otherHalfLockedDoor.setLockCode(code);
+            }
+
+            worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.getRandom().nextFloat() * 0.1F + 0.9F);
+            return true;
         }
 
         return false;

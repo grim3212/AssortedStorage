@@ -3,13 +3,12 @@ package com.grim3212.assorted.storage.common.block;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.storage.api.LockerHalf;
 import com.grim3212.assorted.storage.common.block.blockentity.LockerBlockEntity;
-import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -17,7 +16,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -44,7 +44,7 @@ public class LockerBlock extends BaseStorageBlock {
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction dir, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTickAccess, BlockPos pos, Direction dir, BlockPos neighborPos, BlockState neighborState, RandomSource randomSource) {
         if (neighborState.is(this) && dir.getAxis().isVertical()) {
             LockerHalf half = neighborState.getValue(HALF);
             if (state.getValue(HALF) == LockerHalf.SINGLE && half != LockerHalf.SINGLE && state.getValue(FACING) == neighborState.getValue(FACING) && getConnectedDirection(neighborState) == dir.getOpposite()) {
@@ -54,7 +54,7 @@ public class LockerBlock extends BaseStorageBlock {
             return state.setValue(HALF, LockerHalf.SINGLE);
         }
 
-        return super.updateShape(state, dir, neighborState, level, pos, neighborPos);
+        return super.updateShape(state, level, scheduledTickAccess, pos, dir, neighborPos, neighborState, randomSource);
     }
 
     public static Direction getConnectedDirection(BlockState state) {
@@ -86,7 +86,7 @@ public class LockerBlock extends BaseStorageBlock {
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+    protected VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         if (state.getValue(HALF) == LockerHalf.TOP)
             return super.getShape(state, worldIn, pos, context);
 
@@ -94,36 +94,21 @@ public class LockerBlock extends BaseStorageBlock {
     }
 
     @Override
-    public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
+    protected float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
         if (worldIn.getBlockState(pos.below()) == state)
             return super.getDestroyProgress(state, player, worldIn, pos.below());
 
         return super.getDestroyProgress(state, player, worldIn, pos);
     }
 
+    /**
+     * {@code onRemove} split in two: this only fires for a real removal, and the block entity is
+     * already gone by now - anything that needed it moved onto the block entity's
+     * {@code preRemoveSideEffects}.
+     */
     @Override
-    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            BlockEntity tileentity = worldIn.getBlockEntity(pos);
-
-            if (tileentity instanceof LockerBlockEntity storageBlockEntity) {
-
-                if (storageBlockEntity.isLocked() && worldIn.getBlockState(pos.above()) != state && worldIn.getBlockState(pos.below()) != state) {
-                    ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
-                    CompoundTag tag = new CompoundTag();
-                    StorageUtil.writeLock(tag, storageBlockEntity.getLockCode());
-                    lockStack.setTag(tag);
-                    Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
-                }
-
-                StorageUtil.dropContents(worldIn, pos, storageBlockEntity.getItemStackStorageHandler());
-                worldIn.updateNeighbourForOutputSignal(pos, this);
-            }
-
-            if (state.hasBlockEntity() && !state.is(newState.getBlock())) {
-                worldIn.removeBlockEntity(pos);
-            }
-        }
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel worldIn, BlockPos pos, boolean movedByPiston) {
+        worldIn.updateNeighbourForOutputSignal(pos, this);
     }
 
     @Override
@@ -173,7 +158,7 @@ public class LockerBlock extends BaseStorageBlock {
                 lockerBlockEntity.setLockCode("");
                 topLocker.setLockCode("");
 
-                worldIn.playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+                worldIn.playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.getRandom().nextFloat() * 0.1F + 0.9F);
                 return true;
 
             } else if (worldIn.getBlockEntity(pos.below()) instanceof LockerBlockEntity bottomLocker) {
@@ -181,7 +166,7 @@ public class LockerBlock extends BaseStorageBlock {
                 lockerBlockEntity.setLockCode("");
                 bottomLocker.setLockCode("");
 
-                worldIn.playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+                worldIn.playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.getRandom().nextFloat() * 0.1F + 0.9F);
                 return true;
             }
         }
@@ -204,7 +189,7 @@ public class LockerBlock extends BaseStorageBlock {
                     itemstack.shrink(1);
                 lockerBlockEntity.setLockCode(code);
                 topLocker.setLockCode(code);
-                worldIn.playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+                worldIn.playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.getRandom().nextFloat() * 0.1F + 0.9F);
                 return true;
 
             } else if (worldIn.getBlockEntity(pos.below()) instanceof LockerBlockEntity bottomLocker) {
@@ -212,7 +197,7 @@ public class LockerBlock extends BaseStorageBlock {
                     itemstack.shrink(1);
                 lockerBlockEntity.setLockCode(code);
                 bottomLocker.setLockCode(code);
-                worldIn.playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+                worldIn.playSound(entityplayer, tileentity.getBlockPos(), SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.getRandom().nextFloat() * 0.1F + 0.9F);
                 return true;
             }
         }

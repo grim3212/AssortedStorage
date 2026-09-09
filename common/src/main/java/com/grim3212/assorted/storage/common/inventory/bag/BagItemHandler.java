@@ -2,16 +2,21 @@ package com.grim3212.assorted.storage.common.inventory.bag;
 
 import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
+import com.grim3212.assorted.storage.api.StorageLockIO;
 import com.grim3212.assorted.storage.api.StorageMaterial;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A bag's contents used to live in the stack's free form NBT under an "Inventory" tag. Stack NBT
+ * is gone, and the vanilla component for exactly this is {@code DataComponents.CONTAINER}, so the
+ * bag stores an {@link ItemContainerContents} instead of hand rolled tags.
+ */
 public class BagItemHandler extends ItemStackStorageHandler {
 
-    private ItemStack itemStack;
+    private final ItemStack itemStack;
     private final StorageMaterial material;
 
     public BagItemHandler(ItemStack itemStack, @Nullable StorageMaterial material) {
@@ -27,34 +32,16 @@ public class BagItemHandler extends ItemStackStorageHandler {
 
     @Override
     public void onContentsChanged(int slot) {
-        CompoundTag nbt = itemStack.getOrCreateTag();
-        nbt.put("Inventory", serializeNBT());
+        this.itemStack.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(this.getStacks()));
 
         // If we set the storage lock on each save it should be a bit more performant
         // then checking the inventory every render to decide if it is locked or not
         ItemStack storageLock = this.getStackInSlot(0);
-        String newLockCode = StorageUtil.getCode(storageLock);
-        nbt.putString("Storage_Lock", newLockCode);
-    }
-
-    @Override
-    public void deserializeNBT(CompoundTag nbt) {
-        setSize(numStacks(this.material));
-        ListTag tagList = nbt.getList("Items", Tag.TAG_COMPOUND);
-        for (int i = 0; i < tagList.size(); i++) {
-            CompoundTag itemTags = tagList.getCompound(i);
-            int slot = itemTags.getInt("Slot");
-
-            if (slot >= 0 && slot < stacks.size()) {
-                stacks.set(slot, ItemStack.of(itemTags));
-            }
-        }
-        onLoad();
+        StorageLockIO.setLockOnStack(this.itemStack, StorageUtil.getCode(storageLock));
     }
 
     public void load() {
-        CompoundTag tag = itemStack.getOrCreateTag();
-        if (tag.contains("Inventory"))
-            deserializeNBT(tag.getCompound("Inventory"));
+        setSize(numStacks(this.material));
+        this.itemStack.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(this.getStacks());
     }
 }

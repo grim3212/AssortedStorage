@@ -1,20 +1,17 @@
 package com.grim3212.assorted.storage.common.block;
 
 import com.grim3212.assorted.lib.core.block.IBlockCloneStack;
-import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.StorageAccessUtil;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseLockedBlockEntity;
-import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.mixin.block.DoorBlockAccessor;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -22,13 +19,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
@@ -41,13 +40,13 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockClo
     private final Block parent;
 
     public LockedDoorBlock(DoorBlock parent, Properties builder) {
-        super(builder, ((DoorBlockAccessor) parent).getType());
+        super(((DoorBlockAccessor) parent).getType(), builder);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(OPEN, false).setValue(HINGE, DoorHingeSide.LEFT).setValue(POWERED, false).setValue(HALF, DoubleBlockHalf.LOWER));
         this.parent = parent;
     }
 
     public LockedDoorBlock(Identifier parent, BlockSetType type, Properties builder) {
-        super(builder, type);
+        super(type, builder);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(OPEN, false).setValue(HINGE, DoorHingeSide.LEFT).setValue(POWERED, false).setValue(HALF, DoubleBlockHalf.LOWER));
         this.parent = Services.PLATFORM.getRegistry(Registries.BLOCK).getValue(parent).orElse(Blocks.AIR);
     }
@@ -58,7 +57,7 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockClo
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+    protected void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, Orientation orientation, boolean isMoving) {
         // redstone doesn't work with locked doors
     }
 
@@ -68,7 +67,7 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockClo
     }
 
     @Override
-    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
+    protected BlockState updateShape(BlockState stateIn, LevelReader worldIn, ScheduledTickAccess scheduledTickAccess, BlockPos currentPos, Direction facing, BlockPos facingPos, BlockState facingState, RandomSource randomSource) {
         DoubleBlockHalf doubleblockhalf = stateIn.getValue(HALF);
         if (facing.getAxis() == Direction.Axis.Y && doubleblockhalf == DoubleBlockHalf.LOWER == (facing == Direction.UP)) {
 
@@ -81,7 +80,7 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockClo
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+    protected InteractionResult useItemOn(ItemStack heldStack, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
         if (player.isShiftKeyDown() && StorageAccessUtil.canAccess(worldIn, pos, player)) {
             BlockEntity tileentity = worldIn.getBlockEntity(pos);
             if (tileentity instanceof BaseLockedBlockEntity) {
@@ -110,7 +109,7 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockClo
     }
 
     @Override
-    public float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
+    protected float getDestroyProgress(BlockState state, Player player, BlockGetter worldIn, BlockPos pos) {
         BlockEntity te = worldIn.getBlockEntity(pos);
 
         if (te instanceof BaseLockedBlockEntity) {
@@ -121,27 +120,6 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockClo
         }
 
         return super.getDestroyProgress(state, player, worldIn, pos);
-    }
-
-    @Override
-    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (state.getBlock() != newState.getBlock()) {
-            BlockEntity tileentity = worldIn.getBlockEntity(pos);
-
-            if (tileentity instanceof BaseLockedBlockEntity) {
-                BaseLockedBlockEntity teStorage = (BaseLockedBlockEntity) tileentity;
-
-                if (teStorage.isLocked() && state.getValue(HALF) == DoubleBlockHalf.UPPER) {
-                    ItemStack lockStack = new ItemStack(StorageItems.LOCKSMITH_LOCK.get());
-                    CompoundTag tag = new CompoundTag();
-                    StorageUtil.writeLock(tag, teStorage.getLockCode());
-                    lockStack.setTag(tag);
-                    Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), lockStack);
-                }
-            }
-
-            super.onRemove(state, worldIn, pos, newState, isMoving);
-        }
     }
 
     @Override
@@ -158,7 +136,7 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockClo
         BlockState toPlace = this.parent.defaultBlockState().setValue(FACING, dir).setValue(OPEN, open).setValue(HINGE, hinge);
 
         worldIn.setBlock(pos, toPlace.setValue(HALF, half), 3);
-        worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+        worldIn.playSound(entityplayer, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.5F, worldIn.getRandom().nextFloat() * 0.1F + 0.9F);
 
         if (half == DoubleBlockHalf.UPPER) {
             worldIn.setBlock(pos.below(), toPlace.setValue(HALF, DoubleBlockHalf.LOWER), 3);

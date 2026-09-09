@@ -3,37 +3,45 @@ package com.grim3212.assorted.storage.api;
 import com.google.common.collect.Maps;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.lib.registry.ILoaderRegistry;
-import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.TransientCraftingContainer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplayContext;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Logic follows the same flow as laid out by StorageDrawers and FunctionStorage
+ * <p>
+ * The recipe manager only exists server side in 26.x, so this takes a {@link ServerLevel} rather
+ * than a plain {@code Level}. Recipes also no longer expose their result or their ingredient list
+ * directly - the result comes off the recipe's {@link RecipeDisplay} and the ingredients off its
+ * {@code placementInfo()} - and recipes match against a {@link CraftingInput} instead of a
+ * {@code CraftingContainer}.
  */
 
 public class CompactingHelper {
 
-    private final Level level;
+    private final ServerLevel level;
+    private final ContextMap displayContext;
 
-    public CompactingHelper(Level level) {
+    public CompactingHelper(ServerLevel level) {
         this.level = level;
+        this.displayContext = SlotDisplayContext.fromLevel(level);
     }
 
     public List<Match> findMatches(ItemStack stack, int numTiers) {
@@ -47,7 +55,7 @@ public class CompactingHelper {
             matches.add(0, match);
             // Are we at the topMost tier
             if (matches.size() < numTiers) {
-                // If we aren't search again
+                // If we are not, search again
                 match = findUpperTier(match.getItem());
                 if (!match.getItem().isEmpty()) {
                     // Set the current result number of required items to be multiplied by the
@@ -60,7 +68,7 @@ public class CompactingHelper {
             }
         }
         boolean keepSearching = true;
-        // Until we can't find a lower tier anymore keep searching
+        // Until we cannot find a lower tier anymore keep searching
         while (keepSearching && matches.size() < numTiers) {
             // Look for a lower tier for the first element in the list of matches
             match = findLowerTier(matches.get(matches.size() - 1).getItem());
@@ -91,23 +99,21 @@ public class CompactingHelper {
     private Match findUpperTier(ItemStack stack) {
         List<ItemStack> outputs = new ArrayList<>();
         // Try to check for 3x3 recipes first
-        List<ItemStack> matchingStacks = findMatchingStacks(new ComparisonCraftingContainer(3, stack));
-        int sizeCheck = matchingStacks.size() == 0 ? 4 : 9;
-        if (matchingStacks.size() == 0) {
-            // If we didn't find a match at 3x3 then we search at 2x2
-            matchingStacks = findMatchingStacks(new ComparisonCraftingContainer(2, stack));
+        List<ItemStack> matchingStacks = findMatchingStacks(filledInput(3, stack));
+        int sizeCheck = matchingStacks.isEmpty() ? 4 : 9;
+        if (matchingStacks.isEmpty()) {
+            // If we did not find a match at 3x3 then we search at 2x2
+            matchingStacks = findMatchingStacks(filledInput(2, stack));
         }
 
         if (stack.is(StorageTags.Items.CRAFTING_OVERRIDE)) {
             outputs = matchingStacks;
-        } else if (matchingStacks.size() > 0) {
-            ComparisonCraftingContainer craftingContainer = new ComparisonCraftingContainer(1);
+        } else if (!matchingStacks.isEmpty()) {
             // If we were able to find a matchingStack iterate
             for (ItemStack match : matchingStacks) {
-                // Reset the inventory and fill with the current item we are checking
-                craftingContainer.fillInventory(match);
-                for (ItemStack reverseMatch : findMatchingStacks(craftingContainer)) {
-                    if (reverseMatch.getCount() != sizeCheck || !ItemStack.isSameItemSameTags(reverseMatch, stack)) {
+                // Fill a single slot input with the current item we are checking
+                for (ItemStack reverseMatch : findMatchingStacks(filledInput(1, match))) {
+                    if (reverseMatch.getCount() != sizeCheck || !ItemStack.isSameItemSameComponents(reverseMatch, stack)) {
                         continue;
                     }
                     outputs.add(match);
@@ -119,7 +125,7 @@ public class CompactingHelper {
         if (!same.isEmpty()) {
             return new Match(same, sizeCheck);
         }
-        if (outputs.size() > 0) {
+        if (!outputs.isEmpty()) {
             return new Match(outputs.get(0), sizeCheck);
         }
 
@@ -138,17 +144,17 @@ public class CompactingHelper {
         // For each option we keep track of the amount it takes to craft the stack given
         Map<ItemStack, Integer> itemOptions = Maps.newLinkedHashMap();
 
-        ComparisonCraftingContainer craftingContainer = new ComparisonCraftingContainer(1);
-        for (CraftingRecipe craftingRecipe : level.getRecipeManager().getAllRecipesFor(RecipeType.CRAFTING)) {
-            ItemStack output = craftingRecipe.getResultItem(level.registryAccess());
+        for (CraftingRecipe craftingRecipe : craftingRecipes().toList()) {
+            ItemStack output = resultOf(craftingRecipe);
             // If the output is not this item check the next recipe
-            if (!ItemStack.isSameItemSameTags(stack, output))
+            if (!ItemStack.isSameItemSameComponents(stack, output))
                 continue;
 
             // Look for a match
-            ItemStack match = tryMatch(stack, craftingRecipe.getIngredients());
+            List<Ingredient> ingredients = craftingRecipe.placementInfo().ingredients();
+            ItemStack match = tryMatch(stack, ingredients);
             if (!match.isEmpty()) {
-                int recipeSize = craftingRecipe.getIngredients().size();
+                int recipeSize = ingredients.size();
                 if (stack.is(StorageTags.Items.CRAFTING_OVERRIDE)) {
                     itemOptions.put(match, recipeSize);
                 }
@@ -159,10 +165,9 @@ public class CompactingHelper {
 
                 // Look through each recipe to return a list of stacks that match the output
                 // item
-                craftingContainer.fillInventory(output);
-                List<ItemStack> matchStacks = findMatchingStacks(craftingContainer);
+                List<ItemStack> matchStacks = findMatchingStacks(filledInput(1, output));
                 for (ItemStack matchStack : matchStacks) {
-                    if (ItemStack.isSameItemSameTags(match, matchStack) && matchStack.getCount() == recipeSize) {
+                    if (ItemStack.isSameItemSameComponents(match, matchStack) && matchStack.getCount() == recipeSize) {
                         itemOptions.put(match, recipeSize);
                         break;
                     }
@@ -170,11 +175,11 @@ public class CompactingHelper {
             }
         }
         // Look for same items given the list of options we have generated
-        ItemStack same = findSameItems(stack, itemOptions.keySet().stream().collect(Collectors.toList()));
+        ItemStack same = findSameItems(stack, new ArrayList<>(itemOptions.keySet()));
         if (!same.isEmpty()) {
             return new Match(same, itemOptions.get(same));
         }
-        if (itemOptions.size() > 0) {
+        if (!itemOptions.isEmpty()) {
             // If we could not find any similar items then lets return the first option
             Entry<ItemStack, Integer> firstOption = itemOptions.entrySet().iterator().next();
             return new Match(firstOption.getKey(), firstOption.getValue());
@@ -184,8 +189,32 @@ public class CompactingHelper {
         return new Match(ItemStack.EMPTY, 0);
     }
 
-    private List<ItemStack> findMatchingStacks(CraftingContainer crafting) {
-        return level.getRecipeManager().getRecipesFor(RecipeType.CRAFTING, crafting, level).stream().filter(x -> x.matches(crafting, level)).map(r -> r.assemble(crafting, level.registryAccess())).filter(i -> !i.isEmpty()).collect(Collectors.toList());
+    /**
+     * A square crafting grid of the given size with every slot holding a copy of the given stack.
+     */
+    private static CraftingInput filledInput(int size, ItemStack stack) {
+        return CraftingInput.of(size, size, Collections.nCopies(size * size, stack.copy()));
+    }
+
+    private Stream<CraftingRecipe> craftingRecipes() {
+        return this.level.recipeAccess().getRecipes().stream().map(RecipeHolder::value).filter(CraftingRecipe.class::isInstance).map(CraftingRecipe.class::cast);
+    }
+
+    /**
+     * A recipe's result is only reachable through its display now - {@code getResultItem} was
+     * dropped from {@code Recipe} when the recipe book moved onto {@code RecipeDisplay}.
+     */
+    private ItemStack resultOf(CraftingRecipe recipe) {
+        List<RecipeDisplay> displays = recipe.display();
+        return displays.isEmpty() ? ItemStack.EMPTY : displays.get(0).result().resolveForFirstStack(this.displayContext);
+    }
+
+    private List<ItemStack> findMatchingStacks(CraftingInput crafting) {
+        if (crafting.isEmpty()) {
+            return List.of();
+        }
+
+        return craftingRecipes().filter(x -> x.matches(crafting, this.level)).map(r -> r.assemble(crafting)).filter(i -> !i.isEmpty()).collect(Collectors.toList());
     }
 
     private ItemStack findSameItems(ItemStack stack, List<ItemStack> ingredientItems) {
@@ -201,59 +230,32 @@ public class CompactingHelper {
                 return firstMatch;
             }
         }
-        return ingredientItems.size() > 0 ? ingredientItems.get(0) : ItemStack.EMPTY;
+        return ingredientItems.isEmpty() ? ItemStack.EMPTY : ingredientItems.get(0);
     }
 
-    private ItemStack tryMatch(ItemStack stack, NonNullList<Ingredient> ingredients) {
+    private ItemStack tryMatch(ItemStack stack, List<Ingredient> ingredients) {
         if (ingredients.size() != 9 && ingredients.size() != 4)
             return ItemStack.EMPTY;
 
         Ingredient refIngredient = ingredients.get(0);
-        ItemStack[] refMatchingStacks = refIngredient.getItems();
-        if (refMatchingStacks.length == 0)
+        // An Ingredient no longer hands back an ItemStack[]; its accepted items come off the
+        // SlotDisplay it exposes for the recipe book.
+        List<ItemStack> refMatchingStacks = refIngredient.display().resolveForStacks(this.displayContext);
+        if (refMatchingStacks.isEmpty())
             return ItemStack.EMPTY;
 
         for (int i = 1; i < ingredients.size(); i++) {
             Ingredient curIngredient = ingredients.get(i);
 
-            boolean hasMatch = Arrays.stream(refMatchingStacks).anyMatch(x -> !x.isEmpty() && curIngredient.test(x));
+            boolean hasMatch = refMatchingStacks.stream().anyMatch(x -> !x.isEmpty() && curIngredient.test(x));
 
             if (!hasMatch) {
                 return ItemStack.EMPTY;
             }
         }
 
-        ItemStack match = findSameItems(stack, Arrays.asList(refMatchingStacks));
-        return match.isEmpty() ? refMatchingStacks[0] : match;
-    }
-
-    private static class ComparisonCraftingContainer extends TransientCraftingContainer {
-
-        public ComparisonCraftingContainer(int size) {
-            this(size, ItemStack.EMPTY);
-        }
-
-        public ComparisonCraftingContainer(int size, ItemStack stack) {
-            super(new AbstractContainerMenu(null, 0) {
-                @Override
-                public boolean stillValid(Player playerIn) {
-                    return false;
-                }
-
-                @Override
-                public ItemStack quickMoveStack(Player player, int slot) {
-                    return null;
-                }
-            }, size, size);
-
-            this.fillInventory(stack);
-        }
-
-        protected void fillInventory(ItemStack stack) {
-            for (int i = 0; i < this.getWidth() * this.getHeight(); i++) {
-                this.setItem(i, stack.copy());
-            }
-        }
+        ItemStack match = findSameItems(stack, refMatchingStacks);
+        return match.isEmpty() ? refMatchingStacks.get(0) : match;
     }
 
     public static class Match {
@@ -280,7 +282,7 @@ public class CompactingHelper {
 
         @Override
         public String toString() {
-            return this.item.getDescriptionId() + ", " + this.numRequired;
+            return this.item.getItem().getDescriptionId() + ", " + this.numRequired;
         }
     }
 

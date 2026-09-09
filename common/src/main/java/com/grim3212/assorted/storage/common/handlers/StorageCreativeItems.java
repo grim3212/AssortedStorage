@@ -4,6 +4,7 @@ import com.grim3212.assorted.lib.core.creative.CreativeTabItems;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.lib.registry.IRegistryObject;
 import com.grim3212.assorted.lib.registry.RegistryProvider;
+import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.lib.util.NBTHelper;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.StorageCommonMod;
@@ -13,6 +14,8 @@ import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.DyeColor;
@@ -25,10 +28,17 @@ public class StorageCreativeItems {
 
     public static final RegistryProvider<CreativeModeTab> CREATIVE_TABS = RegistryProvider.create(Registries.CREATIVE_MODE_TAB, Constants.MOD_ID);
 
+    public static final ResourceKey<CreativeModeTab> CREATIVE_TAB_KEY = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath(Constants.MOD_ID, "tab"));
+
+    // CreativeModeTab.Output is protected in the vanilla jar this module compiles against (both
+    // loaders widen it), so a displayItems generator cannot be written here. The tab is registered
+    // empty and populated through the library's modifyCreativeTab hook, which both loaders
+    // implement on top of their own creative tab events.
+    @SuppressWarnings("deprecation")
     public static final IRegistryObject CREATIVE_TAB = CREATIVE_TABS.register("tab", () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
             .title(Component.translatable("itemGroup." + Constants.MOD_ID))
             .icon(() -> new ItemStack(StorageBlocks.WOOD_CABINET.get()))
-            .displayItems((props, output) -> output.acceptAll(StorageCreativeItems.getCreativeItems())).build());
+            .build());
 
     private static List<ItemStack> getCreativeItems() {
         CreativeTabItems items = new CreativeTabItems();
@@ -176,9 +186,13 @@ public class StorageCreativeItems {
     }
 
     private static boolean canNotCraft(StorageMaterial type) {
-        return StorageCommonMod.COMMON_CONFIG.hideUncraftableItems.get() && BuiltInRegistries.ITEM.getTag(type.getMaterial()).isPresent() && BuiltInRegistries.ITEM.getTag(type.getMaterial()).get().stream().count() < 1;
+        // getTag returned an Optional<HolderSet>; getTagOrEmpty yields the holders directly, so
+        // "tag exists but is empty" collapses to a plain emptiness check.
+        return StorageCommonMod.COMMON_CONFIG.hideUncraftableItems.get()
+                && !BuiltInRegistries.ITEM.getTagOrEmpty(type.getMaterial()).iterator().hasNext();
     }
 
     public static void init() {
+        Services.PLATFORM.modifyCreativeTab(CREATIVE_TAB_KEY, StorageCreativeItems::getCreativeItems);
     }
 }
