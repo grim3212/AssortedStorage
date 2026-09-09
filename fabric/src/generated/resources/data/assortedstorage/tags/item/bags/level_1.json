@@ -1,7 +1,7 @@
 {
   "values": [
-    "assortedstorage:bag_tin",
     "assortedstorage:bag_topaz",
+    "assortedstorage:bag_tin",
     "assortedstorage:bag_copper",
     "assortedstorage:bag_aluminum",
     "assortedstorage:bag_iron"

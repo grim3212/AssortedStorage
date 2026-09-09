@@ -9,7 +9,7 @@
         },
         {
           "type": "assortedlib:item_tag_populated",
-          "tag": "c:stone"
+          "tag": "c:stones"
         }
       ]
     }
@@ -30,7 +30,7 @@
       "conditions": {
         "items": [
           {
-            "items": "#c:stone"
+            "items": "#c:stones"
           }
         ]
       },

@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "key": {
     "B": "assortedstorage:blank_upgrade",
-    "M": "#c:stone"
+    "M": "#c:stones"
   },
   "pattern": [
     "MMM",

@@ -2,8 +2,8 @@
   "type": "assortedstorage:locked_upgrading",
   "key": {
     "C": "assortedstorage:chest_nickel",
-    "L": "#c:leather",
-    "S": "#c:string"
+    "L": "#c:leathers",
+    "S": "#c:strings"
   },
   "pattern": [
     "SLS",

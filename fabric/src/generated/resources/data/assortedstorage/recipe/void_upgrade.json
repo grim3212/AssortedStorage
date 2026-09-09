@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "key": {
-    "O": "#c:obsidian",
+    "O": "#c:obsidians",
     "U": "assortedstorage:blank_upgrade"
   },
   "pattern": [

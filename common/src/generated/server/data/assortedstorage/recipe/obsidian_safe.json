@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "key": {
     "G": "#c:chests/wooden",
-    "X": "#c:obsidian"
+    "X": "#c:obsidians"
   },
   "pattern": [
     " X ",

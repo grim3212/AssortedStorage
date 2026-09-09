@@ -1,7 +1,7 @@
 {
   "values": [
-    "assortedstorage:hopper_tin",
     "assortedstorage:hopper_topaz",
+    "assortedstorage:hopper_tin",
     "assortedstorage:hopper_copper",
     "assortedstorage:hopper_aluminum",
     "assortedstorage:hopper_iron"

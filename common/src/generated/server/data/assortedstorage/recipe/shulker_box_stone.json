@@ -9,7 +9,7 @@
         },
         {
           "type": "assortedlib:item_tag_populated",
-          "tag": "c:stone"
+          "tag": "c:stones"
         }
       ]
     }
@@ -17,7 +17,7 @@
   "type": "assortedstorage:locked_upgrading",
   "key": {
     "C": "#assortedstorage:shulkers/normal",
-    "M": "#c:stone"
+    "M": "#c:stones"
   },
   "pattern": [
     "MMM",

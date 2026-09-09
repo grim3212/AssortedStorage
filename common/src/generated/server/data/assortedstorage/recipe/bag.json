@@ -8,8 +8,8 @@
   "type": "assortedstorage:locked_upgrading",
   "key": {
     "C": "#c:chests/wooden",
-    "L": "#c:leather",
-    "S": "#c:string"
+    "L": "#c:leathers",
+    "S": "#c:strings"
   },
   "pattern": [
     "SLS",
