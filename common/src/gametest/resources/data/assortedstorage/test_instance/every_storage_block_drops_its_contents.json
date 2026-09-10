@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "assortedstorage:every_storage_block_drops_its_contents",
+  "structure": "assortedstorage:test_box",
+  "max_ticks": 40,
+  "setup_ticks": 0,
+  "required": true
+}
