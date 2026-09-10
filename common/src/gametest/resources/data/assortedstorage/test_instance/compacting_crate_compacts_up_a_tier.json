@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "assortedstorage:compacting_crate_compacts_up_a_tier",
+  "structure": "assortedstorage:test_box",
+  "max_ticks": 1,
+  "setup_ticks": 0,
+  "required": true
+}

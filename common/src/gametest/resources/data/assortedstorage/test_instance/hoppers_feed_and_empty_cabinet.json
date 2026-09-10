@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "assortedstorage:hoppers_feed_and_empty_cabinet",
+  "structure": "assortedstorage:test_box",
+  "max_ticks": 120,
+  "setup_ticks": 0,
+  "required": true
+}

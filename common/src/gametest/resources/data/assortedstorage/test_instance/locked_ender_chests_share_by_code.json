@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "assortedstorage:locked_ender_chests_share_by_code",
+  "structure": "assortedstorage:test_box",
+  "max_ticks": 1,
+  "setup_ticks": 0,
+  "required": true
+}
