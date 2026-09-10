@@ -1,5 +1,9 @@
 {
+  "parent": "minecraft:block/block",
   "loader": "assortedstorage:locked",
   "locked": "assortedstorage:block/barrel_silver_locked",
+  "textures": {
+    "particle": "assortedstorage:block/barrels/silver/barrel_side"
+  },
   "unlocked": "assortedstorage:block/barrel_silver_unlocked"
 }

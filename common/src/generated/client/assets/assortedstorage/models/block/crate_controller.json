@@ -1,5 +1,9 @@
 {
+  "parent": "minecraft:block/block",
   "loader": "assortedstorage:locked",
   "locked": "assortedstorage:block/crate_controller_locked",
+  "textures": {
+    "particle": "assortedstorage:block/crates/crate_controller_front"
+  },
   "unlocked": "assortedstorage:block/crate_controller_unlocked"
 }

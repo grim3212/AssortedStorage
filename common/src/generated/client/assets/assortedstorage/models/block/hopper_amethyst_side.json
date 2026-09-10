@@ -1,5 +1,9 @@
 {
+  "parent": "minecraft:block/block",
   "loader": "assortedstorage:locked",
   "locked": "assortedstorage:block/hopper_amethyst_locked_side",
+  "textures": {
+    "particle": "assortedstorage:block/hoppers/amethyst/hopper_outside"
+  },
   "unlocked": "assortedstorage:block/hopper_amethyst_unlocked_side"
 }

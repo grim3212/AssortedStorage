@@ -1,20 +1,25 @@
 {
   "variants": {
     "facing=down": {
+      "type": "assortedlib:specification",
       "model": "assortedstorage:block/hopper_topaz"
     },
     "facing=east": {
+      "type": "assortedlib:specification",
       "model": "assortedstorage:block/hopper_topaz_side",
       "y": 90
     },
     "facing=north": {
+      "type": "assortedlib:specification",
       "model": "assortedstorage:block/hopper_topaz_side"
     },
     "facing=south": {
+      "type": "assortedlib:specification",
       "model": "assortedstorage:block/hopper_topaz_side",
       "y": 180
     },
     "facing=west": {
+      "type": "assortedlib:specification",
       "model": "assortedstorage:block/hopper_topaz_side",
       "y": 270
     }

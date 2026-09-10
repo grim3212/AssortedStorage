@@ -1,5 +1,9 @@
 {
+  "parent": "minecraft:block/block",
   "loader": "assortedstorage:locked",
   "locked": "assortedstorage:block/barrel_topaz_locked",
+  "textures": {
+    "particle": "assortedstorage:block/barrels/topaz/barrel_side"
+  },
   "unlocked": "assortedstorage:block/barrel_topaz_unlocked"
 }

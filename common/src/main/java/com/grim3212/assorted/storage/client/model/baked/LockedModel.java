@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ResolvableModel;
 import net.minecraft.client.resources.model.SimpleModelWrapper;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
@@ -33,6 +34,14 @@ public class LockedModel implements IModelSpecification<LockedModel> {
     private LockedModel(Identifier unlockedModel, Identifier lockedModel) {
         this.unlockedModel = unlockedModel;
         this.lockedModel = lockedModel;
+    }
+
+    // ModelBaker#getModel only resolves ids marked during discovery; discovery does not walk the
+    // resource pack, so an unmarked child bakes to the missing model however correct its json is.
+    @Override
+    public void resolveDependencies(ResolvableModel.Resolver resolver) {
+        resolver.markDependency(this.unlockedModel);
+        resolver.markDependency(this.lockedModel);
     }
 
     @Override

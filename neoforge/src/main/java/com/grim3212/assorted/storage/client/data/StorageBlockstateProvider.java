@@ -1,5 +1,6 @@
 package com.grim3212.assorted.storage.client.data;
 
+import com.grim3212.assorted.lib.client.data.SpecificationBlockStateModelBuilder;
 import com.grim3212.assorted.lib.registry.IRegistryObject;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.StorageMaterial;
@@ -20,6 +21,7 @@ import com.grim3212.assorted.storage.common.block.LockedShulkerBoxBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.StorageBlocks.CrateGroup;
 import com.mojang.math.Quadrant;
+import com.mojang.math.Transformation;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
@@ -34,6 +36,7 @@ import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.client.data.models.model.TextureSlot;
 import net.minecraft.client.renderer.block.dispatch.VariantMutator;
+import net.minecraft.client.renderer.blockentity.ShulkerBoxRenderer;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
@@ -51,6 +54,7 @@ import net.neoforged.neoforge.client.model.generators.template.ExtendedModelTemp
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
@@ -250,7 +254,18 @@ public class StorageBlockstateProvider extends ModelProvider {
     private void specialItem(BlockModelGenerators blockModels, Block block, SpecialModelRenderer.Unbaked<?> renderer) {
         Item item = block.asItem();
         Identifier base = ModelTemplates.CHEST_INVENTORY.create(item, TextureMapping.particle(new Material(this.particleOnly.get(block))), blockModels.modelOutput);
-        blockModels.itemModelOutput.accept(item, ItemModelUtils.specialModel(base, renderer));
+        blockModels.itemModelOutput.accept(item, ItemModelUtils.specialModel(base, specialItemTransform(renderer), renderer));
+    }
+
+    /**
+     * {@code SpecialModelRenderer#submit} applies no transform, so a renderer authored in block-entity
+     * space needs the block transform supplied here - as vanilla does in
+     * {@code BlockModelGenerators#createShulkerBox}. The other renderers draw in item space already.
+     */
+    private static Optional<Transformation> specialItemTransform(SpecialModelRenderer.Unbaked<?> renderer) {
+        return renderer instanceof LockedShulkerBoxSpecialRenderer.Unbaked
+                ? Optional.of(ShulkerBoxRenderer.modelTransform(Direction.UP))
+                : Optional.empty();
     }
 
     // ------------------------------------------------------------------ simple blocks
@@ -307,7 +322,7 @@ public class StorageBlockstateProvider extends ModelProvider {
                 new Material(Identifier.parse("block/barrel_bottom")),
                 new Material(Identifier.parse("block/barrel_top_open"))), blockModels.modelOutput);
 
-        barrelState(blockModels, b, unlocked, locked, open);
+        barrelState(blockModels, b, unlocked, locked, open, new Material(Identifier.parse("block/barrel_side")));
     }
 
     private void materialBarrel(BlockModelGenerators blockModels, LockedBarrelBlock b) {
@@ -319,7 +334,7 @@ public class StorageBlockstateProvider extends ModelProvider {
         Identifier locked = ModelTemplates.CUBE_BOTTOM_TOP.createWithSuffix(b, "_locked", barrelTextures(side, bottom, texture("block/barrels/" + material + "/locked_barrel_top")), blockModels.modelOutput);
         Identifier open = ModelTemplates.CUBE_BOTTOM_TOP.createWithSuffix(b, "_open", barrelTextures(side, bottom, texture("block/barrels/" + material + "/barrel_top_open")), blockModels.modelOutput);
 
-        barrelState(blockModels, b, unlocked, locked, open);
+        barrelState(blockModels, b, unlocked, locked, open, side);
     }
 
     private static TextureMapping barrelTextures(Material side, Material bottom, Material top) {
@@ -333,8 +348,8 @@ public class StorageBlockstateProvider extends ModelProvider {
      * {@link BlockItem} at its block model, which is the same closed model the old item json
      * parented.
      */
-    private void barrelState(BlockModelGenerators blockModels, LockedBarrelBlock b, Identifier unlocked, Identifier locked, Identifier open) {
-        MultiVariant closedModel = BlockModelGenerators.plainVariant(lockedModel(blockModels.modelOutput, ModelLocationUtils.getModelLocation(b), unlocked, locked));
+    private void barrelState(BlockModelGenerators blockModels, LockedBarrelBlock b, Identifier unlocked, Identifier locked, Identifier open, Material particle) {
+        MultiVariant closedModel = SpecificationBlockStateModelBuilder.specificationVariant(lockedModel(blockModels.modelOutput, ModelLocationUtils.getModelLocation(b), unlocked, locked, particle));
         MultiVariant openModel = BlockModelGenerators.plainVariant(open);
 
         blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(b)
@@ -349,7 +364,7 @@ public class StorageBlockstateProvider extends ModelProvider {
         Identifier locked = parented(blockModels.modelOutput, ModelLocationUtils.getModelLocation(b, "_locked"), TEMPLATE_HOPPER);
         Identifier lockedSide = parented(blockModels.modelOutput, ModelLocationUtils.getModelLocation(b, "_locked_side"), TEMPLATE_HOPPER_SIDE);
 
-        hopperState(blockModels, b, VANILLA_HOPPER, locked, VANILLA_HOPPER_SIDE, lockedSide);
+        hopperState(blockModels, b, VANILLA_HOPPER, locked, VANILLA_HOPPER_SIDE, lockedSide, new Material(Identifier.parse("block/hopper_outside")));
     }
 
     private void materialHopper(BlockModelGenerators blockModels, LockedHopperBlock b) {
@@ -371,7 +386,7 @@ public class StorageBlockstateProvider extends ModelProvider {
         Identifier unlockedSide = HOPPER_SIDE_TEXTURED.create(ModelLocationUtils.getModelLocation(b, "_unlocked_side"), unlockedTextures, blockModels.modelOutput);
         Identifier lockedSide = LOCKED_HOPPER_SIDE_TEXTURED.create(ModelLocationUtils.getModelLocation(b, "_locked_side"), lockedTextures, blockModels.modelOutput);
 
-        hopperState(blockModels, b, unlocked, locked, unlockedSide, lockedSide);
+        hopperState(blockModels, b, unlocked, locked, unlockedSide, lockedSide, outside);
     }
 
     private static final ModelTemplate HOPPER_TEXTURED = ExtendedModelTemplateBuilder.builder().parent(VANILLA_HOPPER)
@@ -388,9 +403,9 @@ public class StorageBlockstateProvider extends ModelProvider {
      * expressed the same thing: a property nothing selects on simply does not appear in the
      * blockstate key. The rotations are vanilla's own hopper dispatch.
      */
-    private void hopperState(BlockModelGenerators blockModels, LockedHopperBlock b, Identifier unlocked, Identifier locked, Identifier unlockedSide, Identifier lockedSide) {
-        MultiVariant down = BlockModelGenerators.plainVariant(lockedModel(blockModels.modelOutput, ModelLocationUtils.getModelLocation(b), unlocked, locked));
-        MultiVariant side = BlockModelGenerators.plainVariant(lockedModel(blockModels.modelOutput, ModelLocationUtils.getModelLocation(b, "_side"), unlockedSide, lockedSide));
+    private void hopperState(BlockModelGenerators blockModels, LockedHopperBlock b, Identifier unlocked, Identifier locked, Identifier unlockedSide, Identifier lockedSide, Material particle) {
+        MultiVariant down = SpecificationBlockStateModelBuilder.specificationVariant(lockedModel(blockModels.modelOutput, ModelLocationUtils.getModelLocation(b), unlocked, locked, particle));
+        MultiVariant side = SpecificationBlockStateModelBuilder.specificationVariant(lockedModel(blockModels.modelOutput, ModelLocationUtils.getModelLocation(b, "_side"), unlockedSide, lockedSide, particle));
 
         blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(b)
                 .with(PropertyDispatch.initial(BlockStateProperties.FACING_HOPPER)
@@ -482,7 +497,7 @@ public class StorageBlockstateProvider extends ModelProvider {
         Identifier unlocked = ModelTemplates.CUBE_ORIENTABLE.createWithSuffix(b, "_unlocked", orientable(side, texture("block/crates/crate_controller_front"), top), blockModels.modelOutput);
         Identifier locked = ModelTemplates.CUBE_ORIENTABLE.createWithSuffix(b, "_locked", orientable(side, texture("block/crates/crate_controller_front_locked"), top), blockModels.modelOutput);
 
-        MultiVariant model = BlockModelGenerators.plainVariant(lockedModel(blockModels.modelOutput, ModelLocationUtils.getModelLocation(b), unlocked, locked));
+        MultiVariant model = SpecificationBlockStateModelBuilder.specificationVariant(lockedModel(blockModels.modelOutput, ModelLocationUtils.getModelLocation(b), unlocked, locked, texture("block/crates/crate_controller_front")));
 
         // x = up ? 270 : horizontal ? 0 : 90, y = vertical ? 180 : (facing.toYRot() + 180) % 360.
         blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(b)
@@ -668,11 +683,16 @@ public class StorageBlockstateProvider extends ModelProvider {
      * Writes a model whose whole body is the {@code assortedstorage:locked} loader block. The loader
      * replaces the geometry outright, so the template declares no slots and no elements.
      */
-    private static Identifier lockedModel(BiConsumer<Identifier, ModelInstance> output, Identifier target, Identifier unlocked, Identifier locked) {
+    private static Identifier lockedModel(BiConsumer<Identifier, ModelInstance> output, Identifier target, Identifier unlocked, Identifier locked, Material particle) {
         return ExtendedModelTemplateBuilder.builder()
+                // A block item reads its transforms from the block model's parent chain
+                // (ResolvedModel#getTopTransforms); parenting to nothing yields ItemTransforms.NO_TRANSFORMS.
+                // block/block supplies the standard display block and gui_light, and no geometry.
+                .parent(Identifier.withDefaultNamespace("block/block"))
                 .customLoader(LockedModelBuilder::begin, b -> b.unlockedModel(unlocked).lockedModel(locked))
+                .requiredTextureSlot(TextureSlot.PARTICLE)
                 .build()
-                .create(target, new TextureMapping(), output);
+                .create(target, new TextureMapping().put(TextureSlot.PARTICLE, particle), output);
     }
 
     /** A model that is nothing but a parent reference, which is what {@code withExistingParent} was. */

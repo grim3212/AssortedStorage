@@ -1,5 +1,9 @@
 {
+  "parent": "minecraft:block/block",
   "loader": "assortedstorage:locked",
   "locked": "assortedstorage:block/hopper_netherite_locked_side",
+  "textures": {
+    "particle": "assortedstorage:block/hoppers/netherite/hopper_outside"
+  },
   "unlocked": "assortedstorage:block/hopper_netherite_unlocked_side"
 }
