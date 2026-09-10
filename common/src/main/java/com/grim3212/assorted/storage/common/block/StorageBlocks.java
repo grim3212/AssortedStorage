@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -79,10 +79,10 @@ public class StorageBlocks {
     public static final IRegistryObject<CrateControllerBlock> CRATE_CONTROLLER = register("crate_controller", key -> new CrateControllerBlock(BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).sound(SoundType.STONE)));
     public static final IRegistryObject<CrateBridgeBlock> CRATE_BRIDGE = register("crate_bridge", key -> new CrateBridgeBlock(BlockBehaviour.Properties.of().setId(key).mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F).sound(SoundType.STONE)));
 
-    public static final Map<StorageMaterial, IRegistryObject<LockedChestBlock>> CHESTS = new HashMap<>();
-    public static final Map<StorageMaterial, IRegistryObject<LockedBarrelBlock>> BARRELS = new HashMap<>();
-    public static final Map<StorageMaterial, IRegistryObject<LockedHopperBlock>> HOPPERS = new HashMap<>();
-    public static final Map<StorageMaterial, IRegistryObject<LockedShulkerBoxBlock>> SHULKERS = new HashMap<>();
+    public static final Map<StorageMaterial, IRegistryObject<LockedChestBlock>> CHESTS = new EnumMap<>(StorageMaterial.class);
+    public static final Map<StorageMaterial, IRegistryObject<LockedBarrelBlock>> BARRELS = new EnumMap<>(StorageMaterial.class);
+    public static final Map<StorageMaterial, IRegistryObject<LockedHopperBlock>> HOPPERS = new EnumMap<>(StorageMaterial.class);
+    public static final Map<StorageMaterial, IRegistryObject<LockedShulkerBoxBlock>> SHULKERS = new EnumMap<>(StorageMaterial.class);
     public static final List<CrateGroup> CRATES = new ArrayList<>();
 
     static {

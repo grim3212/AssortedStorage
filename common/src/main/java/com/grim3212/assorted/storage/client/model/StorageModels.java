@@ -10,8 +10,8 @@ import java.util.stream.Stream;
 
 public class StorageModels {
 
-    public static final Map<StorageMaterial, Identifier> CHEST_LOCATIONS = Maps.newHashMap();
-    public static final Map<StorageMaterial, Identifier> SHULKER_LOCATIONS = Maps.newHashMap();
+    public static final Map<StorageMaterial, Identifier> CHEST_LOCATIONS = Maps.newLinkedHashMap();
+    public static final Map<StorageMaterial, Identifier> SHULKER_LOCATIONS = Maps.newLinkedHashMap();
 
     static {
         CHEST_LOCATIONS.put(null, Identifier.fromNamespaceAndPath(Constants.MOD_ID, "model/chests/normal"));

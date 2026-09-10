@@ -32,8 +32,8 @@ public class StorageItems {
     public static final IRegistryObject<RedstoneUpgradeItem> REDSTONE_UPGRADE = register("redstone_upgrade", key -> new RedstoneUpgradeItem(props(key).stacksTo(16)));
     public static final IRegistryObject<BasicCrateUpgradeItem> GLOW_UPGRADE = register("glow_upgrade", key -> new BasicCrateUpgradeItem(props(key).stacksTo(16)));
 
-    public static final Map<StorageMaterial, IRegistryObject<LevelUpgradeItem>> LEVEL_UPGRADES = Maps.newHashMap();
-    public static final Map<StorageMaterial, IRegistryObject<BagItem>> BAGS = Maps.newHashMap();
+    public static final Map<StorageMaterial, IRegistryObject<LevelUpgradeItem>> LEVEL_UPGRADES = Maps.newEnumMap(StorageMaterial.class);
+    public static final Map<StorageMaterial, IRegistryObject<BagItem>> BAGS = Maps.newEnumMap(StorageMaterial.class);
 
     static {
         Stream.of(StorageMaterial.values()).forEach((type) -> BAGS.put(type, register("bag_" + type.toString(), key -> new BagItem(props(key), type))));
