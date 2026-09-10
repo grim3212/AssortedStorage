@@ -7,6 +7,7 @@ import com.grim3212.assorted.storage.client.blockentity.item.LockedChestSpecialR
 import com.grim3212.assorted.storage.client.blockentity.item.LockedShulkerBoxSpecialRenderer;
 import com.grim3212.assorted.storage.client.blockentity.item.StorageSpecialRenderer;
 import com.grim3212.assorted.storage.client.color.BagTintSource;
+import com.grim3212.assorted.storage.client.properties.HasStorageTagProperty;
 import com.grim3212.assorted.storage.client.model.*;
 import com.grim3212.assorted.storage.client.model.baked.LockedModel;
 import com.grim3212.assorted.storage.client.screen.*;
@@ -81,6 +82,10 @@ public class StorageClient {
         // type. Bag models need a "tints" entry naming this id once per dyed layer, with "tag" set to
         // BagItem.TAG_PRIMARY_COLOR / TAG_SECONDARY_COLOR.
         ClientServices.CLIENT.registerItemTintSource(BagTintSource.ID, BagTintSource.MAP_CODEC);
+
+        for (HasStorageTagProperty property : HasStorageTagProperty.values()) {
+            ClientServices.CLIENT.registerConditionalItemModelProperty(property.id(), property.type());
+        }
 
         // BlockEntityWithoutLevelRenderer is gone: a special item renderer is selected by the item's
         // own model json ("minecraft:special" naming one of these ids), so code only registers the id

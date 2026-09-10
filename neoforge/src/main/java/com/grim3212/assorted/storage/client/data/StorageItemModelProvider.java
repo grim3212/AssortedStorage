@@ -2,6 +2,8 @@ package com.grim3212.assorted.storage.client.data;
 
 import com.grim3212.assorted.lib.registry.IRegistryObject;
 import com.grim3212.assorted.storage.Constants;
+import com.grim3212.assorted.storage.client.color.BagTintSource;
+import com.grim3212.assorted.storage.client.properties.HasStorageTagProperty;
 import com.grim3212.assorted.storage.common.item.BagItem;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.item.upgrades.LevelUpgradeItem;
@@ -11,6 +13,9 @@ import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.client.data.models.model.ModelTemplate;
+import net.minecraft.client.renderer.item.ItemModel;
+import net.neoforged.neoforge.client.model.generators.template.ExtendedModelTemplateBuilder;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.client.data.models.model.TextureSlot;
@@ -35,22 +40,14 @@ import java.util.stream.Stream;
  * owns the special-renderer items, the hoppers and the crate controller and lets
  * {@link ModelProvider} point the rest at their block model.
  * <p>
- * <b>The bag, ender bag and shulker box item variants are gone.</b> In 1.20.1 each bag model carried
- * {@code overrides} keyed on two {@code ItemProperties} functions -
- * {@code assortedstorage:color} and {@code assortedstorage:locked} - which swapped in a dyed or
- * padlocked model per stack. {@code ItemOverrides} was deleted in 26.2 and
- * {@code registerItemProperty} has no replacement: a model is chosen before baking, from a
- * {@code minecraft:select} / {@code minecraft:condition} tree over a codec-registered property.
+ * The bag and ender bag models' 1.20.1 {@code overrides} lists are now {@code minecraft:condition}
+ * trees over {@link HasStorageTagProperty}: the branch is chosen before baking, from the item json,
+ * and only the predicate is code. The dye is a tint rather than a branch, so the two combine - the
+ * condition picks the greyscale body texture and {@code tints} colours it.
  * <p>
- * TODO(26.2): neither state can be expressed with a vanilla property. Both live inside
- *  {@code DataComponents.CUSTOM_DATA} - the lock under {@code Storage_Lock}, the dye under the
- *  {@code BagItem} colour tags - and the only vanilla conditional that reads a component predicate,
- *  {@code minecraft:component_matches}, needs an exact {@code NbtPredicate} value, which an
- *  arbitrary combination code cannot supply. Restoring the padlock overlay and the dyed body needs a
- *  custom {@code ConditionalItemModelProperty} registered on <em>both</em> loaders (the item json is
- *  shared), which AssortedLib does not currently expose. Until then a bag renders as its plain,
- *  undyed, unlocked model whatever is on the stack. The dyed and padlocked textures are still
- *  shipped, so nothing is lost but the wiring.
+ * The shulker box item needs nothing here: it is special-rendered, and
+ * {@code LockedShulkerBoxSpecialRenderer#extractArgument} reads the stack's {@code Color} and lock
+ * directly, which is the per-stack hook {@code registerItemProperty} used to provide.
  */
 public class StorageItemModelProvider extends ModelProvider {
 
@@ -84,7 +81,7 @@ public class StorageItemModelProvider extends ModelProvider {
         generatedItem(itemModels, StorageItems.LOCKSMITH_KEY.get());
         generatedItem(itemModels, StorageItems.LOCKSMITH_LOCK.get());
         generatedItem(itemModels, StorageItems.KEY_RING.get());
-        generatedItem(itemModels, StorageItems.ENDER_BAG.get());
+        enderBag(itemModels, StorageItems.ENDER_BAG.get());
 
         bag(itemModels, StorageItems.BAG.get());
         for (IRegistryObject<BagItem> bag : StorageItems.BAGS.values()) {
@@ -101,25 +98,82 @@ public class StorageItemModelProvider extends ModelProvider {
         }
     }
 
+    /** The ender bag carries no dye, only a padlock, so it is a single condition rather than a tree. */
+    private void enderBag(ItemModelGenerators itemModels, Item item) {
+        Identifier plain = ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(item),
+                TextureMapping.layer0(itemTexture("ender_bag")), itemModels.modelOutput);
+        Identifier locked = ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(item).withSuffix("_locked"),
+                TextureMapping.layer0(itemTexture("ender_bag_locked")), itemModels.modelOutput);
+
+        itemModels.itemModelOutput.accept(item, ItemModelUtils.conditional(HasStorageTagProperty.LOCKED,
+                ItemModelUtils.plainModel(locked), ItemModelUtils.plainModel(plain)));
+    }
+
     /** The plain bag: its own body plus the shared strap. */
     private void bag(ItemModelGenerators itemModels, Item item) {
-        layered(itemModels, item, ModelTemplates.TWO_LAYERED_ITEM, new TextureMapping()
-                .put(TextureSlot.LAYER0, itemTexture(name(item)))
-                .put(TextureSlot.LAYER1, itemTexture("bag_strap")));
+        bagTree(itemModels, item,
+                variant(itemModels, item, "", ModelTemplates.TWO_LAYERED_ITEM, "bag", "bag_strap", null),
+                variant(itemModels, item, "_colored", ModelTemplates.TWO_LAYERED_ITEM, "bag_colored", "bag_strap", null),
+                variant(itemModels, item, "_locked", ModelTemplates.THREE_LAYERED_ITEM, "bag_lock_cutout", "bag_strap_lock_cutout", null),
+                variant(itemModels, item, "_locked_colored", ModelTemplates.THREE_LAYERED_ITEM, "bag_colored_lock_cutout", "bag_strap_lock_cutout", null));
     }
 
     /** A material bag: the shared body and strap with the material's own colour layer on top. */
     private void materialBag(ItemModelGenerators itemModels, BagItem item) {
-        layered(itemModels, item, ModelTemplates.THREE_LAYERED_ITEM, new TextureMapping()
-                .put(TextureSlot.LAYER0, itemTexture("bag_material"))
-                .put(TextureSlot.LAYER1, itemTexture("bag_strap"))
-                .put(TextureSlot.LAYER2, itemTexture(name(item))));
+        String material = name(item);
+        bagTree(itemModels, item,
+                variant(itemModels, item, "", ModelTemplates.THREE_LAYERED_ITEM, "bag_material", "bag_strap", material),
+                variant(itemModels, item, "_colored", ModelTemplates.THREE_LAYERED_ITEM, "bag_material_colored", "bag_strap", material),
+                variant(itemModels, item, "_locked", FOUR_LAYERED_ITEM, "bag_material_lock_cutout", "bag_strap_lock_cutout", material),
+                variant(itemModels, item, "_locked_colored", FOUR_LAYERED_ITEM, "bag_material_colored_lock_cutout", "bag_strap_lock_cutout", material));
     }
 
-    private void layered(ItemModelGenerators itemModels, Item item, ModelTemplate template, TextureMapping textures) {
-        Identifier model = template.create(ModelLocationUtils.getModelLocation(item), textures, itemModels.modelOutput);
-        itemModels.itemModelOutput.accept(item, ItemModelUtils.plainModel(model));
+    /**
+     * Picks one of the four bag models from the stack, replacing the {@code overrides} list its 1.20.1
+     * model carried. The dye is a tint and the lock is a whole texture set, so the two are not
+     * interchangeable: {@code dyed} only chooses between the plain body and the greyscale one that
+     * takes the tint, which is why tinting the plain body directly came out muddy.
+     */
+    private void bagTree(ItemModelGenerators itemModels, Item item, ItemModel.Unbaked plain, ItemModel.Unbaked colored, ItemModel.Unbaked locked, ItemModel.Unbaked lockedColored) {
+        itemModels.itemModelOutput.accept(item, ItemModelUtils.conditional(HasStorageTagProperty.LOCKED,
+                ItemModelUtils.conditional(HasStorageTagProperty.DYED, lockedColored, locked),
+                ItemModelUtils.conditional(HasStorageTagProperty.DYED, colored, plain)));
     }
+
+    /**
+     * One bag variant. {@code tints} is positional - entry N tints the layer with {@code tintindex} N -
+     * so both sources always sit on the body and the strap, and the material and padlock layers above
+     * them are left alone, the way vanilla's leather armour leaves its overlay untinted.
+     */
+    private ItemModel.Unbaked variant(ItemModelGenerators itemModels, Item item, String suffix, ModelTemplate template, String body, String strap, @Nullable String material) {
+        TextureMapping textures = new TextureMapping()
+                .put(TextureSlot.LAYER0, itemTexture(body))
+                .put(TextureSlot.LAYER1, itemTexture(strap));
+        if (material != null) {
+            textures.put(TextureSlot.LAYER2, itemTexture(material));
+            if (template == FOUR_LAYERED_ITEM) {
+                textures.put(LAYER3, itemTexture("bag_lock"));
+            }
+        } else if (template == ModelTemplates.THREE_LAYERED_ITEM) {
+            textures.put(TextureSlot.LAYER2, itemTexture("bag_lock"));
+        }
+
+        Identifier model = template.create(ModelLocationUtils.getModelLocation(item).withSuffix(suffix), textures, itemModels.modelOutput);
+        return ItemModelUtils.tintedModel(model,
+                new BagTintSource(BagItem.TAG_PRIMARY_COLOR),
+                new BagTintSource(BagItem.TAG_SECONDARY_COLOR));
+    }
+
+    // item/generated bakes layer0..layer4 (ItemModelGenerator.LAYERS) but vanilla only names slots up
+    // to LAYER2; a locked material bag needs body, strap, material and padlock.
+    private static final TextureSlot LAYER3 = TextureSlot.create("layer3");
+    private static final ModelTemplate FOUR_LAYERED_ITEM = ExtendedModelTemplateBuilder.builder()
+            .parent(Identifier.withDefaultNamespace("item/generated"))
+            .requiredTextureSlot(TextureSlot.LAYER0)
+            .requiredTextureSlot(TextureSlot.LAYER1)
+            .requiredTextureSlot(TextureSlot.LAYER2)
+            .requiredTextureSlot(LAYER3)
+            .build();
 
     private void generatedItem(ItemModelGenerators itemModels, Item item) {
         itemModels.generateFlatItem(item, ModelTemplates.FLAT_ITEM);

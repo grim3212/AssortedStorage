@@ -8,6 +8,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.color.item.ItemTintSource;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +26,8 @@ import org.jetbrains.annotations.Nullable;
 public record BagTintSource(String tag) implements ItemTintSource {
 
     public static final Identifier ID = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "bag");
-    private static final int NO_TINT = 0xFFFFFF;
+    // Colours carry an alpha channel now, so an opaque white is -1 rather than 0xFFFFFF.
+    private static final int NO_TINT = -1;
 
     public static final MapCodec<BagTintSource> MAP_CODEC = RecordCodecBuilder.mapCodec(
             i -> i.group(
@@ -40,7 +42,8 @@ public record BagTintSource(String tag) implements ItemTintSource {
         }
 
         int dyeColor = NBTHelper.getInt(itemStack, this.tag);
-        return dyeColor == -1 ? NO_TINT : DyeColor.byId(dyeColor).getFireworkColor();
+        // getFireworkColor is an unpacked RGB, so it has to be made opaque explicitly.
+        return dyeColor == -1 ? NO_TINT : ARGB.opaque(DyeColor.byId(dyeColor).getFireworkColor());
     }
 
     @Override

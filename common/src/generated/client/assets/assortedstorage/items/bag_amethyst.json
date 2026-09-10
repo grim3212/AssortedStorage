@@ -1,6 +1,70 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "assortedstorage:item/bag_amethyst"
+    "type": "minecraft:condition",
+    "on_false": {
+      "type": "minecraft:condition",
+      "on_false": {
+        "type": "minecraft:model",
+        "model": "assortedstorage:item/bag_amethyst",
+        "tints": [
+          {
+            "type": "assortedstorage:bag",
+            "tag": "PrimaryColor"
+          },
+          {
+            "type": "assortedstorage:bag",
+            "tag": "SecondaryColor"
+          }
+        ]
+      },
+      "on_true": {
+        "type": "minecraft:model",
+        "model": "assortedstorage:item/bag_amethyst_colored",
+        "tints": [
+          {
+            "type": "assortedstorage:bag",
+            "tag": "PrimaryColor"
+          },
+          {
+            "type": "assortedstorage:bag",
+            "tag": "SecondaryColor"
+          }
+        ]
+      },
+      "property": "assortedstorage:dyed"
+    },
+    "on_true": {
+      "type": "minecraft:condition",
+      "on_false": {
+        "type": "minecraft:model",
+        "model": "assortedstorage:item/bag_amethyst_locked",
+        "tints": [
+          {
+            "type": "assortedstorage:bag",
+            "tag": "PrimaryColor"
+          },
+          {
+            "type": "assortedstorage:bag",
+            "tag": "SecondaryColor"
+          }
+        ]
+      },
+      "on_true": {
+        "type": "minecraft:model",
+        "model": "assortedstorage:item/bag_amethyst_locked_colored",
+        "tints": [
+          {
+            "type": "assortedstorage:bag",
+            "tag": "PrimaryColor"
+          },
+          {
+            "type": "assortedstorage:bag",
+            "tag": "SecondaryColor"
+          }
+        ]
+      },
+      "property": "assortedstorage:dyed"
+    },
+    "property": "assortedstorage:locked"
   }
 }
