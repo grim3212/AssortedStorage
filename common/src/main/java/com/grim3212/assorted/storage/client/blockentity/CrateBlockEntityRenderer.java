@@ -70,12 +70,13 @@ public class CrateBlockEntityRenderer implements BlockEntityRenderer<CrateBlockE
         state.layout = crate.getLayout();
         state.itemLightCoords = inventory.hasGlowUpgrade() ? LightCoordsUtil.FULL_BRIGHT : state.lightCoords;
         state.anySlotLocked = inventory.anySlotsLocked();
-        state.blockEntity = crate;
 
         int seed = (int) crate.getBlockPos().asLong();
         List<ItemStackRenderState> items = new ArrayList<>(slots);
         state.itemRotations = new float[slots];
         state.slotLocked = new boolean[slots];
+        state.slotAmounts = new int[slots];
+        state.slotCapacities = new int[slots];
 
         for (int slot = 0; slot < slots; slot++) {
             LargeItemStack largeStack = inventory.getLargeItemStack(slot);
@@ -84,11 +85,13 @@ public class CrateBlockEntityRenderer implements BlockEntityRenderer<CrateBlockE
             items.add(itemState);
             state.itemRotations[slot] = largeStack.getRotation();
             state.slotLocked[slot] = inventory.isSlotLocked(slot);
+            state.slotAmounts[slot] = largeStack.getAmount();
+            state.slotCapacities[slot] = inventory.getMaxStackSizeForSlot(slot);
         }
         state.items = items;
 
         // Unique upgrades only
-        state.upgrades = inventory.getEnhancements().stream().filter(StreamHelper.distinctByKey(ItemStack::getItem)).toList();
+        state.upgrades = inventory.getEnhancements().stream().filter(StreamHelper.distinctByKey(ItemStack::getItem)).map(ItemStack::copy).toList();
     }
 
     @Override
@@ -148,19 +151,14 @@ public class CrateBlockEntityRenderer implements BlockEntityRenderer<CrateBlockE
     }
 
     private void submitUpgrades(CrateRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
-        CrateBlockEntity crate = state.blockEntity;
-        if (crate == null) {
-            return;
-        }
-
         poseStack.pushPose();
         for (ItemStack stack : state.upgrades) {
             if (stack.getItem() instanceof PadlockItem) {
-                PadlockUpgradeRenderer.INSTANCE.render(crate, stack, 0.0F, poseStack, submitNodeCollector, state.lightCoords, OverlayTexture.NO_OVERLAY);
+                PadlockUpgradeRenderer.INSTANCE.submit(state, stack, poseStack, submitNodeCollector);
             } else if (stack.getItem() instanceof VoidUpgradeItem) {
-                VoidUpgradeRenderer.INSTANCE.render(crate, stack, 0.0F, poseStack, submitNodeCollector, state.lightCoords, OverlayTexture.NO_OVERLAY);
+                VoidUpgradeRenderer.INSTANCE.submit(state, stack, poseStack, submitNodeCollector);
             } else if (stack.getItem() instanceof AmountUpgradeItem) {
-                AmountUpgradeRenderer.INSTANCE.render(crate, stack, 0.0F, poseStack, submitNodeCollector, state.lightCoords, OverlayTexture.NO_OVERLAY);
+                AmountUpgradeRenderer.INSTANCE.submit(state, stack, poseStack, submitNodeCollector);
             }
         }
         poseStack.popPose();
