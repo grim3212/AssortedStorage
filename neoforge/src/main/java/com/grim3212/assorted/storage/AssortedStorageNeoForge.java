@@ -1,5 +1,6 @@
 package com.grim3212.assorted.storage;
 
+import com.grim3212.assorted.storage.client.data.StorageLanguageProvider;
 import com.grim3212.assorted.lib.core.inventory.IInventoryBlockEntity;
 import com.grim3212.assorted.lib.core.inventory.IInventoryItem;
 import com.grim3212.assorted.lib.data.ForgeBlockTagProvider;
@@ -77,8 +78,8 @@ public class AssortedStorageNeoForge {
      * everything else on the other - because a {@code ModelProvider} writes both halves and would
      * otherwise fight over the same files. See {@link StorageBlockstateProvider}.
      * <p>
-     * {@code StorageLanguageProvider} is gone: Forge's {@code LanguageProvider} has no vanilla
-     * equivalent, so {@code en_us.json} is a hand maintained file under {@code common} now.
+     * {@link StorageLanguageProvider} writes {@code en_us.json} with the rest of the assets, into
+     * {@code common/src/generated/client}; there is no hand written lang file.
      */
     private void gatherClientData(final GatherDataEvent.Client event) {
         PackOutput packOutput = event.getGenerator().getPackOutput();
@@ -87,6 +88,7 @@ public class AssortedStorageNeoForge {
         event.addProvider(new StorageBlockstateProvider(packOutput));
         event.addProvider(new StorageItemModelProvider(packOutput));
         event.addProvider(new StorageSpriteSourceProvider(packOutput, lookupProvider));
+        event.addProvider(new StorageLanguageProvider(packOutput));
     }
 
     /**
