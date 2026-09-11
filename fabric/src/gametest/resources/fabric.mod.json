@@ -12,6 +12,9 @@
   "entrypoints": {
     "main": [
       "com.grim3212.assorted.storage.gametest.StorageFabricGameTests"
+    ],
+    "fabric-client-gametest": [
+      "com.grim3212.assorted.storage.gametest.StorageClientGameTests"
     ]
   },
   "depends": {

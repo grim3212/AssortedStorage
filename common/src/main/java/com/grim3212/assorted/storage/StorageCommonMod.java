@@ -1,5 +1,6 @@
 package com.grim3212.assorted.storage;
 
+import com.grim3212.assorted.storage.common.item.StorageDataComponents;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import com.grim3212.assorted.storage.common.crafting.StorageConditions;
@@ -20,6 +21,7 @@ public class StorageCommonMod {
     public static void init() {
         Constants.LOG.info(Constants.MOD_NAME + " starting up...");
 
+        StorageDataComponents.init();
         StorageBlocks.init();
         StorageBlockEntityTypes.init();
         StorageItems.init();

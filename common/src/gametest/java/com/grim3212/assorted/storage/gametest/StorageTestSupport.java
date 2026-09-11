@@ -1,5 +1,12 @@
 package com.grim3212.assorted.storage.gametest;
 
+import com.grim3212.assorted.lib.platform.Services;
+import net.minecraft.world.item.component.TooltipProvider;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.core.component.DataComponentType;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.grim3212.assorted.storage.Constants;
@@ -253,5 +260,27 @@ final class StorageTestSupport {
 
     static Block oakCrate() {
         return StorageBlocks.CRATES.stream().filter(group -> group.getType() == Wood.OAK).findFirst().orElseThrow().SINGLE.get();
+    }
+
+    /** The translation keys of the lines one component adds to a stack's tooltip, in order. */
+    static <T extends TooltipProvider> List<String> tooltipKeys(GameTestHelper helper, ItemStack stack, DataComponentType<T> type) {
+        List<String> keys = new ArrayList<>();
+        stack.addToTooltip(type, Item.TooltipContext.of(helper.getLevel()), TooltipDisplay.DEFAULT, line -> keys.add(tooltipKey(line)), TooltipFlag.NORMAL);
+        return keys;
+    }
+
+    /** The translation keys of a stack's whole tooltip, as the loader builds it. */
+    static List<String> fullTooltipKeys(GameTestHelper helper, ItemStack stack) {
+        return stack.getTooltipLines(Item.TooltipContext.of(helper.getLevel()), null, TooltipFlag.NORMAL).stream().map(StorageTestSupport::tooltipKey).toList();
+    }
+
+    /** A line's translation key, or its text when it is not translatable. */
+    static String tooltipKey(Component line) {
+        return line.getContents() instanceof TranslatableContents translatable ? translatable.getKey() : line.getString();
+    }
+
+    /** NeoForge adds mod component tooltip lines on the server too; Fabric only on the client. */
+    static boolean onNeoForge() {
+        return "Forge".equals(Services.PLATFORM.getPlatformName());
     }
 }

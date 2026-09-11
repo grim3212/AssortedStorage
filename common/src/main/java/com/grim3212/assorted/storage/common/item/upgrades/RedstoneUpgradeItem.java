@@ -1,6 +1,8 @@
 package com.grim3212.assorted.storage.common.item.upgrades;
 
 
+import com.grim3212.assorted.storage.common.item.UpgradeModeInfo;
+import com.grim3212.assorted.storage.common.item.StorageDataComponents;
 import com.grim3212.assorted.lib.util.NBTHelper;
 import com.grim3212.assorted.storage.Constants;
 import net.minecraft.ChatFormatting;
@@ -12,7 +14,7 @@ public class RedstoneUpgradeItem extends ModeCrateUpgradeItem {
     private final static int MAX_MODE = 7;
 
     public RedstoneUpgradeItem(Properties props) {
-        super(props);
+        super(props.component(StorageDataComponents.UPGRADE_MODE_INFO.get(), new UpgradeModeInfo(UpgradeModeInfo.Kind.REDSTONE)));
     }
 
     // Modes:
@@ -33,7 +35,11 @@ public class RedstoneUpgradeItem extends ModeCrateUpgradeItem {
 
     @Override
     protected Component modeDisplay(ItemStack stack) {
-        int currentMode = NBTHelper.getInt(stack, "Mode", 4);
+        return describeMode(NBTHelper.getInt(stack, "Mode", 4));
+    }
+
+    /** The mode line: the chat message when the mode is cycled, and the tooltip. */
+    public static Component describeMode(int currentMode) {
         String modeKey = ".info.upgrade_redstone.mode.slot";
         if (currentMode == 4) {
             modeKey = ".info.upgrade_redstone.mode.all";

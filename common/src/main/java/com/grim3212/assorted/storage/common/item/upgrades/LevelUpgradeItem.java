@@ -1,6 +1,7 @@
 package com.grim3212.assorted.storage.common.item.upgrades;
 
-import com.grim3212.assorted.storage.Constants;
+import com.grim3212.assorted.storage.common.item.StorageInfo;
+import com.grim3212.assorted.storage.common.item.StorageDataComponents;
 import com.grim3212.assorted.storage.StorageCommonMod;
 import com.grim3212.assorted.storage.api.StorageAccessUtil;
 import com.grim3212.assorted.storage.api.StorageMaterial;
@@ -8,7 +9,6 @@ import com.grim3212.assorted.storage.api.crates.ICrateUpgrade;
 import com.grim3212.assorted.storage.common.block.*;
 import com.grim3212.assorted.storage.common.block.blockentity.*;
 import com.grim3212.assorted.storage.mixin.block.BarrelBlockEntityAccessor;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
@@ -19,8 +19,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BarrelBlock;
@@ -30,34 +28,18 @@ import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.function.Consumer;
 
 public class LevelUpgradeItem extends Item implements ICrateUpgrade {
 
     private final StorageMaterial storageMaterial;
 
     public LevelUpgradeItem(Properties properties, StorageMaterial storageMaterial) {
-        super(properties.stacksTo(16));
+        super(properties.stacksTo(16).component(StorageDataComponents.STORAGE_INFO.get(), new StorageInfo(StorageInfo.LockLine.NONE, storageMaterial.getStorageLevel())));
         this.storageMaterial = storageMaterial;
     }
 
     public StorageMaterial getStorageMaterial() {
         return storageMaterial;
-    }
-
-    /**
-     * {@code Item.appendHoverText} is marked deprecated in 26.x - tooltips are meant to come from
-     * data components implementing {@code TooltipProvider} - but it is still the only per item
-     * hook, and vanilla's own items (DiscFragmentItem, HangingEntityItem, SmithingTemplateItem)
-     * still override it.
-     * <p>
-     * TODO(26.2): moving this text onto a component would mean giving the lock its own
-     * DataComponentType instead of the CUSTOM_DATA tag AssortedLib's StorageUtil writes.
-     */
-    @SuppressWarnings("deprecation")
-    @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flagIn) {
-        tooltip.accept(Component.translatable(Constants.MOD_ID + ".info.level_upgrade_level", Component.literal("" + storageMaterial.getStorageLevel()).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
     }
 
     @Override
