@@ -17,7 +17,18 @@ import java.util.stream.IntStream;
 
 public class CompactingCrateInventory extends CrateSidedInv {
 
-    private List<CompactingHelper.Match> matches = NonNullList.<CompactingHelper.Match>withSize(3, new CompactingHelper.Match(ItemStack.EMPTY, 1));
+    /** How many compacting tiers a compactor tracks; the slot index into {@link #matches}. */
+    private static final int TIERS = 3;
+
+    private List<CompactingHelper.Match> matches = emptyMatches(TIERS);
+
+    private static List<CompactingHelper.Match> emptyMatches(int size) {
+        List<CompactingHelper.Match> matches = Lists.newArrayList();
+        for (int i = 0; i < size; i++) {
+            matches.add(new CompactingHelper.Match(ItemStack.EMPTY, 1));
+        }
+        return matches;
+    }
 
     public CompactingCrateInventory(CrateBlockEntity inv) {
         super(inv);
@@ -27,23 +38,33 @@ public class CompactingCrateInventory extends CrateSidedInv {
     public void serialize(ValueOutput output) {
         super.serialize(output);
 
-        if (!this.matches.isEmpty()) {
-            ValueOutput.ValueOutputList matchList = output.childrenList("Matches");
-            this.matches.forEach(m -> {
-                ValueOutput match = matchList.addChild();
-                match.store("Item", ItemStack.CODEC, m.getItem());
-                match.putInt("MatchRequired", m.getNumRequired());
-            });
+        // ItemStack.CODEC refuses an empty stack and the tier list is padded with empty matches, so
+        // an empty tier is skipped and the index written out rather than implied by position.
+        ValueOutput.ValueOutputList matchList = output.childrenList("Matches");
+        for (int i = 0; i < this.matches.size(); i++) {
+            CompactingHelper.Match m = this.matches.get(i);
+            if (m.getItem().isEmpty()) {
+                continue;
+            }
+
+            ValueOutput match = matchList.addChild();
+            match.putByte("Slot", (byte) i);
+            match.store("Item", ItemStack.CODEC, m.getItem());
+            match.putInt("MatchRequired", m.getNumRequired());
         }
+        output.putInt("MatchCount", this.matches.size());
     }
 
     @Override
     public void deserialize(ValueInput input) {
         super.deserialize(input);
 
-        this.matches = Lists.newArrayList();
+        this.matches = emptyMatches(input.getIntOr("MatchCount", TIERS));
         for (ValueInput match : input.childrenListOrEmpty("Matches")) {
-            this.matches.add(new CompactingHelper.Match(match.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY), match.getIntOr("MatchRequired", 1)));
+            int slotIdx = match.getByteOr("Slot", (byte) -1) & 255;
+            if (slotIdx < this.matches.size()) {
+                this.matches.set(slotIdx, new CompactingHelper.Match(match.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY), match.getIntOr("MatchRequired", 1)));
+            }
         }
     }
 
@@ -59,7 +80,13 @@ public class CompactingCrateInventory extends CrateSidedInv {
         }
 
         CompactingHelper helper = new CompactingHelper(serverLevel);
-        matches = helper.findMatches(stack, 3);
+        matches = helper.findMatches(stack, TIERS);
+
+        // The tiers ride along in the block entity's update tag, and every capacity this compactor
+        // reports is worked out from them. Nothing else sends that tag while a crate is being filled,
+        // so without this a client keeps the empty tier list it was placed with.
+        this.inv.setChanged();
+        this.inv.modelUpdate();
     }
 
     public boolean haveMatchForItemStack(ItemStack stack) {

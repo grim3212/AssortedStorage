@@ -26,6 +26,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
@@ -49,6 +50,7 @@ import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -86,6 +88,20 @@ final class StorageTestSupport {
         helper.assertTrue(onClient instanceof ILockable, name + " did not recreate as a lockable block entity");
         onClient.loadWithComponents(TagValueInput.create(ProblemReporter.DISCARDING, registries, placed.getUpdateTag(registries)));
         helper.assertValueEqual(((ILockable) onClient).getLockCode(), CODE, name + " lock code as a client receives it");
+    }
+
+    /**
+     * Saves a block entity through a collecting problem reporter and fails the test if anything was
+     * refused. A codec that rejects the value it is handed - ItemStack.CODEC on an empty stack, say -
+     * only logs "Serialization errors" in game and writes nothing, so a test has to read the report.
+     */
+    static CompoundTag saveWithoutProblems(GameTestHelper helper, BlockEntity blockEntity, String what) {
+        ProblemReporter.Collector problems = new ProblemReporter.Collector();
+        TagValueOutput output = TagValueOutput.createWithContext(problems, helper.getLevel().registryAccess());
+        blockEntity.saveWithFullMetadata(output);
+
+        helper.assertTrue(problems.isEmpty(), what + " reported serialization errors: " + problems.getReport());
+        return output.buildResult();
     }
 
     /** Every variant object in a blockstate json: each "variants" entry and each multipart "apply". */
@@ -260,6 +276,10 @@ final class StorageTestSupport {
 
     static Block oakCrate() {
         return StorageBlocks.CRATES.stream().filter(group -> group.getType() == Wood.OAK).findFirst().orElseThrow().SINGLE.get();
+    }
+
+    static Block oakCrateQuadruple() {
+        return StorageBlocks.CRATES.stream().filter(group -> group.getType() == Wood.OAK).findFirst().orElseThrow().QUADRUPLE.get();
     }
 
     /** The translation keys of the lines one component adds to a stack's tooltip, in order. */

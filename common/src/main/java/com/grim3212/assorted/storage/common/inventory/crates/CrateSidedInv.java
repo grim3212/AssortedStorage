@@ -14,6 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -283,7 +284,7 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
         this.inv.setSlotChanged(slot);
     }
 
-    /** Applies a slot change synced from the server. */
+    /** Sets a slot, capped at what the slot can hold. */
     public void setItem(int slot, LargeItemStack stack) {
         if (slot >= 0 && slot < this.slotContents.size()) {
 
@@ -291,6 +292,19 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
                 stack.setAmount(this.getMaxStackSizeForSlot(slot));
             }
 
+            this.slotContents.set(slot, stack);
+        }
+
+        this.inv.setSlotChanged(slot);
+    }
+
+    /**
+     * Applies a slot exactly as the server sent it. The server has already capped it, and a client
+     * cannot always work the cap out for itself - a compactor's tiers come from the recipe manager -
+     * so re-capping here would silently throw the slot away.
+     */
+    public void applySyncedItem(int slot, LargeItemStack stack) {
+        if (slot >= 0 && slot < this.slotContents.size()) {
             this.slotContents.set(slot, stack);
         }
 
@@ -340,7 +354,7 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
     }
 
     public int getMaxStackSizeForSlot(int slot) {
-        if (slot < 0 && slot >= this.slotContents.size()) {
+        if (slot < 0 || slot >= this.slotContents.size()) {
             return 0;
         }
 
@@ -348,9 +362,16 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
         return baseStackSize + this.getExtraStorage(baseStackSize);
     }
 
+    /**
+     * A slot holds a number of stacks of whatever item is in it. An empty slot has no item to size
+     * against, and an empty ItemStack answers 1 to getMaxStackSize in 26.2 (the component default;
+     * air used to answer 64), so an empty slot would only accept its stack count in items. Fall
+     * back to the normal stack size until the slot knows what it holds.
+     */
     public int getBaseStackSize(int slot) {
         int slotBase = this.inv.getLayout().getSlotsBaseStacks()[slot];
-        int stackSizeMultiplier = this.getStackInSlot(slot).getMaxStackSize();
+        ItemStack inSlot = this.getStackInSlot(slot);
+        int stackSizeMultiplier = inSlot.isEmpty() ? Item.DEFAULT_MAX_STACK_SIZE : inSlot.getMaxStackSize();
         return stackSizeMultiplier * slotBase;
     }
 
@@ -484,9 +505,15 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
 
     @Override
     public void serialize(ValueOutput output) {
+        // ItemStack.CODEC refuses an empty stack, so a slot with no item is left out entirely and
+        // deserialize's fresh empty list covers it. A locked slot still has its item.
         ValueOutput.ValueOutputList items = output.childrenList("Items");
         for (int i = 0; i < this.slotContents.size(); i++) {
             LargeItemStack stack = this.slotContents.get(i);
+            if (stack.getStack().isEmpty()) {
+                continue;
+            }
+
             ValueOutput slot = items.addChild();
             slot.putByte("Slot", (byte) i);
             slot.putInt("SlotAmount", stack.getAmount());

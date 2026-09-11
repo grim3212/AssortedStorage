@@ -43,7 +43,7 @@ public class SyncCrate {
     public static void handle(SyncCrate packet, Player player) {
         BlockEntity blockEntity = player.level().getBlockEntity(packet.pos);
         if (blockEntity instanceof CrateBlockEntity crate) {
-            crate.getItemStackStorageHandler().setItem(packet.slot, packet.stack);
+            crate.getItemStackStorageHandler().applySyncedItem(packet.slot, packet.stack);
         }
     }
 }
