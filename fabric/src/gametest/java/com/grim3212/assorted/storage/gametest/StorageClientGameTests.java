@@ -8,9 +8,23 @@ import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.client.blockentity.state.CrateRenderState;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.CrateCompactingBlockEntity;
+import com.grim3212.assorted.storage.common.inventory.crates.CompactingCrateInventory;
 import com.grim3212.assorted.storage.common.inventory.crates.CrateSidedInv;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.api.Wood;
+import com.grim3212.assorted.lib.client.screen.LibGuiItemRenderer;
+import com.grim3212.assorted.storage.client.screen.CrateScreen;
+import com.grim3212.assorted.storage.client.screen.buttons.ImageToggleButton;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.state.gui.GuiItemRenderState;
+import net.minecraft.client.renderer.state.gui.GuiRenderState;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.data.AtlasIds;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemDisplayContext;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -54,6 +68,8 @@ public class StorageClientGameTests implements FabricClientGameTest {
             tooltipsShowStorageInfo(context);
             menusOpenOnTheClient(context, world);
             crateRendersFromItsState(context, world);
+            crateScreenShowsItsFace(context, world);
+            compactingCrateTiersReachTheClient(context, world);
         }
     }
 
@@ -156,6 +172,111 @@ public class StorageClientGameTests implements FabricClientGameTest {
             List<String> texts = new ArrayList<>();
             renderer.submit(state, new PoseStack(), recordingText(texts), new CameraRenderState());
             check(texts.equals(List.of("7")), "the amount upgrade drew " + texts + " from a state holding 7");
+        });
+    }
+
+    /**
+     * The crate screen draws the crate's face, not the three-quarter view an item icon gets: the
+     * slots it draws on top belong to that face. Only the model identity says which view was asked
+     * for - a layer's transform can be set but never read back - and that identity is also what
+     * keeps this drawing apart from the crate's own inventory icon in the GUI item atlas.
+     *
+     * The lock buttons are checked here too, because a sprite that is not in the atlas draws as the
+     * missing texture and nothing is logged.
+     */
+    private static void crateScreenShowsItsFace(ClientGameTestContext context, TestSingleplayerContext world) {
+        BlockPos pos = world.getServer().computeOnServer(server -> {
+            ServerPlayer player = player(server);
+            ServerLevel level = player.level();
+            BlockPos at = player.blockPosition().offset(0, 0, -3);
+            level.setBlockAndUpdate(at, oakCrate().defaultBlockState());
+            CrateBlockEntity crate = (CrateBlockEntity) level.getBlockEntity(at);
+            // Capacity comes from the item already in the slot, so the item goes in before the amount.
+            crate.getItemStackStorageHandler().setItem(0, new LargeItemStack(new ItemStack(Items.COBBLESTONE), 1));
+            crate.getItemStackStorageHandler().setItem(0, new LargeItemStack(new ItemStack(Items.COBBLESTONE), 191));
+            crate.setChanged();
+            level.sendBlockUpdated(at, crate.getBlockState(), crate.getBlockState(), Block.UPDATE_ALL);
+            return at;
+        });
+        // The screen builds its lock buttons in init(), so the client has to have the contents first.
+        context.waitFor(client -> client.level != null && client.level.getBlockEntity(pos) instanceof CrateBlockEntity crate
+                && crate.getItemStackStorageHandler().getLargeItemStack(0).getAmount() == 191, 100);
+
+        world.getServer().runOnServer(server -> {
+            ServerPlayer player = player(server);
+            ServerLevel level = player.level();
+            Services.PLATFORM.openMenu(player, level.getBlockState(pos).getMenuProvider(level, pos));
+        });
+        context.waitForScreen(CrateScreen.class);
+
+        context.runOnClient(client -> {
+            CrateScreen screen = (CrateScreen) client.gui.screen();
+
+            long lockButtons = screen.children().stream().filter(ImageToggleButton.class::isInstance).count();
+            check(lockButtons == 1, "a filled single crate's screen has " + lockButtons + " lock buttons");
+
+            GuiRenderState renderState = new GuiRenderState();
+            GuiGraphicsExtractor graphics = new GuiGraphicsExtractor(client, renderState, 0, 0);
+
+            TextureAtlas guiAtlas = client.getAtlasManager().getAtlasOrThrow(AtlasIds.GUI);
+            for (Identifier sprite : ImageToggleButton.SPRITES) {
+                TextureAtlasSprite inAtlas = guiAtlas.getSprite(sprite);
+                check(!inAtlas.contents().name().equals(MissingTextureAtlasSprite.getLocation()), "the lock button's " + sprite + " is not in the GUI atlas");
+            }
+
+            screen.extractBackground(graphics, 0, 0, 0.0F);
+            List<GuiItemRenderState> items = new ArrayList<>();
+            renderState.forEachItem(items::add);
+            check(items.size() == 1, "the crate screen's background drew " + items.size() + " items, not just the crate preview");
+
+            Object identity = items.getFirst().itemStackRenderState().getModelIdentity();
+            check(identity instanceof List<?> elements
+                            && elements.contains(ItemDisplayContext.NONE)
+                            && elements.contains(LibGuiItemRenderer.facingViewer(180.0F)),
+                    "the crate preview was not drawn facing the viewer: " + identity);
+        });
+
+        world.getServer().runOnServer(server -> player(server).closeContainer());
+        context.waitFor(client -> client.gui.screen() == null);
+    }
+
+    /**
+     * A compactor works its tiers out of the recipe manager, which is server side only, and every
+     * capacity it reports comes from them. A client that watched the crate being filled has to end
+     * up with the same three tiers as the server, not just the ones it could cap for itself.
+     */
+    private static void compactingCrateTiersReachTheClient(ClientGameTestContext context, TestSingleplayerContext world) {
+        BlockPos pos = world.getServer().computeOnServer(server -> {
+            ServerPlayer player = player(server);
+            BlockPos at = player.blockPosition().offset(-4, 0, 0);
+            player.level().setBlockAndUpdate(at, StorageBlocks.CRATE_COMPACTING.get().defaultBlockState());
+            return at;
+        });
+        // The client has to see the crate placed and empty first: filling it afterwards is what the
+        // player does, and what leaves the client with the empty tier list it was placed with.
+        context.waitFor(client -> client.level != null && client.level.getBlockEntity(pos) instanceof CrateCompactingBlockEntity, 100);
+
+        world.getServer().runOnServer(server -> {
+            CrateCompactingBlockEntity crate = (CrateCompactingBlockEntity) player(server).level().getBlockEntity(pos);
+            crate.getItemStackStorageHandler().addItem(0, new ItemStack(Items.IRON_INGOT, 9));
+        });
+        try {
+            context.waitFor(client -> client.level.getBlockEntity(pos) instanceof CrateCompactingBlockEntity crate
+                    && crate.getItemStackStorageHandler().getLargeItemStack(2).getAmount() == 81, 100);
+        } catch (AssertionError timedOut) {
+            String seen = context.computeOnClient(client -> describeCrate(client.level.getBlockEntity(pos)));
+            throw new AssertionError("the client never saw the compactor's lowest tier: " + seen, timedOut);
+        }
+
+        context.runOnClient(client -> {
+            CompactingCrateInventory compactor = (CompactingCrateInventory) ((CrateCompactingBlockEntity) client.level.getBlockEntity(pos)).getItemStackStorageHandler();
+            check(compactor.getLargeItemStack(0).getStack().is(Items.IRON_BLOCK), "the client's block tier is " + compactor.getLargeItemStack(0).getStack());
+            check(compactor.getLargeItemStack(1).getStack().is(Items.IRON_INGOT), "the client's ingot tier is " + compactor.getLargeItemStack(1).getStack());
+            check(compactor.getLargeItemStack(2).getStack().is(Items.IRON_NUGGET), "the client's nugget tier is " + compactor.getLargeItemStack(2).getStack());
+            // Capacity is read for the slot tooltip and by the amount upgrade, and is worked out
+            // from the tiers, so a client without them reports nothing for the lower ones.
+            check(compactor.getMaxStackSizeForSlot(2) > 0, "the client's compactor reports no capacity for the nugget tier");
+            check(compactor.getMaxStackSizeForSlot(1) > 0, "the client's compactor reports no capacity for the ingot tier");
         });
     }
 

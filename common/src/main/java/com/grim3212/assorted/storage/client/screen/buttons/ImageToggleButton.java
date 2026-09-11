@@ -9,29 +9,31 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
-/** A button drawn as one of two images, depending on its state. */
+import java.util.List;
+
+/**
+ * A button drawn as a checkbox that stays ticked while it is on. The widget textures are sprites in
+ * 26.2 - the {@code textures/gui/checkbox.png} sheet this used to slice up is gone - so the four
+ * states are four sprite ids rather than offsets into one image.
+ */
 public class ImageToggleButton extends Button {
-    private final Identifier resourceLocation;
-    private final int xTexStart;
-    private final int yTexStart;
-    private final int yDiffTex;
-    private final int textureWidth;
-    private final int textureHeight;
+
+    public static final Identifier CHECKBOX = Identifier.withDefaultNamespace("widget/checkbox");
+    public static final Identifier CHECKBOX_HIGHLIGHTED = Identifier.withDefaultNamespace("widget/checkbox_highlighted");
+    public static final Identifier CHECKBOX_SELECTED = Identifier.withDefaultNamespace("widget/checkbox_selected");
+    public static final Identifier CHECKBOX_SELECTED_HIGHLIGHTED = Identifier.withDefaultNamespace("widget/checkbox_selected_highlighted");
+
+    /** Every sprite this button can draw, for the client gametest that checks they are all in the atlas. */
+    public static final List<Identifier> SPRITES = List.of(CHECKBOX, CHECKBOX_HIGHLIGHTED, CHECKBOX_SELECTED, CHECKBOX_SELECTED_HIGHLIGHTED);
 
     private boolean buttonClicked;
 
-    public ImageToggleButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, Identifier location, int textureWidth, int textureHeight, OnPress onPress, boolean clicked, Component tooltip) {
-        this(x, y, width, height, xTexStart, yTexStart, yDiffTex, location, textureWidth, textureHeight, onPress, clicked, CommonComponents.EMPTY, tooltip);
+    public ImageToggleButton(int x, int y, int width, int height, OnPress onPress, boolean clicked, Component tooltip) {
+        this(x, y, width, height, onPress, clicked, CommonComponents.EMPTY, tooltip);
     }
 
-    public ImageToggleButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, Identifier location, int textureWidth, int textureHeight, Button.OnPress onPress, boolean clicked, Component message, Component tooltip) {
+    public ImageToggleButton(int x, int y, int width, int height, Button.OnPress onPress, boolean clicked, Component message, Component tooltip) {
         super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
-        this.textureWidth = textureWidth;
-        this.textureHeight = textureHeight;
-        this.xTexStart = xTexStart;
-        this.yTexStart = yTexStart;
-        this.yDiffTex = yDiffTex;
-        this.resourceLocation = location;
         this.buttonClicked = clicked;
 
         this.setTooltip(Tooltip.create(tooltip));
@@ -57,13 +59,14 @@ public class ImageToggleButton extends Button {
 
     @Override
     protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        int i = this.yTexStart;
-        if (!this.isActive()) {
-            i += this.yDiffTex * 2;
-        } else if (this.isHoveredOrFocused() || this.isButtonClicked()) {
-            i += this.yDiffTex;
+        boolean highlighted = this.isActive() && this.isHoveredOrFocused();
+        Identifier sprite;
+        if (this.isButtonClicked()) {
+            sprite = highlighted ? CHECKBOX_SELECTED_HIGHLIGHTED : CHECKBOX_SELECTED;
+        } else {
+            sprite = highlighted ? CHECKBOX_HIGHLIGHTED : CHECKBOX;
         }
 
-        graphics.blit(RenderPipelines.GUI_TEXTURED, this.resourceLocation, this.getX(), this.getY(), (float) this.xTexStart, (float) i, this.width, this.height, this.textureWidth, this.textureHeight);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, this.getX(), this.getY(), this.width, this.height);
     }
 }

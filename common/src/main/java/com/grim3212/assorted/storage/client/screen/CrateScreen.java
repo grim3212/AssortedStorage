@@ -1,5 +1,6 @@
 package com.grim3212.assorted.storage.client.screen;
 
+import com.grim3212.assorted.lib.client.screen.LibGuiItemRenderer;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.Constants;
 import com.grim3212.assorted.storage.api.LargeItemStack;
@@ -20,6 +21,7 @@ import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
@@ -31,7 +33,6 @@ import java.util.Optional;
  */
 public class CrateScreen extends AbstractContainerScreen<CrateContainer> {
 
-    protected static final Identifier CHECKBOX_LOCATION = Identifier.parse("textures/gui/checkbox.png");
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/crate.png");
     private static final int LABEL_COLOR = -12566464;
 
@@ -54,7 +55,8 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> {
                 LargeItemStack stackInSlot = this.getStack(curSlot);
                 int maxStackSize = this.getCrateInventory().getMaxStackSizeForSlot(curSlot);
                 tooltip.add(Component.translatable(Constants.MOD_ID + ".info.amount", Component.literal(String.valueOf(stackInSlot.getAmount() + "/" + maxStackSize)).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
-                tooltip.add(Component.translatable(Constants.MOD_ID + ".info.upgrade_redstone.mode.slot", Component.literal(String.valueOf(curSlot)).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
+                // Slots are indices everywhere but the label, which counts from 1 as the player does.
+                tooltip.add(Component.translatable(Constants.MOD_ID + ".info.upgrade_redstone.mode.slot", Component.literal(String.valueOf(curSlot + 1)).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
             } else if (this.hoveredSlot.getItem().getItem() instanceof ICrateUpgrade upgrade && upgrade.getStorageModifier() > 0) {
                 tooltip.add(Component.translatable(Constants.MOD_ID + ".info.storage_multiplier", Component.literal(String.valueOf(upgrade.getStorageModifier())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GOLD));
             }
@@ -85,9 +87,9 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> {
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
 
-        return new ImageToggleButton(i + x, j + y, 10, 10, 0, 0, 10, CHECKBOX_LOCATION, 32, 32, (button) -> {
+        return new ImageToggleButton(i + x, j + y, 10, 10, (button) -> {
             CrateScreen.this.toggleSlotLock(slot);
-        }, this.getCrateInventory().isSlotLocked(slot), Component.translatable(Constants.MOD_ID + ".info.item_lock", Component.literal(String.valueOf(slot)).withStyle(ChatFormatting.AQUA)));
+        }, this.getCrateInventory().isSlotLocked(slot), Component.translatable(Constants.MOD_ID + ".info.item_lock", Component.literal(String.valueOf(slot + 1)).withStyle(ChatFormatting.AQUA)));
     }
 
     private void toggleSlotLock(int slot) {
@@ -192,13 +194,15 @@ public class CrateScreen extends AbstractContainerScreen<CrateContainer> {
 
         graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, i, j, 0.0F, 0.0F, this.imageWidth + 26, this.imageHeight, 256, 256);
 
-        // The crate preview used to be an ItemRenderer#renderStatic call with a hand built model
-        // transform. The retained GUI only draws items through GuiGraphicsExtractor#item, which
-        // applies the standard GUI display context; scaling the 2D pose keeps the same 51px footprint.
+        // The preview shows the crate's face, not the usual three-quarter item icon: the slots the
+        // screen draws on top of it are the ones on that face. GuiGraphicsExtractor#item always uses
+        // the GUI display context, so the view comes from AssortedLib instead. The crate's facing
+        // texture is its model's north side, hence the half turn. Scaling the 2D pose keeps the
+        // 51px footprint the screen's background is drawn around.
         graphics.pose().pushMatrix();
         graphics.pose().translate(i + 88, j + 42);
         graphics.pose().scale(3.2F, 3.2F);
-        graphics.item(this.renderStack, -8, -8);
+        LibGuiItemRenderer.item(graphics, this.renderStack, ItemDisplayContext.NONE, LibGuiItemRenderer.facingViewer(180.0F), -8, -8);
         graphics.pose().popMatrix();
     }
 }

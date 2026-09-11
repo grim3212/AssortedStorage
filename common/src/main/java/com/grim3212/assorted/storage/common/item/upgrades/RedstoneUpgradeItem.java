@@ -41,7 +41,8 @@ public class RedstoneUpgradeItem extends ModeCrateUpgradeItem {
         } else if (currentMode == 6) {
             modeKey = ".info.upgrade_redstone.mode.least";
         }
-        return Component.translatable(Constants.MOD_ID + ".info.upgrade.mode", Component.translatable(Constants.MOD_ID + modeKey, currentMode).withStyle(ChatFormatting.GRAY)).withStyle(ChatFormatting.AQUA);
+        // Modes and slots are indices everywhere but the label, which counts from 1 as the player does.
+        return Component.translatable(Constants.MOD_ID + ".info.upgrade.mode", Component.translatable(Constants.MOD_ID + modeKey, currentMode + 1).withStyle(ChatFormatting.GRAY)).withStyle(ChatFormatting.AQUA);
     }
 
     @Override

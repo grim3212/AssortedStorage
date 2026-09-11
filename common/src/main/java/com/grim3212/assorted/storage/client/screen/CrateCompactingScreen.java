@@ -35,7 +35,7 @@ public class CrateCompactingScreen extends CrateScreen {
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
 
-        return new ImageToggleButton(i + x, j + y, 10, 10, 0, 0, 10, CHECKBOX_LOCATION, 32, 32, (button) -> {
+        return new ImageToggleButton(i + x, j + y, 10, 10, (button) -> {
             CrateCompactingScreen.this.toggleAllSlotsLock();
         }, this.getCrateInventory().isSlotLocked(0), Component.translatable(Constants.MOD_ID + ".info.compact_item_lock"));
     }
