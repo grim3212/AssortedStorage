@@ -12,8 +12,6 @@ import java.util.function.Consumer;
  * {@code data/assortedstorage/test_instance/*.json} pairs each one with the shared
  * {@code test_box} structure.
  * <p>
- * Manual checks that need a human are in {@code TESTING-CHECKLIST.md}.
- * <p>
  * The tests themselves are split by feature into the {@code *Tests} classes in this package,
  * with shared helpers in {@code StorageTestSupport}; this only lists them.
  */
