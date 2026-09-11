@@ -1,4 +1,22 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "barrels"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "registry": "minecraft:item",
+          "values": [
+            "c:ingots/bronze"
+          ]
+        }
+      ]
+    }
+  ],
   "type": "assortedstorage:locked_upgrading",
   "key": {
     "C": "#assortedstorage:barrels/level_2",

@@ -1,4 +1,22 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "bags"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "registry": "minecraft:item",
+          "values": [
+            "c:ingots/aluminum"
+          ]
+        }
+      ]
+    }
+  ],
   "type": "assortedstorage:locked_upgrading",
   "key": {
     "C": "#assortedstorage:bags/level_0",

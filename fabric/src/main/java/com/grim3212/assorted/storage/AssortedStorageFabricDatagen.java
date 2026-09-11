@@ -1,5 +1,6 @@
 package com.grim3212.assorted.storage;
 
+import com.grim3212.assorted.lib.data.FabricConditionalRecipeProvider;
 import com.grim3212.assorted.lib.data.FabricBlockTagProvider;
 import com.grim3212.assorted.lib.data.FabricItemTagProvider;
 import com.grim3212.assorted.storage.data.StorageBlockLoot;
@@ -20,7 +21,7 @@ public class AssortedStorageFabricDatagen implements DataGeneratorEntrypoint {
         FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
 
         // Recipe providers are not data providers any more - the Runner owns the output.
-        pack.addProvider((output, registriesFuture) -> new StorageRecipes.Runner(output, registriesFuture));
+        pack.addProvider((output, registriesFuture) -> new FabricConditionalRecipeProvider(output, registriesFuture, new StorageRecipes.Runner(output, registriesFuture)));
         FabricBlockTagProvider provider = pack.addProvider((output, registriesFuture) -> new FabricBlockTagProvider(output, registriesFuture, new StorageBlockTagProvider(output, registriesFuture)));
         pack.addProvider((output, registriesFuture) -> new FabricItemTagProvider(output, registriesFuture, provider.contentsGetter(), new StorageItemTagProvider(output, registriesFuture, provider.contentsGetter())));
         pack.addProvider((output, registriesFuture) -> new LootTableProvider(output, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(StorageBlockLoot::new, LootContextParamSets.BLOCK)), registriesFuture));

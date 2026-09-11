@@ -1,4 +1,22 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "shulkers"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "registry": "minecraft:item",
+          "values": [
+            "c:ingots/electrum"
+          ]
+        }
+      ]
+    }
+  ],
   "type": "assortedstorage:locked_upgrading",
   "key": {
     "C": "#assortedstorage:shulkers/level_3",

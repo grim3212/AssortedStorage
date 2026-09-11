@@ -1,4 +1,19 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "crates"
+        },
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "upgrades"
+        }
+      ]
+    }
+  ],
   "type": "minecraft:crafting_shaped",
   "key": {
     "C": "minecraft:comparator",
