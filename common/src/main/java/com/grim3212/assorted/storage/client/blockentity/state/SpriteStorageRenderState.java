@@ -4,10 +4,8 @@ import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.resources.model.sprite.SpriteId;
 
 /**
- * For the storage blocks whose texture lives on one of the entity atlases rather than being a
- * standalone png. 1.20.1's {@code Material(atlas, texture)} is {@link SpriteId} now, and the sprite is
- * handed to {@code SubmitNodeCollector#submitModel} together with the {@code SpriteGetter} that
- * resolves it, instead of being used to open a {@code VertexConsumer}.
+ * For the storage blocks whose texture is on an entity atlas: the {@link SpriteId} goes to
+ * {@code submitModel} with the {@code SpriteGetter} that resolves it.
  */
 public class SpriteStorageRenderState extends StorageBlockRenderState {
 

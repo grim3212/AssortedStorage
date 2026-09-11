@@ -57,10 +57,8 @@ public class AssortedStorageNeoForge {
     }
 
     /**
-     * {@code ExistingFileHelper} was removed from datagen, the event owns the provider list now
-     * ({@code addProvider}), and the include flags are gone because the server and client halves are
-     * separate events. Getting this split wrong is quiet: the wrong event runs and reports
-     * "All providers took: 0 ms" with a successful build.
+     * Server datagen. The server and client halves are separate events; if the wrong one runs, the
+     * build still succeeds, with "All providers took: 0 ms".
      */
     private void gatherServerData(final GatherDataEvent.Server event) {
         PackOutput packOutput = event.getGenerator().getPackOutput();
@@ -74,12 +72,8 @@ public class AssortedStorageNeoForge {
     }
 
     /**
-     * The two model providers split the mod between them - blocks and block items on one side,
-     * everything else on the other - because a {@code ModelProvider} writes both halves and would
-     * otherwise fight over the same files. See {@link StorageBlockstateProvider}.
-     * <p>
-     * {@link StorageLanguageProvider} writes {@code en_us.json} with the rest of the assets, into
-     * {@code common/src/generated/client}; there is no hand written lang file.
+     * Client datagen: block states and models, item models, sprite sources and the lang file. The
+     * two model providers split the mod between them so they never write the same file.
      */
     private void gatherClientData(final GatherDataEvent.Client event) {
         PackOutput packOutput = event.getGenerator().getPackOutput();
@@ -92,16 +86,8 @@ public class AssortedStorageNeoForge {
     }
 
     /**
-     * Both halves of this used to be mixins: {@code AddItemHandlerCapabilityBlockEntities} overrode
-     * {@code BlockEntity#getCapability} and {@code AddItemHandlerCapabilityItems} overrode
-     * {@code Item#initCapabilities}. Neither hook exists any more - a capability is registered per
-     * block entity type or per item from {@link RegisterCapabilitiesEvent} - so both mixins were
-     * deleted and the registration lives here, mirroring what {@code AssortedStorageFabric} does
-     * with {@code ItemStorage.SIDED}.
-     * <p>
-     * {@code ForgeCapabilities.ITEM_HANDLER} and the deprecated {@code IItemHandler} it was typed
-     * with are replaced by {@code Capabilities.Item.BLOCK} / {@code .ITEM}, a transactional
-     * {@code ResourceHandler<ItemResource>} that the library's handler already exposes.
+     * Exposes the storage blocks and items as item handlers ({@code Capabilities.Item.BLOCK} /
+     * {@code .ITEM}), the NeoForge side of Fabric's {@code ItemStorage.SIDED}.
      */
     private void registerCapabilities(final RegisterCapabilitiesEvent event) {
         registerBlockEntity(event, StorageBlockEntityTypes.WOOD_CABINET);

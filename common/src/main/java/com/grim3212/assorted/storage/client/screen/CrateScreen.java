@@ -26,14 +26,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * See {@link BaseStorageScreen} for the retained-mode GUI change. Two more things had to move here:
- * <ul>
- * <li>{@code renderTooltip} is {@code extractTooltip}, and a tooltip is <em>recorded</em> with
- * {@code setTooltipForNextFrame} rather than drawn on the spot;</li>
- * <li>the pose is a 2D {@code Matrix3x2fStack} with no z, so the {@code translate(0, 0, 300)} that
- * lifted the slot amounts over the item stacks is a {@code nextStratum()} call after the contents
- * instead.</li>
- * </ul>
+ * The crate screen. Slot amounts are drawn in a later {@code nextStratum()} so they sit above the
+ * item stacks, and tooltips are recorded with {@code setTooltipForNextFrame}.
  */
 public class CrateScreen extends AbstractContainerScreen<CrateContainer> {
 

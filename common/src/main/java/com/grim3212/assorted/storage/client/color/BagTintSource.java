@@ -15,13 +15,8 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Tints a bag layer from the dye colour stored on the stack.
- * <p>
- * {@code ItemColor} / {@code ItemColors} were removed in 26.2, so an item's tints are no longer
- * registered per item in code. An item model json lists its tint layers, each naming an
- * {@link ItemTintSource} type by id, and code only registers the id to {@link MapCodec} pair. The
- * layer index the old {@code ItemColor} switched on is therefore the position of the entry in that
- * list, and which of the bag's two colours a layer wants is said explicitly through {@link #tag()}.
+ * Tints a bag layer from a dye colour on the stack. The item model lists the tint layers, and
+ * {@link #tag()} says which of the bag's two colours a layer takes.
  */
 public record BagTintSource(String tag) implements ItemTintSource {
 

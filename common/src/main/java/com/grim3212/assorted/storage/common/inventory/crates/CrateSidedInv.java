@@ -283,12 +283,7 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
         this.inv.setSlotChanged(slot);
     }
 
-    /**
-     * Used to sync the server side to the client side for slot changes
-     *
-     * @param slot
-     * @param stack
-     */
+    /** Applies a slot change synced from the server. */
     public void setItem(int slot, LargeItemStack stack) {
         if (slot >= 0 && slot < this.slotContents.size()) {
 
@@ -455,10 +450,7 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
     }
 
     /**
-     * @param index
-     * @param stack
-     * @return -1 means that we couldn't add anything 0 means everything was added
-     * 1+ means there was a remainder of items not added
+     * @return -1 if nothing was added, 0 if everything was, otherwise the count left over
      */
     public int addItem(int index, ItemStack stack) {
         if (index >= 0 && index < this.slotContents.size() && !stack.isEmpty()) {

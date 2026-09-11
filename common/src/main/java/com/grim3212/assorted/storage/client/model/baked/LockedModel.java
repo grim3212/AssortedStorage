@@ -16,13 +16,9 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 
 /**
- * A block model that swaps between a locked and an unlocked variant.
- * <p>
- * The two children are model <em>references</em> now rather than inline json objects. 26.2 parses
- * json models as {@code CuboidModel} records through a private Gson whose element and face adapters
- * are package private, so an inline child cannot be deserialised from a foreign context; a model id
- * resolved through {@link ModelBaker#getModel(Identifier)} can. The json shape is therefore
- * {@code {"unlocked": "namespace:block/foo_unlocked", "locked": "namespace:block/foo_locked"}}.
+ * A block model that swaps between a locked and an unlocked variant. The children are model ids,
+ * resolved through {@link ModelBaker#getModel(Identifier)}, because inline json children cannot be
+ * parsed from here: {@code {"unlocked": "ns:block/foo_unlocked", "locked": "ns:block/foo_locked"}}.
  */
 public class LockedModel implements IModelSpecification<LockedModel> {
 

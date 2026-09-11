@@ -187,13 +187,9 @@ final class StorageBlockTests {
     }
 
     /**
-     * Breaking a storage block gives the contents back. Most of them spill loose from the block
-     * entity's {@code preRemoveSideEffects}; the gold safe and the locked shulker box deliberately
-     * do not, and carry their contents inside the dropped item instead, so those two are broken
-     * with drops on and the dropped item is inspected.
-     * <p>
-     * Each block is given a different marker item so one dropped stack can never be mistaken for
-     * a neighbour's.
+     * Breaking a storage block gives its contents back. Most spill from {@code
+     * preRemoveSideEffects}; the gold safe and locked shulker box keep them in the dropped item.
+     * Each block gets its own marker item.
      */
     private static void everyStorageBlockDropsItsContents(GameTestHelper helper) {
         List<Block> keepsContentsInTheItem = List.of(StorageBlocks.GOLD_SAFE.get(), StorageBlocks.LOCKED_SHULKER_BOX.get());

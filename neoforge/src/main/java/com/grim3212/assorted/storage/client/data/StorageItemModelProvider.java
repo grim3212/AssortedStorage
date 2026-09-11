@@ -31,23 +31,9 @@ import net.minecraft.world.level.block.Block;
 import java.util.stream.Stream;
 
 /**
- * Forge's {@code ItemModelProvider} / {@code ItemModelBuilder} / {@code ExistingFileHelper} are all
- * gone, and so is the idea that an item model is one json: an item points at a data-driven
- * {@code ItemModel} in {@code assets/<ns>/items/}, which names the {@code assets/<ns>/models/}
- * geometry to draw. {@link ItemModelGenerators} writes both halves.
- * <p>
- * Block items are not listed here at all - they belong to {@link StorageBlockstateProvider}, which
- * owns the special-renderer items, the hoppers and the crate controller and lets
- * {@link ModelProvider} point the rest at their block model.
- * <p>
- * The bag and ender bag models' 1.20.1 {@code overrides} lists are now {@code minecraft:condition}
- * trees over {@link HasStorageTagProperty}: the branch is chosen before baking, from the item json,
- * and only the predicate is code. The dye is a tint rather than a branch, so the two combine - the
- * condition picks the greyscale body texture and {@code tints} colours it.
- * <p>
- * The shulker box item needs nothing here: it is special-rendered, and
- * {@code LockedShulkerBoxSpecialRenderer#extractArgument} reads the stack's {@code Color} and lock
- * directly, which is the per-stack hook {@code registerItemProperty} used to provide.
+ * Item models for everything but block items, which {@link StorageBlockstateProvider} models. The
+ * bags are {@code minecraft:condition} trees over {@link HasStorageTagProperty}, with the dye as a
+ * tint; the shulker box item is special-rendered and needs nothing here.
  */
 public class StorageItemModelProvider extends ModelProvider {
 
@@ -129,10 +115,8 @@ public class StorageItemModelProvider extends ModelProvider {
     }
 
     /**
-     * Picks one of the four bag models from the stack, replacing the {@code overrides} list its 1.20.1
-     * model carried. The dye is a tint and the lock is a whole texture set, so the two are not
-     * interchangeable: {@code dyed} only chooses between the plain body and the greyscale one that
-     * takes the tint, which is why tinting the plain body directly came out muddy.
+     * Picks one of the four bag models from the stack. The lock picks the texture set; {@code dyed}
+     * picks the greyscale body that takes the tint, because tinting the plain body comes out muddy.
      */
     private void bagTree(ItemModelGenerators itemModels, Item item, ItemModel.Unbaked plain, ItemModel.Unbaked colored, ItemModel.Unbaked locked, ItemModel.Unbaked lockedColored) {
         itemModels.itemModelOutput.accept(item, ItemModelUtils.conditional(HasStorageTagProperty.LOCKED,

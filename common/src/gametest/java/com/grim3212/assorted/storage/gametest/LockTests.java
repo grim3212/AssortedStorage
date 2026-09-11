@@ -76,10 +76,8 @@ final class LockTests {
     }
 
     /**
-     * The three blocks whose padlock face comes from model data send their lock to clients. The
-     * update tag is what every other player receives; if it lost the lock, their barrel, hopper or
-     * crate controller would keep showing the unlocked face. AssortedLib re-renders a model-data
-     * block entity on the client once this is loaded into it - the half a server cannot test.
+     * The barrel, hopper and crate controller send their lock to clients in the update tag, or
+     * other players keep seeing the unlocked face.
      */
     private static void lockedBlocksSendTheirLockToClients(GameTestHelper helper) {
         assertLockReachesClients(helper, new BlockPos(2, 1, 4), StorageBlocks.LOCKED_BARREL.get());
@@ -168,12 +166,9 @@ final class LockTests {
     }
 
     /**
-     * The whole locksmith loop, server side: iron crafts into blank keys and locks, a code typed
-     * into the workbench is put on whichever of the two is in the slot, and the lock and key that
-     * come out share it - the lock closes a cabinet the key then opens.
-     * <p>
-     * The typed code arrives as {@link SetLockPacket}, so the packet's own handler is what is
-     * called here rather than the screen that would normally send it.
+     * The locksmith loop: iron crafts into blank keys and locks, a code typed into the workbench
+     * goes on the item in the slot, and the lock and key that come out match. The code arrives as a
+     * {@link SetLockPacket}, whose handler is called directly.
      */
     private static void locksmithWorkbenchCodesAKeyAndALock(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();

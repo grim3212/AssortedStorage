@@ -19,11 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The locked ender chest inventories, one per lock code.
- * <p>
- * {@link SavedData} is codec driven in 26.x - it no longer round trips a {@code CompoundTag}
- * itself, it is described by a {@link SavedDataType} holding a {@link Codec} and the storage layer
- * does the reading and writing. Each inventory is stored as its plain list of stacks.
+ * The locked ender chest inventories, one per lock code, saved through a {@link SavedDataType}
+ * codec.
  */
 public class EnderSavedData extends SavedData implements IEnderData {
 

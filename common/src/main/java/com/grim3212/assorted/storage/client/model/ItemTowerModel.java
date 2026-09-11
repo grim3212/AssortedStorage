@@ -15,13 +15,8 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 public class ItemTowerModel extends Model<ItemTowerModel.State> {
 
 	/**
-	 * Which neighbours the tower has, and whether this is the flat inventory rendering.
-	 * <p>
-	 * These were mutable fields on the model in 1.20.1. Submission is deferred in 26.2 -
-	 * {@code SubmitNodeCollector#submitModel} records the model and calls {@code setupAnim} later -
-	 * so anything that varies per tower has to travel in the state instead. The scroll animation
-	 * counter below deliberately stays on the model: it is per tower already, because
-	 * {@code ItemTowerBlockEntity} keeps its own {@code ItemTowerModel} instance for it.
+	 * Which neighbours the tower has, and whether this is the flat inventory rendering. It travels
+	 * in the state because submission is deferred; the scroll counter stays on the per-tower model.
 	 */
 	public record State(boolean topBlock, boolean bottomBlock, boolean inventory) {
 
@@ -285,10 +280,8 @@ public class ItemTowerModel extends Model<ItemTowerModel.State> {
 	}
 
 	/**
-	 * Offsets a shelf along the animation curve. This used to translate the {@code PoseStack} by
-	 * {@code y / 16} block units around the part's own render call; a {@link ModelPart}'s position is
-	 * in those same sixteenths, so setting it directly is the identical displacement and survives the
-	 * deferred submit, which no longer lets a model interleave its own transforms.
+	 * Offsets a shelf along the animation curve by setting the part's position, in sixteenths,
+	 * which survives the deferred submit.
 	 */
 	private void poseShelf(ModelPart shelf, int offset, float[] yTable, float[] zTable) {
 		int index = this.frame + offset;

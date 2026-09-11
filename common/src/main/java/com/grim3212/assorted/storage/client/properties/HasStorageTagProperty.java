@@ -14,14 +14,8 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The two branches a bag's item model picks between: whether the stack is dyed, and whether it is
- * locked. Both replace an {@code ItemProperties} function that a model {@code overrides} list keyed
- * on in 1.20.1.
- * <p>
- * Neither is expressible with a vanilla conditional. Both values live in
- * {@code DataComponents.CUSTOM_DATA}, and the only vanilla property that reads a component predicate,
- * {@code minecraft:component_matches}, needs an exact {@code NbtPredicate} value - which neither an
- * arbitrary dye id nor an arbitrary lock code can supply.
+ * What a bag's item model branches on: whether the stack is dyed, and whether it is locked. Both
+ * live in {@code custom_data}, which no vanilla property can test for an arbitrary value.
  */
 public enum HasStorageTagProperty implements ConditionalItemModelProperty {
     DYED(Identifier.fromNamespaceAndPath(Constants.MOD_ID, "dyed")) {

@@ -118,12 +118,8 @@ public class StorageBlockLoot extends LibBlockLootProvider {
     }
 
     /**
-     * Carrying the block entity's state into the dropped item is one function now.
-     * <p>
-     * {@code CopyNbtFunction} and {@code SetContainerContents} pointed at a block entity type are
-     * gone - {@code ContextNbtProvider.BLOCK_ENTITY} has no public factory any more - and the
-     * contents, name and lock are all data components the block entity exposes. This is what
-     * vanilla's own shulker box drop does.
+     * Drops the block with its contents, name and lock carried over as data components, as
+     * vanilla's shulker box does.
      */
     private LootTable.Builder createContentsTable(Block b) {
         LootPoolEntryContainer.Builder<?> entry = LootItem.lootTableItem(b).apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY).include(DataComponents.CUSTOM_NAME).include(DataComponents.CONTAINER).include(DataComponents.CUSTOM_DATA));

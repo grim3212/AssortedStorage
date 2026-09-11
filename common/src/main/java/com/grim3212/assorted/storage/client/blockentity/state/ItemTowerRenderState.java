@@ -6,11 +6,8 @@ import net.minecraft.core.Direction;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The item tower's shelves scroll, and the scroll position is per block entity: opening the screen
- * calls {@code ItemTowerBlockEntity#animate}, which drives a counter that has to survive between
- * frames. That counter lives on an {@code ItemTowerModel} the block entity owns, so the model itself
- * is what gets extracted here - the renderer's own shared model is only used when a tower has no
- * animating instance of its own (and for the block item, which has no block entity in a level).
+ * Carries the tower's own model, whose scroll counter has to survive between frames; the renderer's
+ * shared model is used when there is none, as for the item.
  */
 public class ItemTowerRenderState extends BlockEntityRenderState {
 

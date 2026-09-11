@@ -19,11 +19,8 @@ import java.util.function.Consumer;
 
 /**
  * The lines a storage item adds to its tooltip: its lock, and the storage level it has or upgrades
- * to. Each such item's constructor sets one as a default component.
- * <p>
- * {@code Item#appendHoverText} is deprecated, and item tooltips come from components implementing
- * {@link TooltipProvider} instead. The lock itself stays in the stack's {@code custom_data}, where
- * AssortedLib's {@link StorageUtil} keeps it; this only says how to show it.
+ * to. Each item's constructor sets one as a default component; the lock itself stays in
+ * {@code custom_data}, where {@link StorageUtil} keeps it.
  *
  * @param lock  how the lock is shown, when the stack has one
  * @param level the storage level to show, or -1 for none

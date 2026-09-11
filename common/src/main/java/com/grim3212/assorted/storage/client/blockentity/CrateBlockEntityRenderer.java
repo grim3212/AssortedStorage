@@ -196,11 +196,8 @@ public class CrateBlockEntityRenderer implements BlockEntityRenderer<CrateBlockE
     }
 
     /**
-     * The lock icons are one textured quad each, which is exactly what
-     * {@code SubmitNodeCollector#submitCustomGeometry} - the one remaining escape hatch to a raw
-     * {@code VertexConsumer} - is for. The whole crate goes in one callback, and the pose it hands
-     * back has to be copied into a local stack because the caller's stack is long gone by the time
-     * the geometry is actually built.
+     * Draws the lock icons, one quad each, through {@code submitCustomGeometry}. The pose is copied
+     * into a local stack because the caller's is gone by the time the geometry is built.
      */
     private static void submitLockIcons(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, boolean[] locked, int[] xs, int[] ys) {
         submitNodeCollector.submitCustomGeometry(poseStack, ICONS, (pose, buffer) -> {

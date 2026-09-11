@@ -30,12 +30,10 @@ final class TooltipTests {
     }
 
     /**
-     * Each storage item's lock, level and mode lines come from the {@code storage_info} or
-     * {@code upgrade_mode_info} component its constructor sets. Bags only say they are locked, while
-     * keys and storage block items show the code, and the level comes after the lock. NeoForge adds
-     * component lines on the server too, so there the whole tooltip is checked as well, which proves
-     * the components are wired in; Fabric only adds them on the client, and
-     * {@code StorageClientGameTests} checks it there.
+     * Each storage item's lock, level and mode lines come from its {@code storage_info} or {@code
+     * upgrade_mode_info} component: bags only say they are locked, keys and storage blocks show the
+     * code. NeoForge also builds the full tooltip on the server, so there it is checked too; {@code
+     * StorageClientGameTests} covers Fabric.
      */
     private static void storageTooltipsComeFromComponents(GameTestHelper helper) {
         DataComponentType<StorageInfo> info = StorageDataComponents.STORAGE_INFO.get();

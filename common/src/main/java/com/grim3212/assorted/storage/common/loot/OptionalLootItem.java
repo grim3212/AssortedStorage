@@ -15,12 +15,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * A loot entry naming an item that may not exist, so an optional dependency can be dropped without
+ * A loot entry naming an item that may not exist, so an optional dependency can be missing without
  * breaking the table.
- * <p>
- * Loot entries are codec driven in 26.x - the registry holds a {@link MapCodec} and the entry
- * exposes it through {@code codec()} - so the Gson {@code Serializer} inner class is gone, and the
- * condition/function arrays became {@code List}s.
  */
 public class OptionalLootItem extends LootPoolSingletonContainer {
 

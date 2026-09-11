@@ -10,16 +10,8 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 /**
- * Mirrors vanilla's {@code ShulkerBoxRenderer.ShulkerBoxModel}, which is now a
- * {@link Model} of the lid progress; the padlock overlay is the one extra piece, so this model's
- * state carries the progress and whether the box is locked.
- * <p>
- * 26.2 renamed the entity render types: {@code RenderPipelines.ENTITY_CUTOUT} is declared
- * {@code withCull(false)}, so {@code entityCutout} is what {@code entityCutoutNoCull} used to be and
- * the culled variant gained the {@code Cull} suffix. That is the render type used here, because the
- * model's own {@code entityCutoutNoCullZOffset} never actually applied in 1.20.1 - the block entity
- * renderer opened its {@code VertexConsumer} with {@code entityCutoutNoCull} and overrode it. The
- * submit API takes the render type from the model, so it has to be the one that was really in use.
+ * Vanilla's shulker box model plus the padlock overlay; the state carries the lid progress and the
+ * lock. It uses {@code entityCutout}, which does not cull, as the old renderer effectively did.
  */
 public class ShulkerBoxModel extends Model<ShulkerBoxModel.State> {
     private static final String LID = "lid";

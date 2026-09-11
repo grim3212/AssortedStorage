@@ -9,11 +9,7 @@ import net.minecraft.util.StringRepresentable;
 import java.util.function.Function;
 
 /**
- * Names the storage entity models that a special item renderer can pick from.
- * <p>
- * Item rendering is data driven in 26.2 - an item model json names a {@code minecraft:special}
- * renderer type and its options - so the model to use has to be expressible in a codec rather than
- * being wired up in code by a {@code BlockEntityWithoutLevelRenderer} registration.
+ * The storage models a special item renderer can draw, named so an item model json can choose one.
  */
 public enum StorageModelType implements StringRepresentable {
     CABINET("cabinet", StorageModelLayers.CABINET, CabinetModel::new),

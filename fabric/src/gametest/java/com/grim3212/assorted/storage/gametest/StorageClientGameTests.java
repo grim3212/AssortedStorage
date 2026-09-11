@@ -15,13 +15,8 @@ import net.minecraft.world.item.TooltipFlag;
 import java.util.List;
 
 /**
- * What a headless server cannot see: storage item tooltips as Fabric builds them. Fabric only adds a
- * mod component's tooltip lines on the client, so this is the one place the {@code storage_info}
- * and {@code upgrade_mode_info} lines can be checked end to end on Fabric; the server gametest covers
- * NeoForge.
- * <p>
- * Runs in a real client - {@code ./gradlew :fabric:runClientGameTest} - and exits non-zero on a
- * failure.
+ * Storage item tooltips as Fabric builds them, which only happens on the client. Run with
+ * {@code ./gradlew :fabric:runClientGameTest}; it exits non-zero on a failure.
  */
 public class StorageClientGameTests implements FabricClientGameTest {
 

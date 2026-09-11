@@ -25,13 +25,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Logic follows the same flow as laid out by StorageDrawers and FunctionStorage
- * <p>
- * The recipe manager only exists server side in 26.x, so this takes a {@link ServerLevel} rather
- * than a plain {@code Level}. Recipes also no longer expose their result or their ingredient list
- * directly - the result comes off the recipe's {@link RecipeDisplay} and the ingredients off its
- * {@code placementInfo()} - and recipes match against a {@link CraftingInput} instead of a
- * {@code CraftingContainer}.
+ * Finds compacting recipes, following the approach of StorageDrawers and FunctionStorage. Needs a
+ * {@link ServerLevel}, the only side with a recipe manager.
  */
 
 public class CompactingHelper {
@@ -133,13 +128,7 @@ public class CompactingHelper {
         return new Match(ItemStack.EMPTY, 0);
     }
 
-    /**
-     * Look for a lower crafting tier recipe using the input stack Example: 1 iron
-     * ingot would trying to find 9 iron nuggets
-     *
-     * @param stack
-     * @return
-     */
+    /** Finds the recipe one tier down, e.g. an iron ingot into nine iron nuggets. */
     private Match findLowerTier(ItemStack stack) {
         // For each option we keep track of the amount it takes to craft the stack given
         Map<ItemStack, Integer> itemOptions = Maps.newLinkedHashMap();

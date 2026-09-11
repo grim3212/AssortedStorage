@@ -17,12 +17,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.item.ItemStack;
 
-/**
- * See {@link BaseStorageScreen} for the retained-mode GUI change. The edit box is a renderable widget,
- * so the hand written {@code render} override that drew it after {@code super.render} is gone - the
- * base screen extracts every widget it was given. {@code keyPressed} takes a {@code KeyEvent} record
- * and {@code ContainerListener} lost {@code refreshContainer}.
- */
+/** The locksmith workbench screen. The code field is a widget, so the base screen draws it. */
 public class LocksmithWorkbenchScreen extends AbstractContainerScreen<LocksmithWorkbenchContainer> implements ContainerListener {
 
     private static final Identifier GUI_TEXTURE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/container/locksmith_workbench.png");

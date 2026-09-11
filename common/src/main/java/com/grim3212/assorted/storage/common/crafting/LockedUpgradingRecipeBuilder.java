@@ -22,13 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Builds a {@link LockedUpgradingRecipe} for data generation.
- * <p>
- * {@code FinishedRecipe} is gone - the provider hands a {@link RecipeOutput} the real recipe object
- * and the recipe's own codec writes it - so the JSON serialising {@code Result} inner class has no
- * equivalent and the pattern validation is now {@link ShapedRecipePattern}'s job. The result is an
- * {@link ItemStackTemplate}: a real {@code ItemStack} cannot be built at datagen time because an
- * item's default components are not bound yet.
+ * Builds a {@link LockedUpgradingRecipe} for data generation. The result is an
+ * {@link ItemStackTemplate} because a stack cannot be built before item components are bound.
  */
 public class LockedUpgradingRecipeBuilder implements RecipeBuilder {
     private final HolderGetter<Item> items;

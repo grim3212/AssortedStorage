@@ -11,13 +11,7 @@ import net.neoforged.neoforge.client.data.SpriteSourceProvider;
 
 import java.util.concurrent.CompletableFuture;
 
-/**
- * {@code SpriteSourceProvider} survived, but it moved from {@code net.minecraftforge.common.data} to
- * {@code net.neoforged.neoforge.client.data} and it is a {@code JsonCodecProvider} now, so it takes
- * a registry lookup future instead of an {@code ExistingFileHelper}; the hook it asks a subclass to
- * fill is {@code JsonCodecProvider#gather} rather than {@code addSources}. The atlas constants moved
- * out of the provider itself into vanilla's {@link AtlasIds}.
- */
+/** Adds this mod's textures to the vanilla atlases they are drawn from. */
 public class StorageSpriteSourceProvider extends SpriteSourceProvider {
 
     public StorageSpriteSourceProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {

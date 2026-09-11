@@ -18,15 +18,8 @@ import org.joml.Vector3fc;
 import java.util.function.Consumer;
 
 /**
- * Draws a cabinet, safe, locker, warehouse crate or ender chest as an item.
- * <p>
- * This replaces the {@code StorageBEWLR} / {@code LockerBEWLR} / {@code WarehouseCrateBEWLR} family.
- * {@code BlockEntityWithoutLevelRenderer} is gone in 26.2, and with it the ability to attach an item
- * renderer to an {@code Item} from code: an item opts in from its own model json, which names a
- * {@code minecraft:special} renderer by id, and the only thing registered in code is the id to
- * {@link MapCodec} pair. The dummy block entities the old renderers kept around are gone too - the
- * model is submitted directly, and the one thing that varied per stack, whether the padlock is shown,
- * comes back through {@link #extractArgument(ItemStack)}.
+ * Draws a cabinet, safe, locker, warehouse crate or ender chest as an item. Whether the padlock
+ * shows is read per stack in {@link #extractArgument(ItemStack)}.
  */
 public class StorageSpecialRenderer implements SpecialModelRenderer<Boolean> {
 

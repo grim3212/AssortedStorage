@@ -42,14 +42,7 @@ final class AssetTests {
         out.accept("every_item_tag_has_a_name", AssetTests::everyItemTagHasAName);
     }
 
-    /**
-     * Every block and item this mod registers has a model and a name.
-     * <p>
-     * Both are generated - blockstates and item models by the NeoForge client datagen, the lang
-     * file by hand since this mod's language provider did not survive the port - and neither shows
-     * up as a compile error, so a missing one is only ever found by looking. Every gap is reported
-     * at once, because finding them one run at a time is unbearable.
-     */
+    /** Every block and item has a model and a name. Every gap is reported at once. */
     private static void everyBlockAndItemHasAModelAndAName(GameTestHelper helper) {
         JsonObject lang = lang(helper);
         List<String> missing = new ArrayList<>();
@@ -90,11 +83,9 @@ final class AssetTests {
     }
 
     /**
-     * A locked barrel item shows its padlock - the plain barrel and every material one. The closed
-     * barrel's own model is the {@code assortedstorage:locked} loader, which an item bakes to its
-     * unlocked child, so an item json pointing at it silently loses the padlock. It has to choose
-     * between the locked and unlocked models itself, on the stack's lock code, the way the bags do.
-     * Read off the shipped item jsons, which are on the classpath even on a headless server.
+     * A locked barrel item shows its padlock, for every material. The closed barrel model is the
+     * {@code assortedstorage:locked} loader, which an item bakes to its unlocked child, so the item
+     * json has to choose between the two models itself, on the stack's lock.
      */
     private static void barrelItemsShowTheirPadlock(GameTestHelper helper) {
         List<Block> barrels = new ArrayList<>();
@@ -133,11 +124,9 @@ final class AssetTests {
     }
 
     /**
-     * Every custom blockstate model and every loader model this mod's blocks use is read by both
-     * loaders. The jsons are generated once and shared, but NeoForge reads a variant's custom type from
-     * {@code "type"} and a model's loader from {@code "loader"}, while Fabric reads both from
-     * {@code "fabric:type"} and ignores the others. A json carrying only NeoForge's key loads on Fabric
-     * as a plain static model - no locked block ever showing its padlock - and nothing warns.
+     * Every custom blockstate model and loader model carries both loaders' keys: NeoForge reads
+     * {@code "type"} and {@code "loader"}, Fabric only {@code "fabric:type"}. With only NeoForge's
+     * key, Fabric loads a plain static model and nothing warns.
      */
     private static void loaderModelsAreReadOnBothLoaders(GameTestHelper helper) {
         List<String> wrong = new ArrayList<>();
@@ -182,10 +171,8 @@ final class AssetTests {
     }
 
     /**
-     * Every recipe file this mod ships either loaded, or carries this loader's load conditions and was
-     * skipped by them. A file with neither failed to parse. On Fabric that was every conditional
-     * recipe for a while: Fabric's datagen wrote them without conditions, and the NeoForge copy that
-     * shadowed it carries a key Fabric ignores - so only this loader's own key counts.
+     * Every recipe file either loaded or was skipped by this loader's own load conditions; anything
+     * else failed to parse.
      */
     private static void everyRecipeLoadsOrIsConditionedOff(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
@@ -214,11 +201,9 @@ final class AssetTests {
     }
 
     /**
-     * Every item tag outside minecraft has a name. Recipe viewers show it in place of the raw id,
-     * and it is the check Fabric API runs at dev startup ("Untranslated Item Tags detected"), made
-     * to fail here: the key is {@code tag.item.<namespace>.<path>} with each '/' in the path turned
-     * into '.'. Both loaders load every mod's lang file on a dedicated server and name the standard
-     * c: tags themselves, so whatever is still missing is one of ours.
+     * Every non-vanilla item tag has a {@code tag.item.<namespace>.<path>} name, the check Fabric
+     * API warns about at dev startup. Both loaders name the standard c: tags, so anything missing
+     * is ours.
      */
     private static void everyItemTagHasAName(GameTestHelper helper) {
         Language language = Language.getInstance();

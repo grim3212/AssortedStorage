@@ -29,11 +29,8 @@ public class CrateRenderState extends BlockEntityRenderState {
      */
     public List<ItemStack> upgrades = Collections.emptyList();
 
-    // TODO(26.2): ICrateUpgradeRenderer (owned by the api package) still takes the CrateBlockEntity
-    //  itself, so the block entity has to be carried into the submit pass rather than being left
-    //  behind in extraction like every other renderer here. The upgrade renderers only read display
-    //  data off it (slot amounts, the layout, the glow upgrade), so this is the same data the old
-    //  render method saw - but the interface should grow an extracted state of its own so the submit
-    //  pass stops touching level objects at all.
+    // TODO(26.2): ICrateUpgradeRenderer still takes the CrateBlockEntity, so the submit pass
+    //  carries it. The interface should take an extracted state so the submit pass stops touching
+    //  level objects.
     public @Nullable CrateBlockEntity blockEntity;
 }

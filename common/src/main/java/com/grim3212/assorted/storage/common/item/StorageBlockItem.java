@@ -7,12 +7,8 @@ import net.minecraft.world.level.block.Block;
 
 
 /**
- * Shared block item for the storage blocks.
- * <p>
- * Its lock code and storage level lines come from the {@link StorageInfo} component its
- * constructor sets; tooltips are a component concern now. The stored contents lines are gone from
- * the mod's own code entirely: the vanilla {@code CONTAINER} data component the block entity hands
- * to the stack renders them itself.
+ * Shared block item for the storage blocks. Its lock and level lines come from the {@link
+ * StorageInfo} component it sets; the vanilla {@code CONTAINER} component shows the contents.
  */
 public class StorageBlockItem extends BlockItem {
 

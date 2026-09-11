@@ -17,14 +17,7 @@ public class RedstoneUpgradeItem extends ModeCrateUpgradeItem {
         super(props.component(StorageDataComponents.UPGRADE_MODE_INFO.get(), new UpgradeModeInfo(UpgradeModeInfo.Kind.REDSTONE)));
     }
 
-    // Modes:
-    // 0: Based on slot 0
-    // 1: Based on slot 1
-    // 2: Based on slot 2
-    // 3: Based on slot 3
-    // 4: Based on all slots
-    // 5: Based on most full slot
-    // 6: Based on least full slot
+    // Modes: 0-3 a single slot, 4 all slots, 5 the most full slot, 6 the least full slot.
 
     @Override
     protected void cycleMode(ItemStack stack) {

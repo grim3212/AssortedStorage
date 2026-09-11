@@ -14,12 +14,6 @@ import java.util.List;
 /**
  * Picks the locked or unlocked geometry from the model data the block entity publishes for its
  * position.
- * <p>
- * {@code BakedModel} became {@code BlockStateModel} in 26.2: geometry is handed out as
- * {@link BlockStateModelPart}s appended to a list rather than returned per {@code Direction}, there is
- * no {@code getQuads(BlockState, ...)} because a model is already baked per block state, and a model
- * no longer chooses a {@code RenderType} - each quad carries its own {@code BakedQuad.MaterialInfo}
- * and the section compiler buckets them by its layer.
  */
 public class LockedBakedModel implements IDataAwareBakedModel {
 

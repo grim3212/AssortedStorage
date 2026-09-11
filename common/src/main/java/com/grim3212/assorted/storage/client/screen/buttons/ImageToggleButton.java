@@ -9,14 +9,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
-/**
- * {@code Button} is abstract in 26.2 and widgets went retained-mode with the rest of the GUI:
- * {@code renderWidget} is {@code extractContents}, drawing is a {@code blit} on a
- * {@link GuiGraphicsExtractor} with an explicit {@code RenderPipeline} instead of a
- * {@code RenderSystem.setShader}/{@code setShaderTexture} pair, and {@code onClick} takes a
- * {@code MouseButtonEvent}. Depth ordering is no longer a pose translate either - the GUI renderer
- * orders elements by the stratum they were recorded in.
- */
+/** A button drawn as one of two images, depending on its state. */
 public class ImageToggleButton extends Button {
     private final Identifier resourceLocation;
     private final int xTexStart;

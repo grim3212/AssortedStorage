@@ -201,14 +201,7 @@ public class CrateBlockEntity extends BlockEntity implements MenuProvider, IName
     }
 
 
-    /**
-     * Attacking (left-click) will drop items if they are contained in the slot hit
-     * <p>
-     * if player is shifting then drop a stack else drop 1
-     *
-     * @param player
-     * @param hit
-     */
+    /** Left-click drops items from the slot hit: a whole stack when sneaking, otherwise one. */
     public boolean attack(Player player, BlockHitResult hit) {
         int hitSlot = getHitSlot(hit);
         if (hitSlot < 0)
@@ -227,18 +220,8 @@ public class CrateBlockEntity extends BlockEntity implements MenuProvider, IName
     }
 
     /**
-     * On use (right-click) we will try and do a number of things depending on how
-     * it was interacted
-     * <p>
-     * if rotate item is used rotate hit slot
-     * <p>
-     * <p>
-     * if first use add the current item by 1 if second use add the current item by
-     * all found in players inventory
-     *
-     * @param player
-     * @param handIn
-     * @param hit
+     * Right-click: a rotate item rotates the hit slot; otherwise the first use inserts the held
+     * item and a second inserts all of that item from the inventory.
      */
     public InteractionResult use(Player player, InteractionHand handIn, BlockHitResult hit) {
         int hitSlot = getHitSlot(hit);

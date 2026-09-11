@@ -22,10 +22,8 @@ import org.joml.Vector3fc;
 import java.util.function.Consumer;
 
 /**
- * The locked shulker boxes as items. Vanilla's {@code ShulkerBoxSpecialRenderer} bakes the dye colour
- * into the model json, one item model per colour; these boxes keep their colour on the stack, so it is
- * pulled out per stack in {@link #extractArgument(ItemStack)} instead. The storage material overlay is
- * a second pass over the same model, exactly as the block renderer does it.
+ * The locked shulker boxes as items. The colour lives on the stack, so it is read per stack in
+ * {@link #extractArgument(ItemStack)}; the material overlay is a second pass over the same model.
  */
 public class LockedShulkerBoxSpecialRenderer implements SpecialModelRenderer<LockedShulkerBoxSpecialRenderer.Data> {
 

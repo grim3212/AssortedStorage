@@ -153,11 +153,8 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
     }
 
     /**
-     * Drops the lock and the contents when the block is removed.
-     * <p>
-     * The block used to do this from {@code onRemove}, but that split in two in 26.x: by the time
-     * the block's {@code affectNeighborsAfterRemoval} runs the block entity is already gone, so
-     * anything that needs the block entity has to happen here instead.
+     * Drops the lock and the contents when the block is removed. It has to happen here: the block
+     * entity is already gone by {@code affectNeighborsAfterRemoval}.
      */
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {

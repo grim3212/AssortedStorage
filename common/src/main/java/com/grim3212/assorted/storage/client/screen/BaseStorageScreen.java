@@ -9,12 +9,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
 /**
- * The GUI is retained-mode in 26.x: a screen records elements into a {@link GuiGraphicsExtractor} that
- * {@code GuiRenderer} plays back later, so {@code renderBg} became {@code extractBackground} and the
- * {@code render} override that sequenced background/contents/tooltip by hand is gone - the base screen
- * does that itself. {@code imageWidth} / {@code imageHeight} are final now and have to be passed to
- * the constructor, and the label drawing this class used to override is exactly what
- * {@code AbstractContainerScreen#extractLabels} already does with the default label positions.
+ * Base for the storage screens. It draws the background texture; the base screen draws the labels,
+ * contents and tooltips.
  */
 public abstract class BaseStorageScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> {
 

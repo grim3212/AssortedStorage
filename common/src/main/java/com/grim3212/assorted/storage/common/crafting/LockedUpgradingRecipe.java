@@ -30,13 +30,8 @@ import net.minecraft.world.level.block.ShulkerBoxBlock;
 import java.util.List;
 
 /**
- * A shaped recipe that carries the data of the storage item being upgraded over to the result.
- * <p>
- * The 1.20.1 version was a hand copied {@code ShapedRecipe}, including its own pattern parsing,
- * shrinking and matching, because none of that was reusable. 26.x factored all of it out into
- * {@link ShapedRecipePattern}, so this is now just a {@link NormalCraftingRecipe} that delegates
- * the shape work and only keeps the interesting part: the result inherits the input's data
- * components rather than being a fresh stack.
+ * A shaped recipe whose result keeps the data components of the storage item being upgraded; the
+ * shape matching is {@link ShapedRecipePattern}'s.
  */
 public class LockedUpgradingRecipe extends NormalCraftingRecipe {
 
