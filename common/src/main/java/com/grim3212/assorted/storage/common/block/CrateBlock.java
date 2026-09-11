@@ -225,7 +225,7 @@ public class CrateBlock extends Block implements IBlockOnPlayerBreak, EntityBloc
             if (!worldIn.isClientSide()) {
                 MenuProvider inamedcontainerprovider = this.getMenuProvider(state, worldIn, pos);
                 if (inamedcontainerprovider != null) {
-                    Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> byteBuf.writeBlockPos(pos));
+                    Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider);
                     if (worldIn instanceof ServerLevel serverLevel) {
                         PiglinAi.angerNearbyPiglins(serverLevel, player, true);
                     }

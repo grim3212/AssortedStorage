@@ -141,10 +141,7 @@ public class LockedHopperBlock extends HopperBlock implements IStorageMaterial {
             if (!worldIn.isClientSide()) {
                 MenuProvider inamedcontainerprovider = this.getMenuProvider(state, worldIn, pos);
                 if (inamedcontainerprovider != null) {
-                    Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> {
-                        StorageMaterial.write(byteBuf, this.material);
-                        byteBuf.writeBlockPos(pos);
-                    });
+                    Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider);
                     player.awardStat(Stats.INSPECT_HOPPER);
                 }
             }

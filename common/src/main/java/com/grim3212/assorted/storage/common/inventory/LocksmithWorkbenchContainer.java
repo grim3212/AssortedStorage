@@ -3,7 +3,6 @@ package com.grim3212.assorted.storage.common.inventory;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.item.CombinationItem;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -70,7 +69,7 @@ public class LocksmithWorkbenchContainer extends AbstractContainerMenu {
 
     }
 
-    public static LocksmithWorkbenchContainer createContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
+    public static LocksmithWorkbenchContainer createContainer(int windowId, Inventory playerInventory) {
         return new LocksmithWorkbenchContainer(windowId, playerInventory);
     }
 

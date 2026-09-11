@@ -2,7 +2,6 @@ package com.grim3212.assorted.storage.common.inventory;
 
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -15,7 +14,7 @@ public class LockerContainer extends AbstractContainerMenu {
     private final IItemStorageHandler inventory;
     private final int numRows;
 
-    public static LockerContainer createLockerContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
+    public static LockerContainer createLockerContainer(int windowId, Inventory playerInventory) {
         return new LockerContainer(StorageContainerTypes.LOCKER.get(), windowId, playerInventory, new ItemStackStorageHandler(45), 5);
     }
 
@@ -23,7 +22,7 @@ public class LockerContainer extends AbstractContainerMenu {
         return new LockerContainer(StorageContainerTypes.LOCKER.get(), windowId, playerInventory, inventory, 5);
     }
 
-    public static LockerContainer createDualLockerContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
+    public static LockerContainer createDualLockerContainer(int windowId, Inventory playerInventory) {
         return new LockerContainer(StorageContainerTypes.DUAL_LOCKER.get(), windowId, playerInventory, new ItemStackStorageHandler(90), 10);
     }
 

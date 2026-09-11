@@ -154,10 +154,7 @@ public class LockedShulkerBoxBlock extends Block implements EntityBlock, IStorag
                 if (!level.isClientSide()) {
                     MenuProvider inamedcontainerprovider = this.getMenuProvider(state, level, pos);
                     if (inamedcontainerprovider != null) {
-                        Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> {
-                            StorageMaterial.write(byteBuf, this.material);
-                            byteBuf.writeBlockPos(pos);
-                        });
+                        Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider);
                         player.awardStat(Stats.OPEN_SHULKER_BOX);
                         if (level instanceof ServerLevel serverLevel) {
                             PiglinAi.angerNearbyPiglins(serverLevel, player, true);

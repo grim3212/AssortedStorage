@@ -14,8 +14,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import com.grim3212.assorted.lib.core.inventory.IMenuDataProvider;
+import net.minecraft.server.level.ServerPlayer;
+import java.util.Optional;
 
-public class LockedChestBlockEntity extends BaseStorageBlockEntity {
+public class LockedChestBlockEntity extends BaseStorageBlockEntity implements IMenuDataProvider<Optional<StorageMaterial>> {
 
     private final StorageMaterial storageMaterial;
 
@@ -30,6 +33,11 @@ public class LockedChestBlockEntity extends BaseStorageBlockEntity {
         }
 
         this.setStorageHandler(new StorageItemStackStorageHandler(this, storageMaterial != null ? storageMaterial.totalItems() : 27));
+    }
+
+    @Override
+    public Optional<StorageMaterial> getMenuData(ServerPlayer player) {
+        return Optional.ofNullable(this.storageMaterial);
     }
 
     @Override

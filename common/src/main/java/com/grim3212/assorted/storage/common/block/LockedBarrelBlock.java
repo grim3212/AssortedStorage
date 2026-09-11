@@ -161,10 +161,7 @@ public class LockedBarrelBlock extends Block implements EntityBlock, IStorageMat
             if (!worldIn.isClientSide()) {
                 MenuProvider inamedcontainerprovider = this.getMenuProvider(state, worldIn, pos);
                 if (inamedcontainerprovider != null) {
-                    Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider, byteBuf -> {
-                        StorageMaterial.write(byteBuf, this.material);
-                        byteBuf.writeBlockPos(pos);
-                    });
+                    Services.PLATFORM.openMenu((ServerPlayer) player, inamedcontainerprovider);
                     player.awardStat(Stats.OPEN_BARREL);
                     if (worldIn instanceof ServerLevel serverLevel) {
                         PiglinAi.angerNearbyPiglins(serverLevel, player, true);

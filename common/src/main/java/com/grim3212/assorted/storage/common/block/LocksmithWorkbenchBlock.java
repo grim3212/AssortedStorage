@@ -32,7 +32,7 @@ public class LocksmithWorkbenchBlock extends Block {
         if (worldIn.isClientSide()) {
             return InteractionResult.SUCCESS;
         } else {
-            Services.PLATFORM.openMenu((ServerPlayer) player, state.getMenuProvider(worldIn, pos), buf -> buf.writeBlockPos(pos));
+            Services.PLATFORM.openMenu((ServerPlayer) player, state.getMenuProvider(worldIn, pos));
             player.awardStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
             return InteractionResult.CONSUME;
         }

@@ -18,6 +18,7 @@ public final class StorageGameTests {
         LockTests.register(out);
         StorageBlockTests.register(out);
         CrateTests.register(out);
+        MenuTests.register(out);
         BagTests.register(out);
         TooltipTests.register(out);
         AssetTests.register(out);

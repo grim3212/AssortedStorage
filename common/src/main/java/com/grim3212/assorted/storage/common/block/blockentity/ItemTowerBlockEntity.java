@@ -15,8 +15,10 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.state.BlockState;
+import com.grim3212.assorted.lib.core.inventory.IMenuDataProvider;
+import net.minecraft.server.level.ServerPlayer;
 
-public class ItemTowerBlockEntity extends BaseStorageBlockEntity {
+public class ItemTowerBlockEntity extends BaseStorageBlockEntity implements IMenuDataProvider<BlockPos> {
 
 
     public ItemTowerModel model;
@@ -49,6 +51,11 @@ public class ItemTowerBlockEntity extends BaseStorageBlockEntity {
         }
 
         this.model.setAnimation(animId);
+    }
+
+    @Override
+    public BlockPos getMenuData(ServerPlayer player) {
+        return this.worldPosition;
     }
 
     @Override

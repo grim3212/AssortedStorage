@@ -2,17 +2,14 @@ package com.grim3212.assorted.storage.common.block;
 
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
-import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.api.block.IStorageMaterial;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedChestBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.NonNullList;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -50,13 +47,6 @@ public class LockedChestBlock extends BaseStorageBlock implements IStorageMateri
         return new LockedChestBlockEntity(pos, state);
     }
 
-    @Override
-    protected void openMenu(Player player, MenuProvider provider, BlockPos pos) {
-        Services.PLATFORM.openMenu((ServerPlayer) player, provider, byteBuf -> {
-            StorageMaterial.write(byteBuf, this.material);
-            byteBuf.writeBlockPos(pos);
-        });
-    }
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {

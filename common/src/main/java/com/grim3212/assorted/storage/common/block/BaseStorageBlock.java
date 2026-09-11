@@ -176,7 +176,7 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
             if (!worldIn.isClientSide()) {
                 MenuProvider inamedcontainerprovider = this.getMenuProvider(state, worldIn, pos);
                 if (inamedcontainerprovider != null) {
-                    this.openMenu(player, inamedcontainerprovider, pos);
+                    this.openMenu(player, inamedcontainerprovider);
                     player.awardStat(this.getOpenStat());
                     if (worldIn instanceof ServerLevel serverLevel) {
                         PiglinAi.angerNearbyPiglins(serverLevel, player, true);
@@ -187,8 +187,8 @@ public abstract class BaseStorageBlock extends Block implements EntityBlock, Sim
         return InteractionResult.SUCCESS;
     }
 
-    protected void openMenu(Player player, MenuProvider provider, BlockPos pos) {
-        Services.PLATFORM.openMenu((ServerPlayer) player, provider, byteBuf -> byteBuf.writeBlockPos(pos));
+    protected void openMenu(Player player, MenuProvider provider) {
+        Services.PLATFORM.openMenu((ServerPlayer) player, provider);
     }
 
     // TODO: Create custom stat for this

@@ -7,7 +7,6 @@ import com.grim3212.assorted.storage.common.inventory.LockSlot;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.item.BagItem;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -23,7 +22,7 @@ public class BagContainer extends AbstractContainerMenu {
     public BagItemHandler handler;
     private StorageMaterial storageMaterial;
 
-    public BagContainer(final int windowId, final Inventory playerInventory, FriendlyByteBuf extra) {
+    public BagContainer(final int windowId, final Inventory playerInventory) {
         this(windowId, playerInventory.player.level(), playerInventory.player.blockPosition(), playerInventory, playerInventory.player);
     }
 

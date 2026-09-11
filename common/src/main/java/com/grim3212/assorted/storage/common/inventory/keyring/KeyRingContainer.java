@@ -5,7 +5,6 @@ import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.item.KeyRingItem;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +19,7 @@ public class KeyRingContainer extends AbstractContainerMenu {
     private int keyRingSlotId;
     public KeyRingItemHandler handler;
 
-    public KeyRingContainer(final int windowId, final Inventory playerInventory, FriendlyByteBuf extra) {
+    public KeyRingContainer(final int windowId, final Inventory playerInventory) {
         this(windowId, playerInventory.player.level(), playerInventory.player.blockPosition(), playerInventory, playerInventory.player);
     }
 

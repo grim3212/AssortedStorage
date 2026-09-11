@@ -3,7 +3,6 @@ package com.grim3212.assorted.storage.common.inventory;
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.slot.SlotStorageHandler;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -15,7 +14,7 @@ public class StorageContainer extends AbstractContainerMenu {
 
     private final IItemStorageHandler inventory;
 
-    public static StorageContainer createGlassCabinetContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
+    public static StorageContainer createGlassCabinetContainer(int windowId, Inventory playerInventory) {
         return new StorageContainer(StorageContainerTypes.GLASS_CABINET.get(), windowId, playerInventory, new ItemStackStorageHandler(27));
     }
 
@@ -23,7 +22,7 @@ public class StorageContainer extends AbstractContainerMenu {
         return new StorageContainer(StorageContainerTypes.GLASS_CABINET.get(), windowId, playerInventory, inventory);
     }
 
-    public static StorageContainer createWoodCabinetContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
+    public static StorageContainer createWoodCabinetContainer(int windowId, Inventory playerInventory) {
         return new StorageContainer(StorageContainerTypes.WOOD_CABINET.get(), windowId, playerInventory, new ItemStackStorageHandler(27));
     }
 
@@ -31,7 +30,7 @@ public class StorageContainer extends AbstractContainerMenu {
         return new StorageContainer(StorageContainerTypes.WOOD_CABINET.get(), windowId, playerInventory, inventory);
     }
 
-    public static StorageContainer createWarehouseCrateContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
+    public static StorageContainer createWarehouseCrateContainer(int windowId, Inventory playerInventory) {
         return new StorageContainer(StorageContainerTypes.WAREHOUSE_CRATE.get(), windowId, playerInventory, new ItemStackStorageHandler(27));
     }
 
@@ -39,7 +38,7 @@ public class StorageContainer extends AbstractContainerMenu {
         return new StorageContainer(StorageContainerTypes.WAREHOUSE_CRATE.get(), windowId, playerInventory, inventory);
     }
 
-    public static StorageContainer createGoldSafeContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
+    public static StorageContainer createGoldSafeContainer(int windowId, Inventory playerInventory) {
         return new StorageContainer(StorageContainerTypes.GOLD_SAFE.get(), windowId, playerInventory, new ItemStackStorageHandler(36));
     }
 
@@ -47,7 +46,7 @@ public class StorageContainer extends AbstractContainerMenu {
         return new StorageContainer(StorageContainerTypes.GOLD_SAFE.get(), windowId, playerInventory, inventory);
     }
 
-    public static StorageContainer createEnderChestContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
+    public static StorageContainer createEnderChestContainer(int windowId, Inventory playerInventory) {
         return new StorageContainer(StorageContainerTypes.LOCKED_ENDER_CHEST.get(), windowId, playerInventory, new ItemStackStorageHandler(27));
     }
 
@@ -55,7 +54,7 @@ public class StorageContainer extends AbstractContainerMenu {
         return new StorageContainer(StorageContainerTypes.LOCKED_ENDER_CHEST.get(), windowId, playerInventory, inventory);
     }
 
-    public static StorageContainer createObsidianSafeContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
+    public static StorageContainer createObsidianSafeContainer(int windowId, Inventory playerInventory) {
         return new StorageContainer(StorageContainerTypes.OBSIDIAN_SAFE.get(), windowId, playerInventory, new ItemStackStorageHandler(27));
     }
 

@@ -24,7 +24,6 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -41,8 +40,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import com.grim3212.assorted.lib.core.inventory.IMenuDataProvider;
+import net.minecraft.server.level.ServerPlayer;
 
-public class CrateBlockEntity extends BlockEntity implements MenuProvider, INamed, ILockable, IInventoryBlockEntity {
+public class CrateBlockEntity extends BlockEntity implements IMenuDataProvider<BlockPos>, INamed, ILockable, IInventoryBlockEntity {
 
     private final CrateLayout layout;
     private Component customName;
@@ -307,6 +308,11 @@ public class CrateBlockEntity extends BlockEntity implements MenuProvider, IName
         if (this.handler != null) {
             this.handler.invalidate();
         }
+    }
+
+    @Override
+    public BlockPos getMenuData(ServerPlayer player) {
+        return this.worldPosition;
     }
 
     @Override

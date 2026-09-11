@@ -69,7 +69,7 @@ public class BagItem extends Item implements IInventoryItem {
                     public Component getDisplayName() {
                         return playerIn.getItemInHand(handIn).getHoverName();
                     }
-                }, buf -> buf.writeBlockPos(playerIn.blockPosition()));
+                });
             }
         }
         return InteractionResult.SUCCESS;

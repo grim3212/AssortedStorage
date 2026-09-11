@@ -46,8 +46,10 @@ import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import com.grim3212.assorted.lib.core.inventory.IMenuDataProvider;
+import net.minecraft.server.level.ServerPlayer;
 
-public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements IBlockEntityWithModelData {
+public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements IBlockEntityWithModelData, IMenuDataProvider<Optional<StorageMaterial>> {
 
     private int cooldownTime = -1;
     private long tickedGameTime;
@@ -65,6 +67,11 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements I
         }
 
         this.setStorageHandler(new ItemHandler(this));
+    }
+
+    @Override
+    public Optional<StorageMaterial> getMenuData(ServerPlayer player) {
+        return Optional.ofNullable(this.storageMaterial);
     }
 
     @Override

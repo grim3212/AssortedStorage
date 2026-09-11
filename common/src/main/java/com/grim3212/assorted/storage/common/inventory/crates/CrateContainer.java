@@ -4,7 +4,6 @@ import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -18,8 +17,8 @@ public class CrateContainer extends AbstractContainerMenu {
 
     private final CrateBlockEntity crateBlockEntity;
 
-    public static CrateContainer createCrateContainer(int windowId, Inventory playerInventory, FriendlyByteBuf data) {
-        CrateBlockEntity crate = getCrateBlockEntity(playerInventory, data.readBlockPos());
+    public static CrateContainer createCrateContainer(int windowId, Inventory playerInventory, BlockPos pos) {
+        CrateBlockEntity crate = getCrateBlockEntity(playerInventory, pos);
         return new CrateContainer(StorageContainerTypes.CRATE.get(), windowId, playerInventory, crate);
     }
 

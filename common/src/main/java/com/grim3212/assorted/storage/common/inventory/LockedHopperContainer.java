@@ -4,21 +4,21 @@ import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.slot.SlotStorageHandler;
 import com.grim3212.assorted.storage.api.StorageMaterial;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import java.util.Optional;
 
 public class LockedHopperContainer extends AbstractContainerMenu {
 
     private final IItemStorageHandler inventory;
     private final StorageMaterial storageMaterial;
 
-    public static LockedHopperContainer createHopperContainer(int windowId, Inventory playerInventory, FriendlyByteBuf byteBuf) {
-        StorageMaterial storageMaterial = StorageMaterial.read(byteBuf);
+    public static LockedHopperContainer createHopperContainer(int windowId, Inventory playerInventory, Optional<StorageMaterial> material) {
+        StorageMaterial storageMaterial = material.orElse(null);
         return new LockedHopperContainer(StorageContainerTypes.LOCKED_HOPPER.get(), windowId, playerInventory, new ItemStackStorageHandler(storageMaterial == null ? 5 : storageMaterial.hopperSize()), storageMaterial);
     }
 

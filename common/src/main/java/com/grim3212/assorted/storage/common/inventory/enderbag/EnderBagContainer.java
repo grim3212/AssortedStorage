@@ -9,7 +9,6 @@ import com.grim3212.assorted.storage.common.inventory.StorageContainerTypes;
 import com.grim3212.assorted.storage.common.item.EnderBagItem;
 import com.grim3212.assorted.storage.common.save.EnderSavedData;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -27,7 +26,7 @@ public class EnderBagContainer extends AbstractContainerMenu {
     private final PlayerEnderChestContainer playerEnderChest;
     private final LockedEnderChestInventory lockedEnderChestInv;
 
-    public EnderBagContainer(final int windowId, final Inventory playerInventory, FriendlyByteBuf extra) {
+    public EnderBagContainer(final int windowId, final Inventory playerInventory) {
         this(windowId, playerInventory.player.level(), playerInventory.player.blockPosition(), playerInventory, playerInventory.player);
     }
 

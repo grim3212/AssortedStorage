@@ -29,8 +29,11 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
+import com.grim3212.assorted.lib.core.inventory.IMenuDataProvider;
+import net.minecraft.server.level.ServerPlayer;
+import java.util.Optional;
 
-public class LockedShulkerBoxBlockEntity extends BaseStorageBlockEntity {
+public class LockedShulkerBoxBlockEntity extends BaseStorageBlockEntity implements IMenuDataProvider<Optional<StorageMaterial>> {
 
     private final StorageMaterial storageMaterial;
     private AnimationStatus animationStatus = AnimationStatus.CLOSED;
@@ -182,6 +185,11 @@ public class LockedShulkerBoxBlockEntity extends BaseStorageBlockEntity {
 
     public boolean isClosed() {
         return this.animationStatus == AnimationStatus.CLOSED;
+    }
+
+    @Override
+    public Optional<StorageMaterial> getMenuData(ServerPlayer player) {
+        return Optional.ofNullable(this.storageMaterial);
     }
 
     @Override

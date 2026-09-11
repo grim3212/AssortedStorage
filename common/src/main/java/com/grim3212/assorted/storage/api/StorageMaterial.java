@@ -2,7 +2,6 @@ package com.grim3212.assorted.storage.api;
 
 import com.grim3212.assorted.lib.util.LibCommonTags;
 import com.grim3212.assorted.storage.Constants;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.StringRepresentable;
@@ -13,6 +12,10 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 
 import java.util.function.Supplier;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import java.util.Optional;
 
 public enum StorageMaterial implements StringRepresentable {
     // Vanilla materials
@@ -43,6 +46,9 @@ public enum StorageMaterial implements StringRepresentable {
     ELECTRUM("electrum", () -> StorageTags.Items.INGOTS_ELECTRUM, Identifier.fromNamespaceAndPath(Constants.MOD_ID, "block/particle/electrum_block"), 4, 9, 11, 3, 5, 5.0F, 6.0F),
     STEEL("steel", () -> StorageTags.Items.INGOTS_STEEL, Identifier.fromNamespaceAndPath(Constants.MOD_ID, "block/particle/steel_block"), 4, 9, 12, 3, 6, 5.0F, 6.0F),
     PLATINUM("platinum", () -> StorageTags.Items.INGOTS_PLATINUM, Identifier.fromNamespaceAndPath(Constants.MOD_ID, "block/particle/platinum_block"), 5, 9, 13, 3, 8, 5.0F, 6.0F);
+
+    /** A locked block's menu data: the material its client-side menu is sized from, if any. */
+    public static final StreamCodec<ByteBuf, Optional<StorageMaterial>> OPTIONAL_STREAM_CODEC = ByteBufCodecs.optional(ByteBufCodecs.idMapper(i -> values()[i], StorageMaterial::ordinal));
 
     private final String name;
     private final Supplier<TagKey<Item>> material;
@@ -130,20 +136,4 @@ public enum StorageMaterial implements StringRepresentable {
         return this.name;
     }
 
-    public static void write(FriendlyByteBuf byteBuf, StorageMaterial material) {
-        if (material == null) {
-            byteBuf.writeVarInt(-1);
-        } else {
-            byteBuf.writeEnum(material);
-        }
-    }
-
-    public static StorageMaterial read(FriendlyByteBuf byteBuf) {
-        int matIdx = byteBuf.readVarInt();
-        if (matIdx == -1) {
-            return null;
-        } else {
-            return StorageMaterial.values()[matIdx];
-        }
-    }
 }
