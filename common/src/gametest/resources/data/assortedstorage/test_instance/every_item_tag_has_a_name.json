@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "assortedstorage:every_item_tag_has_a_name",
+  "structure": "assortedstorage:test_box",
+  "max_ticks": 1,
+  "setup_ticks": 0,
+  "required": true
+}
