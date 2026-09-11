@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 import static com.grim3212.assorted.storage.gametest.StorageTestSupport.*;
 
 /**
- * Item tooltips, which come from data components now that {@code Item#appendHoverText} is deprecated.
+ * Item tooltips, which come from data components.
  */
 final class TooltipTests {
 
