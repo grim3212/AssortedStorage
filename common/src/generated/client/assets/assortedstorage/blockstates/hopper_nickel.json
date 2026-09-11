@@ -2,24 +2,29 @@
   "variants": {
     "facing=down": {
       "type": "assortedlib:specification",
+      "fabric:type": "assortedlib:specification",
       "model": "assortedstorage:block/hopper_nickel"
     },
     "facing=east": {
       "type": "assortedlib:specification",
+      "fabric:type": "assortedlib:specification",
       "model": "assortedstorage:block/hopper_nickel_side",
       "y": 90
     },
     "facing=north": {
       "type": "assortedlib:specification",
+      "fabric:type": "assortedlib:specification",
       "model": "assortedstorage:block/hopper_nickel_side"
     },
     "facing=south": {
       "type": "assortedlib:specification",
+      "fabric:type": "assortedlib:specification",
       "model": "assortedstorage:block/hopper_nickel_side",
       "y": 180
     },
     "facing=west": {
       "type": "assortedlib:specification",
+      "fabric:type": "assortedlib:specification",
       "model": "assortedstorage:block/hopper_nickel_side",
       "y": 270
     }

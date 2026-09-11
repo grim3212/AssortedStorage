@@ -1,6 +1,14 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "assortedstorage:block/barrel_topaz"
+    "type": "minecraft:condition",
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "assortedstorage:block/barrel_topaz_unlocked"
+    },
+    "on_true": {
+      "type": "minecraft:model",
+      "model": "assortedstorage:block/barrel_topaz_locked"
+    },
+    "property": "assortedstorage:locked"
   }
 }

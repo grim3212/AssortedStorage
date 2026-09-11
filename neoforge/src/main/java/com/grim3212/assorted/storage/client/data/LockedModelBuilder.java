@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import com.grim3212.assorted.storage.client.model.baked.LockedModel;
 import net.minecraft.resources.Identifier;
+import com.grim3212.assorted.lib.client.data.LibCustomLoaderBuilder;
 import net.neoforged.neoforge.client.model.generators.template.CustomLoaderBuilder;
 import net.neoforged.neoforge.client.model.generators.template.ExtendedModelTemplateBuilder;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
  * through {@code ModelBaker#getModel} instead. The shape it reads is
  * {@code {"unlocked": "ns:block/foo_unlocked", "locked": "ns:block/foo_locked"}}.
  */
-public class LockedModelBuilder extends CustomLoaderBuilder {
+public class LockedModelBuilder extends LibCustomLoaderBuilder {
 
     public static LockedModelBuilder begin() {
         return new LockedModelBuilder();

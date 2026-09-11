@@ -1,6 +1,14 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "assortedstorage:block/barrel_peridot"
+    "type": "minecraft:condition",
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "assortedstorage:block/barrel_peridot_unlocked"
+    },
+    "on_true": {
+      "type": "minecraft:model",
+      "model": "assortedstorage:block/barrel_peridot_locked"
+    },
+    "property": "assortedstorage:locked"
   }
 }

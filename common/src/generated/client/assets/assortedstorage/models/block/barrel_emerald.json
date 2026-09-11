@@ -1,5 +1,6 @@
 {
   "parent": "minecraft:block/block",
+  "fabric:type": "assortedstorage:locked",
   "loader": "assortedstorage:locked",
   "locked": "assortedstorage:block/barrel_emerald_locked",
   "textures": {

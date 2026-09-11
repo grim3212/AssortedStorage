@@ -2,6 +2,7 @@
   "variants": {
     "facing=down,open=false": {
       "type": "assortedlib:specification",
+      "fabric:type": "assortedlib:specification",
       "model": "assortedstorage:block/barrel_copper",
       "x": 180
     },
@@ -11,6 +12,7 @@
     },
     "facing=east,open=false": {
       "type": "assortedlib:specification",
+      "fabric:type": "assortedlib:specification",
       "model": "assortedstorage:block/barrel_copper",
       "x": 90,
       "y": 90
@@ -22,6 +24,7 @@
     },
     "facing=north,open=false": {
       "type": "assortedlib:specification",
+      "fabric:type": "assortedlib:specification",
       "model": "assortedstorage:block/barrel_copper",
       "x": 90
     },
@@ -31,6 +34,7 @@
     },
     "facing=south,open=false": {
       "type": "assortedlib:specification",
+      "fabric:type": "assortedlib:specification",
       "model": "assortedstorage:block/barrel_copper",
       "x": 90,
       "y": 180
@@ -42,6 +46,7 @@
     },
     "facing=up,open=false": {
       "type": "assortedlib:specification",
+      "fabric:type": "assortedlib:specification",
       "model": "assortedstorage:block/barrel_copper"
     },
     "facing=up,open=true": {
@@ -49,6 +54,7 @@
     },
     "facing=west,open=false": {
       "type": "assortedlib:specification",
+      "fabric:type": "assortedlib:specification",
       "model": "assortedstorage:block/barrel_copper",
       "x": 90,
       "y": 270

@@ -1,6 +1,14 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "assortedstorage:block/barrel_bronze"
+    "type": "minecraft:condition",
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "assortedstorage:block/barrel_bronze_unlocked"
+    },
+    "on_true": {
+      "type": "minecraft:model",
+      "model": "assortedstorage:block/barrel_bronze_locked"
+    },
+    "property": "assortedstorage:locked"
   }
 }

@@ -26,15 +26,10 @@ public class LockedBakedModel implements IDataAwareBakedModel {
     private final BlockStateModelPart unlockedModel;
     private final BlockStateModelPart lockedModel;
 
-    // TODO(26.2): the item side of this model is gone. It used to carry an ItemOverrides list whose
-    //  resolve() swapped in the locked model for a stack with a lock code, which is how a locked
-    //  barrel/hopper item showed its padlock in inventories. ItemOverrides was deleted outright:
-    //  item variation is chosen before baking, by an ItemModel named in the item's own model json -
-    //  here that would be a "minecraft:condition" ItemModel over a registered ConditionalItemModel
-    //  property that reports whether the stack has a lock code, with the locked and unlocked models as
-    //  its branches. That needs a client-side property registration plus a change to the generated
-    //  item models, so it is deliberately left undone rather than faked: the block still swaps
-    //  correctly in the world, only the item form does not.
+    // An item never reaches the lock check below: it has no block entity, so no model data, and this
+    // model would bake to its unlocked child. A barrel item chooses between the locked and unlocked
+    // children in its own item json instead, on the assortedstorage:locked property - see
+    // StorageBlockstateProvider#barrelState. A hopper item is a flat sprite, as it was in 1.20.1.
 
     public LockedBakedModel(BlockStateModelPart unlockedModel, BlockStateModelPart lockedModel) {
         this.unlockedModel = unlockedModel;

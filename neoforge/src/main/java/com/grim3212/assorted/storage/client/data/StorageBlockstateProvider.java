@@ -28,6 +28,7 @@ import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
+import com.grim3212.assorted.storage.client.properties.HasStorageTagProperty;
 import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.data.models.model.ModelInstance;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
@@ -343,10 +344,11 @@ public class StorageBlockstateProvider extends ModelProvider {
 
     /**
      * The closed barrel is the {@code assortedstorage:locked} loader model, which picks between the
-     * locked and unlocked children; the open one is an ordinary model, exactly as in 1.20.1. The
-     * block item needs nothing explicit - {@link ModelProvider} points an unclaimed
-     * {@link BlockItem} at its block model, which is the same closed model the old item json
-     * parented.
+     * locked and unlocked children; the open one is an ordinary model, exactly as in 1.20.1.
+     * <p>
+     * The item chooses between the same two children itself, on the stack's lock code, the way the
+     * bags do. It cannot point at the closed model: an item has no block entity, so it bakes the
+     * loader to its unlocked child and the padlock the 1.20.1 item override list swapped in is lost.
      */
     private void barrelState(BlockModelGenerators blockModels, LockedBarrelBlock b, Identifier unlocked, Identifier locked, Identifier open, Material particle) {
         MultiVariant closedModel = SpecificationBlockStateModelBuilder.specificationVariant(lockedModel(blockModels.modelOutput, ModelLocationUtils.getModelLocation(b), unlocked, locked, particle));
@@ -355,6 +357,9 @@ public class StorageBlockstateProvider extends ModelProvider {
         blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(b)
                 .with(BlockModelGenerators.createBooleanModelDispatch(LockedBarrelBlock.OPEN, openModel, closedModel))
                 .with(BARREL_ROTATION));
+
+        blockModels.itemModelOutput.accept(b.asItem(), ItemModelUtils.conditional(HasStorageTagProperty.LOCKED,
+                ItemModelUtils.plainModel(locked), ItemModelUtils.plainModel(unlocked)));
     }
 
     // ------------------------------------------------------------------ hoppers
