@@ -78,7 +78,7 @@ public class StorageClient {
         // own model json ("minecraft:special" naming one of these ids), so code only registers the id
         // to codec pairs. The generated item models for the cabinets, safes, lockers, warehouse
         // crates, item towers, locked chests and locked shulker boxes have to point at them.
-        ClientServices.CLIENT.registerBEWLR((register) -> {
+        ClientServices.CLIENT.registerSpecialModelRenderers((register) -> {
             register.registerSpecialModelRenderer(StorageSpecialRenderer.ID, StorageSpecialRenderer.Unbaked.MAP_CODEC);
             register.registerSpecialModelRenderer(ItemTowerSpecialRenderer.ID, ItemTowerSpecialRenderer.Unbaked.MAP_CODEC);
             register.registerSpecialModelRenderer(LockedChestSpecialRenderer.ID, LockedChestSpecialRenderer.Unbaked.MAP_CODEC);
