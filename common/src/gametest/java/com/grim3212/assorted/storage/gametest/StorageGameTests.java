@@ -19,6 +19,7 @@ import com.grim3212.assorted.storage.api.StorageMaterial;
 import com.grim3212.assorted.storage.api.Wood;
 import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
 import com.grim3212.assorted.storage.common.block.LockerBlock;
+import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseLockedBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
@@ -77,12 +78,14 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.GameType;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
@@ -121,6 +124,7 @@ public final class StorageGameTests {
         out.accept("lock_and_key_share_a_code", StorageGameTests::lockAndKeyShareACode);
         out.accept("storage_block_drops_contents_and_lock", StorageGameTests::storageBlockDropsContentsAndLock);
         out.accept("storage_block_survives_save_load", StorageGameTests::storageBlockSurvivesSaveLoad);
+        out.accept("locked_blocks_send_their_lock_to_clients", StorageGameTests::lockedBlocksSendTheirLockToClients);
         out.accept("hoppers_feed_and_empty_cabinet", StorageGameTests::hoppersFeedAndEmptyCabinet);
         out.accept("crates_join_through_a_bridge", StorageGameTests::cratesJoinThroughABridge);
         out.accept("crate_upgrades_apply_and_read_back", StorageGameTests::crateUpgradesApplyAndReadBack);
@@ -241,6 +245,34 @@ public final class StorageGameTests {
         helper.assertValueEqual(first.getCount(), 5, "slot 0 stack size across a save/load");
         helper.assertTrue(loaded.getItemStackStorageHandler().getStackInSlot(26).is(Items.EMERALD), "the last slot lost its item across a save/load");
         helper.succeed();
+    }
+
+    /**
+     * The three blocks whose padlock face comes from model data send their lock to clients. The
+     * update tag is what every other player receives; if it lost the lock, their barrel, hopper or
+     * crate controller would keep showing the unlocked face. AssortedLib re-renders a model-data
+     * block entity on the client once this is loaded into it - the half a server cannot test.
+     */
+    private static void lockedBlocksSendTheirLockToClients(GameTestHelper helper) {
+        assertLockReachesClients(helper, new BlockPos(2, 1, 4), StorageBlocks.LOCKED_BARREL.get());
+        assertLockReachesClients(helper, new BlockPos(4, 1, 4), StorageBlocks.LOCKED_HOPPER.get());
+        assertLockReachesClients(helper, new BlockPos(6, 1, 4), StorageBlocks.CRATE_CONTROLLER.get());
+        helper.succeed();
+    }
+
+    private static void assertLockReachesClients(GameTestHelper helper, BlockPos rel, Block block) {
+        helper.setBlock(rel, block);
+        BlockEntity placed = helper.getLevel().getBlockEntity(helper.absolutePos(rel));
+        String name = BuiltInRegistries.BLOCK.getKey(block).toString();
+        helper.assertTrue(placed instanceof ILockable, name + " has no lockable block entity");
+        ((ILockable) placed).setLockCode(CODE);
+        helper.assertTrue(placed.getUpdatePacket() != null, name + " sends clients no update packet");
+
+        HolderLookup.Provider registries = helper.getLevel().registryAccess();
+        BlockEntity onClient = placed.getType().create(placed.getBlockPos(), placed.getBlockState());
+        helper.assertTrue(onClient instanceof ILockable, name + " did not recreate as a lockable block entity");
+        onClient.loadWithComponents(TagValueInput.create(ProblemReporter.DISCARDING, registries, placed.getUpdateTag(registries)));
+        helper.assertValueEqual(((ILockable) onClient).getLockCode(), CODE, name + " lock code as a client receives it");
     }
 
     /**
