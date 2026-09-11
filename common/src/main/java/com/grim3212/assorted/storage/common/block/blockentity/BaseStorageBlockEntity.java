@@ -13,7 +13,6 @@ import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
 import com.grim3212.assorted.storage.common.inventory.StorageContainer;
 import com.grim3212.assorted.storage.common.inventory.StorageItemStackStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
-import com.grim3212.assorted.storage.api.StorageLockIO;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -125,7 +124,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
         }
 
         this.customName = parseCustomNameSafe(input, "CustomName");
-        this.lockCode = StorageLockIO.readLock(input);
+        this.lockCode = StorageUtil.readLock(input);
     }
 
     @Override
@@ -136,7 +135,7 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
         }
 
         output.storeNullable("CustomName", ComponentSerialization.CODEC, this.customName);
-        StorageLockIO.writeLock(output, this.lockCode);
+        StorageUtil.writeLock(output, this.lockCode);
     }
 
     @Override

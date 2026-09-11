@@ -2,7 +2,6 @@ package com.grim3212.assorted.storage.common.inventory.bag;
 
 import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
-import com.grim3212.assorted.storage.api.StorageLockIO;
 import com.grim3212.assorted.storage.api.StorageMaterial;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
@@ -37,7 +36,7 @@ public class BagItemHandler extends ItemStackStorageHandler {
         // If we set the storage lock on each save it should be a bit more performant
         // then checking the inventory every render to decide if it is locked or not
         ItemStack storageLock = this.getStackInSlot(0);
-        StorageLockIO.setLockOnStack(this.itemStack, StorageUtil.getCode(storageLock));
+        StorageUtil.setLockOnStack(this.itemStack, StorageUtil.getCode(storageLock));
     }
 
     public void load() {

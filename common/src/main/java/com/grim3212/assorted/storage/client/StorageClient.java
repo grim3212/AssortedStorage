@@ -52,12 +52,6 @@ public class StorageClient {
         ClientServices.CLIENT.registerScreen(StorageContainerTypes.LOCKED_SHULKER_BOX::get, LockedMaterialScreen::new);
         ClientServices.CLIENT.registerScreen(StorageContainerTypes.LOCKED_HOPPER::get, LockedHopperScreen::new);
 
-        // TODO(26.2): the fourteen locked doors used to be registered as RenderType.cutout() here.
-        //  ItemBlockRenderTypes is gone and a block's chunk layer is now derived per quad from the
-        //  sprite's transparency or from "render_type" in the block model json, so those calls have
-        //  no runtime equivalent - the generated door models must carry
-        //  "render_type": "minecraft:cutout" instead. That is a datagen change, outside this package.
-
         ClientServices.CLIENT.registerBlockEntityRenderer(StorageBlockEntityTypes.WOOD_CABINET, WoodCabinetBlockEntityRenderer::new);
         ClientServices.CLIENT.registerBlockEntityRenderer(StorageBlockEntityTypes.GLASS_CABINET, GlassCabinetBlockEntityRenderer::new);
         ClientServices.CLIENT.registerBlockEntityRenderer(StorageBlockEntityTypes.WAREHOUSE_CRATE, WarehouseCrateBlockEntityRenderer::new);
@@ -70,13 +64,6 @@ public class StorageClient {
         ClientServices.CLIENT.registerBlockEntityRenderer(StorageBlockEntityTypes.LOCKED_SHULKER_BOX, LockedShulkerBoxBlockEntityRenderer::new);
         ClientServices.CLIENT.registerBlockEntityRenderer(StorageBlockEntityTypes.CRATE, CrateBlockEntityRenderer::new);
         ClientServices.CLIENT.registerBlockEntityRenderer(StorageBlockEntityTypes.CRATE_COMPACTING, CrateBlockEntityRenderer::new);
-
-        // TODO(26.2): registerItemProperty is gone and has no runtime replacement. The bag's "color"
-        //  and "locked" properties and the shulker box's "color" property used to select an item model
-        //  through ItemProperties; 26.2 chooses item models before baking, from the item's own model
-        //  json, using a "minecraft:select" / "minecraft:condition" ItemModel over a codec-registered
-        //  property under client.renderer.item.properties.**. Restoring those three needs a property
-        //  type registered on each loader plus regenerated item models, both outside this package.
 
         // An item's tints live in its model json now; all that is registered from code is the source
         // type. Bag models need a "tints" entry naming this id once per dyed layer, with "tag" set to

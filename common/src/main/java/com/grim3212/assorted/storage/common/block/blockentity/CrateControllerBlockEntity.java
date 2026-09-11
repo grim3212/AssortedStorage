@@ -17,7 +17,6 @@ import com.grim3212.assorted.storage.common.inventory.crates.CrateControllerInvW
 import com.grim3212.assorted.storage.common.properties.StorageModelProperties;
 import net.minecraft.util.Util;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
-import com.grim3212.assorted.storage.api.StorageLockIO;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -121,7 +120,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements INamed, I
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         this.customName = parseCustomNameSafe(input, "CustomName");
-        this.lockCode = StorageLockIO.readLock(input);
+        this.lockCode = StorageUtil.readLock(input);
     }
 
     @Override
@@ -129,7 +128,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements INamed, I
         super.saveAdditional(output);
 
         output.storeNullable("CustomName", ComponentSerialization.CODEC, this.customName);
-        StorageLockIO.writeLock(output, this.lockCode);
+        StorageUtil.writeLock(output, this.lockCode);
     }
 
     @Override

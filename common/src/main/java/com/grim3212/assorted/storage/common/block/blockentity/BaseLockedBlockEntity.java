@@ -2,7 +2,6 @@ package com.grim3212.assorted.storage.common.block.blockentity;
 
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
-import com.grim3212.assorted.storage.api.StorageLockIO;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -53,13 +52,13 @@ public class BaseLockedBlockEntity extends BlockEntity implements ILockable {
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        this.lockCode = StorageLockIO.readLock(input);
+        this.lockCode = StorageUtil.readLock(input);
     }
 
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-        StorageLockIO.writeLock(output, this.lockCode);
+        StorageUtil.writeLock(output, this.lockCode);
     }
 
     /**
