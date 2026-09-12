@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static com.grim3212.assorted.lib.test.TestSupport.*;
 import static com.grim3212.assorted.storage.gametest.StorageTestSupport.*;
 
 /**

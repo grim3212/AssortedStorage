@@ -1,12 +1,5 @@
 package com.grim3212.assorted.storage.gametest;
 
-import com.grim3212.assorted.lib.platform.Services;
-import net.minecraft.world.item.component.TooltipProvider;
-import net.minecraft.world.item.component.TooltipDisplay;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.core.component.DataComponentType;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.grim3212.assorted.storage.Constants;
@@ -17,8 +10,6 @@ import com.grim3212.assorted.storage.common.block.blockentity.LockedEnderChestBl
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import com.grim3212.assorted.storage.common.inventory.LocksmithWorkbenchContainer;
 import com.grim3212.assorted.storage.common.network.SetLockPacket;
-import com.mojang.authlib.GameProfile;
-import io.netty.channel.embedded.EmbeddedChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -26,15 +17,10 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityTypes;
@@ -44,13 +30,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.GameType;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.TagValueInput;
-import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -60,11 +43,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+
+import static com.grim3212.assorted.lib.test.TestSupport.craft;
 
 /**
- * Helpers, constants and fixtures shared by AssortedStorage's gametest classes, which import them statically.
+ * Helpers, constants and fixtures shared by AssortedStorage's gametest classes, which import them
+ * statically, alongside AssortedLib's {@code TestSupport}.
  */
 final class StorageTestSupport {
 
@@ -88,47 +72,6 @@ final class StorageTestSupport {
         helper.assertTrue(onClient instanceof ILockable, name + " did not recreate as a lockable block entity");
         onClient.loadWithComponents(TagValueInput.create(ProblemReporter.DISCARDING, registries, placed.getUpdateTag(registries)));
         helper.assertValueEqual(((ILockable) onClient).getLockCode(), CODE, name + " lock code as a client receives it");
-    }
-
-    /**
-     * Saves a block entity through a collecting problem reporter and fails the test if anything was
-     * refused. A codec that rejects the value it is handed - ItemStack.CODEC on an empty stack, say -
-     * only logs "Serialization errors" in game and writes nothing, so a test has to read the report.
-     */
-    static CompoundTag saveWithoutProblems(GameTestHelper helper, BlockEntity blockEntity, String what) {
-        ProblemReporter.Collector problems = new ProblemReporter.Collector();
-        TagValueOutput output = TagValueOutput.createWithContext(problems, helper.getLevel().registryAccess());
-        blockEntity.saveWithFullMetadata(output);
-
-        helper.assertTrue(problems.isEmpty(), what + " reported serialization errors: " + problems.getReport());
-        return output.buildResult();
-    }
-
-    /** Every variant object in a blockstate json: each "variants" entry and each multipart "apply". */
-    static List<JsonObject> blockstateVariants(JsonObject blockstate) {
-        List<JsonObject> out = new ArrayList<>();
-        if (blockstate.has("variants")) {
-            for (Map.Entry<String, com.google.gson.JsonElement> entry : blockstate.getAsJsonObject("variants").entrySet()) {
-                addVariants(entry.getValue(), out);
-            }
-        }
-        if (blockstate.has("multipart")) {
-            for (com.google.gson.JsonElement part : blockstate.getAsJsonArray("multipart")) {
-                addVariants(part.getAsJsonObject().get("apply"), out);
-            }
-        }
-        return out;
-    }
-
-    static void addVariants(com.google.gson.JsonElement element, List<JsonObject> out) {
-        if (element == null) {
-            return;
-        }
-        if (element.isJsonArray()) {
-            element.getAsJsonArray().forEach(variant -> out.add(variant.getAsJsonObject()));
-        } else {
-            out.add(element.getAsJsonObject());
-        }
     }
 
     /** A json off the mod's own classpath, or null if it is not there. */
@@ -189,9 +132,7 @@ final class StorageTestSupport {
 
     /** The result of the one crafting recipe that matches {@code input}. */
     static ItemStack crafted(GameTestHelper helper, CraftingInput input) {
-        var found = helper.getLevel().recipeAccess().getRecipeFor(RecipeType.CRAFTING, input, helper.getLevel());
-        helper.assertTrue(found.isPresent(), "no crafting recipe matched the ingredients laid out");
-        return found.get().value().assemble(input);
+        return craft(helper, input, "the ingredients laid out");
     }
 
     /** Puts {@code blank} in the workbench, types {@link #CODE} at it, and takes the result. */
@@ -244,27 +185,6 @@ final class StorageTestSupport {
         }
     }
 
-    /**
-     * A player really in the level, in survival. {@code makeMockServerPlayerInLevel} is deprecated
-     * for removal and hard codes creative; {@code makeMockServerPlayer} is never placed, so it has
-     * no connection and anything sent to it throws.
-     */
-    static ServerPlayer survivalPlayer(GameTestHelper helper, ItemStack held) {
-        ServerLevel level = helper.getLevel();
-        CommonListenerCookie cookie = CommonListenerCookie.createInitial(new GameProfile(UUID.randomUUID(), "assortedstorage-test"), false);
-        ServerPlayer player = new ServerPlayer(level.getServer(), level, cookie.gameProfile(), cookie.clientInformation());
-
-        Connection connection = new Connection(PacketFlow.SERVERBOUND);
-        new EmbeddedChannel(connection);
-        level.getServer().getPlayerList().placeNewPlayer(connection, player, cookie);
-        helper.runBeforeTestEnd(() -> level.getServer().getPlayerList().remove(player));
-
-        player.setGameMode(GameType.SURVIVAL);
-        helper.assertFalse(player.isCreative(), "the test player is in creative, which changes every path under test");
-        player.setItemInHand(InteractionHand.MAIN_HAND, held);
-        return player;
-    }
-
     static LockedEnderChestBlockEntity enderChest(GameTestHelper helper, BlockPos pos, String code) {
         helper.setBlock(pos, StorageBlocks.LOCKED_ENDER_CHEST.get());
         LockedEnderChestBlockEntity chest = helper.getBlockEntity(pos, LockedEnderChestBlockEntity.class);
@@ -280,27 +200,5 @@ final class StorageTestSupport {
 
     static Block oakCrateQuadruple() {
         return StorageBlocks.CRATES.stream().filter(group -> group.getType() == Wood.OAK).findFirst().orElseThrow().QUADRUPLE.get();
-    }
-
-    /** The translation keys of the lines one component adds to a stack's tooltip, in order. */
-    static <T extends TooltipProvider> List<String> tooltipKeys(GameTestHelper helper, ItemStack stack, DataComponentType<T> type) {
-        List<String> keys = new ArrayList<>();
-        stack.addToTooltip(type, Item.TooltipContext.of(helper.getLevel()), TooltipDisplay.DEFAULT, line -> keys.add(tooltipKey(line)), TooltipFlag.NORMAL);
-        return keys;
-    }
-
-    /** The translation keys of a stack's whole tooltip, as the loader builds it. */
-    static List<String> fullTooltipKeys(GameTestHelper helper, ItemStack stack) {
-        return stack.getTooltipLines(Item.TooltipContext.of(helper.getLevel()), null, TooltipFlag.NORMAL).stream().map(StorageTestSupport::tooltipKey).toList();
-    }
-
-    /** A line's translation key, or its text when it is not translatable. */
-    static String tooltipKey(Component line) {
-        return line.getContents() instanceof TranslatableContents translatable ? translatable.getKey() : line.getString();
-    }
-
-    /** NeoForge adds mod component tooltip lines on the server too; Fabric only on the client. */
-    static boolean onNeoForge() {
-        return "Forge".equals(Services.PLATFORM.getPlatformName());
     }
 }
