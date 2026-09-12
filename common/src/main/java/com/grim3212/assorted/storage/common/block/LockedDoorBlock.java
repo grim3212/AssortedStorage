@@ -52,8 +52,8 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockClo
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter world, BlockPos pos, Player player) {
-        return Services.LEVEL_PROPERTIES.getCloneItemStack(this.parent.defaultBlockState(), target, world, pos, player);
+    public ItemStack getCloneItemStack(BlockState state, BlockGetter world, BlockPos pos, Player player) {
+        return Services.LEVEL_PROPERTIES.getCloneItemStack(this.parent.defaultBlockState(), world, pos, player);
     }
 
     @Override
