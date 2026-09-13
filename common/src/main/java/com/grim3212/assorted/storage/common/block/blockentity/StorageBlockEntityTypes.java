@@ -39,7 +39,7 @@ public class StorageBlockEntityTypes {
     public static final IRegistryObject<BlockEntityType<CrateControllerBlockEntity>> CRATE_CONTROLLER = BLOCK_ENTITIES.register("crate_controller", () -> Services.PLATFORM.createBlockEntityType(CrateControllerBlockEntity::new, StorageBlocks.CRATE_CONTROLLER.get()));
 
     public static Block[] getWarehouseCrates() {
-        return new Block[]{StorageBlocks.OAK_WAREHOUSE_CRATE.get(), StorageBlocks.BIRCH_WAREHOUSE_CRATE.get(), StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get(), StorageBlocks.ACACIA_WAREHOUSE_CRATE.get(), StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get(), StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get(), StorageBlocks.WARPED_WAREHOUSE_CRATE.get(), StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get(), StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get()};
+        return StorageBlocks.WAREHOUSE_CRATES.values().stream().map(IRegistryObject::get).toArray(Block[]::new);
     }
 
     public static Block[] getChests() {

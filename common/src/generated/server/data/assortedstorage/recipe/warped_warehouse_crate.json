@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "key": {
-    "L": "minecraft:warped_stem",
+    "L": "#minecraft:warped_stems",
     "P": "minecraft:warped_planks"
   },
   "pattern": [

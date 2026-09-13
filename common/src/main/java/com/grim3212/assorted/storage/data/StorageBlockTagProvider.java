@@ -34,15 +34,7 @@ public class StorageBlockTagProvider extends LibBlockTagProvider {
         Function<TagKey<Block>, BlockTagAppender> tagger = (tag) -> new BlockTagAppender(rawTagger.apply(tag));
 
         BlockTagAppender piglinBuilder = tagger.apply(BlockTags.GUARDED_BY_PIGLINS);
-        piglinBuilder.add(StorageBlocks.ACACIA_WAREHOUSE_CRATE.get());
-        piglinBuilder.add(StorageBlocks.BIRCH_WAREHOUSE_CRATE.get());
-        piglinBuilder.add(StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get());
-        piglinBuilder.add(StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get());
-        piglinBuilder.add(StorageBlocks.OAK_WAREHOUSE_CRATE.get());
-        piglinBuilder.add(StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get());
-        piglinBuilder.add(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get());
-        piglinBuilder.add(StorageBlocks.WARPED_WAREHOUSE_CRATE.get());
-        piglinBuilder.add(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get());
+        StorageBlocks.WAREHOUSE_CRATES.values().forEach(crate -> piglinBuilder.add(crate.get()));
         piglinBuilder.add(StorageBlocks.GLASS_CABINET.get());
         piglinBuilder.add(StorageBlocks.WOOD_CABINET.get());
         piglinBuilder.add(StorageBlocks.GOLD_SAFE.get());
@@ -208,7 +200,11 @@ public class StorageBlockTagProvider extends LibBlockTagProvider {
             doorBuilder.add(b);
         }
 
-        tagger.apply(BlockTags.MINEABLE_WITH_PICKAXE).add(StorageBlocks.ITEM_TOWER.get(), StorageBlocks.LOCKER.get(), StorageBlocks.GOLD_SAFE.get(), StorageBlocks.OBSIDIAN_SAFE.get(), StorageBlocks.LOCKED_IRON_DOOR.get(), StorageBlocks.LOCKED_QUARTZ_DOOR.get(), StorageBlocks.LOCKED_STEEL_DOOR.get(), StorageBlocks.LOCKED_ENDER_CHEST.get(), StorageBlocks.LOCKED_HOPPER.get());
+        BlockTagAppender pickaxeBuilder = tagger.apply(BlockTags.MINEABLE_WITH_PICKAXE);
+        pickaxeBuilder.add(StorageBlocks.ITEM_TOWER.get(), StorageBlocks.LOCKER.get(), StorageBlocks.GOLD_SAFE.get(), StorageBlocks.OBSIDIAN_SAFE.get(), StorageBlocks.LOCKED_IRON_DOOR.get(), StorageBlocks.LOCKED_QUARTZ_DOOR.get(), StorageBlocks.LOCKED_STEEL_DOOR.get(), StorageBlocks.LOCKED_ENDER_CHEST.get(), StorageBlocks.LOCKED_HOPPER.get());
+        // The locked copper doors need the right tool, as vanilla's do, so they have to be in a
+        // mineable tag or they break normally and drop nothing.
+        Blocks.COPPER_DOOR.forEach(door -> pickaxeBuilder.add(StorageBlocks.VANILLA_DOORS.get(door).get()));
         tagger.apply(LibCommonTags.Blocks.CHESTS_ENDER).add(StorageBlocks.LOCKED_ENDER_CHEST.get());
         tagger.apply(BlockTags.MINEABLE_WITH_AXE).add(StorageBlocks.LOCKED_CHEST.get(), StorageBlocks.LOCKED_BARREL.get());
 

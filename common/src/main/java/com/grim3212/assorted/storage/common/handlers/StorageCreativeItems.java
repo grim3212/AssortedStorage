@@ -106,15 +106,7 @@ public class StorageCreativeItems {
         items.add(StorageBlocks.OBSIDIAN_SAFE.get());
         items.add(StorageBlocks.LOCKER.get());
         items.add(StorageBlocks.ITEM_TOWER.get());
-        items.add(StorageBlocks.OAK_WAREHOUSE_CRATE.get());
-        items.add(StorageBlocks.BIRCH_WAREHOUSE_CRATE.get());
-        items.add(StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get());
-        items.add(StorageBlocks.ACACIA_WAREHOUSE_CRATE.get());
-        items.add(StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get());
-        items.add(StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get());
-        items.add(StorageBlocks.WARPED_WAREHOUSE_CRATE.get());
-        items.add(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get());
-        items.add(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get());
+        StorageBlocks.WAREHOUSE_CRATES.values().forEach(crate -> items.add(crate.get()));
 
         items.add(defaultLock(StorageBlocks.LOCKED_ENDER_CHEST.get()));
 

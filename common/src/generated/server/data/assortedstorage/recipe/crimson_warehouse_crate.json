@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "key": {
-    "L": "minecraft:crimson_stem",
+    "L": "#minecraft:crimson_stems",
     "P": "minecraft:crimson_planks"
   },
   "pattern": [

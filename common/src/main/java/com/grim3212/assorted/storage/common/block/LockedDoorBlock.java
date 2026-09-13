@@ -51,9 +51,26 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockClo
         this.parent = Services.PLATFORM.getRegistry(Registries.BLOCK).getValue(parent).orElse(Blocks.AIR);
     }
 
+    /** The vanilla door this one stands in for: what it reverts to, drops and is picked as. */
+    public Block getParent() {
+        return this.parent;
+    }
+
     @Override
     public ItemStack getCloneItemStack(BlockState state, BlockGetter world, BlockPos pos, Player player) {
         return Services.LEVEL_PROPERTIES.getCloneItemStack(this.parent.defaultBlockState(), world, pos, player);
+    }
+
+    /**
+     * Keep the block entity, and with it the lock, when one locked door becomes another in place -
+     * a copper door oxidising, being waxed, or being scraped back. Every locked door shares the one
+     * {@code BASE_LOCKED} block entity type, so the block entity already there is still the right
+     * one. Without this the lock is lost and {@code BaseLockedBlockEntity#preRemoveSideEffects}
+     * drops the padlock on the floor on every oxidation step.
+     */
+    @Override
+    protected boolean shouldChangedStateKeepBlockEntity(BlockState oldState) {
+        return oldState.getBlock() instanceof LockedDoorBlock;
     }
 
     @Override
@@ -70,6 +87,15 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockClo
     protected BlockState updateShape(BlockState stateIn, LevelReader worldIn, ScheduledTickAccess scheduledTickAccess, BlockPos currentPos, Direction facing, BlockPos facingPos, BlockState facingState, RandomSource randomSource) {
         DoubleBlockHalf doubleblockhalf = stateIn.getValue(HALF);
         if (facing.getAxis() == Direction.Axis.Y && doubleblockhalf == DoubleBlockHalf.LOWER == (facing == Direction.UP)) {
+
+            // A copper door oxidises, waxes and scrapes one half at a time, so the other half follows
+            // the half that changed - which is what vanilla's DoorBlock does for its own copper doors.
+            // Only for a neighbour that is a *different* locked door: putting a padlock on a door and
+            // taking it off again both pass through a half that has not been converted yet, and those
+            // must fall through to the tolerance below rather than adopt.
+            if (facingState.getBlock() instanceof LockedDoorBlock && !facingState.is(this) && facingState.getValue(HALF) != doubleblockhalf) {
+                return facingState.setValue(HALF, doubleblockhalf);
+            }
 
             boolean isValidBlock = doubleblockhalf == DoubleBlockHalf.UPPER ? worldIn.getBlockState(currentPos.below()).getBlock() instanceof DoorBlock : worldIn.getBlockState(currentPos.above()).getBlock() instanceof DoorBlock;
 

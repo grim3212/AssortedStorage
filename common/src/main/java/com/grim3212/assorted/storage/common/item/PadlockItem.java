@@ -39,16 +39,7 @@ public class PadlockItem extends CombinationItem {
 
         // Populate map so that we can properly map unlocked doors to locked doors
         this.lockMappings = Maps.newHashMap();
-        lockMappings.put(Blocks.OAK_DOOR, StorageBlocks.LOCKED_OAK_DOOR.get());
-        lockMappings.put(Blocks.SPRUCE_DOOR, StorageBlocks.LOCKED_SPRUCE_DOOR.get());
-        lockMappings.put(Blocks.BIRCH_DOOR, StorageBlocks.LOCKED_BIRCH_DOOR.get());
-        lockMappings.put(Blocks.ACACIA_DOOR, StorageBlocks.LOCKED_ACACIA_DOOR.get());
-        lockMappings.put(Blocks.JUNGLE_DOOR, StorageBlocks.LOCKED_JUNGLE_DOOR.get());
-        lockMappings.put(Blocks.DARK_OAK_DOOR, StorageBlocks.LOCKED_DARK_OAK_DOOR.get());
-        lockMappings.put(Blocks.CRIMSON_DOOR, StorageBlocks.LOCKED_CRIMSON_DOOR.get());
-        lockMappings.put(Blocks.MANGROVE_DOOR, StorageBlocks.LOCKED_MANGROVE_DOOR.get());
-        lockMappings.put(Blocks.WARPED_DOOR, StorageBlocks.LOCKED_WARPED_DOOR.get());
-        lockMappings.put(Blocks.IRON_DOOR, StorageBlocks.LOCKED_IRON_DOOR.get());
+        StorageBlocks.VANILLA_DOORS.forEach((door, locked) -> lockMappings.put(door, locked.get()));
         lockMappings.put(Blocks.ENDER_CHEST, StorageBlocks.LOCKED_ENDER_CHEST.get());
         lockMappings.put(Blocks.CHEST, StorageBlocks.LOCKED_CHEST.get());
         lockMappings.put(Blocks.BARREL, StorageBlocks.LOCKED_BARREL.get());

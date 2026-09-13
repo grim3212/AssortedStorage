@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "key": {
-    "L": "minecraft:mangrove_log",
+    "L": "#minecraft:mangrove_logs",
     "P": "minecraft:mangrove_planks"
   },
   "pattern": [

@@ -99,6 +99,14 @@
     "assortedstorage:locked_quartz_door",
     "assortedstorage:locked_steel_door",
     "assortedstorage:locked_ender_chest",
-    "assortedstorage:locked_hopper"
+    "assortedstorage:locked_hopper",
+    "assortedstorage:locked_copper_door",
+    "assortedstorage:locked_exposed_copper_door",
+    "assortedstorage:locked_weathered_copper_door",
+    "assortedstorage:locked_oxidized_copper_door",
+    "assortedstorage:locked_waxed_copper_door",
+    "assortedstorage:locked_waxed_exposed_copper_door",
+    "assortedstorage:locked_waxed_weathered_copper_door",
+    "assortedstorage:locked_waxed_oxidized_copper_door"
   ]
 }

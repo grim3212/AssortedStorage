@@ -5,7 +5,10 @@ import com.grim3212.assorted.lib.inventory.FabricPlatformInventoryStorageHandler
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntityTypes;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 public class AssortedStorageFabric implements ModInitializer {
 
@@ -14,6 +17,7 @@ public class AssortedStorageFabric implements ModInitializer {
         StorageCommonMod.init();
 
         StorageBlocks.initDispenserHandlers();
+        registerLockedCopperDoorOxidation();
 
         ItemStorage.SIDED.registerForBlockEntities((be, direction) ->
                 {
@@ -37,5 +41,21 @@ public class AssortedStorageFabric implements ModInitializer {
                 StorageBlockEntityTypes.CRATE_CONTROLLER.get(),
                 StorageBlockEntityTypes.CRATE_COMPACTING.get()
         );
+    }
+
+    /**
+     * Tells Fabric how the locked copper doors scrape back with an axe and wax with a honeycomb.
+     * Oxidising over time is {@code LockedCopperDoorBlock}'s own random tick and does not read this;
+     * scraping and waxing are vanilla's item code, which does. NeoForge's half is the
+     * {@code neoforge:oxidizables} and {@code neoforge:waxables} data maps in
+     * {@code StorageDataMapProvider}, so a change here needs the same change there.
+     */
+    private static void registerLockedCopperDoorOxidation() {
+        Blocks.COPPER_DOOR.weathering().progressMapping((from, to) -> OxidizableBlocksRegistry.registerNextStage(locked(from), locked(to)));
+        Blocks.COPPER_DOOR.zipUnwaxedWaxed((unwaxed, waxed) -> OxidizableBlocksRegistry.registerWaxable(locked(unwaxed), locked(waxed)));
+    }
+
+    private static Block locked(Block vanillaDoor) {
+        return StorageBlocks.VANILLA_DOORS.get(vanillaDoor).get();
     }
 }

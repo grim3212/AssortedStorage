@@ -1,0 +1,8 @@
+{
+  "parent": "assortedstorage:block/base_crate_double_vertical",
+  "textures": {
+    "facing": "assortedstorage:block/crates/cherry_facing",
+    "facing_columns": "minecraft:block/cherry_log",
+    "sides": "minecraft:block/cherry_log"
+  }
+}

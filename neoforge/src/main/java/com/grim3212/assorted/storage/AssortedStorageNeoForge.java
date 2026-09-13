@@ -15,6 +15,7 @@ import com.grim3212.assorted.storage.common.block.blockentity.StorageBlockEntity
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.data.StorageBlockLoot;
 import com.grim3212.assorted.storage.data.StorageBlockTagProvider;
+import com.grim3212.assorted.storage.data.StorageDataMapProvider;
 import com.grim3212.assorted.storage.data.StorageItemTagProvider;
 import com.grim3212.assorted.storage.data.StorageRecipes;
 import net.minecraft.core.HolderLookup;
@@ -69,6 +70,7 @@ public class AssortedStorageNeoForge {
         ForgeBlockTagProvider blockTagProvider = event.addProvider(new ForgeBlockTagProvider(packOutput, lookupProvider, Constants.MOD_ID, new StorageBlockTagProvider(packOutput, lookupProvider)));
         event.addProvider(new ForgeItemTagProvider(packOutput, lookupProvider, blockTagProvider.contentsGetter(), Constants.MOD_ID, new StorageItemTagProvider(packOutput, lookupProvider, blockTagProvider.contentsGetter())));
         event.addProvider(new LootTableProvider(packOutput, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(StorageBlockLoot::new, LootContextParamSets.BLOCK)), lookupProvider));
+        event.addProvider(new StorageDataMapProvider(packOutput, lookupProvider));
     }
 
     /**

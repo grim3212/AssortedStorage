@@ -1,8 +1,12 @@
 package com.grim3212.assorted.storage.gametest;
 
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
+import com.grim3212.assorted.lib.registry.IRegistryObject;
 import com.grim3212.assorted.storage.api.StorageAccessUtil;
+import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
+import com.grim3212.assorted.storage.common.block.LockedCopperDoorBlock;
+import com.grim3212.assorted.storage.common.block.LockedDoorBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseLockedBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.LockedEnderChestBlockEntity;
@@ -12,21 +16,36 @@ import com.grim3212.assorted.storage.common.inventory.keyring.KeyRingItemHandler
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.network.SetLockPacket;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.item.HoneycombItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.WeatheringCopper;
+import net.minecraft.world.level.block.WeatheringCopper.WeatherState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.Vec3;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -48,7 +67,204 @@ final class LockTests {
         out.accept("key_ring_holds_keys_and_opens_a_lock", LockTests::keyRingHoldsKeysAndOpensALock);
         out.accept("locked_doors_open_only_with_the_right_key", LockTests::lockedDoorsOpenOnlyWithTheRightKey);
         out.accept("locksmith_workbench_codes_a_key_and_a_lock", LockTests::locksmithWorkbenchCodesAKeyAndALock);
+        out.accept("every_vanilla_door_can_be_locked", LockTests::everyVanillaDoorCanBeLocked);
+        out.accept("locked_doors_drop_the_door_they_stand_in_for", LockTests::lockedDoorsDropTheDoorTheyStandInFor);
+        out.accept("locked_copper_doors_oxidise_keeping_their_lock", LockTests::lockedCopperDoorsOxidiseKeepingTheirLock);
+        out.accept("locked_copper_doors_scrape_and_wax", LockTests::lockedCopperDoorsScrapeAndWax);
+        out.accept("a_locked_copper_door_oxidises_on_its_own", LockTests::aLockedCopperDoorOxidisesOnItsOwn);
     }
+
+    /**
+     * The whole path a real world takes: a random tick reaching {@code changeOverTime}, its scan of
+     * the copper nearby, its roll, and the block swap that follows. Driven by ticking rather than by
+     * calling {@code getNext} directly, which is the half {@code locked_copper_doors_oxidise_keeping
+     * _their_lock} covers.
+     * <p>
+     * The unaffected door is the one to use here: the scan refuses to progress a block that has
+     * less oxidised copper within four blocks, and nothing is less oxidised than unaffected, so a
+     * neighbouring test's copper doors can only speed this up, never stall it.
+     */
+    private static void aLockedCopperDoorOxidisesOnItsOwn(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        Block unaffected = StorageBlocks.VANILLA_DOORS.get(Blocks.COPPER_DOOR.weathering().unaffected()).get();
+        Block exposed = StorageBlocks.VANILLA_DOORS.get(Blocks.COPPER_DOOR.weathering().exposed()).get();
+
+        BlockPos lower = new BlockPos(4, 1, 4);
+        helper.setBlock(lower, unaffected.defaultBlockState().setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER));
+        helper.setBlock(lower.above(), unaffected.defaultBlockState().setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER));
+        helper.getBlockEntity(lower, BaseLockedBlockEntity.class).setLockCode(CODE);
+        helper.getBlockEntity(lower.above(), BaseLockedBlockEntity.class).setLockCode(CODE);
+
+        // ~4% a tick, so 2000 tries is a certainty many times over without being a slow test.
+        BlockPos pos = helper.absolutePos(lower);
+        for (int tick = 0; tick < 2000 && helper.getBlockState(lower).is(unaffected); tick++) {
+            level.getBlockState(pos).randomTick(level, pos, level.getRandom());
+        }
+
+        helper.assertTrue(helper.getBlockState(lower).is(exposed), "the locked copper door never oxidised in 2000 random ticks, it is still " + name(helper.getBlockState(lower).getBlock()));
+        helper.assertTrue(helper.getBlockState(lower.above()).is(exposed), "the upper half did not follow the lower half as it oxidised, it is still " + name(helper.getBlockState(lower.above()).getBlock()));
+        helper.assertValueEqual(helper.getBlockEntity(lower, BaseLockedBlockEntity.class).getLockCode(), CODE, "the lock after oxidising");
+        helper.succeed();
+    }
+
+    /**
+     * A locked copper door goes on oxidising, and arrives at the next stage still locked. The step
+     * itself is what vanilla's {@code changeOverTime} does - the roll that schedules it is vanilla's
+     * and not worth a probabilistic test - so this drives the change and checks what it leaves
+     * behind: both halves at the new stage, the lock still on, and no padlock on the floor.
+     */
+    private static void lockedCopperDoorsOxidiseKeepingTheirLock(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        List<String> wrong = new ArrayList<>();
+
+        int i = 0;
+        for (Map.Entry<Block, IRegistryObject<LockedDoorBlock>> entry : copperDoors().entrySet()) {
+            Block locked = entry.getValue().get();
+            boolean shouldOxidise = locked instanceof LockedCopperDoorBlock copper && copper.getAge() != WeatherState.OXIDIZED;
+
+            BlockPos lower = spread(i++);
+            BlockPos upper = lower.above();
+            helper.setBlock(lower, locked.defaultBlockState().setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER));
+            helper.setBlock(upper, locked.defaultBlockState().setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER));
+            helper.getBlockEntity(lower, BaseLockedBlockEntity.class).setLockCode(CODE);
+            helper.getBlockEntity(upper, BaseLockedBlockEntity.class).setLockCode(CODE);
+
+            // The baked property that actually schedules the change. It cannot be worked out from
+            // the loaders' oxidation registries, which load later, so it is the thing to assert.
+            if (helper.getBlockState(lower).isRandomlyTicking() != shouldOxidise) {
+                wrong.add(name(locked) + (shouldOxidise ? " is not randomly ticked, so it never oxidises" : " is randomly ticked but has nowhere to go"));
+            }
+
+            Optional<BlockState> next = shouldOxidise ? ((LockedCopperDoorBlock) locked).getNext(helper.getBlockState(lower)) : Optional.empty();
+            if (!shouldOxidise) {
+                continue;
+            }
+            if (next.isEmpty()) {
+                wrong.add(name(locked) + " has no next oxidation stage");
+                continue;
+            }
+
+            // Exactly what ChangeOverTimeBlock#changeOverTime does once its roll succeeds.
+            level.setBlockAndUpdate(helper.absolutePos(lower), next.get());
+
+            Block expected = next.get().getBlock();
+            if (!helper.getBlockState(lower).is(expected)) {
+                wrong.add(name(locked) + " lower half became " + name(helper.getBlockState(lower).getBlock()) + ", not " + name(expected));
+            }
+            if (!helper.getBlockState(upper).is(expected)) {
+                wrong.add(name(locked) + " upper half stayed " + name(helper.getBlockState(upper).getBlock()) + " while the lower half became " + name(expected));
+            }
+            for (BlockPos half : List.of(lower, upper)) {
+                BlockEntity be = level.getBlockEntity(helper.absolutePos(half));
+                if (!(be instanceof BaseLockedBlockEntity locking) || !CODE.equals(locking.getLockCode())) {
+                    wrong.add(name(locked) + " lost its lock on the " + (half.equals(lower) ? "lower" : "upper") + " half when it oxidised");
+                }
+            }
+        }
+
+        List<ItemEntity> dropped = helper.getEntities(EntityTypes.ITEM);
+        if (dropped.stream().anyMatch(item -> item.getItem().is(StorageItems.LOCKSMITH_LOCK.get()))) {
+            wrong.add("a padlock was dropped while oxidising - the block entity was removed rather than kept");
+        }
+
+        helper.assertTrue(wrong.isEmpty(), wrong.size() + " oxidation problem(s): " + String.join("; ", wrong));
+        helper.succeed();
+    }
+
+    /**
+     * Axe scraping and honeycomb waxing are vanilla's own item code, reached through the loaders'
+     * oxidation registries rather than anything of ours - NeoForge's {@code neoforge:oxidizables} and
+     * {@code neoforge:waxables} data maps, Fabric's {@code OxidizableBlocksRegistry}. Miss one and
+     * the door simply cannot be scraped or waxed, silently. Asked the way the axe and the honeycomb
+     * ask, because the two loaders answer from different places: NeoForge deprecates the vanilla
+     * {@code WAXABLES} / {@code NEXT_BY_BLOCK} fields and ignores what is registered in them.
+     */
+    private static void lockedCopperDoorsScrapeAndWax(GameTestHelper helper) {
+        List<String> wrong = new ArrayList<>();
+
+        Blocks.COPPER_DOOR.weathering().progressMapping((from, to) -> {
+            Block lockedFrom = StorageBlocks.VANILLA_DOORS.get(from).get();
+            Block lockedTo = StorageBlocks.VANILLA_DOORS.get(to).get();
+            Optional<BlockState> scraped = WeatheringCopper.getPrevious(lockedTo.defaultBlockState());
+            if (scraped.filter(state -> state.is(lockedFrom)).isEmpty()) {
+                wrong.add(name(lockedTo) + " scrapes back to " + scraped.map(state -> name(state.getBlock())).orElse("nothing") + ", not " + name(lockedFrom));
+            }
+        });
+
+        Blocks.COPPER_DOOR.zipUnwaxedWaxed((unwaxed, waxed) -> {
+            Block lockedUnwaxed = StorageBlocks.VANILLA_DOORS.get(unwaxed).get();
+            Block lockedWaxed = StorageBlocks.VANILLA_DOORS.get(waxed).get();
+            Optional<BlockState> waxedState = HoneycombItem.getWaxed(lockedUnwaxed.defaultBlockState());
+            if (waxedState.filter(state -> state.is(lockedWaxed)).isEmpty()) {
+                wrong.add(name(lockedUnwaxed) + " waxes into " + waxedState.map(state -> name(state.getBlock())).orElse("nothing") + ", not " + name(lockedWaxed));
+            }
+        });
+
+        helper.assertTrue(wrong.isEmpty(), wrong.size() + " scrape/wax problem(s) on " + Services.PLATFORM.getPlatformName() + ": " + String.join("; ", wrong));
+        helper.succeed();
+    }
+
+    /** The eight locked copper doors, keyed on the vanilla door each stands in for. */
+    private static Map<Block, IRegistryObject<LockedDoorBlock>> copperDoors() {
+        Map<Block, IRegistryObject<LockedDoorBlock>> doors = new LinkedHashMap<>();
+        Blocks.COPPER_DOOR.forEach(door -> doors.put(door, StorageBlocks.VANILLA_DOORS.get(door)));
+        return doors;
+    }
+
+    /**
+     * A padlock works on every door vanilla has. The only symptom of a missing one is the padlock
+     * doing nothing when a player right clicks that door, which is how cherry, pale oak, bamboo and
+     * the eight copper doors were all silently unlockable.
+     */
+    private static void everyVanillaDoorCanBeLocked(GameTestHelper helper) {
+        List<String> missing = BuiltInRegistries.BLOCK.entrySet().stream()
+                .filter(entry -> "minecraft".equals(entry.getKey().identifier().getNamespace()))
+                .filter(entry -> entry.getValue() instanceof DoorBlock)
+                .filter(entry -> !StorageBlocks.VANILLA_DOORS.containsKey(entry.getValue()))
+                .map(entry -> entry.getKey().identifier().toString())
+                .sorted()
+                .toList();
+
+        helper.assertTrue(missing.isEmpty(), "vanilla doors with no locked stand-in: " + missing);
+        helper.succeed();
+    }
+
+    /**
+     * Breaking a locked door with the right tool gives back the door the padlock went on. The
+     * interesting half is the copper doors: like vanilla's they need a correct tool, so leaving one
+     * out of a {@code #minecraft:mineable/*} tag makes it break at normal speed and drop nothing at
+     * all, which no log or datagen run reports.
+     */
+    private static void lockedDoorsDropTheDoorTheyStandInFor(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        List<String> wrong = new ArrayList<>();
+
+        int i = 0;
+        for (Map.Entry<Block, IRegistryObject<LockedDoorBlock>> entry : StorageBlocks.VANILLA_DOORS.entrySet()) {
+            Block locked = entry.getValue().get();
+            BlockPos lower = spread(i++);
+            helper.setBlock(lower, locked.defaultBlockState().setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER));
+            helper.setBlock(lower.above(), locked.defaultBlockState().setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER));
+
+            if (helper.getBlockState(lower).requiresCorrectToolForDrops() && MINEABLE.stream().noneMatch(tag -> helper.getBlockState(lower).is(tag))) {
+                wrong.add(name(locked) + " needs a correct tool but is in no mineable tag, so it drops nothing");
+                continue;
+            }
+
+            level.destroyBlock(helper.absolutePos(lower), true);
+            List<ItemEntity> dropped = helper.getEntities(EntityTypes.ITEM);
+            if (dropped.stream().noneMatch(item -> item.getItem().is(entry.getKey().asItem()))) {
+                wrong.add(name(locked) + " dropped " + dropped.stream().map(item -> item.getItem().toString()).toList() + " rather than " + name(entry.getKey()));
+            }
+            dropped.forEach(ItemEntity::discard);
+        }
+
+        helper.assertTrue(wrong.isEmpty(), wrong.size() + " locked door drop problem(s): " + String.join("; ", wrong));
+        helper.succeed();
+    }
+
+    /** The tags a block that needs a correct tool has to be in for any tool to be the right one. */
+    private static final List<TagKey<Block>> MINEABLE = List.of(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.MINEABLE_WITH_AXE, BlockTags.MINEABLE_WITH_SHOVEL, BlockTags.MINEABLE_WITH_HOE);
 
     /** A padlock puts its code on the block, and only a key carrying that same code opens it. */
     private static void lockAndKeyShareACode(GameTestHelper helper) {
@@ -131,12 +347,16 @@ final class LockTests {
     }
 
     /**
-     * All fourteen locked doors: the right key opens them, no key and the wrong key do not. What
-     * they look like while doing it is a manual check.
+     * Every locked door: the right key opens it, no key and the wrong key do not. What they look
+     * like while doing it is a manual check.
      */
     private static void lockedDoorsOpenOnlyWithTheRightKey(GameTestHelper helper) {
         Block[] doors = StorageBlocks.lockedDoors();
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+
+        // spread() lays out a 5x5 grid, and each door is two blocks tall, so 25 is all the 9x9x9
+        // test box holds. A 26th would be written outside it and silently fail to place.
+        helper.assertTrue(doors.length <= 25, doors.length + " locked doors no longer fit the test box; give this test its own layout");
 
         for (int i = 0; i < doors.length; i++) {
             Block door = doors[i];

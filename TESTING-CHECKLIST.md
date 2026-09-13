@@ -15,7 +15,13 @@ Run each list on **both** NeoForge and Fabric.
 - [ ] A bag works in a container slot
 
 ## Locks and keys
-- [ ] None of the 14 locked doors draw solid
+- [ ] None of the 25 locked doors draw solid
+- [ ] A padlock on each of the eight copper doors keeps that door's own oxidation and waxing, and
+      shift-clicking the lock off gives back the door at whatever stage it has reached
+- [ ] A locked copper door left alone oxidises to the next stage, both halves together, still locked
+      and with no padlock dropped
+- [ ] An axe scrapes a locked copper door back a stage and a honeycomb waxes it, both keeping the
+      lock; a locked waxed copper door never oxidises
 - [ ] Locked barrel, hopper and crate controller show their padlocked face
 - [ ] A locked barrel item shows its padlock, and an unlocked one does not
 - [ ] The key ring opens a locked door
@@ -30,6 +36,8 @@ Run each list on **both** NeoForge and Fabric.
       each open
 - [ ] Their item forms render as the block in hand, inventory and on the ground
 - [ ] Warehouse crates (every wood) open, and show their contents on the front
+- [ ] The cherry, pale oak and bamboo crates, warehouse crates and locked doors read as their wood
+      beside the other nine (their textures are derived, not hand-drawn)
 - [ ] Locked chest, ender chest and shulker box open and render correctly
 - [ ] Item tower shelf offsets and part-picking models look right
 - [ ] A locked shulker box item shows its colour

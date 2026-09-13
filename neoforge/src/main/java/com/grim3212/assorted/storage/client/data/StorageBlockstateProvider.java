@@ -8,6 +8,7 @@ import com.grim3212.assorted.storage.api.crates.CrateLayout;
 import com.grim3212.assorted.storage.client.blockentity.item.ItemTowerSpecialRenderer;
 import com.grim3212.assorted.storage.client.blockentity.item.LockedChestSpecialRenderer;
 import com.grim3212.assorted.storage.client.blockentity.item.LockedShulkerBoxSpecialRenderer;
+import com.grim3212.assorted.storage.client.blockentity.WarehouseCrateBlockEntityRenderer;
 import com.grim3212.assorted.storage.client.blockentity.item.StorageSpecialRenderer;
 import com.grim3212.assorted.storage.client.model.StorageModelType;
 import com.grim3212.assorted.storage.client.model.StorageModels;
@@ -48,6 +49,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.neoforge.client.model.generators.template.ElementBuilder;
 import net.neoforged.neoforge.client.model.generators.template.ExtendedModelTemplateBuilder;
@@ -108,15 +110,7 @@ public class StorageBlockstateProvider extends ModelProvider {
         particle(StorageBlocks.OBSIDIAN_SAFE.get(), Identifier.parse("block/obsidian"));
         particle(StorageBlocks.LOCKER.get(), Identifier.parse("block/iron_block"));
         particle(StorageBlocks.ITEM_TOWER.get(), Identifier.parse("block/iron_block"));
-        particle(StorageBlocks.OAK_WAREHOUSE_CRATE.get(), Identifier.parse("block/oak_log_top"));
-        particle(StorageBlocks.BIRCH_WAREHOUSE_CRATE.get(), Identifier.parse("block/birch_log_top"));
-        particle(StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get(), Identifier.parse("block/spruce_log_top"));
-        particle(StorageBlocks.ACACIA_WAREHOUSE_CRATE.get(), Identifier.parse("block/acacia_log_top"));
-        particle(StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get(), Identifier.parse("block/dark_oak_log_top"));
-        particle(StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get(), Identifier.parse("block/jungle_log_top"));
-        particle(StorageBlocks.WARPED_WAREHOUSE_CRATE.get(), Identifier.parse("block/warped_stem_top"));
-        particle(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get(), Identifier.parse("block/crimson_stem_top"));
-        particle(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get(), Identifier.parse("block/mangrove_log_top"));
+        StorageBlocks.WAREHOUSE_CRATES.forEach((wood, crate) -> particle(crate.get(), Identifier.parse("block/" + wood.getLogTopTextureName())));
         particle(StorageBlocks.LOCKED_CHEST.get(), Identifier.parse("block/oak_planks"));
         particle(StorageBlocks.LOCKED_SHULKER_BOX.get(), Identifier.parse("block/shulker_box"));
 
@@ -136,15 +130,7 @@ public class StorageBlockstateProvider extends ModelProvider {
         special(StorageBlocks.OBSIDIAN_SAFE.get(), StorageModelType.SAFE, modelTexture("obsidian_safe"));
         special(StorageBlocks.LOCKER.get(), StorageModelType.LOCKER, modelTexture("locker"));
         special(StorageBlocks.LOCKED_ENDER_CHEST.get(), StorageModelType.CHEST, modelTexture("locked_ender_chest"));
-        special(StorageBlocks.OAK_WAREHOUSE_CRATE.get(), StorageModelType.WAREHOUSE_CRATE, modelTexture("warehouse_crate/oak"));
-        special(StorageBlocks.BIRCH_WAREHOUSE_CRATE.get(), StorageModelType.WAREHOUSE_CRATE, modelTexture("warehouse_crate/birch"));
-        special(StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get(), StorageModelType.WAREHOUSE_CRATE, modelTexture("warehouse_crate/spruce"));
-        special(StorageBlocks.ACACIA_WAREHOUSE_CRATE.get(), StorageModelType.WAREHOUSE_CRATE, modelTexture("warehouse_crate/acacia"));
-        special(StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get(), StorageModelType.WAREHOUSE_CRATE, modelTexture("warehouse_crate/dark_oak"));
-        special(StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get(), StorageModelType.WAREHOUSE_CRATE, modelTexture("warehouse_crate/jungle"));
-        special(StorageBlocks.WARPED_WAREHOUSE_CRATE.get(), StorageModelType.WAREHOUSE_CRATE, modelTexture("warehouse_crate/warped"));
-        special(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get(), StorageModelType.WAREHOUSE_CRATE, modelTexture("warehouse_crate/crimson"));
-        special(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get(), StorageModelType.WAREHOUSE_CRATE, modelTexture("warehouse_crate/mangrove"));
+        StorageBlocks.WAREHOUSE_CRATES.forEach((wood, crate) -> special(crate.get(), StorageModelType.WAREHOUSE_CRATE, WarehouseCrateBlockEntityRenderer.texture(wood)));
 
         this.specialItems.put(StorageBlocks.ITEM_TOWER.get(), new ItemTowerSpecialRenderer.Unbaked());
 
@@ -264,11 +250,23 @@ public class StorageBlockstateProvider extends ModelProvider {
     }
 
     /**
+     * Which other locked door a door takes its textures from. A waxed copper door looks exactly like
+     * the unwaxed one of the same oxidation stage - vanilla shares those textures too - so only the
+     * four unwaxed locked copper doors ship a png.
+     */
+    private static final Map<Block, Block> DOOR_TEXTURE_SOURCE = new HashMap<>();
+
+    static {
+        Blocks.COPPER_DOOR.zipUnwaxedWaxed((unwaxed, waxed) ->
+                DOOR_TEXTURE_SOURCE.put(StorageBlocks.VANILLA_DOORS.get(waxed).get(), StorageBlocks.VANILLA_DOORS.get(unwaxed).get()));
+    }
+
+    /**
      * A locked door's block state and models. The doors have no item, so vanilla's {@code
      * createDoor}, which also writes an item model, cannot be used.
      */
     private void door(BlockModelGenerators blockModels, Block door) {
-        TextureMapping mapping = TextureMapping.door(door);
+        TextureMapping mapping = TextureMapping.door(DOOR_TEXTURE_SOURCE.getOrDefault(door, door));
         MultiVariant bottomLeft = BlockModelGenerators.plainVariant(ModelTemplates.DOOR_BOTTOM_LEFT.create(door, mapping, blockModels.modelOutput));
         MultiVariant bottomLeftOpen = BlockModelGenerators.plainVariant(ModelTemplates.DOOR_BOTTOM_LEFT_OPEN.create(door, mapping, blockModels.modelOutput));
         MultiVariant bottomRight = BlockModelGenerators.plainVariant(ModelTemplates.DOOR_BOTTOM_RIGHT.create(door, mapping, blockModels.modelOutput));

@@ -10,6 +10,7 @@ import com.grim3212.assorted.lib.platform.Services;
 import java.io.BufferedReader;
 import java.io.IOException;
 import com.grim3212.assorted.storage.Constants;
+import com.grim3212.assorted.storage.api.Wood;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.handlers.StorageCreativeItems;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,11 +19,13 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static com.grim3212.assorted.lib.test.TestSupport.*;
 import static com.grim3212.assorted.storage.gametest.StorageTestSupport.*;
@@ -41,6 +44,69 @@ final class AssetTests {
         out.accept("loader_models_are_read_on_both_loaders", AssetTests::loaderModelsAreReadOnBothLoaders);
         out.accept("every_recipe_loads_or_is_conditioned_off", AssetTests::everyRecipeLoadsOrIsConditionedOff);
         out.accept("every_item_tag_has_a_name", AssetTests::everyItemTagHasAName);
+        out.accept("every_vanilla_wood_has_a_family", AssetTests::everyVanillaWoodHasAFamily);
+        out.accept("every_locked_door_has_its_textures", AssetTests::everyLockedDoorHasItsTextures);
+    }
+
+    /**
+     * Every vanilla {@link WoodType} is a {@link Wood}, and every {@code Wood} ships the two crate
+     * textures that are drawn by hand rather than generated. Vanilla adding a wood is otherwise
+     * silent: the missing crates simply never exist, which is how cherry, pale oak and bamboo went
+     * unnoticed. The blocks themselves are covered by {@code everyBlockAndItemHasAModelAndAName},
+     * which sees whatever {@code Wood} lists.
+     */
+    private static void everyVanillaWoodHasAFamily(GameTestHelper helper) {
+        List<String> missing = new ArrayList<>();
+
+        WoodType.values().filter(type -> Stream.of(Wood.values()).noneMatch(wood -> wood.getType() == type))
+                .forEach(type -> missing.add("vanilla wood " + type.name() + " has no Wood entry"));
+
+        for (Wood wood : Wood.values()) {
+            if (!resourceExists("/assets/" + Constants.MOD_ID + "/textures/block/crates/" + wood + "_facing.png")) {
+                missing.add("crate facing texture for " + wood);
+            }
+            if (!resourceExists("/assets/" + Constants.MOD_ID + "/textures/model/warehouse_crate/" + wood + ".png")) {
+                missing.add("warehouse crate texture for " + wood);
+            }
+        }
+
+        helper.assertTrue(missing.isEmpty(), missing.size() + " incomplete wood familie(s): " + String.join(", ", missing));
+        helper.succeed();
+    }
+
+    /**
+     * Every locked door's generated model names two textures that are actually in the jar. A texture
+     * a model asks for and does not get draws as the missing-texture checkerboard, which is the only
+     * warning there is; this reads the model rather than guessing the path, so the waxed copper doors
+     * pointing at the unwaxed pngs is checked rather than assumed.
+     */
+    private static void everyLockedDoorHasItsTextures(GameTestHelper helper) {
+        List<String> missing = new ArrayList<>();
+
+        for (Block door : StorageBlocks.lockedDoors()) {
+            JsonObject model = json("/assets/" + Constants.MOD_ID + "/models/block/" + name(door) + "_bottom_left.json");
+            if (model == null) {
+                missing.add(name(door) + " has no bottom model");
+                continue;
+            }
+
+            JsonObject textures = model.getAsJsonObject("textures");
+            for (String slot : new String[]{"bottom", "top"}) {
+                String texture = string(textures, slot);
+                if (texture == null) {
+                    missing.add(name(door) + " names no " + slot + " texture");
+                    continue;
+                }
+
+                Identifier id = Identifier.parse(texture);
+                if (!resourceExists("/assets/" + id.getNamespace() + "/textures/" + id.getPath() + ".png")) {
+                    missing.add(name(door) + " " + slot + " points at " + texture + ", which is not in the jar");
+                }
+            }
+        }
+
+        helper.assertTrue(missing.isEmpty(), missing.size() + " door texture problem(s): " + String.join(", ", missing));
+        helper.succeed();
     }
 
     /** Every block and item has a model and a name. Every gap is reported at once. */

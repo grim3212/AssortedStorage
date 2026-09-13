@@ -4,10 +4,13 @@
     "assortedstorage:spruce_crate_quadruple",
     "assortedstorage:birch_crate_quadruple",
     "assortedstorage:acacia_crate_quadruple",
+    "assortedstorage:cherry_crate_quadruple",
     "assortedstorage:jungle_crate_quadruple",
     "assortedstorage:dark_oak_crate_quadruple",
+    "assortedstorage:pale_oak_crate_quadruple",
     "assortedstorage:crimson_crate_quadruple",
     "assortedstorage:warped_crate_quadruple",
-    "assortedstorage:mangrove_crate_quadruple"
+    "assortedstorage:mangrove_crate_quadruple",
+    "assortedstorage:bamboo_crate_quadruple"
   ]
 }

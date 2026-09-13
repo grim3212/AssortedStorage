@@ -1,0 +1,22 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "assortedlib:part_enabled",
+      "part": "crates"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "#c:chests/wooden",
+    "D": "#c:deepslate",
+    "L": "#minecraft:cherry_logs"
+  },
+  "pattern": [
+    " D ",
+    "LCL",
+    "CDC"
+  ],
+  "result": {
+    "id": "assortedstorage:cherry_crate_triple"
+  }
+}

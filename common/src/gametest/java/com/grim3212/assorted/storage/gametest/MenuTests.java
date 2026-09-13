@@ -3,6 +3,7 @@ package com.grim3212.assorted.storage.gametest;
 import com.grim3212.assorted.lib.core.inventory.IMenuDataProvider;
 import com.grim3212.assorted.lib.core.inventory.MenuData;
 import com.grim3212.assorted.storage.api.StorageMaterial;
+import com.grim3212.assorted.storage.api.Wood;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
@@ -82,7 +83,7 @@ final class MenuTests {
      */
     private static void plainMenusRebuildOnTheClient(GameTestHelper helper) {
         ServerPlayer player = survivalPlayer(helper, ItemStack.EMPTY);
-        List<Block> blocks = List.of(StorageBlocks.WOOD_CABINET.get(), StorageBlocks.GLASS_CABINET.get(), StorageBlocks.OAK_WAREHOUSE_CRATE.get(),
+        List<Block> blocks = List.of(StorageBlocks.WOOD_CABINET.get(), StorageBlocks.GLASS_CABINET.get(), StorageBlocks.WAREHOUSE_CRATES.get(Wood.OAK).get(),
                 StorageBlocks.GOLD_SAFE.get(), StorageBlocks.OBSIDIAN_SAFE.get(), StorageBlocks.LOCKER.get(), StorageBlocks.LOCKSMITH_WORKBENCH.get());
 
         for (int i = 0; i < blocks.size(); i++) {

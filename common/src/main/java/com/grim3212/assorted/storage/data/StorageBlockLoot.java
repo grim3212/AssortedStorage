@@ -41,15 +41,10 @@ public class StorageBlockLoot extends LibBlockLootProvider {
         blocks.add(StorageBlocks.LOCKER.get());
         blocks.add(StorageBlocks.ITEM_TOWER.get());
         blocks.add(StorageBlocks.LOCKSMITH_WORKBENCH.get());
-        blocks.add(StorageBlocks.OAK_WAREHOUSE_CRATE.get());
-        blocks.add(StorageBlocks.BIRCH_WAREHOUSE_CRATE.get());
-        blocks.add(StorageBlocks.SPRUCE_WAREHOUSE_CRATE.get());
-        blocks.add(StorageBlocks.ACACIA_WAREHOUSE_CRATE.get());
-        blocks.add(StorageBlocks.DARK_OAK_WAREHOUSE_CRATE.get());
-        blocks.add(StorageBlocks.JUNGLE_WAREHOUSE_CRATE.get());
-        blocks.add(StorageBlocks.WARPED_WAREHOUSE_CRATE.get());
-        blocks.add(StorageBlocks.CRIMSON_WAREHOUSE_CRATE.get());
-        blocks.add(StorageBlocks.MANGROVE_WAREHOUSE_CRATE.get());
+
+        for (IRegistryObject<WarehouseCrateBlock> b : StorageBlocks.WAREHOUSE_CRATES.values()) {
+            blocks.add(b.get());
+        }
 
         blocks.add(StorageBlocks.CRATE_COMPACTING.get());
         blocks.add(StorageBlocks.CRATE_CONTROLLER.get());
@@ -92,16 +87,8 @@ public class StorageBlockLoot extends LibBlockLootProvider {
             this.add(b.get(), createLockedShulkerTable(b.get()));
         }
 
-        this.add(StorageBlocks.LOCKED_IRON_DOOR.get(), createLockedDoorTable(StorageBlocks.LOCKED_IRON_DOOR.get(), Blocks.IRON_DOOR));
-        this.add(StorageBlocks.LOCKED_OAK_DOOR.get(), createLockedDoorTable(StorageBlocks.LOCKED_OAK_DOOR.get(), Blocks.OAK_DOOR));
-        this.add(StorageBlocks.LOCKED_SPRUCE_DOOR.get(), createLockedDoorTable(StorageBlocks.LOCKED_SPRUCE_DOOR.get(), Blocks.SPRUCE_DOOR));
-        this.add(StorageBlocks.LOCKED_BIRCH_DOOR.get(), createLockedDoorTable(StorageBlocks.LOCKED_BIRCH_DOOR.get(), Blocks.BIRCH_DOOR));
-        this.add(StorageBlocks.LOCKED_ACACIA_DOOR.get(), createLockedDoorTable(StorageBlocks.LOCKED_ACACIA_DOOR.get(), Blocks.ACACIA_DOOR));
-        this.add(StorageBlocks.LOCKED_JUNGLE_DOOR.get(), createLockedDoorTable(StorageBlocks.LOCKED_JUNGLE_DOOR.get(), Blocks.JUNGLE_DOOR));
-        this.add(StorageBlocks.LOCKED_DARK_OAK_DOOR.get(), createLockedDoorTable(StorageBlocks.LOCKED_DARK_OAK_DOOR.get(), Blocks.DARK_OAK_DOOR));
-        this.add(StorageBlocks.LOCKED_CRIMSON_DOOR.get(), createLockedDoorTable(StorageBlocks.LOCKED_CRIMSON_DOOR.get(), Blocks.CRIMSON_DOOR));
-        this.add(StorageBlocks.LOCKED_MANGROVE_DOOR.get(), createLockedDoorTable(StorageBlocks.LOCKED_MANGROVE_DOOR.get(), Blocks.MANGROVE_DOOR));
-        this.add(StorageBlocks.LOCKED_WARPED_DOOR.get(), createLockedDoorTable(StorageBlocks.LOCKED_WARPED_DOOR.get(), Blocks.WARPED_DOOR));
+        // Every locked door drops the vanilla door it stands in for, the one the padlock was put on.
+        StorageBlocks.VANILLA_DOORS.forEach((door, locked) -> this.add(locked.get(), createLockedDoorTable(locked.get(), door)));
 
         this.add(StorageBlocks.LOCKED_STEEL_DOOR.get(), createDecorTable(StorageBlocks.LOCKED_STEEL_DOOR.get(), Identifier.parse("assorteddecor:steel_door")));
         this.add(StorageBlocks.LOCKED_CHAIN_LINK_DOOR.get(), createDecorTable(StorageBlocks.LOCKED_CHAIN_LINK_DOOR.get(), Identifier.parse("assorteddecor:chain_link_door")));

@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "assortedlib:part_enabled",
+      "part": "crates"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "#c:chests/wooden",
+    "D": "#c:deepslate",
+    "L": "#minecraft:pale_oak_logs"
+  },
+  "pattern": [
+    " D ",
+    "LCL",
+    "CDC"
+  ],
+  "result": {
+    "id": "assortedstorage:pale_oak_crate_triple"
+  }
+}
