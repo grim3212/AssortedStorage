@@ -107,12 +107,22 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
         this.modelDataUpdate();
     }
 
+    /**
+     * Re-renders the lock. The block update is not client-only: on a server it is what puts the
+     * block entity's new data on the wire, and without it a block someone else locked kept looking
+     * unlocked to every other player.
+     */
     protected void modelDataUpdate() {
         Level level = this.getLevel();
-        if (level != null && level.isClientSide()) {
-            ClientServices.MODELS.requestModelDataRefresh(this);
-            this.level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
+        if (level == null) {
+            return;
         }
+
+        if (level.isClientSide()) {
+            ClientServices.MODELS.requestModelDataRefresh(this);
+        }
+
+        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
     }
 
     @Override

@@ -54,6 +54,17 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
         return slotContents;
     }
 
+    /**
+     * Puts an upgrade in an enhancement slot. The block update is what sends the crate's new
+     * enhancements to every client that can see it; the renderer draws them straight off that list,
+     * so a crate upgraded without this only changed for the player who upgraded it.
+     */
+    public void setEnhancement(int index, ItemStack stack) {
+        this.enhancements.set(index, stack);
+        this.inv.setChanged();
+        this.inv.modelUpdate();
+    }
+
     public ItemStack removeEnhancement(int index, int count) {
         ItemStack stack = ContainerHelper.removeItem(this.enhancements, index, count);
         if (!stack.isEmpty()) {

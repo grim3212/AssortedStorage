@@ -8,12 +8,12 @@ import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import com.grim3212.assorted.storage.common.item.PadlockItem;
 import com.grim3212.assorted.storage.common.item.upgrades.LevelUpgradeItem;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class StorageEvents {
@@ -34,40 +34,30 @@ public class StorageEvents {
         BlockPos pos = hitResult.getBlockPos();
 
         if (stack.getItem() instanceof LevelUpgradeItem) {
-            BlockEntity entity = level.getBlockEntity(pos);
-            if (entity instanceof CrateBlockEntity crate) {
-                int firstEmptySlot = (crate.getItemStackStorageHandler().getEnhancements().subList(1, crate.getItemStackStorageHandler().getEnhancements().size()).indexOf(ItemStack.EMPTY) + 1);
-                // The 0 slot is for Padlocks only
+            if (level.getBlockEntity(pos) instanceof CrateBlockEntity crate) {
+                int firstEmptySlot = firstEmptyUpgradeSlot(crate);
                 if (firstEmptySlot > 0) {
-                    crate.getItemStackStorageHandler().getEnhancements().set(firstEmptySlot, stack.copyWithCount(1));
-                    stack.shrink(1);
-                    return InteractionResult.SUCCESS;
+                    return install(level, crate, firstEmptySlot, stack);
                 }
             }
 
             return InteractionResult.PASS;
         } else if (stack.getItem() instanceof PadlockItem) {
-            BlockEntity entity = level.getBlockEntity(pos);
-            if (entity instanceof CrateBlockEntity crate) {
+            if (level.getBlockEntity(pos) instanceof CrateBlockEntity crate) {
                 if (!crate.isLocked() && StorageUtil.hasCode(stack)) {
-                    crate.getItemStackStorageHandler().getEnhancements().set(0, stack.copyWithCount(1));
-                    stack.shrink(1);
-                    return InteractionResult.SUCCESS;
+                    // The 0 slot is for Padlocks only
+                    return install(level, crate, 0, stack);
                 }
             }
 
             return InteractionResult.PASS;
         } else if (stack.getItem() instanceof ICrateUpgrade) {
-            BlockEntity entity = level.getBlockEntity(pos);
-            if (entity instanceof CrateBlockEntity crate) {
-                int firstEmptySlot = (crate.getItemStackStorageHandler().getEnhancements().subList(1, crate.getItemStackStorageHandler().getEnhancements().size()).indexOf(ItemStack.EMPTY) + 1);
-                // The 0 slot is for Padlocks only
+            if (level.getBlockEntity(pos) instanceof CrateBlockEntity crate) {
+                int firstEmptySlot = firstEmptyUpgradeSlot(crate);
                 if (firstEmptySlot > 0) {
                     boolean alreadyExists = crate.getItemStackStorageHandler().getEnhancements().stream().anyMatch(slotStack -> slotStack.getItem() == stack.getItem());
                     if (!alreadyExists) {
-                        crate.getItemStackStorageHandler().getEnhancements().set(firstEmptySlot, stack.copyWithCount(1));
-                        stack.shrink(1);
-                        return InteractionResult.SUCCESS;
+                        return install(level, crate, firstEmptySlot, stack);
                     }
                 }
             }
@@ -75,5 +65,25 @@ public class StorageEvents {
         }
 
         return InteractionResult.PASS;
+    }
+
+    /** The first free upgrade slot, or 0 - the padlock's own slot, never free to an upgrade - when there is none. */
+    private static int firstEmptyUpgradeSlot(CrateBlockEntity crate) {
+        NonNullList<ItemStack> enhancements = crate.getItemStackStorageHandler().getEnhancements();
+        return enhancements.subList(1, enhancements.size()).indexOf(ItemStack.EMPTY) + 1;
+    }
+
+    /**
+     * Only the server fits the upgrade, through the handler that sends the crate on to every client
+     * that can see it. A client writing to its own copy instead is what made an upgrade show up for
+     * the player who placed it and nobody else.
+     */
+    private static InteractionResult install(Level level, CrateBlockEntity crate, int slot, ItemStack stack) {
+        if (!level.isClientSide()) {
+            crate.getItemStackStorageHandler().setEnhancement(slot, stack.copyWithCount(1));
+        }
+
+        stack.shrink(1);
+        return InteractionResult.SUCCESS;
     }
 }

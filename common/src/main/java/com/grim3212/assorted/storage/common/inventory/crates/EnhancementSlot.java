@@ -45,16 +45,14 @@ public class EnhancementSlot extends SlotStorageHandler {
     @Override
     public void set(ItemStack stack) {
         if (this.getItemHandler() instanceof CrateSidedInv crate) {
-            crate.getEnhancements().set(this.getContainerSlot(), stack);
-            this.setChanged();
+            crate.setEnhancement(this.getContainerSlot(), stack);
         }
     }
 
     @Override
     public void setByPlayer(ItemStack stack) {
         if (this.getItemHandler() instanceof CrateSidedInv crate) {
-            crate.getEnhancements().set(this.getContainerSlot(), stack);
-            this.setChanged();
+            crate.setEnhancement(this.getContainerSlot(), stack);
         }
     }
 

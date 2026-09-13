@@ -162,8 +162,14 @@ public class CrateBlockEntity extends BlockEntity implements IMenuDataProvider<B
         }
     }
 
+    /**
+     * Re-renders the crate. On a server the block update is also what puts the crate's new block
+     * entity data - its lock and its upgrades - on the wire for every player who can see it.
+     */
     public void modelUpdate() {
-        this.level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
+        if (this.level != null) {
+            this.level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
+        }
     }
 
     @Override

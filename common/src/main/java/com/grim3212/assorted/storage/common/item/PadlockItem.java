@@ -320,7 +320,11 @@ public class PadlockItem extends CombinationItem {
 
             BlockState newState = newDoor.defaultBlockState().setValue(DoorBlock.FACING, currentDoor.getValue(DoorBlock.FACING)).setValue(DoorBlock.OPEN, currentDoor.getValue(DoorBlock.OPEN)).setValue(DoorBlock.HINGE, currentDoor.getValue(DoorBlock.HINGE));
             DoubleBlockHalf currentHalf = currentDoor.getValue(DoorBlock.HALF);
-            worldIn.setBlock(pos, newState.setValue(DoorBlock.HALF, currentHalf), Block.UPDATE_KNOWN_SHAPE);
+            // UPDATE_KNOWN_SHAPE keeps the clicked half from asking its partner, which is still the
+            // door the padlock went on, whether it should stay. It carries no UPDATE_CLIENTS of its
+            // own, though, so this half has to be told to send itself: without that the padlock
+            // reached other players on one half of the door only.
+            worldIn.setBlock(pos, newState.setValue(DoorBlock.HALF, currentHalf), Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
             if (currentHalf == DoubleBlockHalf.UPPER) {
                 worldIn.setBlock(pos.below(), newState.setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER), Block.UPDATE_ALL);
             } else {

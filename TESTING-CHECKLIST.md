@@ -29,7 +29,11 @@ Run each list on **both** NeoForge and Fabric.
 - [ ] Breaking a locked chest, crate, locker and door drops the contents once and the padlock once
 - [ ] A hopper or pipe pulls from a locked chest, crate and locker
 - [ ] On a dedicated server, a barrel, hopper or crate controller locked by one player shows its
-      padlock to a second player
+      padlock to a second player, as do a cabinet, safe, locker and item tower
+- [ ] On a dedicated server, an upgrade a player right-clicks onto a crate shows on its face for
+      a second player without them opening it
+- [ ] On a dedicated server, a door and a double locker a player locks show as locked to a second
+      player on *both* halves, and unlocking clears both
 
 ## Storage blocks
 - [ ] Locker, double locker, wood cabinet, glass cabinet, gold safe, obsidian safe and item tower

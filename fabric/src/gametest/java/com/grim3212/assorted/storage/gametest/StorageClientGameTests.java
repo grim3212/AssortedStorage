@@ -9,6 +9,7 @@ import com.grim3212.assorted.storage.client.blockentity.state.CrateRenderState;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateCompactingBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.WoodCabinetBlockEntity;
 import com.grim3212.assorted.storage.common.inventory.crates.CompactingCrateInventory;
 import com.grim3212.assorted.storage.common.inventory.crates.CrateSidedInv;
 import com.grim3212.assorted.storage.common.item.StorageItems;
@@ -34,12 +35,14 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
@@ -47,6 +50,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.lang.reflect.Proxy;
@@ -70,6 +77,8 @@ public class StorageClientGameTests implements FabricClientGameTest {
             crateRendersFromItsState(context, world);
             crateScreenShowsItsFace(context, world);
             compactingCrateTiersReachTheClient(context, world);
+            blockEntityChangesReachOtherClients(context, world);
+            lockedDoorsReachOtherClientsWhole(context, world);
         }
     }
 
@@ -276,6 +285,111 @@ public class StorageClientGameTests implements FabricClientGameTest {
             check(compactor.getMaxStackSizeForSlot(2) > 0, "the client's compactor reports no capacity for the nugget tier");
             check(compactor.getMaxStackSizeForSlot(1) > 0, "the client's compactor reports no capacity for the ingot tier");
         });
+    }
+
+    /**
+     * Locking a block and fitting a crate upgrade both live only in the block entity, so nothing
+     * about the block changes and vanilla broadcasts nothing of its own accord. This client never
+     * runs either interaction - the server does it for its own player - which is the position every
+     * other player's client is in, and where both changes used to stop.
+     */
+    private static void blockEntityChangesReachOtherClients(ClientGameTestContext context, TestSingleplayerContext world) {
+        BlockPos cabinet = placeOnServer(world, StorageBlocks.WOOD_CABINET.get(), 4, 2);
+        BlockPos crate = placeOnServer(world, oakCrate(), 4, 4);
+        context.waitFor(client -> client.level != null
+                && client.level.getBlockEntity(cabinet) instanceof WoodCabinetBlockEntity
+                && client.level.getBlockEntity(crate) instanceof CrateBlockEntity, 100);
+
+        world.getServer().runOnServer(server -> {
+            ServerPlayer player = player(server);
+            rightClickOnServer(player, cabinet, StorageUtil.setCodeOnStack("1234", new ItemStack(StorageItems.LOCKSMITH_LOCK.get())));
+            rightClickOnServer(player, crate, new ItemStack(StorageItems.AMOUNT_UPGRADE.get()));
+        });
+
+        // The server has to have made both changes, or this test would pass on the server doing
+        // nothing at all.
+        world.getServer().runOnServer(server -> {
+            ServerLevel level = player(server).level();
+            check(((WoodCabinetBlockEntity) level.getBlockEntity(cabinet)).isLocked(), "the server did not lock the cabinet");
+            check(hasAmountUpgrade(level.getBlockEntity(crate)), "the server did not fit the crate upgrade");
+        });
+
+        try {
+            context.waitFor(client -> client.level.getBlockEntity(cabinet) instanceof WoodCabinetBlockEntity locked && locked.isLocked()
+                    && hasAmountUpgrade(client.level.getBlockEntity(crate)), 100);
+        } catch (AssertionError timedOut) {
+            String seen = context.computeOnClient(client -> "cabinet locked " + ((WoodCabinetBlockEntity) client.level.getBlockEntity(cabinet)).isLocked()
+                    + ", " + describeCrate(client.level.getBlockEntity(crate)));
+            throw new AssertionError("a lock and an upgrade the server made never reached this client: " + seen, timedOut);
+        }
+    }
+
+    /**
+     * Both halves of a door, not only the one the padlock was clicked on. That half is swapped with
+     * UPDATE_KNOWN_SHAPE, so it does not ask its still-vanilla partner whether it should stay - and
+     * that flag carries no UPDATE_CLIENTS, so it was never sent. A client that did not run the
+     * interaction saw half a locked door and half a plain one.
+     */
+    private static void lockedDoorsReachOtherClientsWhole(ClientGameTestContext context, TestSingleplayerContext world) {
+        Block locked = StorageBlocks.VANILLA_DOORS.get(Blocks.OAK_DOOR).get();
+
+        BlockPos lower = world.getServer().computeOnServer(server -> {
+            ServerPlayer player = player(server);
+            ServerLevel level = player.level();
+            BlockPos at = player.blockPosition().offset(6, 0, 2);
+            // A door needs something to stand on, and the world this runs in is ordinary terrain.
+            level.setBlockAndUpdate(at.below(), Blocks.STONE.defaultBlockState());
+            level.setBlockAndUpdate(at, Blocks.OAK_DOOR.defaultBlockState().setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER));
+            level.setBlockAndUpdate(at.above(), Blocks.OAK_DOOR.defaultBlockState().setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER));
+            return at;
+        });
+        context.waitFor(client -> client.level != null && client.level.getBlockState(lower).is(Blocks.OAK_DOOR)
+                && client.level.getBlockState(lower.above()).is(Blocks.OAK_DOOR), 100);
+
+        world.getServer().runOnServer(server -> {
+            ServerPlayer player = player(server);
+            // A door answers a plain right click by opening, so the padlock only reaches its own
+            // useOn when the block's use is suppressed - which is to say while sneaking, the way one
+            // is fitted in game.
+            player.setShiftKeyDown(true);
+            rightClickOnServer(player, lower, StorageUtil.setCodeOnStack("1234", new ItemStack(StorageItems.LOCKSMITH_LOCK.get())));
+            player.setShiftKeyDown(false);
+        });
+        world.getServer().runOnServer(server -> {
+            ServerLevel level = player(server).level();
+            check(level.getBlockState(lower).is(locked) && level.getBlockState(lower.above()).is(locked),
+                    "the server did not lock both halves: lower " + level.getBlockState(lower).getBlock() + ", upper " + level.getBlockState(lower.above()).getBlock());
+        });
+
+        try {
+            context.waitFor(client -> client.level.getBlockState(lower).is(locked)
+                    && client.level.getBlockState(lower.above()).is(locked), 100);
+        } catch (AssertionError timedOut) {
+            String seen = context.computeOnClient(client -> "lower " + client.level.getBlockState(lower).getBlock()
+                    + ", upper " + client.level.getBlockState(lower.above()).getBlock());
+            throw new AssertionError("a door the server locked reached this client as " + seen, timedOut);
+        }
+    }
+
+    private static boolean hasAmountUpgrade(Object blockEntity) {
+        return blockEntity instanceof CrateBlockEntity crate
+                && crate.getItemStackStorageHandler().getEnhancements().stream().anyMatch(stack -> stack.is(StorageItems.AMOUNT_UPGRADE.get()));
+    }
+
+    private static BlockPos placeOnServer(TestSingleplayerContext world, Block block, int dx, int dz) {
+        return world.getServer().computeOnServer(server -> {
+            ServerPlayer player = player(server);
+            BlockPos at = player.blockPosition().offset(dx, 0, dz);
+            player.level().setBlockAndUpdate(at, block.defaultBlockState());
+            return at;
+        });
+    }
+
+    /** A right click on the top of {@code pos}, through the game mode, so the loader's use-block event runs. */
+    private static void rightClickOnServer(ServerPlayer player, BlockPos pos, ItemStack held) {
+        player.setItemInHand(InteractionHand.MAIN_HAND, held);
+        BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(pos).relative(Direction.UP, 0.5D), Direction.UP, pos, false);
+        player.gameMode.useItemOn(player, player.level(), held, InteractionHand.MAIN_HAND, hit);
     }
 
     private record Opened(int containerId, Class<?> type, int slots) {
