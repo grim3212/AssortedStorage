@@ -9,11 +9,9 @@ import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import java.util.Optional;
 
 /**
- * Curios 16.0.0+26.2 dropped {@code LazyOptional} along with NeoForge: {@code getCuriosInventory}
- * hands back a plain {@link Optional} now. The walk over {@code getEquippedCurios()} is gone too -
- * that returns an {@code IItemHandlerModifiable}, which is {@code @Deprecated(forRemoval)} in 26.2 -
- * so the search goes through {@code findCurios(Predicate)}, which is the API's own way of asking the
- * same question and returns the equipped stacks directly.
+ * The search goes through the API's own {@code findCurios(Predicate)} rather than a walk over
+ * {@code getEquippedCurios()}, which hands back an {@code IItemHandlerModifiable} - deprecated for
+ * removal in 26.2.
  */
 public class CuriosHelper {
 

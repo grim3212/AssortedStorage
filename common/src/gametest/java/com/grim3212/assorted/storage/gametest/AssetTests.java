@@ -51,9 +51,8 @@ final class AssetTests {
     /**
      * Every vanilla {@link WoodType} is a {@link Wood}, and every {@code Wood} ships the two crate
      * textures that are drawn by hand rather than generated. Vanilla adding a wood is otherwise
-     * silent: the missing crates simply never exist, which is how cherry, pale oak and bamboo went
-     * unnoticed. The blocks themselves are covered by {@code everyBlockAndItemHasAModelAndAName},
-     * which sees whatever {@code Wood} lists.
+     * silent: the missing crates simply never exist. The blocks themselves are covered by
+     * {@code everyBlockAndItemHasAModelAndAName}, which sees whatever {@code Wood} lists.
      */
     private static void everyVanillaWoodHasAFamily(GameTestHelper helper) {
         List<String> missing = new ArrayList<>();

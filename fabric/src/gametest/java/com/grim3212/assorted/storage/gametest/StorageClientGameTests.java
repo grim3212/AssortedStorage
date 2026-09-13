@@ -178,11 +178,9 @@ public class StorageClientGameTests implements FabricClientGameTest {
     /**
      * The crate screen draws the crate's face, not the three-quarter view an item icon gets: the
      * slots it draws on top belong to that face. Only the model identity says which view was asked
-     * for - a layer's transform can be set but never read back - and that identity is also what
-     * keeps this drawing apart from the crate's own inventory icon in the GUI item atlas.
-     *
-     * The lock buttons are checked here too, because a sprite that is not in the atlas draws as the
-     * missing texture and nothing is logged.
+     * for - a layer's transform can be set but never read back - and it is also what keeps this
+     * drawing apart from the crate's inventory icon in the GUI item atlas. The lock buttons are
+     * checked here too, since a sprite missing from the atlas draws as the missing texture silently.
      */
     private static void crateScreenShowsItsFace(ClientGameTestContext context, TestSingleplayerContext world) {
         BlockPos pos = world.getServer().computeOnServer(server -> {

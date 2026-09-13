@@ -44,10 +44,9 @@ public class AssortedStorageFabric implements ModInitializer {
     }
 
     /**
-     * Tells Fabric how the locked copper doors scrape back with an axe and wax with a honeycomb.
-     * Oxidising over time is {@code LockedCopperDoorBlock}'s own random tick and does not read this;
-     * scraping and waxing are vanilla's item code, which does. NeoForge's half is the
-     * {@code neoforge:oxidizables} and {@code neoforge:waxables} data maps in
+     * Tells Fabric how the locked copper doors scrape back with an axe and wax with a honeycomb;
+     * oxidising over time is {@code LockedCopperDoorBlock}'s own random tick and does not read this.
+     * NeoForge's half is the {@code neoforge:oxidizables} and {@code neoforge:waxables} data maps in
      * {@code StorageDataMapProvider}, so a change here needs the same change there.
      */
     private static void registerLockedCopperDoorOxidation() {

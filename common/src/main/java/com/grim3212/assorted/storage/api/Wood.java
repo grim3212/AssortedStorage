@@ -11,13 +11,12 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.WoodType;
 
 /**
- * Every vanilla {@link WoodType}, in {@code WoodType.values()} order. The four crates, the warehouse
- * crate and the locked door of each wood are all generated from this, so a wood added here gets its
- * blocks, models, recipes, loot, tags and names for free. Only the textures have to be drawn:
- * {@code block/crates/<wood>_facing}, {@code model/warehouse_crate/<wood>} and the two halves of
- * {@code block/locked_<wood>_door}. The {@code every_vanilla_wood_has_a_family} and
- * {@code every_locked_door_has_its_textures} gametests fail if vanilla grows a wood this does not
- * list, or if a wood here is short a texture.
+ * Every vanilla {@link WoodType}, in {@code WoodType.values()} order. Each wood's four crates,
+ * warehouse crate and locked door are generated from this, so a wood added here gets its blocks,
+ * models, recipes, loot, tags and names for free; only the textures have to be drawn
+ * ({@code block/crates/<wood>_facing}, {@code model/warehouse_crate/<wood>} and the two halves of
+ * {@code block/locked_<wood>_door}). The {@code every_vanilla_wood_has_a_family} and
+ * {@code every_locked_door_has_its_textures} gametests guard both halves.
  */
 public enum Wood {
 	OAK(WoodType.OAK, Blocks.OAK_PLANKS, Blocks.OAK_LOG, Blocks.OAK_DOOR, () -> ItemTags.OAK_LOGS),

@@ -54,11 +54,7 @@ public enum StorageMaterial implements StringRepresentable {
     private final Supplier<TagKey<Item>> material;
     private final Identifier particle;
     private final Supplier<Block.Properties> props;
-    /**
-     * The level at which this storage item is relative to other storage materials
-     * <p>
-     * wood/stone being the worst, netherite being the best
-     */
+    /** Where this material ranks against the others: wood and stone worst, netherite best. */
     private final int storageLevel;
     private final int xRows;
     private final int yCols;

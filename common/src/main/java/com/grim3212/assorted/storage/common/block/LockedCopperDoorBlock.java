@@ -13,17 +13,12 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import java.util.Optional;
 
 /**
- * A locked copper door, which oxidises on its own like the vanilla door it stands in for. The four
- * waxed copper doors get a plain {@link LockedDoorBlock} instead, because a waxed door never
- * changes.
- * <p>
- * The lock survives each step: {@link LockedDoorBlock#shouldChangedStateKeepBlockEntity} keeps the
- * block entity, and {@link LockedDoorBlock#updateShape} carries the change to the other half.
- * Scraping with an axe and waxing with a honeycomb are vanilla's own item code rather than
- * anything here, and reach these blocks through the loaders' oxidation registries - NeoForge's
- * {@code neoforge:oxidizables} and {@code neoforge:waxables} data maps, written by
- * {@code StorageDataMapProvider}, and Fabric's {@code OxidizableBlocksRegistry}, called from
- * {@code AssortedStorageFabric}.
+ * A locked copper door, which oxidises on its own like the vanilla door it stands in for; the four
+ * waxed copper doors get a plain {@link LockedDoorBlock}, since a waxed door never changes. The lock
+ * survives each step through {@link LockedDoorBlock#shouldChangedStateKeepBlockEntity} and
+ * {@link LockedDoorBlock#updateShape}. Scraping with an axe and waxing with a honeycomb are vanilla's
+ * item code, which reaches these blocks through the loaders' oxidation registries - NeoForge's data
+ * maps in {@code StorageDataMapProvider}, Fabric's {@code OxidizableBlocksRegistry}.
  */
 public class LockedCopperDoorBlock extends LockedDoorBlock implements WeatheringCopper {
 
