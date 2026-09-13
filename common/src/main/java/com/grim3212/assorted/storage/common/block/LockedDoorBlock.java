@@ -1,6 +1,5 @@
 package com.grim3212.assorted.storage.common.block;
 
-import com.grim3212.assorted.lib.core.block.IBlockCloneStack;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.StorageAccessUtil;
 import com.grim3212.assorted.storage.common.block.blockentity.BaseLockedBlockEntity;
@@ -35,7 +34,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 
-public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockCloneStack {
+public class LockedDoorBlock extends DoorBlock implements EntityBlock {
 
     private final Block parent;
 
@@ -56,17 +55,18 @@ public class LockedDoorBlock extends DoorBlock implements EntityBlock, IBlockClo
         return this.parent;
     }
 
+    /** A locked door has no item of its own; it is picked as the door the padlock went on. */
     @Override
-    public ItemStack getCloneItemStack(BlockState state, BlockGetter world, BlockPos pos, Player player) {
-        return Services.LEVEL_PROPERTIES.getCloneItemStack(this.parent.defaultBlockState(), world, pos, player);
+    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
+        return this.parent.defaultBlockState().getCloneItemStack(level, pos, includeData);
     }
 
     /**
-     * Keep the block entity, and with it the lock, when one locked door becomes another in place -
-     * a copper door oxidising, being waxed, or being scraped back. Every locked door shares the one
-     * {@code BASE_LOCKED} block entity type, so the block entity already there is still the right
-     * one. Without this the lock is lost and {@code BaseLockedBlockEntity#preRemoveSideEffects}
-     * drops the padlock on the floor on every oxidation step.
+     * Keep the block entity, and with it the lock, when one locked door becomes another in place - a
+     * copper door oxidising, being waxed, or being scraped back. Every locked door shares the one
+     * {@code BASE_LOCKED} block entity type, so the one already there is still the right one. Without
+     * this the lock is lost and {@code BaseLockedBlockEntity#preRemoveSideEffects} drops the padlock
+     * on every oxidation step.
      */
     @Override
     protected boolean shouldChangedStateKeepBlockEntity(BlockState oldState) {

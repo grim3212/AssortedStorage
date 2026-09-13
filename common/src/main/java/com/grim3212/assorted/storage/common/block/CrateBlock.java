@@ -181,24 +181,17 @@ public class CrateBlock extends Block implements IBlockOnPlayerBreak, EntityBloc
         return level.clip(new ClipContext(vec3, vec31, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
     }
 
+    /**
+     * A creative left click on a crate with something in it takes one item out instead of breaking
+     * it, as {@link #attack} does in survival - which creative never reaches, its break being instant.
+     */
     @Override
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-        BlockEntity tileentity = level.getBlockEntity(pos);
-
-        if (player.isCreative() && tileentity instanceof CrateBlockEntity crate) {
-            if (!crate.getItemStackStorageHandler().isEmpty()) {
-                // Simulate an attack in the instance that we failed
-                if (StorageAccessUtil.canAccess(level, pos, player)) {
-                    BlockHitResult result = getPlayerPOVHitResult(level, player);
-                    if (crate.attack(player, result)) {
-                        return false;
-                    }
-                }
-            }
+    public boolean canPlayerBreak(BlockState state, Level level, BlockPos pos, Player player) {
+        if (player.isCreative() && level.getBlockEntity(pos) instanceof CrateBlockEntity crate && !crate.getItemStackStorageHandler().isEmpty() && StorageAccessUtil.canAccess(level, pos, player)) {
+            return !crate.attack(player, getPlayerPOVHitResult(level, player));
         }
 
-        this.playerWillDestroy(level, pos, state, player);
-        return level.setBlock(pos, fluid.createLegacyBlock(), level.isClientSide() ? Block.UPDATE_ALL_IMMEDIATE : Block.UPDATE_ALL);
+        return true;
     }
 
     @Override

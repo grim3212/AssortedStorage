@@ -2,6 +2,7 @@ package com.grim3212.assorted.storage.gametest;
 
 import com.grim3212.assorted.storage.api.LargeItemStack;
 import com.grim3212.assorted.storage.api.StorageMaterial;
+import com.grim3212.assorted.storage.common.block.CrateBlock;
 import com.grim3212.assorted.storage.common.block.StorageBlocks;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateCompactingBlockEntity;
@@ -18,7 +19,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -41,6 +45,42 @@ final class CrateTests {
         out.accept("empty_crate_takes_a_full_stack", CrateTests::emptyCrateTakesAFullStack);
         out.accept("crates_save_with_empty_slots", CrateTests::cratesSaveWithEmptySlots);
         out.accept("compacting_crate_tiers_survive_a_sync", CrateTests::compactingCrateTiersSurviveASync);
+        out.accept("creative_click_takes_from_a_crate_instead_of_breaking_it", CrateTests::creativeClickTakesFromACrateInsteadOfBreakingIt);
+    }
+
+    /**
+     * A creative left click on a crate that still holds something takes one item out and leaves the
+     * crate standing; an empty crate breaks as usual. Asserted on both loaders because they reach
+     * {@code IBlockOnPlayerBreak} from different places - NeoForge from {@code BreakBlockEvent},
+     * Fabric from AssortedLib's game mode mixins - and NeoForge had no route to it at all.
+     */
+    private static void creativeClickTakesFromACrateInsteadOfBreakingIt(GameTestHelper helper) {
+        final BlockPos full = new BlockPos(2, 1, 2);
+        final BlockPos empty = new BlockPos(6, 1, 6);
+
+        // Facing up, so a click from straight above lands on the face the slots are on.
+        helper.setBlock(full, oakCrate().defaultBlockState().setValue(CrateBlock.FACING, Direction.UP));
+        helper.setBlock(empty, oakCrate().defaultBlockState().setValue(CrateBlock.FACING, Direction.UP));
+
+        CrateSidedInv crate = helper.getBlockEntity(full, CrateBlockEntity.class).getItemStackStorageHandler();
+        crate.setItem(0, new LargeItemStack(new ItemStack(Items.DIAMOND), 3));
+
+        // A mock server player, not TestSupport's real one: emptying a slot syncs it to nearby
+        // players, and NeoForge refuses a payload to a connection that negotiated no channels. A
+        // mock player is never added to the level, so the sync has nobody to reach.
+        ServerPlayer player = (ServerPlayer) helper.makeMockServerPlayer(GameType.CREATIVE);
+
+        hover(helper, player, Vec3.atCenterOf(full).add(0.0D, 2.0D, 0.0D), 90.0F);
+        helper.assertFalse(player.gameMode.destroyBlock(helper.absolutePos(full)), "a creative click broke a crate that still had something in it");
+        helper.assertBlockPresent(oakCrate(), full);
+        helper.assertValueEqual(crate.getLargeItemStack(0).getAmount(), 2, "what was left in the crate after one creative click");
+        helper.assertValueEqual(countInInventory(player, Items.DIAMOND), 1, "diamonds the click put in the player's inventory");
+
+        hover(helper, player, Vec3.atCenterOf(empty).add(0.0D, 2.0D, 0.0D), 90.0F);
+        helper.assertTrue(player.gameMode.destroyBlock(helper.absolutePos(empty)), "a creative click would not break an empty crate");
+        helper.assertBlockPresent(Blocks.AIR, empty);
+
+        helper.succeed();
     }
 
     /**

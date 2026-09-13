@@ -69,6 +69,7 @@ final class LockTests {
         out.accept("locksmith_workbench_codes_a_key_and_a_lock", LockTests::locksmithWorkbenchCodesAKeyAndALock);
         out.accept("every_vanilla_door_can_be_locked", LockTests::everyVanillaDoorCanBeLocked);
         out.accept("locked_doors_drop_the_door_they_stand_in_for", LockTests::lockedDoorsDropTheDoorTheyStandInFor);
+        out.accept("locked_doors_are_picked_as_the_door_they_stand_in_for", LockTests::lockedDoorsArePickedAsTheDoorTheyStandInFor);
         out.accept("locked_copper_doors_oxidise_keeping_their_lock", LockTests::lockedCopperDoorsOxidiseKeepingTheirLock);
         out.accept("locked_copper_doors_scrape_and_wax", LockTests::lockedCopperDoorsScrapeAndWax);
         out.accept("a_locked_copper_door_oxidises_on_its_own", LockTests::aLockedCopperDoorOxidisesOnItsOwn);
@@ -76,13 +77,10 @@ final class LockTests {
 
     /**
      * The whole path a real world takes: a random tick reaching {@code changeOverTime}, its scan of
-     * the copper nearby, its roll, and the block swap that follows. Driven by ticking rather than by
-     * calling {@code getNext} directly, which is the half {@code locked_copper_doors_oxidise_keeping
-     * _their_lock} covers.
-     * <p>
-     * The unaffected door is the one to use here: the scan refuses to progress a block that has
-     * less oxidised copper within four blocks, and nothing is less oxidised than unaffected, so a
-     * neighbouring test's copper doors can only speed this up, never stall it.
+     * the copper nearby, its roll and the block swap that follows, driven by ticking rather than by
+     * calling {@code getNext} directly. The unaffected door is the one to use: the scan refuses to
+     * progress a block with less oxidised copper within four blocks, so a neighbouring test's copper
+     * doors can only speed this up, never stall it.
      */
     private static void aLockedCopperDoorOxidisesOnItsOwn(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
@@ -173,11 +171,10 @@ final class LockTests {
 
     /**
      * Axe scraping and honeycomb waxing are vanilla's own item code, reached through the loaders'
-     * oxidation registries rather than anything of ours - NeoForge's {@code neoforge:oxidizables} and
-     * {@code neoforge:waxables} data maps, Fabric's {@code OxidizableBlocksRegistry}. Miss one and
-     * the door simply cannot be scraped or waxed, silently. Asked the way the axe and the honeycomb
-     * ask, because the two loaders answer from different places: NeoForge deprecates the vanilla
-     * {@code WAXABLES} / {@code NEXT_BY_BLOCK} fields and ignores what is registered in them.
+     * oxidation registries - NeoForge's {@code neoforge:oxidizables} and {@code neoforge:waxables}
+     * data maps, Fabric's {@code OxidizableBlocksRegistry}. Miss one and the door simply cannot be
+     * scraped or waxed, silently. Asked the way the axe and the honeycomb ask, because NeoForge
+     * ignores the vanilla {@code WAXABLES} / {@code NEXT_BY_BLOCK} fields.
      */
     private static void lockedCopperDoorsScrapeAndWax(GameTestHelper helper) {
         List<String> wrong = new ArrayList<>();
@@ -235,6 +232,31 @@ final class LockTests {
      * out of a {@code #minecraft:mineable/*} tag makes it break at normal speed and drop nothing at
      * all, which no log or datagen run reports.
      */
+    /**
+     * A locked door is picked as the door the padlock went on; it has no item of its own, so a block
+     * that does not answer here hands back nothing at all. Asked through
+     * {@code BlockState#getCloneItemStack}, which is what vanilla's pick block calls on both loaders.
+     */
+    private static void lockedDoorsArePickedAsTheDoorTheyStandInFor(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        List<String> wrong = new ArrayList<>();
+
+        int i = 0;
+        for (Map.Entry<Block, IRegistryObject<LockedDoorBlock>> entry : StorageBlocks.VANILLA_DOORS.entrySet()) {
+            Block locked = entry.getValue().get();
+            BlockPos lower = spread(i++);
+            helper.setBlock(lower, locked.defaultBlockState().setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER));
+
+            ItemStack picked = helper.getBlockState(lower).getCloneItemStack(level, helper.absolutePos(lower), true);
+            if (!picked.is(entry.getKey().asItem())) {
+                wrong.add(name(locked) + " was picked as " + picked + " rather than " + name(entry.getKey()));
+            }
+        }
+
+        helper.assertTrue(wrong.isEmpty(), wrong.size() + " locked door pick problem(s): " + String.join("; ", wrong));
+        helper.succeed();
+    }
+
     private static void lockedDoorsDropTheDoorTheyStandInFor(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         List<String> wrong = new ArrayList<>();
