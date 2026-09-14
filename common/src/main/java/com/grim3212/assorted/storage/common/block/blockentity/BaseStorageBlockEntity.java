@@ -10,7 +10,7 @@ import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.storage.api.blockentity.IStorage;
 import com.grim3212.assorted.storage.common.block.BaseStorageBlock;
 import com.grim3212.assorted.storage.common.block.LockedBarrelBlock;
-import com.grim3212.assorted.storage.common.inventory.StorageContainer;
+import com.grim3212.assorted.storage.common.inventory.IStorageMenu;
 import com.grim3212.assorted.storage.common.inventory.StorageItemStackStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.StorageUtil;
 import com.grim3212.assorted.storage.common.item.StorageItems;
@@ -290,7 +290,8 @@ public abstract class BaseStorageBlockEntity extends BlockEntity implements Menu
         int i = 0;
 
         for (Player playerentity : world.getEntitiesOfClass(Player.class, new AABB((double) ((float) x - 5.0F), (double) ((float) y - 5.0F), (double) ((float) z - 5.0F), (double) ((float) (x + 1) + 5.0F), (double) ((float) (y + 1) + 5.0F), (double) ((float) (z + 1) + 5.0F)))) {
-            if (playerentity.containerMenu instanceof StorageContainer) {
+            // This block, not any nearby storage menu: a row of lockers would hold each other open.
+            if (playerentity.containerMenu instanceof IStorageMenu menu && menu.holdsOpen(lockableTileEntity)) {
                 ++i;
             }
         }

@@ -1,6 +1,7 @@
 package com.grim3212.assorted.storage.common.inventory;
 
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
+import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
 import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -9,7 +10,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-public class LockerContainer extends AbstractContainerMenu {
+public class LockerContainer extends AbstractContainerMenu implements IStorageMenu {
 
     private final IItemStorageHandler inventory;
     private final int numRows;
@@ -77,6 +78,16 @@ public class LockerContainer extends AbstractContainerMenu {
                 ((MoveableSlot) this.slots.get(slotIndex)).setSlotDisabled();
             }
         }
+    }
+
+    /** A double locker's menu holds both halves open, so either one may be the block asking. */
+    @Override
+    public boolean holdsOpen(BaseStorageBlockEntity blockEntity) {
+        if (this.inventory instanceof DualLockerInventory dual) {
+            return dual.holds(blockEntity);
+        }
+
+        return this.inventory == blockEntity.getItemStackStorageHandler();
     }
 
     @Override

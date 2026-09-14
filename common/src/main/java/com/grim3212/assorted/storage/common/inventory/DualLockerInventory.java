@@ -2,6 +2,7 @@ package com.grim3212.assorted.storage.common.inventory;
 
 import com.grim3212.assorted.lib.core.inventory.impl.LockedItemStackStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.ILockable;
+import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +16,11 @@ public class DualLockerInventory extends LockedItemStackStorageHandler {
         super(lockCode, topLocker != null ? topLocker.getSlots() + bottomLocker.getSlots() : bottomLocker.getSlots());
         this.bottomLocker = bottomLocker;
         this.topLocker = topLocker;
+    }
+
+    public boolean holds(BaseStorageBlockEntity blockEntity) {
+        return this.bottomLocker == blockEntity.getItemStackStorageHandler()
+                || (hasTopLocker() && this.topLocker == blockEntity.getItemStackStorageHandler());
     }
 
     private boolean hasTopLocker() {

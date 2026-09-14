@@ -3,6 +3,7 @@ package com.grim3212.assorted.storage.common.inventory;
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.slot.SlotStorageHandler;
+import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -10,7 +11,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-public class StorageContainer extends AbstractContainerMenu {
+public class StorageContainer extends AbstractContainerMenu implements IStorageMenu {
 
     private final IItemStorageHandler inventory;
 
@@ -89,6 +90,13 @@ public class StorageContainer extends AbstractContainerMenu {
         for (int hotbarSlot = 0; hotbarSlot < 9; hotbarSlot++) {
             this.addSlot(new Slot(playerInventory, hotbarSlot, leftCol + hotbarSlot * 18, heighOffset - 24));
         }
+    }
+
+    /** The block's own inventory, or its platform handler's - the ender chest opens on the latter. */
+    @Override
+    public boolean holdsOpen(BaseStorageBlockEntity blockEntity) {
+        return this.inventory == blockEntity.getItemStackStorageHandler()
+                || this.inventory == blockEntity.getStorageHandler().getItemStorageHandler(null);
     }
 
     @Override

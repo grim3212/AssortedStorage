@@ -1,6 +1,7 @@
 package com.grim3212.assorted.storage.common.inventory;
 
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
+import com.grim3212.assorted.storage.common.block.blockentity.BaseStorageBlockEntity;
 import com.grim3212.assorted.lib.core.inventory.impl.ItemStackStorageHandler;
 import com.grim3212.assorted.storage.common.block.blockentity.ItemTowerBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -13,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class ItemTowerContainer extends AbstractContainerMenu {
+public class ItemTowerContainer extends AbstractContainerMenu implements IStorageMenu {
 
     private final IItemStorageHandler inventory;
 
@@ -99,6 +100,16 @@ public class ItemTowerContainer extends AbstractContainerMenu {
                 }
             }
         }
+    }
+
+    /** A tower's menu holds the whole stack open, so any tower in it may be the block asking. */
+    @Override
+    public boolean holdsOpen(BaseStorageBlockEntity blockEntity) {
+        if (this.inventory instanceof ItemTowerInventory tower) {
+            return tower.holds(blockEntity);
+        }
+
+        return this.inventory == blockEntity.getItemStackStorageHandler();
     }
 
     @Override
