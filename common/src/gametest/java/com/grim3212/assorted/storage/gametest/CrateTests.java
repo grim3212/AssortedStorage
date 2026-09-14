@@ -8,6 +8,7 @@ import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateCompactingBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateControllerBlockEntity;
 import com.grim3212.assorted.storage.common.inventory.crates.CompactingCrateInventory;
+import com.grim3212.assorted.storage.common.inventory.crates.CrateControllerInvWrapper;
 import com.grim3212.assorted.storage.common.inventory.crates.CrateSidedInv;
 import com.grim3212.assorted.storage.common.item.StorageItems;
 import com.grim3212.assorted.storage.common.network.SyncCrate;
@@ -46,6 +47,117 @@ final class CrateTests {
         out.accept("crates_save_with_empty_slots", CrateTests::cratesSaveWithEmptySlots);
         out.accept("compacting_crate_tiers_survive_a_sync", CrateTests::compactingCrateTiersSurviveASync);
         out.accept("creative_click_takes_from_a_crate_instead_of_breaking_it", CrateTests::creativeClickTakesFromACrateInsteadOfBreakingIt);
+        out.accept("crate_reports_everything_it_holds", CrateTests::crateReportsEverythingItHolds);
+        out.accept("an_aborted_transfer_leaves_a_crate_alone", CrateTests::anAbortedTransferLeavesACrateAlone);
+        out.accept("controller_lists_every_crate_on_the_network", CrateTests::controllerListsEveryCrateOnTheNetwork);
+    }
+
+    /**
+     * A crate tells an item handler how much it really holds, which is what Jade, The One Probe and
+     * storage mods read to show a block's contents.
+     */
+    private static void crateReportsEverythingItHolds(GameTestHelper helper) {
+        helper.setBlock(BLOCK, oakCrate());
+        CrateSidedInv crate = helper.getBlockEntity(BLOCK, CrateBlockEntity.class).getItemStackStorageHandler();
+
+        crate.setItem(0, new LargeItemStack(new ItemStack(Items.COBBLESTONE), 2000));
+        helper.assertValueEqual(crate.getStackInSlot(0).getCount(), 2000, "what the crate reports holding");
+        helper.assertValueEqual(crate.getSlotLimit(0), 64 * 32, "the capacity the crate reports");
+
+        // Taking from it is still one stack at a time, sized by the item.
+        helper.assertValueEqual(crate.extractItem(0, 64, false).getCount(), 64, "what one extract took out");
+        helper.assertValueEqual(crate.getStackInSlot(0).getCount(), 1936, "what is left after one extract");
+
+        // A locked slot that has run empty reads as empty, so nothing may be pulled from it.
+        BlockPos quadPos = BLOCK.east(2);
+        helper.setBlock(quadPos, oakCrateQuadruple());
+        CrateSidedInv quad = helper.getBlockEntity(quadPos, CrateBlockEntity.class).getItemStackStorageHandler();
+
+        quad.setItem(1, new LargeItemStack(new ItemStack(Items.DIAMOND), 0));
+        quad.setSlotLocked(1, true);
+        helper.assertTrue(quad.isSlotLocked(1), "the slot did not lock");
+        helper.assertTrue(quad.getStackInSlot(1).isEmpty(), "an empty locked slot reported an item that was not there");
+        helper.assertTrue(quad.extractItem(1, 1, false).isEmpty(), "an empty locked slot handed out an item");
+
+        // It still sizes against the item it is reserved for rather than falling back to 64.
+        helper.assertValueEqual(quad.getSlotLimit(1), 64 * 8, "the capacity a locked empty slot reports");
+
+        // Nothing re-caps a slot on load, so an existing world's crates come back untouched.
+        CrateBlockEntity saved = helper.getBlockEntity(BLOCK, CrateBlockEntity.class);
+        CompoundTag tag = saveWithoutProblems(helper, saved, "a crate holding more than a stack");
+        BlockEntity reloaded = BlockEntity.loadStatic(helper.absolutePos(BLOCK), saved.getBlockState(), tag, helper.getLevel().registryAccess());
+        CrateSidedInv loaded = ((CrateBlockEntity) reloaded).getItemStackStorageHandler();
+
+        helper.assertValueEqual(loaded.getLargeItemStack(0).getAmount(), 1936, "the amount a crate came back from a save holding");
+        helper.assertValueEqual(loaded.getStackInSlot(0).getCount(), 1936, "what a crate reports after a save/load");
+        helper.succeed();
+    }
+
+    /**
+     * Rolling back a transfer puts a crate slot back exactly as it was. Both loaders snapshot a slot
+     * before touching it and restore it on abort, which every simulated insert or extract does.
+     */
+    private static void anAbortedTransferLeavesACrateAlone(GameTestHelper helper) {
+        helper.setBlock(BLOCK, oakCrate());
+        CrateSidedInv crate = helper.getBlockEntity(BLOCK, CrateBlockEntity.class).getItemStackStorageHandler();
+
+        crate.setItem(0, new LargeItemStack(new ItemStack(Items.COBBLESTONE), 2000, 7, false));
+        Runnable rollback = crate.captureSlot(0);
+
+        crate.extractItem(0, 64, false);
+        helper.assertValueEqual(crate.getLargeItemStack(0).getAmount(), 1936, "the amount the extract left");
+
+        rollback.run();
+        helper.assertValueEqual(crate.getLargeItemStack(0).getAmount(), 2000, "the amount a rolled back extract left");
+        helper.assertValueEqual(crate.getLargeItemStack(0).getRotation(), 7, "the rotation a rolled back extract left");
+
+        // The same for a slot that had nothing in it: the rollback must not invent one.
+        BlockPos emptyPos = BLOCK.east(2);
+        helper.setBlock(emptyPos, oakCrate());
+        CrateSidedInv empty = helper.getBlockEntity(emptyPos, CrateBlockEntity.class).getItemStackStorageHandler();
+
+        Runnable emptyRollback = empty.captureSlot(0);
+        helper.assertTrue(empty.insertItem(0, new ItemStack(Items.DIAMOND, 5), false).isEmpty(), "an empty crate would not take five diamonds");
+        emptyRollback.run();
+        helper.assertTrue(empty.getStackInSlot(0).isEmpty(), "a rolled back insert left something in an empty slot");
+        helper.succeed();
+    }
+
+    /**
+     * A controller is one inventory over every slot of every crate it reaches, so a storage mod
+     * reading it sees the whole network rather than one slot per crate index.
+     */
+    private static void controllerListsEveryCrateOnTheNetwork(GameTestHelper helper) {
+        BlockPos controllerPos = new BlockPos(3, 1, 4);
+        BlockPos firstPos = controllerPos.east();
+        BlockPos secondPos = firstPos.east();
+
+        helper.setBlock(controllerPos, StorageBlocks.CRATE_CONTROLLER.get());
+        helper.setBlock(firstPos, oakCrate());
+        helper.setBlock(secondPos, oakCrate());
+
+        CrateSidedInv first = helper.getBlockEntity(firstPos, CrateBlockEntity.class).getItemStackStorageHandler();
+        CrateSidedInv second = helper.getBlockEntity(secondPos, CrateBlockEntity.class).getItemStackStorageHandler();
+        first.setItem(0, new LargeItemStack(new ItemStack(Items.COBBLESTONE), 300));
+        second.setItem(0, new LargeItemStack(new ItemStack(Items.DIAMOND), 5));
+
+        CrateControllerBlockEntity controller = helper.getBlockEntity(controllerPos, CrateControllerBlockEntity.class);
+        controller.tick();
+
+        CrateControllerInvWrapper network = controller.getItemStackStorageHandler();
+        helper.assertValueEqual(network.getSlots(), 2, "the controller's slot count for two single crates");
+
+        // Each crate listed with everything it holds, in the order the controller fills them.
+        helper.assertTrue(network.getStackInSlot(0).is(Items.COBBLESTONE), "the nearest crate's item was not listed first");
+        helper.assertValueEqual(network.getStackInSlot(0).getCount(), 300, "the amount listed for the nearest crate");
+        helper.assertTrue(network.getStackInSlot(1).is(Items.DIAMOND), "the second crate's item was not listed");
+        helper.assertValueEqual(network.getStackInSlot(1).getCount(), 5, "the amount listed for the second crate");
+
+        // Each slot reaches the crate behind it, not the first one that would take the item.
+        helper.assertTrue(network.extractItem(1, 5, false).is(Items.DIAMOND), "extracting from the second crate's slot took the wrong item");
+        helper.assertValueEqual(second.getLargeItemStack(0).getAmount(), 0, "what the second crate has left");
+        helper.assertValueEqual(first.getLargeItemStack(0).getAmount(), 300, "the first crate was touched by an extract aimed at the second");
+        helper.succeed();
     }
 
     /**

@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "assortedstorage:crate_reports_everything_it_holds",
+  "structure": "assortedstorage:test_box",
+  "max_ticks": 1,
+  "setup_ticks": 0,
+  "required": true
+}

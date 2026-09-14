@@ -482,8 +482,9 @@ public class LockedHopperBlockEntity extends BaseStorageBlockEntity implements I
                 stack = ItemStack.EMPTY;
                 flag = true;
             } else if (canMergeItems(itemstack, stack)) {
+                // Clamped: a slot may report more than one stack, and shrink() with a negative grows.
                 int i = stack.getMaxStackSize() - itemstack.getCount();
-                int j = Math.min(stack.getCount(), i);
+                int j = Math.max(0, Math.min(stack.getCount(), i));
                 stack.shrink(j);
                 itemstack.grow(j);
                 flag = j > 0;

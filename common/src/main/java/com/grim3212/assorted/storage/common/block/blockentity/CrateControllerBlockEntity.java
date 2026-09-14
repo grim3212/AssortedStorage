@@ -48,7 +48,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements INamed, I
     private Component customName;
 
     private List<CrateConnection> connectedStorageCrates = new ArrayList<>();
-    private Map<Integer, List<Integer>> slottedConnections = new HashMap<>();
+    private List<NetworkSlot> networkSlots = new ArrayList<>();
 
     private final int maxRange;
 
@@ -218,20 +218,16 @@ public class CrateControllerBlockEntity extends BlockEntity implements INamed, I
         findConnections();
     }
 
-    public List<CrateConnection> findSlottedCrates(int slot) {
-        List<Integer> connections = this.slottedConnections.get(slot);
-        List<CrateConnection> foundConnections = new ArrayList<>();
+    /** One slot on one connected crate. A controller's network is a flat list of these. */
+    public record NetworkSlot(BlockPos pos, int slot) {
+    }
 
-        for (int i = 0; i < connections.size(); i++) {
-            int connectionIndex = connections.get(i);
-            CrateConnection checkConnection = this.connectedStorageCrates.get(connectionIndex);
-
-            if (checkConnection != null) {
-                foundConnections.add(checkConnection);
-            }
-        }
-
-        return foundConnections;
+    /**
+     * Every slot the controller reaches, slot index first then nearest crate - the order it fills
+     * them, and the inventory other mods see.
+     */
+    public List<NetworkSlot> getNetworkSlots() {
+        return this.networkSlots;
     }
 
     public void findConnections() {
@@ -240,7 +236,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements INamed, I
         }
 
         connectedStorageCrates.clear();
-        slottedConnections.clear();
+        networkSlots.clear();
 
         BlockPos start = this.getBlockPos();
 
@@ -297,35 +293,26 @@ public class CrateControllerBlockEntity extends BlockEntity implements INamed, I
 
         int maxSlots = connectedStorageCrates.stream().max((a, b) -> Integer.compare(a.getNumSlots(), b.getNumSlots())).map(x -> x.getNumSlots()).get();
 
+        // Slot index first, crates already sorted by depth: the order the controller fills them.
         for (int i = 0; i < maxSlots; i++) {
-            List<Integer> storageConnectionsForSlotIndex = new ArrayList<>();
-            for (int j = 0; j < connectedStorageCrates.size(); j++) {
-                CrateConnection connection = this.connectedStorageCrates.get(j);
-
+            for (CrateConnection connection : this.connectedStorageCrates) {
                 if (connection.getNumSlots() > i) {
-                    storageConnectionsForSlotIndex.add(j);
+                    networkSlots.add(new NetworkSlot(connection.getPos(), i));
                 }
             }
-            slottedConnections.put(i, storageConnectionsForSlotIndex);
         }
-
-    }
-
-    public int[] getPossibleSlots() {
-        return this.slottedConnections.keySet().stream().mapToInt(x -> x).toArray();
     }
 
     public InteractionResult use(Player player, InteractionHand handIn) {
         ItemStack playerStack = player.getItemInHand(handIn).copyWithCount(1);
         if (player.getUUID().equals(playerTimerUUID) && Util.getMillis() - playerTimerMillis < 275 && playerTimerStack != ItemStack.EMPTY) {
             List<Integer> slots = CrateBlockEntity.findMatchingStacks(player, playerTimerStack);
-            int[] possibleSlots = this.getPossibleSlots();
+            int networkSize = this.networkSlots.size();
 
             for (int playerSlot : slots) {
                 ItemStack slotItem = player.getInventory().getItem(playerSlot).copy();
 
-                for (int i = 0; i < possibleSlots.length; i++) {
-                    int connectionSlot = possibleSlots[i];
+                for (int connectionSlot = 0; connectionSlot < networkSize; connectionSlot++) {
                     ItemStack insertReturn = this.getItemStackStorageHandler().insertItem(connectionSlot, slotItem, false, this.getLockCode(), false);
 
                     // We added all of the stack to this slot
@@ -355,7 +342,7 @@ public class CrateControllerBlockEntity extends BlockEntity implements INamed, I
         }
 
         ItemStack playerItem = player.getItemInHand(handIn).copy();
-        for (int connectionSlot = 0; connectionSlot < this.slottedConnections.size(); connectionSlot++) {
+        for (int connectionSlot = 0; connectionSlot < this.networkSlots.size(); connectionSlot++) {
             ItemStack insertReturn = this.getItemStackStorageHandler().insertItem(connectionSlot, playerItem, false, this.getLockCode(), false);
 
             // We added all of the stack to this slot

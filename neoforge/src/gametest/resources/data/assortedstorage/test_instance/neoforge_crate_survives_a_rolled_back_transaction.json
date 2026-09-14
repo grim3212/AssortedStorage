@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "assortedstorage:neoforge_crate_survives_a_rolled_back_transaction",
+  "structure": "assortedstorage:test_box",
+  "max_ticks": 1,
+  "setup_ticks": 0,
+  "required": true
+}

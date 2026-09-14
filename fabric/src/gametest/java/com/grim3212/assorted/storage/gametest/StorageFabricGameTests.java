@@ -17,5 +17,8 @@ public class StorageFabricGameTests implements ModInitializer {
     public void onInitialize() {
         StorageGameTests.forEach((name, function) ->
                 Registry.register(BuiltInRegistries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name), function));
+        // Fabric only: what the mod looks like through this loader's own transfer API.
+        CrateTransferTests.register((name, function) ->
+                Registry.register(BuiltInRegistries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name), function));
     }
 }

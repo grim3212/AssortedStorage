@@ -79,6 +79,12 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
         return this.slotContents.size();
     }
 
+    /**
+     * The whole slot, past a stack: {@link IItemStorageHandler} and both loaders' item handlers allow
+     * an oversized stack, which is how readout mods see a crate's real count. A locked slot that has
+     * run empty reports empty; the crate screen shows its reserved item from
+     * {@link #getLargeItemStack(int)}.
+     */
     @Override
     @NotNull
     public ItemStack getStackInSlot(int inSlot) {
@@ -89,16 +95,11 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
 
         LargeItemStack largeStack = this.slotContents.get(slot);
 
-        if (!largeStack.isEmpty() && !largeStack.getStack().isEmpty()) {
-            if (largeStack.getAmount() >= 64) {
-                return largeStack.getStack().copyWithCount(64);
-            } else {
-                int amount = largeStack.isLocked() ? Math.max(1, largeStack.getAmount()) : largeStack.getAmount();
-                return largeStack.getStack().copyWithCount(amount);
-            }
+        if (largeStack.getStack().isEmpty() || largeStack.getAmount() <= 0) {
+            return ItemStack.EMPTY;
         }
 
-        return ItemStack.EMPTY;
+        return largeStack.getStack().copyWithCount(largeStack.getAmount());
     }
 
     public LargeItemStack getLargeItemStack(int index) {
@@ -251,7 +252,8 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
     public ItemStack removeItem(int slot, int amount) {
         ItemStack stack;
         if (slot >= 0 && slot < this.slotContents.size() && !this.slotContents.get(slot).isEmpty() && amount > 0) {
-            int maxStackSize = this.getStackInSlot(slot).getMaxStackSize();
+            // Not getStackInSlot: it reports the whole slot, which is no limit on one move.
+            int maxStackSize = this.slotContents.get(slot).getStack().getMaxStackSize();
 
             stack = this.slotContents.get(slot).split(Math.min(maxStackSize, amount), true);
         } else {
@@ -275,6 +277,10 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
         return slot1 != -1;
     }
 
+    /**
+     * Lossy: keeps the slot's rotation and lock but takes its amount from {@code stack}. Rollbacks go
+     * through {@link #captureSlot(int)} instead.
+     */
     @Override
     public void setStackInSlot(int inSlot, @NotNull ItemStack stack) {
         int slot = getSlot(inSlot);
@@ -295,6 +301,32 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
         this.inv.setSlotChanged(slot);
     }
 
+    /** Snapshots the LargeItemStack: amount, rotation and lock do not survive an ItemStack. */
+    @Override
+    @NotNull
+    public Runnable captureSlot(int inSlot) {
+        int slot = getSlot(inSlot);
+        if (slot == -1) {
+            return () -> {
+            };
+        }
+
+        LargeItemStack snapshot = this.slotContents.get(slot).copy();
+        return () -> this.restoreSlot(slot, snapshot);
+    }
+
+    /**
+     * Applies a slot verbatim, with no re-capping: a compactor's cap comes from the recipe manager,
+     * which a client does not have.
+     */
+    public void restoreSlot(int slot, LargeItemStack stack) {
+        if (slot >= 0 && slot < this.slotContents.size()) {
+            this.slotContents.set(slot, stack);
+        }
+
+        this.inv.setSlotChanged(slot);
+    }
+
     /** Sets a slot, capped at what the slot can hold. */
     public void setItem(int slot, LargeItemStack stack) {
         if (slot >= 0 && slot < this.slotContents.size()) {
@@ -309,17 +341,9 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
         this.inv.setSlotChanged(slot);
     }
 
-    /**
-     * Applies a slot exactly as the server sent it. The server has already capped it, and a client
-     * cannot always work the cap out for itself - a compactor's tiers come from the recipe manager -
-     * so re-capping here would silently throw the slot away.
-     */
+    /** Applies a slot exactly as the server sent it. See {@link #restoreSlot(int, LargeItemStack)}. */
     public void applySyncedItem(int slot, LargeItemStack stack) {
-        if (slot >= 0 && slot < this.slotContents.size()) {
-            this.slotContents.set(slot, stack);
-        }
-
-        this.inv.setSlotChanged(slot);
+        this.restoreSlot(slot, stack);
     }
 
     @Override
@@ -381,7 +405,8 @@ public class CrateSidedInv implements IItemStorageHandler, LockedStorageHandler,
      */
     public int getBaseStackSize(int slot) {
         int slotBase = this.inv.getLayout().getSlotsBaseStacks()[slot];
-        ItemStack inSlot = this.getStackInSlot(slot);
+        // Not getStackInSlot: a locked slot that has run empty still sizes against its item.
+        ItemStack inSlot = this.slotContents.get(slot).getStack();
         int stackSizeMultiplier = inSlot.isEmpty() ? Item.DEFAULT_MAX_STACK_SIZE : inSlot.getMaxStackSize();
         return stackSizeMultiplier * slotBase;
     }

@@ -301,19 +301,16 @@ public class CompactingCrateInventory extends CrateSidedInv {
         return baseStackSize;
     }
 
+    /** The whole tier, however far past a stack it counts. See {@link CrateSidedInv#getStackInSlot(int)}. */
     @Override
     public @NotNull ItemStack getStackInSlot(int slot) {
         LargeItemStack largeStack = this.slotContents.get(slot);
 
-        if (!largeStack.getStack().isEmpty()) {
-            if (largeStack.getAmount() >= 64) {
-                return largeStack.getStack().copyWithCount(64);
-            } else {
-                return largeStack.getStack().copyWithCount(Math.max(1, largeStack.getAmount()));
-            }
+        if (largeStack.getStack().isEmpty() || largeStack.getAmount() <= 0) {
+            return ItemStack.EMPTY;
         }
 
-        return ItemStack.EMPTY;
+        return largeStack.getStack().copyWithCount(largeStack.getAmount());
     }
 
     @Override
@@ -346,7 +343,8 @@ public class CompactingCrateInventory extends CrateSidedInv {
     public ItemStack removeItem(int slot, int amount) {
         ItemStack stack;
         if (slot >= 0 && slot < this.slotContents.size() && !this.slotContents.get(slot).isEmpty() && amount > 0) {
-            int maxStackSize = this.getStackInSlot(slot).getMaxStackSize();
+            // Not getStackInSlot: it reports the whole tier, which is no limit on one move.
+            int maxStackSize = this.slotContents.get(slot).getStack().getMaxStackSize();
             int amountToTake = Math.min(maxStackSize, amount);
             int currentAmount = this.slotContents.get(slot).getAmount();
             stack = this.slotContents.get(slot).split(amountToTake, false);

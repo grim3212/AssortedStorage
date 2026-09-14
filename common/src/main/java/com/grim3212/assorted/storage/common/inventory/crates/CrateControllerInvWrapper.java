@@ -2,17 +2,21 @@ package com.grim3212.assorted.storage.common.inventory.crates;
 
 import com.grim3212.assorted.lib.core.inventory.IItemStorageHandler;
 import com.grim3212.assorted.lib.core.inventory.locking.LockedStorageHandler;
-import com.grim3212.assorted.lib.platform.Services;
-import com.grim3212.assorted.storage.api.crates.CrateConnection;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateBlockEntity;
 import com.grim3212.assorted.storage.common.block.blockentity.CrateControllerBlockEntity;
+import com.grim3212.assorted.storage.common.block.blockentity.CrateControllerBlockEntity.NetworkSlot;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+/**
+ * A crate controller as one inventory: one slot per slot of every crate it reaches. The slot count
+ * moves as the network changes.
+ */
 public class CrateControllerInvWrapper implements IItemStorageHandler, LockedStorageHandler {
     protected final CrateControllerBlockEntity inv;
 
@@ -24,16 +28,34 @@ public class CrateControllerInvWrapper implements IItemStorageHandler, LockedSto
         return inv;
     }
 
-
     @Override
     public int getSlots() {
-        return this.inv.getPossibleSlots().length;
+        return this.inv.getNetworkSlots().size();
+    }
+
+    /** The crate slot a handler slot stands for; null once the network no longer reaches it. */
+    private @Nullable Target target(int slot) {
+        List<NetworkSlot> networkSlots = this.inv.getNetworkSlots();
+        if (slot < 0 || slot >= networkSlots.size() || this.inv.getLevel() == null) {
+            return null;
+        }
+
+        NetworkSlot networkSlot = networkSlots.get(slot);
+        if (this.inv.getLevel().getBlockEntity(networkSlot.pos()) instanceof CrateBlockEntity crate) {
+            return new Target(crate.getItemStackStorageHandler(), networkSlot.slot());
+        }
+
+        return null;
+    }
+
+    private record Target(CrateSidedInv crate, int slot) {
     }
 
     @Override
     @NotNull
     public ItemStack getStackInSlot(int slot) {
-        return ItemStack.EMPTY;
+        Target target = target(slot);
+        return target == null ? ItemStack.EMPTY : target.crate().getStackInSlot(target.slot());
     }
 
     @Override
@@ -51,26 +73,13 @@ public class CrateControllerInvWrapper implements IItemStorageHandler, LockedSto
         if (!codeMatches(inLockCode) && !ignoreLock)
             return stack;
 
-        List<CrateConnection> connections = this.inv.findSlottedCrates(slot);
+        Target target = target(slot);
+        if (target == null)
+            return stack;
 
-        for (CrateConnection connection : connections) {
-            if (connection == null) {
-                continue;
-            }
-
-            if (this.inv.getLevel().getBlockEntity(connection.getPos()) instanceof CrateBlockEntity crate) {
-                IItemStorageHandler storageHandler = Services.INVENTORY.getItemStorageHandler(crate, null).orElse(null);
-                if (storageHandler != null && storageHandler instanceof CrateSidedInv crateInv) {
-                    ItemStack response = inLockCode.isEmpty() ? crateInv.insertItem(slot, stack, simulate) : crateInv.insertItem(slot, stack, simulate, inLockCode, ignoreLock);
-
-                    if (response != stack) {
-                        return response;
-                    }
-                }
-            }
-        }
-
-        return stack;
+        return inLockCode.isEmpty()
+                ? target.crate().insertItem(target.slot(), stack, simulate)
+                : target.crate().insertItem(target.slot(), stack, simulate, inLockCode, ignoreLock);
     }
 
     @Override
@@ -85,25 +94,13 @@ public class CrateControllerInvWrapper implements IItemStorageHandler, LockedSto
         if (amount == 0 || (!codeMatches(inLockCode) && !ignoreLock))
             return ItemStack.EMPTY;
 
-        List<CrateConnection> connections = this.inv.findSlottedCrates(slot);
+        Target target = target(slot);
+        if (target == null)
+            return ItemStack.EMPTY;
 
-        for (CrateConnection connection : connections) {
-            if (connection == null) {
-                continue;
-            }
-
-            if (this.inv.getLevel().getBlockEntity(connection.getPos()) instanceof CrateBlockEntity crate) {
-                IItemStorageHandler storageHandler = Services.INVENTORY.getItemStorageHandler(crate, null).orElse(null);
-                if (storageHandler != null && storageHandler instanceof CrateSidedInv crateInv) {
-                    ItemStack response = inLockCode.isEmpty() ? crateInv.extractItem(slot, amount, simulate) : crateInv.extractItem(slot, amount, simulate, inLockCode, ignoreLock);
-                    if (!response.isEmpty()) {
-                        return response;
-                    }
-                }
-            }
-        }
-
-        return ItemStack.EMPTY;
+        return inLockCode.isEmpty()
+                ? target.crate().extractItem(target.slot(), amount, simulate)
+                : target.crate().extractItem(target.slot(), amount, simulate, inLockCode, ignoreLock);
     }
 
     private boolean codeMatches(String s) {
@@ -112,16 +109,31 @@ public class CrateControllerInvWrapper implements IItemStorageHandler, LockedSto
 
     @Override
     public int getSlotLimit(int slot) {
-        return 64;
+        Target target = target(slot);
+        return target == null ? 0 : target.crate().getSlotLimit(target.slot());
     }
 
     @Override
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-        return this.insertItem(slot, stack, true, "", true) == ItemStack.EMPTY;
+        Target target = target(slot);
+        return target != null && target.crate().isItemValid(target.slot(), stack);
     }
 
     @Override
     public void setStackInSlot(int slot, @NotNull ItemStack stack) {
+        Target target = target(slot);
+        if (target != null) {
+            target.crate().setStackInSlot(target.slot(), stack);
+        }
+    }
+
+    /** Delegated to the crate, so a rollback through a controller is lossless too. */
+    @Override
+    @NotNull
+    public Runnable captureSlot(int slot) {
+        Target target = target(slot);
+        return target == null ? () -> {
+        } : target.crate().captureSlot(target.slot());
     }
 
     @Override

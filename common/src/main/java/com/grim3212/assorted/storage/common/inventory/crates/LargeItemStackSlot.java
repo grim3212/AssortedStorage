@@ -31,8 +31,13 @@ public class LargeItemStackSlot extends SlotStorageHandler {
         return 1;
     }
 
+    /** Off the slot, not the handler: a locked slot that has run empty still shows its item here. */
     @Override
     public ItemStack getItem() {
+        if (this.getItemHandler() instanceof CrateSidedInv crate) {
+            return crate.getLargeItemStack(this.getContainerSlot()).getStack().copyWithCount(1);
+        }
+
         return super.getItem().copyWithCount(1);
     }
 

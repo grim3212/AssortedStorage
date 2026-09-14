@@ -29,6 +29,11 @@ public class LargeItemStack {
 	public LargeItemStack withStack(ItemStack stack) {
 		return new LargeItemStack(stack, stack.getCount(), this.getRotation(), this.isLocked());
 	}
+
+	/** Detached copy. The only lossless snapshot of a slot; an ItemStack cannot carry the rest. */
+	public LargeItemStack copy() {
+		return new LargeItemStack(this.stack.copy(), this.amount, this.rotation, this.locked);
+	}
 	
 	public LargeItemStack with(ItemStack stack, int amount) {
 		return new LargeItemStack(stack, amount, this.getRotation(), this.isLocked());
@@ -82,8 +87,8 @@ public class LargeItemStack {
 	}
 	
 	public ItemStack split(int amount, boolean allowEmpty) {
-		// Can only take a full stack at a time max
-		int i = Math.min(Math.min(amount, this.amount), 64);
+		// One stack at a time, sized by the item rather than a flat 64.
+		int i = Math.min(Math.min(amount, this.amount), this.stack.getMaxStackSize());
 		ItemStack itemstack = this.stack.copy();
 		itemstack.setCount(i);
 		this.amount -= i;

@@ -19,7 +19,10 @@ public final class StorageNeoForgeGameTests {
 
     @SubscribeEvent
     public static void registerGameTests(final RegisterEvent event) {
-        event.register(Registries.TEST_FUNCTION, helper -> StorageGameTests.forEach(
-                (name, function) -> helper.register(Identifier.fromNamespaceAndPath(Constants.MOD_ID, name), function)));
+        event.register(Registries.TEST_FUNCTION, helper -> {
+            StorageGameTests.forEach((name, function) -> helper.register(Identifier.fromNamespaceAndPath(Constants.MOD_ID, name), function));
+            // NeoForge only: what the mod looks like through this loader's own transfer API.
+            CrateTransferTests.register((name, function) -> helper.register(Identifier.fromNamespaceAndPath(Constants.MOD_ID, name), function));
+        });
     }
 }
