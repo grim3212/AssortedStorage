@@ -1,5 +1,15 @@
 # Changelog
 
+## 11.0.1
+
+- Storage crates no longer lose everything past a stack when a hopper, pipe or funnel starts a
+  transfer that does not go through.
+- Storage crates report how much they really hold and don't stop at 64.
+- Crate controllers list every slot of every crate they reach
+- Taking from a crate hands back a proper stack of an item that does not stack to 64
+- Locker doors close again instead of sticking open
+- Requires Assorted Lib 4.0.1.
+
 ## 11.0.0
 
 Updated to Minecraft 26.2, for NeoForge and Fabric.
