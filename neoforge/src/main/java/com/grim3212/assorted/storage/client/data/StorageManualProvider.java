@@ -28,7 +28,7 @@ public class StorageManualProvider extends LibManualProvider {
 
     @Override
     protected void addChapters() {
-        this.section(20, StorageBlocks.CRATES.getFirst().SINGLE.get());
+        this.section(80, StorageBlocks.CRATES.getFirst().SINGLE.get());
 
         this.addContainers();
         this.addCrates();
