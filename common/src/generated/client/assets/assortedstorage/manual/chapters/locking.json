@@ -1,0 +1,53 @@
+{
+  "pages": [
+    {
+      "type": "assortedlib:recipe",
+      "id": "workbench",
+      "recipes": [
+        "assortedstorage:locksmith_workbench"
+      ],
+      "text": "manual.assortedstorage.chapter.locking.workbench",
+      "title": "manual.assortedstorage.chapter.locking.workbench.title"
+    },
+    {
+      "type": "assortedlib:recipe",
+      "id": "locks",
+      "interval": 50,
+      "recipes": [
+        "assortedstorage:locksmith_lock",
+        "assortedstorage:locksmith_key"
+      ],
+      "text": "manual.assortedstorage.chapter.locking.locks",
+      "title": "manual.assortedstorage.chapter.locking.locks.title"
+    },
+    {
+      "type": "assortedlib:recipe",
+      "id": "key_ring",
+      "recipes": [
+        "assortedstorage:key_ring"
+      ],
+      "text": "manual.assortedstorage.chapter.locking.key_ring",
+      "title": "manual.assortedstorage.chapter.locking.key_ring.title"
+    },
+    {
+      "type": "assortedlib:item",
+      "id": "containers",
+      "items": [
+        "assortedstorage:locked_chest",
+        "assortedstorage:locked_barrel",
+        "assortedstorage:locked_hopper",
+        "assortedstorage:locked_shulker_box",
+        "assortedstorage:locked_ender_chest"
+      ],
+      "text": "manual.assortedstorage.chapter.locking.containers",
+      "title": "manual.assortedstorage.chapter.locking.containers.title"
+    },
+    {
+      "type": "assortedlib:text",
+      "id": "doors",
+      "text": "manual.assortedstorage.chapter.locking.doors",
+      "title": "manual.assortedstorage.chapter.locking.doors.title"
+    }
+  ],
+  "sort_order": 30
+}

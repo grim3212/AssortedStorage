@@ -1,5 +1,10 @@
 # Changelog
 
+## 11.1.1
+
+- Added instruction manual support
+- Requires Assorted Lib 4.1.0.
+
 ## 11.0.1
 
 - Storage crates no longer lose everything past a stack when a hopper, pipe or funnel starts a

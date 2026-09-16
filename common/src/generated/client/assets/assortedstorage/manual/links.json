@@ -1,0 +1,367 @@
+{
+  "links": [
+    {
+      "blocks": [
+        "assortedstorage:chest_stone",
+        "assortedstorage:chest_copper",
+        "assortedstorage:chest_iron",
+        "assortedstorage:chest_amethyst",
+        "assortedstorage:chest_emerald",
+        "assortedstorage:chest_gold",
+        "assortedstorage:chest_diamond",
+        "assortedstorage:chest_netherite",
+        "assortedstorage:chest_aluminum",
+        "assortedstorage:chest_tin",
+        "assortedstorage:chest_topaz",
+        "assortedstorage:chest_peridot",
+        "assortedstorage:chest_lead",
+        "assortedstorage:chest_nickel",
+        "assortedstorage:chest_sapphire",
+        "assortedstorage:chest_bronze",
+        "assortedstorage:chest_ruby",
+        "assortedstorage:chest_invar",
+        "assortedstorage:chest_silver",
+        "assortedstorage:chest_electrum",
+        "assortedstorage:chest_steel",
+        "assortedstorage:chest_platinum"
+      ],
+      "page": "assortedstorage:containers/chests"
+    },
+    {
+      "blocks": [
+        "assortedstorage:barrel_stone",
+        "assortedstorage:barrel_copper",
+        "assortedstorage:barrel_iron",
+        "assortedstorage:barrel_amethyst",
+        "assortedstorage:barrel_emerald",
+        "assortedstorage:barrel_gold",
+        "assortedstorage:barrel_diamond",
+        "assortedstorage:barrel_netherite",
+        "assortedstorage:barrel_aluminum",
+        "assortedstorage:barrel_tin",
+        "assortedstorage:barrel_topaz",
+        "assortedstorage:barrel_peridot",
+        "assortedstorage:barrel_lead",
+        "assortedstorage:barrel_nickel",
+        "assortedstorage:barrel_sapphire",
+        "assortedstorage:barrel_bronze",
+        "assortedstorage:barrel_ruby",
+        "assortedstorage:barrel_invar",
+        "assortedstorage:barrel_silver",
+        "assortedstorage:barrel_electrum",
+        "assortedstorage:barrel_steel",
+        "assortedstorage:barrel_platinum"
+      ],
+      "page": "assortedstorage:containers/barrels"
+    },
+    {
+      "blocks": [
+        "assortedstorage:hopper_stone",
+        "assortedstorage:hopper_copper",
+        "assortedstorage:hopper_iron",
+        "assortedstorage:hopper_amethyst",
+        "assortedstorage:hopper_emerald",
+        "assortedstorage:hopper_gold",
+        "assortedstorage:hopper_diamond",
+        "assortedstorage:hopper_netherite",
+        "assortedstorage:hopper_aluminum",
+        "assortedstorage:hopper_tin",
+        "assortedstorage:hopper_topaz",
+        "assortedstorage:hopper_peridot",
+        "assortedstorage:hopper_lead",
+        "assortedstorage:hopper_nickel",
+        "assortedstorage:hopper_sapphire",
+        "assortedstorage:hopper_bronze",
+        "assortedstorage:hopper_ruby",
+        "assortedstorage:hopper_invar",
+        "assortedstorage:hopper_silver",
+        "assortedstorage:hopper_electrum",
+        "assortedstorage:hopper_steel",
+        "assortedstorage:hopper_platinum"
+      ],
+      "page": "assortedstorage:containers/hoppers"
+    },
+    {
+      "blocks": [
+        "assortedstorage:shulker_box_stone",
+        "assortedstorage:shulker_box_copper",
+        "assortedstorage:shulker_box_iron",
+        "assortedstorage:shulker_box_amethyst",
+        "assortedstorage:shulker_box_emerald",
+        "assortedstorage:shulker_box_gold",
+        "assortedstorage:shulker_box_diamond",
+        "assortedstorage:shulker_box_netherite",
+        "assortedstorage:shulker_box_aluminum",
+        "assortedstorage:shulker_box_tin",
+        "assortedstorage:shulker_box_topaz",
+        "assortedstorage:shulker_box_peridot",
+        "assortedstorage:shulker_box_lead",
+        "assortedstorage:shulker_box_nickel",
+        "assortedstorage:shulker_box_sapphire",
+        "assortedstorage:shulker_box_bronze",
+        "assortedstorage:shulker_box_ruby",
+        "assortedstorage:shulker_box_invar",
+        "assortedstorage:shulker_box_silver",
+        "assortedstorage:shulker_box_electrum",
+        "assortedstorage:shulker_box_steel",
+        "assortedstorage:shulker_box_platinum"
+      ],
+      "page": "assortedstorage:containers/shulker_boxes"
+    },
+    {
+      "items": [
+        "assortedstorage:level_upgrade_stone",
+        "assortedstorage:level_upgrade_copper",
+        "assortedstorage:level_upgrade_iron",
+        "assortedstorage:level_upgrade_amethyst",
+        "assortedstorage:level_upgrade_emerald",
+        "assortedstorage:level_upgrade_gold",
+        "assortedstorage:level_upgrade_diamond",
+        "assortedstorage:level_upgrade_netherite",
+        "assortedstorage:level_upgrade_aluminum",
+        "assortedstorage:level_upgrade_tin",
+        "assortedstorage:level_upgrade_topaz",
+        "assortedstorage:level_upgrade_peridot",
+        "assortedstorage:level_upgrade_lead",
+        "assortedstorage:level_upgrade_nickel",
+        "assortedstorage:level_upgrade_sapphire",
+        "assortedstorage:level_upgrade_bronze",
+        "assortedstorage:level_upgrade_ruby",
+        "assortedstorage:level_upgrade_invar",
+        "assortedstorage:level_upgrade_silver",
+        "assortedstorage:level_upgrade_electrum",
+        "assortedstorage:level_upgrade_steel",
+        "assortedstorage:level_upgrade_platinum"
+      ],
+      "page": "assortedstorage:containers/level_upgrades"
+    },
+    {
+      "blocks": [
+        "assortedstorage:oak_crate",
+        "assortedstorage:spruce_crate",
+        "assortedstorage:birch_crate",
+        "assortedstorage:acacia_crate",
+        "assortedstorage:cherry_crate",
+        "assortedstorage:jungle_crate",
+        "assortedstorage:dark_oak_crate",
+        "assortedstorage:pale_oak_crate",
+        "assortedstorage:crimson_crate",
+        "assortedstorage:warped_crate",
+        "assortedstorage:mangrove_crate",
+        "assortedstorage:bamboo_crate"
+      ],
+      "page": "assortedstorage:crates/crates"
+    },
+    {
+      "blocks": [
+        "assortedstorage:oak_crate_double",
+        "assortedstorage:oak_crate_triple",
+        "assortedstorage:oak_crate_quadruple",
+        "assortedstorage:spruce_crate_double",
+        "assortedstorage:spruce_crate_triple",
+        "assortedstorage:spruce_crate_quadruple",
+        "assortedstorage:birch_crate_double",
+        "assortedstorage:birch_crate_triple",
+        "assortedstorage:birch_crate_quadruple",
+        "assortedstorage:acacia_crate_double",
+        "assortedstorage:acacia_crate_triple",
+        "assortedstorage:acacia_crate_quadruple",
+        "assortedstorage:cherry_crate_double",
+        "assortedstorage:cherry_crate_triple",
+        "assortedstorage:cherry_crate_quadruple",
+        "assortedstorage:jungle_crate_double",
+        "assortedstorage:jungle_crate_triple",
+        "assortedstorage:jungle_crate_quadruple",
+        "assortedstorage:dark_oak_crate_double",
+        "assortedstorage:dark_oak_crate_triple",
+        "assortedstorage:dark_oak_crate_quadruple",
+        "assortedstorage:pale_oak_crate_double",
+        "assortedstorage:pale_oak_crate_triple",
+        "assortedstorage:pale_oak_crate_quadruple",
+        "assortedstorage:crimson_crate_double",
+        "assortedstorage:crimson_crate_triple",
+        "assortedstorage:crimson_crate_quadruple",
+        "assortedstorage:warped_crate_double",
+        "assortedstorage:warped_crate_triple",
+        "assortedstorage:warped_crate_quadruple",
+        "assortedstorage:mangrove_crate_double",
+        "assortedstorage:mangrove_crate_triple",
+        "assortedstorage:mangrove_crate_quadruple",
+        "assortedstorage:bamboo_crate_double",
+        "assortedstorage:bamboo_crate_triple",
+        "assortedstorage:bamboo_crate_quadruple"
+      ],
+      "page": "assortedstorage:crates/sizes"
+    },
+    {
+      "blocks": [
+        "assortedstorage:crate_controller"
+      ],
+      "page": "assortedstorage:crates/controller"
+    },
+    {
+      "blocks": [
+        "assortedstorage:crate_bridge"
+      ],
+      "page": "assortedstorage:crates/bridge"
+    },
+    {
+      "blocks": [
+        "assortedstorage:crate_compacting"
+      ],
+      "page": "assortedstorage:crates/compacting"
+    },
+    {
+      "items": [
+        "assortedstorage:blank_upgrade",
+        "assortedstorage:glow_upgrade",
+        "assortedstorage:void_upgrade",
+        "assortedstorage:amount_upgrade",
+        "assortedstorage:redstone_upgrade"
+      ],
+      "page": "assortedstorage:crates/upgrades"
+    },
+    {
+      "items": [
+        "assortedstorage:bag",
+        "assortedstorage:bag_stone",
+        "assortedstorage:bag_copper",
+        "assortedstorage:bag_iron",
+        "assortedstorage:bag_amethyst",
+        "assortedstorage:bag_emerald",
+        "assortedstorage:bag_gold",
+        "assortedstorage:bag_diamond",
+        "assortedstorage:bag_netherite",
+        "assortedstorage:bag_aluminum",
+        "assortedstorage:bag_tin",
+        "assortedstorage:bag_topaz",
+        "assortedstorage:bag_peridot",
+        "assortedstorage:bag_lead",
+        "assortedstorage:bag_nickel",
+        "assortedstorage:bag_sapphire",
+        "assortedstorage:bag_bronze",
+        "assortedstorage:bag_ruby",
+        "assortedstorage:bag_invar",
+        "assortedstorage:bag_silver",
+        "assortedstorage:bag_electrum",
+        "assortedstorage:bag_steel",
+        "assortedstorage:bag_platinum"
+      ],
+      "page": "assortedstorage:bags/bags"
+    },
+    {
+      "items": [
+        "assortedstorage:ender_bag"
+      ],
+      "page": "assortedstorage:bags/ender_bag"
+    },
+    {
+      "blocks": [
+        "assortedstorage:locksmith_workbench"
+      ],
+      "page": "assortedstorage:locking/workbench"
+    },
+    {
+      "items": [
+        "assortedstorage:locksmith_lock",
+        "assortedstorage:locksmith_key"
+      ],
+      "page": "assortedstorage:locking/locks"
+    },
+    {
+      "items": [
+        "assortedstorage:key_ring"
+      ],
+      "page": "assortedstorage:locking/key_ring"
+    },
+    {
+      "blocks": [
+        "assortedstorage:locked_chest",
+        "assortedstorage:locked_barrel",
+        "assortedstorage:locked_hopper",
+        "assortedstorage:locked_shulker_box",
+        "assortedstorage:locked_ender_chest"
+      ],
+      "page": "assortedstorage:locking/containers"
+    },
+    {
+      "blocks": [
+        "assortedstorage:locked_iron_door",
+        "assortedstorage:locked_oak_door",
+        "assortedstorage:locked_spruce_door",
+        "assortedstorage:locked_birch_door",
+        "assortedstorage:locked_acacia_door",
+        "assortedstorage:locked_cherry_door",
+        "assortedstorage:locked_jungle_door",
+        "assortedstorage:locked_dark_oak_door",
+        "assortedstorage:locked_pale_oak_door",
+        "assortedstorage:locked_crimson_door",
+        "assortedstorage:locked_warped_door",
+        "assortedstorage:locked_mangrove_door",
+        "assortedstorage:locked_bamboo_door",
+        "assortedstorage:locked_copper_door",
+        "assortedstorage:locked_exposed_copper_door",
+        "assortedstorage:locked_weathered_copper_door",
+        "assortedstorage:locked_oxidized_copper_door",
+        "assortedstorage:locked_waxed_copper_door",
+        "assortedstorage:locked_waxed_exposed_copper_door",
+        "assortedstorage:locked_waxed_weathered_copper_door",
+        "assortedstorage:locked_waxed_oxidized_copper_door",
+        "assortedstorage:locked_quartz_door",
+        "assortedstorage:locked_glass_door",
+        "assortedstorage:locked_steel_door",
+        "assortedstorage:locked_chain_link_door"
+      ],
+      "page": "assortedstorage:locking/doors"
+    },
+    {
+      "blocks": [
+        "assortedstorage:locker"
+      ],
+      "page": "assortedstorage:furniture/locker"
+    },
+    {
+      "blocks": [
+        "assortedstorage:wood_cabinet",
+        "assortedstorage:glass_cabinet"
+      ],
+      "page": "assortedstorage:furniture/cabinets"
+    },
+    {
+      "blocks": [
+        "assortedstorage:gold_safe",
+        "assortedstorage:obsidian_safe"
+      ],
+      "page": "assortedstorage:furniture/safes"
+    },
+    {
+      "blocks": [
+        "assortedstorage:item_tower"
+      ],
+      "page": "assortedstorage:furniture/item_tower"
+    },
+    {
+      "blocks": [
+        "assortedstorage:oak_warehouse_crate",
+        "assortedstorage:spruce_warehouse_crate",
+        "assortedstorage:birch_warehouse_crate",
+        "assortedstorage:acacia_warehouse_crate",
+        "assortedstorage:cherry_warehouse_crate",
+        "assortedstorage:jungle_warehouse_crate",
+        "assortedstorage:dark_oak_warehouse_crate",
+        "assortedstorage:pale_oak_warehouse_crate",
+        "assortedstorage:crimson_warehouse_crate",
+        "assortedstorage:warped_warehouse_crate",
+        "assortedstorage:mangrove_warehouse_crate",
+        "assortedstorage:bamboo_warehouse_crate"
+      ],
+      "page": "assortedstorage:furniture/warehouse"
+    },
+    {
+      "items": [
+        "assortedstorage:rotator_majig"
+      ],
+      "page": "assortedstorage:furniture/rotator_majig"
+    }
+  ]
+}

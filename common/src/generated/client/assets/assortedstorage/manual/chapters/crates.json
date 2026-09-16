@@ -1,0 +1,129 @@
+{
+  "conditions": [
+    {
+      "type": "assortedlib:part_enabled",
+      "part": "crates"
+    }
+  ],
+  "pages": [
+    {
+      "type": "assortedlib:recipe",
+      "id": "crates",
+      "recipes": [
+        "assortedstorage:oak_crate",
+        "assortedstorage:spruce_crate",
+        "assortedstorage:birch_crate",
+        "assortedstorage:acacia_crate",
+        "assortedstorage:cherry_crate",
+        "assortedstorage:jungle_crate",
+        "assortedstorage:dark_oak_crate",
+        "assortedstorage:pale_oak_crate",
+        "assortedstorage:crimson_crate",
+        "assortedstorage:warped_crate",
+        "assortedstorage:mangrove_crate",
+        "assortedstorage:bamboo_crate"
+      ],
+      "text": "manual.assortedstorage.chapter.crates.crates",
+      "title": "manual.assortedstorage.chapter.crates.crates.title"
+    },
+    {
+      "type": "assortedlib:recipe",
+      "conditions": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "crates"
+        }
+      ],
+      "id": "sizes",
+      "interval": 50,
+      "recipes": [
+        "assortedstorage:oak_crate",
+        "assortedstorage:oak_crate_double",
+        "assortedstorage:oak_crate_triple",
+        "assortedstorage:oak_crate_quadruple"
+      ],
+      "text": "manual.assortedstorage.chapter.crates.sizes",
+      "title": "manual.assortedstorage.chapter.crates.sizes.title"
+    },
+    {
+      "type": "assortedlib:recipe",
+      "conditions": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "crates"
+        }
+      ],
+      "id": "controller",
+      "recipes": [
+        "assortedstorage:crate_controller"
+      ],
+      "text": "manual.assortedstorage.chapter.crates.controller",
+      "title": "manual.assortedstorage.chapter.crates.controller.title"
+    },
+    {
+      "type": "assortedlib:recipe",
+      "conditions": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "crates"
+        },
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "upgrades"
+        }
+      ],
+      "id": "bridge",
+      "interval": 60,
+      "recipes": [
+        "assortedstorage:crate_bridge_copper",
+        "assortedstorage:crate_bridge_bronze",
+        "assortedstorage:crate_bridge_gold"
+      ],
+      "text": "manual.assortedstorage.chapter.crates.bridge",
+      "title": "manual.assortedstorage.chapter.crates.bridge.title"
+    },
+    {
+      "type": "assortedlib:recipe",
+      "conditions": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "crates"
+        },
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "upgrades"
+        }
+      ],
+      "id": "compacting",
+      "interval": 60,
+      "recipes": [
+        "assortedstorage:crate_compacting_iron",
+        "assortedstorage:crate_compacting_aluminum",
+        "assortedstorage:crate_compacting_steel"
+      ],
+      "text": "manual.assortedstorage.chapter.crates.compacting",
+      "title": "manual.assortedstorage.chapter.crates.compacting.title"
+    },
+    {
+      "type": "assortedlib:recipe",
+      "conditions": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "upgrades"
+        }
+      ],
+      "id": "upgrades",
+      "interval": 50,
+      "recipes": [
+        "assortedstorage:blank_upgrade",
+        "assortedstorage:glow_upgrade",
+        "assortedstorage:void_upgrade",
+        "assortedstorage:amount_upgrade",
+        "assortedstorage:redstone_upgrade"
+      ],
+      "text": "manual.assortedstorage.chapter.crates.upgrades",
+      "title": "manual.assortedstorage.chapter.crates.upgrades.title"
+    }
+  ],
+  "sort_order": 10
+}

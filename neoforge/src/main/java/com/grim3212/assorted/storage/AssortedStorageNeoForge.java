@@ -1,6 +1,7 @@
 package com.grim3212.assorted.storage;
 
 import com.grim3212.assorted.storage.client.data.StorageLanguageProvider;
+import com.grim3212.assorted.storage.client.data.StorageManualProvider;
 import com.grim3212.assorted.lib.core.inventory.IInventoryBlockEntity;
 import com.grim3212.assorted.lib.core.inventory.IInventoryItem;
 import com.grim3212.assorted.lib.data.ForgeBlockTagProvider;
@@ -85,6 +86,7 @@ public class AssortedStorageNeoForge {
         event.addProvider(new StorageItemModelProvider(packOutput));
         event.addProvider(new StorageSpriteSourceProvider(packOutput, lookupProvider));
         event.addProvider(new StorageLanguageProvider(packOutput));
+        event.addProvider(new StorageManualProvider(packOutput));
     }
 
     /**

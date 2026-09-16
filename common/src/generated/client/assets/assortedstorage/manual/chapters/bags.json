@@ -1,0 +1,51 @@
+{
+  "conditions": [
+    {
+      "type": "assortedlib:part_enabled",
+      "part": "bags"
+    }
+  ],
+  "pages": [
+    {
+      "type": "assortedlib:recipe",
+      "id": "bags",
+      "recipes": [
+        "assortedstorage:bag",
+        "assortedstorage:bag_stone",
+        "assortedstorage:bag_copper",
+        "assortedstorage:bag_iron",
+        "assortedstorage:bag_amethyst",
+        "assortedstorage:bag_emerald",
+        "assortedstorage:bag_gold",
+        "assortedstorage:bag_diamond",
+        "assortedstorage:bag_netherite",
+        "assortedstorage:bag_aluminum",
+        "assortedstorage:bag_tin",
+        "assortedstorage:bag_topaz",
+        "assortedstorage:bag_peridot",
+        "assortedstorage:bag_lead",
+        "assortedstorage:bag_nickel",
+        "assortedstorage:bag_sapphire",
+        "assortedstorage:bag_bronze",
+        "assortedstorage:bag_ruby",
+        "assortedstorage:bag_invar",
+        "assortedstorage:bag_silver",
+        "assortedstorage:bag_electrum",
+        "assortedstorage:bag_steel",
+        "assortedstorage:bag_platinum"
+      ],
+      "text": "manual.assortedstorage.chapter.bags.bags",
+      "title": "manual.assortedstorage.chapter.bags.bags.title"
+    },
+    {
+      "type": "assortedlib:recipe",
+      "id": "ender_bag",
+      "recipes": [
+        "assortedstorage:ender_bag"
+      ],
+      "text": "manual.assortedstorage.chapter.bags.ender_bag",
+      "title": "manual.assortedstorage.chapter.bags.ender_bag.title"
+    }
+  ],
+  "sort_order": 20
+}

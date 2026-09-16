@@ -1,0 +1,77 @@
+{
+  "pages": [
+    {
+      "type": "assortedlib:recipe",
+      "id": "locker",
+      "recipes": [
+        "assortedstorage:locker"
+      ],
+      "text": "manual.assortedstorage.chapter.furniture.locker",
+      "title": "manual.assortedstorage.chapter.furniture.locker.title"
+    },
+    {
+      "type": "assortedlib:recipe",
+      "id": "cabinets",
+      "interval": 50,
+      "recipes": [
+        "assortedstorage:wood_cabinet",
+        "assortedstorage:glass_cabinet"
+      ],
+      "text": "manual.assortedstorage.chapter.furniture.cabinets",
+      "title": "manual.assortedstorage.chapter.furniture.cabinets.title"
+    },
+    {
+      "type": "assortedlib:recipe",
+      "id": "safes",
+      "interval": 50,
+      "recipes": [
+        "assortedstorage:gold_safe",
+        "assortedstorage:obsidian_safe"
+      ],
+      "text": "manual.assortedstorage.chapter.furniture.safes",
+      "title": "manual.assortedstorage.chapter.furniture.safes.title"
+    },
+    {
+      "type": "assortedlib:recipe",
+      "id": "item_tower",
+      "recipes": [
+        "assortedstorage:item_tower"
+      ],
+      "text": "manual.assortedstorage.chapter.furniture.item_tower",
+      "title": "manual.assortedstorage.chapter.furniture.item_tower.title"
+    },
+    {
+      "type": "assortedlib:recipe",
+      "id": "warehouse",
+      "recipes": [
+        "assortedstorage:oak_warehouse_crate",
+        "assortedstorage:spruce_warehouse_crate",
+        "assortedstorage:birch_warehouse_crate",
+        "assortedstorage:acacia_warehouse_crate",
+        "assortedstorage:cherry_warehouse_crate",
+        "assortedstorage:jungle_warehouse_crate",
+        "assortedstorage:dark_oak_warehouse_crate",
+        "assortedstorage:pale_oak_warehouse_crate",
+        "assortedstorage:crimson_warehouse_crate",
+        "assortedstorage:warped_warehouse_crate",
+        "assortedstorage:mangrove_warehouse_crate",
+        "assortedstorage:bamboo_warehouse_crate"
+      ],
+      "text": "manual.assortedstorage.chapter.furniture.warehouse",
+      "title": "manual.assortedstorage.chapter.furniture.warehouse.title"
+    },
+    {
+      "type": "assortedlib:recipe",
+      "id": "rotator_majig",
+      "interval": 60,
+      "recipes": [
+        "assortedstorage:rotator_majig_iron",
+        "assortedstorage:rotator_majig_aluminum",
+        "assortedstorage:rotator_majig_steel"
+      ],
+      "text": "manual.assortedstorage.chapter.furniture.rotator_majig",
+      "title": "manual.assortedstorage.chapter.furniture.rotator_majig.title"
+    }
+  ],
+  "sort_order": 40
+}
