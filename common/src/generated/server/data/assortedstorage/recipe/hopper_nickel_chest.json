@@ -6,6 +6,12 @@
     }
   ],
   "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "assortedlib:part_enabled",
+      "part": "hoppers"
+    }
+  ],
   "key": {
     "C": "assortedstorage:chest_nickel",
     "M": "#c:ingots/iron"

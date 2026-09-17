@@ -23,5 +23,6 @@ public final class StorageGameTests {
         BagTests.register(out);
         TooltipTests.register(out);
         AssetTests.register(out);
+        CrossLoaderDataTests.register(out);
     }
 }

@@ -15,6 +15,24 @@
     }
   ],
   "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "chests"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "registry": "minecraft:item",
+          "values": [
+            "c:ingots/iron"
+          ]
+        }
+      ]
+    }
+  ],
   "key": {
     "C": "#assortedstorage:chests/level_0",
     "M": "#c:ingots/iron"

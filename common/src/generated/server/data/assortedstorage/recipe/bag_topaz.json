@@ -15,6 +15,24 @@
     }
   ],
   "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "bags"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "registry": "minecraft:item",
+          "values": [
+            "c:gems/topaz"
+          ]
+        }
+      ]
+    }
+  ],
   "key": {
     "C": "#assortedstorage:bags/level_0",
     "M": "#c:gems/topaz"

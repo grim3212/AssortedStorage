@@ -15,6 +15,21 @@
     }
   ],
   "type": "minecraft:crafting_shapeless",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "crates"
+        },
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "upgrades"
+        }
+      ]
+    }
+  ],
   "ingredients": [
     "assortedstorage:blank_upgrade",
     "minecraft:glow_ink_sac"

@@ -15,6 +15,24 @@
     }
   ],
   "type": "minecraft:crafting_shaped",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "upgrades"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "registry": "minecraft:item",
+          "values": [
+            "c:ingots/electrum"
+          ]
+        }
+      ]
+    }
+  ],
   "key": {
     "B": "assortedstorage:blank_upgrade",
     "M": "#c:ingots/electrum"

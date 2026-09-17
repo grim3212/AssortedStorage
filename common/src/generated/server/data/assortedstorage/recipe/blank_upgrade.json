@@ -6,6 +6,12 @@
     }
   ],
   "type": "minecraft:crafting_shaped",
+  "fabric:load_conditions": [
+    {
+      "condition": "assortedlib:part_enabled",
+      "part": "upgrades"
+    }
+  ],
   "key": {
     "P": "#minecraft:planks",
     "W": "#c:paper"

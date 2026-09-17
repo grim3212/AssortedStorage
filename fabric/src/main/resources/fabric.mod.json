@@ -19,9 +19,6 @@
     ],
     "client": [
       "com.grim3212.assorted.storage.AssortedStorageFabricClient"
-    ],
-    "fabric-datagen": [
-      "com.grim3212.assorted.storage.AssortedStorageFabricDatagen"
     ]
   },
   "mixins": [

@@ -15,6 +15,24 @@
     }
   ],
   "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "barrels"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "registry": "minecraft:item",
+          "values": [
+            "c:ingots/tin"
+          ]
+        }
+      ]
+    }
+  ],
   "key": {
     "C": "#assortedstorage:barrels/level_0",
     "M": "#c:ingots/tin"

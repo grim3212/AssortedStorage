@@ -34,6 +34,12 @@
       "trigger": "minecraft:recipe_unlocked"
     }
   },
+  "fabric:load_conditions": [
+    {
+      "condition": "assortedlib:part_enabled",
+      "part": "crates"
+    }
+  ],
   "requirements": [
     [
       "has_the_recipe",

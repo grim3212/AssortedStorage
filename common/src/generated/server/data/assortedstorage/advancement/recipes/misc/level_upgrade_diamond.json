@@ -43,6 +43,24 @@
       "trigger": "minecraft:inventory_changed"
     }
   },
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "upgrades"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "registry": "minecraft:item",
+          "values": [
+            "c:gems/diamond"
+          ]
+        }
+      ]
+    }
+  ],
   "requirements": [
     [
       "has_the_recipe",

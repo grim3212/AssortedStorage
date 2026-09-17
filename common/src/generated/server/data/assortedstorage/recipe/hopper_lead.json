@@ -15,6 +15,24 @@
     }
   ],
   "type": "assortedstorage:locked_upgrading",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:and",
+      "values": [
+        {
+          "condition": "assortedlib:part_enabled",
+          "part": "hoppers"
+        },
+        {
+          "condition": "fabric:tags_populated",
+          "registry": "minecraft:item",
+          "values": [
+            "c:ingots/lead"
+          ]
+        }
+      ]
+    }
+  ],
   "key": {
     "C": "#assortedstorage:hoppers/level_1",
     "M": "#c:ingots/lead"

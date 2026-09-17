@@ -7,6 +7,15 @@
   ],
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:ingots/steel"
+      ]
+    }
+  ],
   "key": {
     "B": "#c:rods/blaze",
     "I": "#c:ingots/steel",
